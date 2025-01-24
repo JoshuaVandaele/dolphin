@@ -11,6 +11,8 @@ struct WindowSystemInfo;
 
 namespace UICommon
 {
+constexpr int RESTART_EXIT_CODE = 42;
+
 void Init();
 void Shutdown();
 

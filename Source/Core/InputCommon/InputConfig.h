@@ -30,6 +30,7 @@ public:
   ~InputConfig();
 
   bool LoadConfig();
+  void ResetConfig();
   void SaveConfig();
 
   template <typename T, typename... Args>

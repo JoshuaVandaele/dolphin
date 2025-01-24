@@ -34,11 +34,14 @@ private:
   void CreateBasic();
   void CreateAutoUpdate();
   void CreateFallbackRegion();
+  void CreateReset();
   void AddDescriptions();
 
   void LoadConfig();
   void OnSaveConfig();
   void OnEmulationStateChanged(Core::State state);
+  void ResetDolphin();
+  void ResetHotkeys();
 
   // Widgets
   QVBoxLayout* m_main_layout;
@@ -49,6 +52,11 @@ private:
   ConfigBool* m_checkbox_cheats;
   ConfigBool* m_checkbox_override_region_settings;
   ConfigBool* m_checkbox_auto_disc_change;
+  ToolTipPushButton* m_button_reset_dolphin;
+  ToolTipPushButton* m_button_reset_config;
+  ToolTipPushButton* m_button_reset_graphics;
+  ToolTipPushButton* m_button_reset_controller;
+  ToolTipPushButton* m_button_reset_hotkeys;
 #ifdef USE_DISCORD_PRESENCE
   ToolTipCheckBox* m_checkbox_discord_presence;
 #endif

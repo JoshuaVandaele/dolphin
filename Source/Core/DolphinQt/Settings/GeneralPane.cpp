@@ -10,17 +10,20 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QPalette>
 #include <QPushButton>
 #include <QSlider>
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include "Common/FileUtil.h"
 #include "Core/AchievementManager.h"
 #include "Core/Config/MainSettings.h"
 #include "Core/Config/UISettings.h"
 #include "Core/ConfigManager.h"
 #include "Core/Core.h"
 #include "Core/DolphinAnalytics.h"
+#include "Core/HotkeyManager.h"
 #include "Core/PowerPC/PowerPC.h"
 #include "Core/System.h"
 
@@ -34,6 +37,7 @@
 #include "DolphinQt/Settings.h"
 
 #include "UICommon/AutoUpdate.h"
+#include "UICommon/UICommon.h"
 #ifdef USE_DISCORD_PRESENCE
 #include "UICommon/DiscordPresence.h"
 #endif
@@ -81,6 +85,8 @@ void GeneralPane::CreateLayout()
   CreateAnalytics();
 #endif
 
+  CreateReset();
+
   m_main_layout->addStretch(1);
   setLayout(m_main_layout);
 }
@@ -96,6 +102,10 @@ void GeneralPane::OnEmulationStateChanged(Core::State state)
   m_checkbox_discord_presence->setEnabled(!running);
 #endif
   m_combobox_fallback_region->setEnabled(!running);
+  m_button_reset_config->setEnabled(!running);
+  m_button_reset_graphics->setEnabled(!running);
+  m_button_reset_controller->setEnabled(!running);
+  m_button_reset_dolphin->setEnabled(!running);
 }
 
 void GeneralPane::ConnectLayout()
@@ -131,6 +141,8 @@ void GeneralPane::ConnectLayout()
   connect(m_button_generate_new_identity, &QPushButton::clicked, this,
           &GeneralPane::GenerateNewIdentity);
 #endif
+  connect(m_button_reset_dolphin, &QPushButton::clicked, this, &GeneralPane::ResetDolphin);
+  connect(m_button_reset_hotkeys, &QPushButton::clicked, this, &GeneralPane::ResetHotkeys);
 }
 
 void GeneralPane::CreateBasic()
@@ -237,6 +249,29 @@ void GeneralPane::CreateAnalytics()
   analytics_group_layout->addWidget(m_button_generate_new_identity);
 }
 #endif
+
+void GeneralPane::CreateReset()
+{
+  auto* reset_group = new QGroupBox(tr("Reset Dolphin Settings"));
+  auto* reset_group_layout = new QVBoxLayout;
+  reset_group->setLayout(reset_group_layout);
+  m_main_layout->addWidget(reset_group);
+
+  m_button_reset_config = new ToolTipPushButton(tr("Reset Configuration"));
+  reset_group_layout->addWidget(m_button_reset_config);
+
+  m_button_reset_graphics = new ToolTipPushButton(tr("Reset Graphics Configuration"));
+  reset_group_layout->addWidget(m_button_reset_graphics);
+
+  m_button_reset_controller = new ToolTipPushButton(tr("Reset Controller Settings"));
+  reset_group_layout->addWidget(m_button_reset_controller);
+
+  m_button_reset_hotkeys = new ToolTipPushButton(tr("Reset Hotkeys"));
+  reset_group_layout->addWidget(m_button_reset_hotkeys);
+
+  m_button_reset_dolphin = new ToolTipPushButton(tr("Reset ALL Dolphin Settings"));
+  reset_group_layout->addWidget(m_button_reset_dolphin);
+}
 
 void GeneralPane::LoadConfig()
 {
@@ -366,6 +401,52 @@ void GeneralPane::GenerateNewIdentity()
 }
 #endif
 
+void GeneralPane::ResetDolphin()
+{
+  auto response = ModalMessageBox::question(
+      this, tr("Reset Dolphin"),
+      tr("Are you sure you want to restore all Dolphin settings to their default values? "
+         "This action cannot be undone!\n"
+         "All customizations or changes you've made will be lost.\n\n"
+         "Do you want to proceed?"),
+      // TODO: Change "Yes" into "Reset All Dolphin Settings"
+      QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel,
+      QMessageBox::StandardButton::Cancel);
+
+  if (response != QMessageBox::StandardButton::Yes)
+    return;
+
+  std::string config_path = File::GetUserPath(D_CONFIG_IDX);
+  bool success = File::DeleteDirRecursively(config_path);
+  if (!success)
+  {
+    ModalMessageBox::critical(
+        this, tr("Critical"),
+        tr("We were unable to delete the configuration directory. Dolphin has not been reset."));
+    return;
+  }
+  QCoreApplication::exit(UICommon::RESTART_EXIT_CODE);
+}
+
+void GeneralPane::ResetHotkeys()
+{
+  auto response = ModalMessageBox::question(
+      this, tr("Reset Hotkeys"),
+      tr("Are you sure you want to restore all hotkeys to their default values? "
+         "This action cannot be undone!\n"
+         "All customizations or changes you've made will be lost.\n\n"
+         "Do you want to proceed?"),
+      // TODO: Change "Yes" into "Reset All Hotkeys"
+      QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::Cancel,
+      QMessageBox::StandardButton::Cancel);
+
+  if (response != QMessageBox::StandardButton::Yes)
+    return;
+
+  HotkeyManagerEmu::GetConfig()->ResetConfig();
+  emit Settings::Instance().ConfigChanged();
+}
+
 void GeneralPane::AddDescriptions()
 {
   static constexpr char TR_DUALCORE_DESCRIPTION[] =
@@ -438,6 +519,9 @@ void GeneralPane::AddDescriptions()
       QT_TR_NOOP("Generate a new anonymous ID for your usage statistics. This will cause any "
                  "future statistics to be unassociated with your previous statistics.");
 #endif
+  static constexpr char TR_RESET_DOLPHIN_SETTINGS[] =
+      QT_TR_NOOP("Restore all settings to their default values. This action cannot be undone and "
+                 "will erase any customizations or changes you've made.");
 
   m_checkbox_dualcore->SetDescription(tr(TR_DUALCORE_DESCRIPTION));
 
@@ -469,4 +553,6 @@ void GeneralPane::AddDescriptions()
   m_button_generate_new_identity->SetTitle(tr("Generate a New Statistics Identity"));
   m_button_generate_new_identity->SetDescription(tr(TR_GENERATE_NEW_IDENTITY_DESCRIPTION));
 #endif
+  m_button_reset_dolphin->SetTitle(tr("Reset Dolphin to Default Settings"));
+  m_button_reset_dolphin->SetDescription(tr(TR_RESET_DOLPHIN_SETTINGS));
 }

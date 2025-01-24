@@ -1,6 +1,7 @@
 // Copyright 2015 Dolphin Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <optional>
 #ifdef _WIN32
 #include <cstdio>
 #include <string>
@@ -110,11 +111,40 @@ static bool QtMsgAlertHandler(const char* caption, const char* text, bool yes_no
   return false;
 }
 
+static std::optional<char*> getExecutablePath()
+{
+  char path[PATH_MAX];
+
+#ifdef _WIN32
+  if (GetModuleFileNameA(nullptr, path, sizeof(path)) == 0)
+  {
+    return nullptr;
+  }
+#elif __APPLE__
+  uint32_t size = sizeof(path);
+  if (_NSGetExecutablePath(path, &size) != 0)
+  {
+    return nullptr;
+  }
+#elif __linux__
+  ssize_t len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+  if (len == -1)
+  {
+    return nullptr;
+  }
+  path[len] = '\0';
+#else
+  return nullptr;
+#endif
+
+  return path;
+}
+
 #ifdef _WIN32
 #define main app_main
 #endif
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[], char* envp[])
 {
 #ifdef _WIN32
   const bool console_attached = AttachConsole(ATTACH_PARENT_PROCESS) != FALSE;
@@ -296,6 +326,19 @@ int main(int argc, char* argv[])
   Core::Shutdown(Core::System::GetInstance());
   UICommon::Shutdown();
   Host::GetInstance()->deleteLater();
+
+  if (retval == UICommon::RESTART_EXIT_CODE)
+  {
+    const std::optional<char*> path = getExecutablePath();
+
+    if (path.has_value() && execve(path.value(), argv, envp) == -1)
+    {
+      ModalMessageBox::critical(
+          nullptr, QObject::tr("Error"),
+          QObject::tr("We couldn't restart dolphin automatically. Please start it manually."));
+      retval = 1;
+    }
+  }
 
   return retval;
 }

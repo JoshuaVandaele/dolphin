@@ -188,6 +188,7 @@ void MappingWindow::CreateMainLayout()
 
 void MappingWindow::ConnectWidgets()
 {
+  connect(&Settings::Instance(), &Settings::ConfigChanged, this, &MappingWindow::ConfigChanged);
   connect(&Settings::Instance(), &Settings::DevicesChanged, this, &MappingWindow::ConfigChanged);
   connect(this, &MappingWindow::ConfigChanged, this, &MappingWindow::UpdateDeviceList);
   connect(m_devices_combo, &QComboBox::currentIndexChanged, this, &MappingWindow::OnSelectDevice);

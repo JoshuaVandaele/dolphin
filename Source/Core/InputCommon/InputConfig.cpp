@@ -125,6 +125,13 @@ bool InputConfig::LoadConfig()
   }
 }
 
+void InputConfig::ResetConfig()
+{
+  const std::string ini_filename = File::GetUserPath(D_CONFIG_IDX) + m_ini_name + ".ini";
+  File::Delete(ini_filename);
+  LoadConfig();
+}
+
 void InputConfig::SaveConfig()
 {
   std::string ini_filename = File::GetUserPath(D_CONFIG_IDX) + m_ini_name + ".ini";
