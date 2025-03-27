@@ -1,0 +1,117 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "Create Build Directory",
+      "command": "mkdir",
+      "args": ["-p", "${workspaceFolder}/build/Binaries"],
+      "group": {
+        "kind": "build"
+      }
+    },
+    {
+      "type": "shell",
+      "label": "Sys Binaries Symlink",
+      "command": "ln",
+      "args": [
+        "-fs",
+        "${workspaceFolder}/Data/Sys",
+        "${workspaceFolder}/build/Binaries/"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "group": {
+        "kind": "build"
+      },
+      "dependsOn": "Create Build Directory"
+    },
+    {
+      "type": "shell",
+      "label": "CMake Build (Release)",
+      "command": "cmake",
+      "args": [
+        "..",
+        "-DLINUX_LOCAL_DEV=true",
+        "-DCMAKE_CXX_FLAGS=-march=native -Ofast -pipe",
+        "-DCMAKE_C_FLAGS=-march=native -Ofast -pipe",
+        "-DRUSTFLAGS=-Ctarget-cpu=native -Cllvm-args=-enable-dfa-jump-thread",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DUSE_SYSTEM_LIBS=OFF",
+        "-DUSE_SYSTEM_SDL2=ON",
+        "-G=Ninja"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "group": {
+        "kind": "build"
+      },
+      "dependsOn": "Sys Binaries Symlink"
+    },
+    {
+      "type": "shell",
+      "label": "CMake Build (Debug)",
+      "command": "cmake",
+      "args": [
+        "..",
+        "-DLINUX_LOCAL_DEV=true",
+        "-DCMAKE_CXX_FLAGS=-march=native -O0 -fsanitize=address,undefined",
+        "-DCMAKE_C_FLAGS=-march=native -O0 -fsanitize=address,undefined",
+        "-DRUSTFLAGS=-Ctarget-cpu=native -Cllvm-args=-enable-dfa-jump-thread",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DUSE_SYSTEM_LIBS=OFF",
+        "-DUSE_SYSTEM_SDL2=ON",
+        "-G=Ninja"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "group": {
+        "kind": "build"
+      },
+      "dependsOn": "Sys Binaries Symlink"
+    },
+    {
+      "type": "shell",
+      "label": "Build Dolphin (Release)",
+      "command": "ninja",
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "dependsOn": "CMake Build (Release)"
+    },
+    {
+      "type": "shell",
+      "label": "Build Dolphin (Debug)",
+      "command": "ninja",
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "dependsOn": "CMake Build (Debug)"
+    },
+    {
+      "type": "shell",
+      "label": "Test Dolphin",
+      "command": "make",
+      "args": ["-j", "$(nproc)", "unittests"],
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "dependsOn": "CMake Build (Release)"
+    }
+  ]
+}
