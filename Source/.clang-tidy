@@ -1,0 +1,31 @@
+Checks: "-*,readability-identifier-naming"
+HeaderFilterRegex: ".*"
+CheckOptions:
+  # Classes
+  readability-identifier-naming.AbstractClassCase: CamelCase
+  readability-identifier-naming.ClassCase: CamelCase
+
+  # Enums
+  readability-identifier-naming.EnumCase: CamelCase
+
+  # Functions
+  readability-identifier-naming.FunctionCase: CamelCase
+  # These exceptions allow specific function names to bypass the CamelCase rule.
+  # They are needed because certain names are often defined by external libraries
+  readability-identifier-naming.FunctionIgnoredRegexp: "^(parse|format|begin|end|cbegin|cend|size)$"
+
+  # Structs
+  readability-identifier-naming.StructCase: CamelCase
+
+  # Constants
+  readability-identifier-naming.ConstexprVariableCase: UPPER_CASE
+  readability-identifier-naming.StaticConstantCase: UPPER_CASE # `StaticConstantCase` appears to only work with static local variables
+  readability-identifier-naming.GlobalConstantCase: UPPER_CASE
+
+  # Variables
+  readability-identifier-naming.VariableCase: lower_case
+  readability-identifier-naming.ClassMemberPrefix: m_
+  # Those two are currently broken for our use case,
+  # clang-tidy considers static variables to be global variables in a lot of instances: https://github.com/llvm/llvm-project/issues/60915
+  # readability-identifier-naming.GlobalVariablePrefix: g_
+  # readability-identifier-naming.StaticVariablePrefix: s_

@@ -8,7 +8,7 @@ set -euo pipefail
 # inspired by https://markentier.tech/posts/2020/10/faster-git-under-wsl2/#solution
 GIT=git
 if [ "$(uname -s)" == "Linux" ]; then
-  if [ "$(stat --file-system --format=%T `pwd -P`)" == "v9fs" ]; then
+  if [ "$(stat --file-system --format=%T $(pwd -P))" == "v9fs" ]; then
     GIT=git.exe
   fi
 fi
@@ -33,11 +33,31 @@ if ! [ -x "$(command -v $CLANG_FORMAT)" ]; then
   exit 1
 fi
 
+CLANG_TIDY=clang-tidy
+if ! [ -x "$(command -v $CLANG_TIDY)" ]; then
+  echo >&2 "error: clang-tidy is not installed"
+  exit 1
+fi
+
+# Unsupported flags by clang-tidy
+sed -i 's/-mno-direct-extern-access/ /g' build/compile_commands.json
+
+# Use the provided BUILD_DIR environment variable if set, otherwise default to "build".
+if [ -z "${BUILD_DIR:-}" ]; then
+  BUILD_DIR=build
+fi
+
+if [ ! -d "${BUILD_DIR}" ]; then
+  echo >&2 "error: Build directory '${BUILD_DIR}' does not exist."
+  echo >&2 "Please create the build directory with compile_commands.json or set the BUILD_DIR variable."
+  exit 1
+fi
+
 FORCE=0
 
 if [ $# -gt 0 ]; then
   case "$1" in
-    -f|--force)
+  -f | --force)
     FORCE=1
     shift
     ;;
@@ -130,6 +150,14 @@ for f in ${modified_files}; do
   if [ -n "${last_line}" ]; then
     echo "!!! ${f} not compliant to coding style:"
     echo "Missing newline at end of file"
+    fail=1
+  fi
+
+  # Run clang-tidy on the file.
+  tidy_output=$($CLANG_TIDY "${f}" -p "${BUILD_DIR}" 2>&1 || true)
+  if [ -n "${tidy_output}" ]; then
+    echo "!!! ${f} has clang-tidy warnings/errors:"
+    echo "${tidy_output}"
     fail=1
   fi
 done
