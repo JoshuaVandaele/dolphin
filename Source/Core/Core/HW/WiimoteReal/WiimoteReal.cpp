@@ -317,8 +317,8 @@ void Wiimote::Read()
   {
     if (m_balance_board_dump_port > 0 && m_index == WIIMOTE_BALANCE_BOARD)
     {
-      static sf::UdpSocket Socket;
-      (void)Socket.send((char*)rpt.data(), rpt.size(), sf::IpAddress::LocalHost,
+      static sf::UdpSocket socket;
+      (void)socket.send((char*)rpt.data(), rpt.size(), sf::IpAddress::LocalHost,
                         m_balance_board_dump_port);
     }
 
@@ -338,8 +338,8 @@ bool Wiimote::Write()
 
   if (m_balance_board_dump_port > 0 && m_index == WIIMOTE_BALANCE_BOARD)
   {
-    static sf::UdpSocket Socket;
-    (void)Socket.send((char*)rpt.data(), rpt.size(), sf::IpAddress::LocalHost,
+    static sf::UdpSocket socket;
+    (void)socket.send((char*)rpt.data(), rpt.size(), sf::IpAddress::LocalHost,
                       m_balance_board_dump_port);
   }
   int ret = IOWrite(rpt.data(), rpt.size());
@@ -358,20 +358,20 @@ bool Wiimote::IsBalanceBoard()
     return false;
   // Initialise the extension by writing 0x55 to 0xa400f0, then writing 0x00 to 0xa400fb.
   // TODO: Use the structs for building these reports..
-  static const u8 init_extension_rpt1[MAX_PAYLOAD] = {
+  static const u8 INIT_EXTENSION_RPT1[MAX_PAYLOAD] = {
       WR_SET_REPORT | BT_OUTPUT, u8(OutputReportID::WriteData), 0x04, 0xa4, 0x00, 0xf0, 0x01, 0x55};
-  static const u8 init_extension_rpt2[MAX_PAYLOAD] = {
+  static const u8 INIT_EXTENSION_RPT2[MAX_PAYLOAD] = {
       WR_SET_REPORT | BT_OUTPUT, u8(OutputReportID::WriteData), 0x04, 0xa4, 0x00, 0xfb, 0x01, 0x00};
-  static const u8 status_report[] = {WR_SET_REPORT | BT_OUTPUT, u8(OutputReportID::RequestStatus),
+  static const u8 STATUS_REPORT[] = {WR_SET_REPORT | BT_OUTPUT, u8(OutputReportID::RequestStatus),
                                      0};
-  if (!IOWrite(init_extension_rpt1, sizeof(init_extension_rpt1)) ||
-      !IOWrite(init_extension_rpt2, sizeof(init_extension_rpt2)))
+  if (!IOWrite(INIT_EXTENSION_RPT1, sizeof(INIT_EXTENSION_RPT1)) ||
+      !IOWrite(INIT_EXTENSION_RPT2, sizeof(INIT_EXTENSION_RPT2)))
   {
     ERROR_LOG_FMT(WIIMOTE, "IsBalanceBoard(): Failed to initialise extension.");
     return false;
   }
 
-  int ret = IOWrite(status_report, sizeof(status_report));
+  int ret = IOWrite(STATUS_REPORT, sizeof(STATUS_REPORT));
   u8 buf[MAX_PAYLOAD];
   while (ret != 0)
   {
@@ -388,7 +388,7 @@ bool Wiimote::IsBalanceBoard()
       if (!status->extension)
         return false;
       // Read two bytes from 0xa400fe to identify the extension.
-      static const u8 identify_ext_rpt[] = {WR_SET_REPORT | BT_OUTPUT,
+      static const u8 IDENTIFY_EXT_RPT[] = {WR_SET_REPORT | BT_OUTPUT,
                                             u8(OutputReportID::ReadData),
                                             0x04,
                                             0xa4,
@@ -396,7 +396,7 @@ bool Wiimote::IsBalanceBoard()
                                             0xfe,
                                             0x02,
                                             0x00};
-      ret = IOWrite(identify_ext_rpt, sizeof(identify_ext_rpt));
+      ret = IOWrite(IDENTIFY_EXT_RPT, sizeof(IDENTIFY_EXT_RPT));
       break;
     }
     case InputReportID::ReadDataReply:
@@ -527,15 +527,15 @@ void Wiimote::Prepare()
 bool Wiimote::PrepareOnThread()
 {
   // Set reporting mode to non-continuous core buttons and turn on rumble.
-  u8 static const mode_report[] = {WR_SET_REPORT | BT_OUTPUT, u8(OutputReportID::ReportMode), 1,
+  u8 static const MODE_REPORT[] = {WR_SET_REPORT | BT_OUTPUT, u8(OutputReportID::ReportMode), 1,
                                    u8(InputReportID::ReportCore)};
 
   // Request status and turn off rumble.
-  u8 static const req_status_report[] = {WR_SET_REPORT | BT_OUTPUT,
+  u8 static const REQ_STATUS_REPORT[] = {WR_SET_REPORT | BT_OUTPUT,
                                          u8(OutputReportID::RequestStatus), 0};
 
-  return IOWrite(mode_report, sizeof(mode_report)) &&
-         (Common::SleepCurrentThread(200), IOWrite(req_status_report, sizeof(req_status_report)));
+  return IOWrite(MODE_REPORT, sizeof(MODE_REPORT)) &&
+         (Common::SleepCurrentThread(200), IOWrite(REQ_STATUS_REPORT, sizeof(REQ_STATUS_REPORT)));
 }
 
 void Wiimote::EmuStop()

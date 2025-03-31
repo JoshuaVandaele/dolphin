@@ -28,10 +28,10 @@ void DSPEmitter::multiply()
   //	if ((g_dsp.r.sr & SR_MUL_MODIFY) == 0)
   const OpArg sr_reg = m_gpr.GetReg(DSP_REG_SR);
   TEST(16, sr_reg, Imm16(SR_MUL_MODIFY));
-  FixupBranch noMult2 = J_CC(CC_NZ);
+  FixupBranch no_mult2 = J_CC(CC_NZ);
   //		prod <<= 1;
   ADD(64, R(RAX), R(RAX));
-  SetJumpTarget(noMult2);
+  SetJumpTarget(no_mult2);
   m_gpr.PutReg(DSP_REG_SR, false);
   //	return prod;
 }
@@ -80,13 +80,13 @@ void DSPEmitter::multiply_mulx(u8 axh0, u8 axh1)
   //	if ((sign == 1) && (g_dsp.r.sr & SR_MUL_UNSIGNED)) //unsigned
   const OpArg sr_reg = m_gpr.GetReg(DSP_REG_SR);
   TEST(16, sr_reg, Imm16(SR_MUL_UNSIGNED));
-  FixupBranch unsignedMul = J_CC(CC_NZ);
+  FixupBranch unsigned_mul = J_CC(CC_NZ);
   //		prod = (s16)a * (s16)b; //signed
   MOVSX(64, 16, RAX, R(RAX));
   IMUL(64, R(RCX));
-  FixupBranch signedMul = J(Jump::Near);
+  FixupBranch signed_mul = J(Jump::Near);
 
-  SetJumpTarget(unsignedMul);
+  SetJumpTarget(unsigned_mul);
   DSPJitRegCache c(m_gpr);
   m_gpr.PutReg(DSP_REG_SR, false);
   if ((axh0 == 0) && (axh1 == 0))
@@ -123,15 +123,15 @@ void DSPEmitter::multiply_mulx(u8 axh0, u8 axh1)
   }
 
   m_gpr.FlushRegs(c);
-  SetJumpTarget(signedMul);
+  SetJumpTarget(signed_mul);
 
   //	Conditionally multiply by 2.
   //	if ((g_dsp.r.sr & SR_MUL_MODIFY) == 0)
   TEST(16, sr_reg, Imm16(SR_MUL_MODIFY));
-  FixupBranch noMult2 = J_CC(CC_NZ);
+  FixupBranch no_mult2 = J_CC(CC_NZ);
   //		prod <<= 1;
   ADD(64, R(RAX), R(RAX));
-  SetJumpTarget(noMult2);
+  SetJumpTarget(no_mult2);
   m_gpr.PutReg(DSP_REG_SR, false);
   //	return prod;
 }

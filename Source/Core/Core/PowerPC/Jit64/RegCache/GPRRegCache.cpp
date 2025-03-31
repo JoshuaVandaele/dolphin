@@ -32,7 +32,7 @@ OpArg GPRRegCache::GetDefaultLocation(preg_t preg) const
 
 std::span<const X64Reg> GPRRegCache::GetAllocationOrder() const
 {
-  static constexpr X64Reg allocation_order[] = {
+  static constexpr X64Reg ALLOCATION_ORDER[] = {
 #ifdef _WIN32
       RSI, RDI, R13, R14, R15, R8,
       R9,  R10, R11, R12, RCX
@@ -41,7 +41,7 @@ std::span<const X64Reg> GPRRegCache::GetAllocationOrder() const
       R8,  R9,  R10, R11, RCX
 #endif
   };
-  return allocation_order;
+  return ALLOCATION_ORDER;
 }
 
 void GPRRegCache::SetImmediate32(preg_t preg, u32 imm_value, bool dirty)

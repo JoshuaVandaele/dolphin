@@ -14,8 +14,8 @@ bool FileOpenEventFilter::eventFilter(QObject* object, QEvent* event)
 {
   if (event->type() == QEvent::FileOpen)
   {
-    auto* openEvent = static_cast<QFileOpenEvent*>(event);
-    emit fileOpened(openEvent->file());
+    auto* open_event = static_cast<QFileOpenEvent*>(event);
+    emit fileOpened(open_event->file());
     return true;
   }
 

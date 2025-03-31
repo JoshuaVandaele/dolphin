@@ -22,7 +22,7 @@ constexpr size_t NUM_IDLE_SIGS = 8;
 constexpr size_t MAX_IDLE_SIG_SIZE = 6;
 
 // 0xFFFF means ignore.
-constexpr u16 idle_skip_sigs[NUM_IDLE_SIGS][MAX_IDLE_SIG_SIZE + 1] = {
+constexpr u16 IDLE_SKIP_SIGS[NUM_IDLE_SIGS][MAX_IDLE_SIG_SIZE + 1] = {
     // From AX:
     {0x26fc,          // LRS   $30, @DMBH
      0x02c0, 0x8000,  // ANDCF $30, #0x8000
@@ -155,11 +155,11 @@ void Analyzer::FindIdleSkips(const SDSP& dsp, u16 start_addr, u16 end_addr)
       bool found = false;
       for (size_t i = 0; i < MAX_IDLE_SIG_SIZE + 1; i++)
       {
-        if (idle_skip_sigs[s][i] == 0)
+        if (IDLE_SKIP_SIGS[s][i] == 0)
           found = true;
-        if (idle_skip_sigs[s][i] == 0xFFFF)
+        if (IDLE_SKIP_SIGS[s][i] == 0xFFFF)
           continue;
-        if (idle_skip_sigs[s][i] != dsp.ReadIMEM(static_cast<u16>(addr + i)))
+        if (IDLE_SKIP_SIGS[s][i] != dsp.ReadIMEM(static_cast<u16>(addr + i)))
           break;
       }
       if (found)

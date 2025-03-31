@@ -114,7 +114,7 @@ void ConfigComplexChoice::Reset()
 
 void ConfigComplexChoice::SaveValue(int choice)
 {
-  auto Set = [this](auto& setting, auto& value) {
+  auto set = [this](auto& setting, auto& value) {
     if (m_layer != nullptr)
     {
       m_layer->Set(setting.GetLocation(), value);
@@ -125,8 +125,8 @@ void ConfigComplexChoice::SaveValue(int choice)
     Config::SetBaseOrCurrent(setting, value);
   };
 
-  std::visit(Set, m_setting1, m_options[choice].first);
-  std::visit(Set, m_setting2, m_options[choice].second);
+  std::visit(set, m_setting1, m_options[choice].first);
+  std::visit(set, m_setting2, m_options[choice].second);
 }
 
 void ConfigComplexChoice::UpdateComboIndex()

@@ -24,9 +24,9 @@ static void LogCallback(const char* format, ...)
   if (instance == nullptr)
     return;
 
-  constexpr auto log_type = Common::Log::LogType::AUDIO;
-  constexpr auto log_level = Common::Log::LogLevel::LINFO;
-  if (!instance->IsEnabled(log_type, log_level))
+  constexpr auto LOG_TYPE = Common::Log::LogType::AUDIO;
+  constexpr auto LOG_LEVEL = Common::Log::LogLevel::LINFO;
+  if (!instance->IsEnabled(LOG_TYPE, LOG_LEVEL))
     return;
 
   va_list args;
@@ -37,7 +37,7 @@ static void LogCallback(const char* format, ...)
   const std::string message = StringFromFormatV(adapted_format.c_str(), args);
   va_end(args);
 
-  instance->LogWithFullPath(log_level, log_type, filename, lineno, message.c_str());
+  instance->LogWithFullPath(LOG_LEVEL, LOG_TYPE, filename, lineno, message.c_str());
 }
 
 static void DestroyContext(cubeb* ctx)

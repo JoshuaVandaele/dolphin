@@ -56,7 +56,7 @@ void* GLContextEGL::GetFuncAddress(const std::string& name)
 void GLContextEGL::DetectMode()
 {
   EGLint num_configs;
-  bool supportsGL = false, supportsGLES3 = false;
+  bool supports_gl = false, supports_gle_s3 = false;
   std::array<int, 3> renderable_types{{EGL_OPENGL_BIT, EGL_OPENGL_ES3_BIT_KHR}};
 
   for (auto renderable_type : renderable_types)
@@ -94,26 +94,26 @@ void GLContextEGL::DetectMode()
 
     for (int i = 0; i < num_configs; ++i)
     {
-      EGLint attribVal;
+      EGLint attrib_val;
       bool ret;
-      ret = eglGetConfigAttrib(m_egl_display, config[i], EGL_RENDERABLE_TYPE, &attribVal);
+      ret = eglGetConfigAttrib(m_egl_display, config[i], EGL_RENDERABLE_TYPE, &attrib_val);
       if (ret)
       {
-        if (attribVal & EGL_OPENGL_BIT)
-          supportsGL = true;
-        if (attribVal & EGL_OPENGL_ES3_BIT_KHR)
-          supportsGLES3 = true;
+        if (attrib_val & EGL_OPENGL_BIT)
+          supports_gl = true;
+        if (attrib_val & EGL_OPENGL_ES3_BIT_KHR)
+          supports_gle_s3 = true;
       }
     }
     delete[] config;
   }
 
-  if (supportsGL)
+  if (supports_gl)
   {
     INFO_LOG_FMT(VIDEO, "Using OpenGL");
     m_opengl_mode = Mode::OpenGL;
   }
-  else if (supportsGLES3)
+  else if (supports_gle_s3)
   {
     INFO_LOG_FMT(VIDEO, "Using OpenGL|ES");
     m_opengl_mode = Mode::OpenGLES;

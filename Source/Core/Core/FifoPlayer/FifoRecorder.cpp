@@ -326,9 +326,9 @@ void FifoRecorder::WriteGPCommand(const u8* data, u32 size)
     }
 
     // Copy data to buffer
-    size_t currentSize = m_FifoData.size();
-    m_FifoData.resize(currentSize + size);
-    memcpy(&m_FifoData[currentSize], data, size);
+    size_t current_size = m_FifoData.size();
+    m_FifoData.resize(current_size + size);
+    memcpy(&m_FifoData[current_size], data, size);
   }
 
   if (m_FrameEnded && !m_FifoData.empty())
@@ -358,38 +358,38 @@ void FifoRecorder::UseMemory(u32 address, u32 size, MemoryUpdate::Type type, boo
 {
   auto& memory = m_system.GetMemory();
 
-  u8* curData;
-  u8* newData;
+  u8* cur_data;
+  u8* new_data;
   if (address & 0x10000000)
   {
-    curData = &m_ExRam[address & memory.GetExRamMask()];
-    newData = &memory.GetEXRAM()[address & memory.GetExRamMask()];
+    cur_data = &m_ExRam[address & memory.GetExRamMask()];
+    new_data = &memory.GetEXRAM()[address & memory.GetExRamMask()];
   }
   else
   {
-    curData = &m_Ram[address & memory.GetRamMask()];
-    newData = &memory.GetRAM()[address & memory.GetRamMask()];
+    cur_data = &m_Ram[address & memory.GetRamMask()];
+    new_data = &memory.GetRAM()[address & memory.GetRamMask()];
   }
 
-  if (!dynamicUpdate && memcmp(curData, newData, size) != 0)
+  if (!dynamicUpdate && memcmp(cur_data, new_data, size) != 0)
   {
     // Update current memory
-    memcpy(curData, newData, size);
+    memcpy(cur_data, new_data, size);
 
     // Record memory update
-    MemoryUpdate memUpdate;
-    memUpdate.address = address;
-    memUpdate.fifoPosition = (u32)(m_FifoData.size());
-    memUpdate.type = type;
-    memUpdate.data.resize(size);
-    std::copy_n(newData, size, memUpdate.data.begin());
+    MemoryUpdate mem_update;
+    mem_update.address = address;
+    mem_update.fifoPosition = (u32)(m_FifoData.size());
+    mem_update.type = type;
+    mem_update.data.resize(size);
+    std::copy_n(new_data, size, mem_update.data.begin());
 
-    m_CurrentFrame.memoryUpdates.push_back(std::move(memUpdate));
+    m_CurrentFrame.memoryUpdates.push_back(std::move(mem_update));
   }
   else if (dynamicUpdate)
   {
     // Shadow the data so it won't be recorded as changed by a future UseMemory
-    memcpy(curData, newData, size);
+    memcpy(cur_data, new_data, size);
   }
 }
 
@@ -447,8 +447,8 @@ void FifoRecorder::SetVideoMemory(const u32* bpMem, const u32* cpMem, const u32*
     memcpy(m_File->GetCPMem(), cpMem, FifoDataFile::CP_MEM_SIZE * 4);
     memcpy(m_File->GetXFMem(), xfMem, FifoDataFile::XF_MEM_SIZE * 4);
 
-    u32 xfRegsCopySize = std::min((u32)FifoDataFile::XF_REGS_SIZE, xfRegsSize);
-    memcpy(m_File->GetXFRegs(), xfRegs, xfRegsCopySize * 4);
+    u32 xf_regs_copy_size = std::min((u32)FifoDataFile::XF_REGS_SIZE, xfRegsSize);
+    memcpy(m_File->GetXFRegs(), xfRegs, xf_regs_copy_size * 4);
 
     memcpy(m_File->GetTexMem(), texMem_ptr, FifoDataFile::TEX_MEM_SIZE);
   }

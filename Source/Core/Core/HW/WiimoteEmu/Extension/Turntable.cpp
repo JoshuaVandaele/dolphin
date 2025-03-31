@@ -20,9 +20,9 @@
 
 namespace WiimoteEmu
 {
-constexpr std::array<u8, 6> turntable_id{{0x03, 0x00, 0xa4, 0x20, 0x01, 0x03}};
+constexpr std::array<u8, 6> TURNTABLE_ID{{0x03, 0x00, 0xa4, 0x20, 0x01, 0x03}};
 
-constexpr std::array<u16, 9> turntable_button_bitmasks{{
+constexpr std::array<u16, 9> TURNTABLE_BUTTON_BITMASKS{{
     Turntable::BUTTON_L_GREEN,
     Turntable::BUTTON_L_RED,
     Turntable::BUTTON_L_BLUE,
@@ -34,7 +34,7 @@ constexpr std::array<u16, 9> turntable_button_bitmasks{{
     Turntable::BUTTON_EUPHORIA,
 }};
 
-constexpr std::array<const char*, 6> turntable_button_names{{
+constexpr std::array<const char*, 6> TURNTABLE_BUTTON_NAMES{{
     _trans("Green Left"),
     _trans("Red Left"),
     _trans("Blue Left"),
@@ -49,7 +49,7 @@ Turntable::Turntable() : Extension1stParty("Turntable", _trans("DJ Turntable"))
 
   // buttons
   groups.emplace_back(m_buttons = new ControllerEmu::Buttons(_trans("Buttons")));
-  for (auto& turntable_button_name : turntable_button_names)
+  for (auto& turntable_button_name : TURNTABLE_BUTTON_NAMES)
   {
     m_buttons->AddInput(Translatability::Translate, turntable_button_name);
   }
@@ -68,9 +68,9 @@ Turntable::Turntable() : Extension1stParty("Turntable", _trans("DJ Turntable"))
                       new ControllerEmu::Slider("Table Right", _trans("Right Table")));
 
   // stick
-  constexpr auto gate_radius = ControlState(STICK_GATE_RADIUS) / STICK_RADIUS;
+  constexpr auto GATE_RADIUS = ControlState(STICK_GATE_RADIUS) / STICK_RADIUS;
   groups.emplace_back(m_stick =
-                          new ControllerEmu::OctagonAnalogStick(_trans("Stick"), gate_radius));
+                          new ControllerEmu::OctagonAnalogStick(_trans("Stick"), GATE_RADIUS));
 
   // effect dial
   groups.emplace_back(m_effect_dial = new ControllerEmu::Slider(_trans("Effect")));
@@ -131,7 +131,7 @@ void Turntable::BuildDesiredExtensionState(DesiredExtensionState* target_state)
   }
 
   // buttons
-  m_buttons->GetState(&tt_data.bt, turntable_button_bitmasks.data(), m_input_override_function);
+  m_buttons->GetState(&tt_data.bt, TURNTABLE_BUTTON_BITMASKS.data(), m_input_override_function);
 
   // flip button bits :/
   tt_data.bt ^= (BUTTON_L_GREEN | BUTTON_L_RED | BUTTON_L_BLUE | BUTTON_R_GREEN | BUTTON_R_RED |
@@ -149,7 +149,7 @@ void Turntable::Reset()
 {
   EncryptedExtension::Reset();
 
-  m_reg.identifier = turntable_id;
+  m_reg.identifier = TURNTABLE_ID;
 
   // TODO: Is there calibration data?
 }

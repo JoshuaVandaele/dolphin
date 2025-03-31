@@ -24,7 +24,7 @@ namespace InputProfile
 {
 namespace
 {
-constexpr int display_message_ms = 3000;
+constexpr int DISPLAY_MESSAGE_MS = 3000;
 }
 
 std::vector<std::string> GetProfilesFromSetting(const std::string& setting, const std::string& root)
@@ -83,7 +83,7 @@ void ProfileCycler::UpdateToProfile(const std::string& profile_filename,
   {
     Core::DisplayMessage("Loading input profile '" + base + "' for device '" +
                              controller->GetName() + "'",
-                         display_message_ms);
+                         DISPLAY_MESSAGE_MS);
     controller->LoadConfig(ini_file.GetOrCreateSection("Profile"));
     controller->UpdateReferences(g_controller_interface);
     device_configuration->GenerateControllerTextures(ini_file);
@@ -92,7 +92,7 @@ void ProfileCycler::UpdateToProfile(const std::string& profile_filename,
   {
     Core::DisplayMessage("Unable to load input profile '" + base + "' for device '" +
                              controller->GetName() + "'",
-                         display_message_ms);
+                         DISPLAY_MESSAGE_MS);
   }
 }
 
@@ -121,7 +121,7 @@ void ProfileCycler::CycleProfile(CycleDirection cycle_direction, InputConfig* de
   const auto& profiles = GetProfilesForDevice(device_configuration);
   if (profiles.empty())
   {
-    Core::DisplayMessage("No input profiles found", display_message_ms);
+    Core::DisplayMessage("No input profiles found", DISPLAY_MESSAGE_MS);
     return;
   }
   const std::string profile = GetProfile(cycle_direction, profile_index, profiles);
@@ -134,7 +134,7 @@ void ProfileCycler::CycleProfile(CycleDirection cycle_direction, InputConfig* de
   else
   {
     Core::DisplayMessage("No controller found for index: " + std::to_string(controller_index),
-                         display_message_ms);
+                         DISPLAY_MESSAGE_MS);
   }
 }
 
@@ -145,13 +145,13 @@ void ProfileCycler::CycleProfileForGame(CycleDirection cycle_direction,
   const auto& profiles = GetProfilesForDevice(device_configuration);
   if (profiles.empty())
   {
-    Core::DisplayMessage("No input profiles found", display_message_ms);
+    Core::DisplayMessage("No input profiles found", DISPLAY_MESSAGE_MS);
     return;
   }
 
   if (setting.empty())
   {
-    Core::DisplayMessage("No setting found for game", display_message_ms);
+    Core::DisplayMessage("No setting found for game", DISPLAY_MESSAGE_MS);
     return;
   }
 
@@ -159,7 +159,7 @@ void ProfileCycler::CycleProfileForGame(CycleDirection cycle_direction,
       GetMatchingProfilesFromSetting(setting, profiles, device_configuration);
   if (profiles_for_game.empty())
   {
-    Core::DisplayMessage("No input profiles found for game", display_message_ms);
+    Core::DisplayMessage("No input profiles found for game", DISPLAY_MESSAGE_MS);
     return;
   }
 
@@ -173,7 +173,7 @@ void ProfileCycler::CycleProfileForGame(CycleDirection cycle_direction,
   else
   {
     Core::DisplayMessage("No controller found for index: " + std::to_string(controller_index),
-                         display_message_ms);
+                         DISPLAY_MESSAGE_MS);
   }
 }
 

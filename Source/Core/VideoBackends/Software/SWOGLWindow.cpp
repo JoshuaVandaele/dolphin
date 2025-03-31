@@ -90,10 +90,10 @@ void SWOGLWindow::ShowImage(const AbstractTexture* image,
   const SW::SWTexture* sw_image = static_cast<const SW::SWTexture*>(image);
   m_gl_context->Update();  // just updates the render window position and the backbuffer size
 
-  GLsizei glWidth = (GLsizei)m_gl_context->GetBackBufferWidth();
-  GLsizei glHeight = (GLsizei)m_gl_context->GetBackBufferHeight();
+  GLsizei gl_width = (GLsizei)m_gl_context->GetBackBufferWidth();
+  GLsizei gl_height = (GLsizei)m_gl_context->GetBackBufferHeight();
 
-  glViewport(0, 0, glWidth, glHeight);
+  glViewport(0, 0, gl_width, gl_height);
 
   glActiveTexture(GL_TEXTURE9);
   glBindTexture(GL_TEXTURE_2D, m_image_texture);

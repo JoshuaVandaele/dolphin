@@ -62,7 +62,7 @@ EnhancementsWidget::EnhancementsWidget(GameConfigWidget* parent, Config::Layer* 
           &EnhancementsWidget::OnConfigChanged);
 }
 
-constexpr int ANISO_1x = Common::ToUnderlying(AnisotropicFilteringMode::Force1x);
+constexpr int ANISO_1X = Common::ToUnderlying(AnisotropicFilteringMode::Force1x);
 constexpr int ANISO_2X = Common::ToUnderlying(AnisotropicFilteringMode::Force2x);
 constexpr int ANISO_4X = Common::ToUnderlying(AnisotropicFilteringMode::Force4x);
 constexpr int ANISO_8X = Common::ToUnderlying(AnisotropicFilteringMode::Force8x);
@@ -129,14 +129,14 @@ void EnhancementsWidget::CreateWidgets()
                               Config::GFX_ENHANCE_FORCE_TEXTURE_FILTERING, m_game_layer);
 
   m_texture_filtering_combo->Add(tr("Default"), Config::DefaultState{}, FILTERING_DEFAULT);
-  m_texture_filtering_combo->Add(tr("1x Anisotropic"), ANISO_1x, FILTERING_DEFAULT);
+  m_texture_filtering_combo->Add(tr("1x Anisotropic"), ANISO_1X, FILTERING_DEFAULT);
   m_texture_filtering_combo->Add(tr("2x Anisotropic"), ANISO_2X, FILTERING_DEFAULT);
   m_texture_filtering_combo->Add(tr("4x Anisotropic"), ANISO_4X, FILTERING_DEFAULT);
   m_texture_filtering_combo->Add(tr("8x Anisotropic"), ANISO_8X, FILTERING_DEFAULT);
   m_texture_filtering_combo->Add(tr("16x Anisotropic"), ANISO_16X, FILTERING_DEFAULT);
-  m_texture_filtering_combo->Add(tr("Force Nearest and 1x Anisotropic "), ANISO_1x,
+  m_texture_filtering_combo->Add(tr("Force Nearest and 1x Anisotropic "), ANISO_1X,
                                  FILTERING_NEAREST);
-  m_texture_filtering_combo->Add(tr("Force Linear and 1x Anisotropic"), ANISO_1x, FILTERING_LINEAR);
+  m_texture_filtering_combo->Add(tr("Force Linear and 1x Anisotropic"), ANISO_1X, FILTERING_LINEAR);
   m_texture_filtering_combo->Add(tr("Force Linear and 2x Anisotropic"), ANISO_2X, FILTERING_LINEAR);
   m_texture_filtering_combo->Add(tr("Force Linear and 4x Anisotropic"), ANISO_4X, FILTERING_LINEAR);
   m_texture_filtering_combo->Add(tr("Force Linear and 8x Anisotropic"), ANISO_8X, FILTERING_LINEAR);

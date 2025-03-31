@@ -289,12 +289,12 @@ void GameConfigEdit::keyPressEvent(QKeyEvent* e)
 
   QWidget::keyPressEvent(e);
 
-  const static QString end_of_word = QStringLiteral("~!@#$%^&*()_+{}|:\"<>?,./;'\\-=");
+  const static QString END_OF_WORD = QStringLiteral("~!@#$%^&*()_+{}|:\"<>?,./;'\\-=");
 
   QString completion_prefix = GetTextUnderCursor();
 
   if (e->text().isEmpty() || completion_prefix.length() < 2 ||
-      end_of_word.contains(e->text().right(1)))
+      END_OF_WORD.contains(e->text().right(1)))
   {
     m_completer->popup()->hide();
     return;

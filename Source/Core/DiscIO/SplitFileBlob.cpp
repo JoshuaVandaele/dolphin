@@ -27,12 +27,12 @@ SplitPlainFileReader::SplitPlainFileReader(std::vector<SingleFile> files)
 
 std::unique_ptr<SplitPlainFileReader> SplitPlainFileReader::Create(std::string_view first_file_path)
 {
-  constexpr std::string_view part0_iso = ".part0.iso";
-  if (!first_file_path.ends_with(part0_iso))
+  constexpr std::string_view PART0_ISO = ".part0.iso";
+  if (!first_file_path.ends_with(PART0_ISO))
     return nullptr;
 
   const std::string_view base_path =
-      first_file_path.substr(0, first_file_path.size() - part0_iso.size());
+      first_file_path.substr(0, first_file_path.size() - PART0_ISO.size());
   std::vector<SingleFile> files;
   size_t index = 0;
   u64 offset = 0;

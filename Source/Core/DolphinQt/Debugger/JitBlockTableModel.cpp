@@ -93,9 +93,9 @@ void JitBlockTableModel::UpdateProfileData()
   if (row_count <= 0)
     return;
   SumOverallCosts();
-  static const QList<int> roles = {Qt::DisplayRole};
+  static const QList<int> ROLES = {Qt::DisplayRole};
   const int last = row_count - 1;
-  emit dataChanged(createIndex(0, Column::RunCount), createIndex(last, Column::TimePercent), roles);
+  emit dataChanged(createIndex(0, Column::RunCount), createIndex(last, Column::TimePercent), ROLES);
 }
 
 void JitBlockTableModel::UpdateSymbols()
@@ -104,9 +104,9 @@ void JitBlockTableModel::UpdateSymbols()
   if (row_count <= 0)
     return;
   PrefetchSymbols();
-  static const QList<int> roles = {Qt::DisplayRole};
+  static const QList<int> ROLES = {Qt::DisplayRole};
   const int last = row_count - 1;
-  emit dataChanged(createIndex(0, Column::Symbol), createIndex(last, Column::Symbol), roles);
+  emit dataChanged(createIndex(0, Column::Symbol), createIndex(last, Column::Symbol), ROLES);
 }
 
 void JitBlockTableModel::ConnectSlots()
@@ -204,13 +204,13 @@ void JitBlockTableModel::OnEmulationStateChanged(Core::State state)
 
 static QString GetQStringDescription(const CPUEmuFeatureFlags flags)
 {
-  static const std::array<QString, (FEATURE_FLAG_END_OF_ENUMERATION - 1) << 1> descriptions = {
+  static const std::array<QString, (FEATURE_FLAG_END_OF_ENUMERATION - 1) << 1> DESCRIPTIONS = {
       QStringLiteral(""),           QStringLiteral("DR"),
       QStringLiteral("IR"),         QStringLiteral("DR|IR"),
       QStringLiteral("PERFMON"),    QStringLiteral("DR|PERFMON"),
       QStringLiteral("IR|PERFMON"), QStringLiteral("DR|IR|PERFMON"),
   };
-  return descriptions[flags];
+  return DESCRIPTIONS[flags];
 }
 
 static QVariant GetValidSymbolStringVariant(const QVariant& symbol_name_v)
@@ -381,7 +381,7 @@ QVariant JitBlockTableModel::headerData(int section, Qt::Orientation orientation
     return QVariant();
 
   // These abbreviated table header display names have unabbreviated counterparts in JITWidget.cpp.
-  static constexpr std::array<const char*, Column::NumberOfColumns> headers = {
+  static constexpr std::array<const char*, Column::NumberOfColumns> HEADERS = {
       // i18n: PPC Feature Flags
       QT_TR_NOOP("PPC Feat. Flags"),
       // i18n: Effective Address
@@ -408,7 +408,7 @@ QVariant JitBlockTableModel::headerData(int section, Qt::Orientation orientation
       QT_TR_NOOP("Symbol"),
   };
 
-  return tr(headers[section]);
+  return tr(HEADERS[section]);
 }
 
 int JitBlockTableModel::rowCount(const QModelIndex& parent) const

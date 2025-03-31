@@ -240,12 +240,12 @@ void SaveCodes(Common::IniFile& inifile, const std::vector<GeckoCode>& gcodes)
   std::vector<std::string> enabled_lines;
   std::vector<std::string> disabled_lines;
 
-  for (const GeckoCode& geckoCode : gcodes)
+  for (const GeckoCode& gecko_code : gcodes)
   {
-    if (geckoCode.enabled != geckoCode.default_enabled)
-      (geckoCode.enabled ? enabled_lines : disabled_lines).emplace_back('$' + geckoCode.name);
+    if (gecko_code.enabled != gecko_code.default_enabled)
+      (gecko_code.enabled ? enabled_lines : disabled_lines).emplace_back('$' + gecko_code.name);
 
-    SaveGeckoCode(lines, geckoCode);
+    SaveGeckoCode(lines, gecko_code);
   }
 
   inifile.SetLines("Gecko", lines);

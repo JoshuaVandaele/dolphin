@@ -1114,7 +1114,7 @@ void ZeldaAudioRenderer::ApplyReverb(bool post_rendering)
       for (u16 i = 0; i < 8; ++i)
         (*last8_samples_buffers[rpb_idx])[i] = buffer[0x50 + i];
 
-      auto ApplyFilter = [&]() {
+      auto apply_filter = [&]() {
         // Filter the buffer using provided coefficients.
         for (u16 i = 0; i < 0x50; ++i)
         {
@@ -1128,7 +1128,7 @@ void ZeldaAudioRenderer::ApplyReverb(bool post_rendering)
 
       // LSB set -> pre-filtering.
       if (rpb.enabled & 1)
-        ApplyFilter();
+        apply_filter();
 
       for (const auto& dest : rpb.dest)
       {
@@ -1148,7 +1148,7 @@ void ZeldaAudioRenderer::ApplyReverb(bool post_rendering)
 
       // LSB not set, bit 1 set -> post-filtering.
       if (rpb.enabled & 2)
-        ApplyFilter();
+        apply_filter();
 
       for (u16 i = 0; i < 0x50; ++i)
         (*reverb_buffers[rpb_idx])[i] = buffer[i];
@@ -1536,7 +1536,7 @@ void ZeldaAudioRenderer::LoadInputSamples(MixingBuffer* buffer, VPB* vpb)
   case VPB::SRC_CONST_PATTERN_2:
   case VPB::SRC_CONST_PATTERN_3:
   {
-    const u16 PATTERN_SIZE = 0x40;
+    const u16 pattern_size = 0x40;
 
     struct PatternInfo
     {
@@ -1549,7 +1549,7 @@ void ZeldaAudioRenderer::LoadInputSamples(MixingBuffer* buffer, VPB* vpb)
         {VPB::SRC_CONST_PATTERN_3, {3, false}},
     };
     auto& pattern_info = samples_source_to_pattern[vpb->samples_source_type];
-    u16 pattern_offset = pattern_info.idx * PATTERN_SIZE;
+    u16 pattern_offset = pattern_info.idx * pattern_size;
     s16* pattern = m_const_patterns.data() + pattern_offset;
 
     u32 pos = vpb->current_pos_frac << 6;   // log2(PATTERN_SIZE)
@@ -1558,7 +1558,7 @@ void ZeldaAudioRenderer::LoadInputSamples(MixingBuffer* buffer, VPB* vpb)
     for (size_t i = 0; i < buffer->size(); ++i)
     {
       (*buffer)[i] = pattern[pos >> 16];
-      pos = (pos + step) % (PATTERN_SIZE << 16);
+      pos = (pos + step) % (pattern_size << 16);
       if (pattern_info.variable_step)
         pos = ((pos << 10) + m_buf_back_right[i] * vpb->resampling_ratio) >> 10;
     }

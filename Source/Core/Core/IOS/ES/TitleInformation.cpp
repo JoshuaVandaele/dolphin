@@ -194,7 +194,7 @@ IPCReply ESDevice::GetStoredTMD(const IOCtlVRequest& request)
     return IPCReply(FS_ENOENT);
 
   // TODO: actually use this param in when writing to the outbuffer :/
-  const u32 MaxCount = memory.Read_U32(request.in_vectors[1].address);
+  const u32 max_count = memory.Read_U32(request.in_vectors[1].address);
 
   const std::vector<u8>& raw_tmd = tmd.GetBytes();
   if (raw_tmd.size() != request.io_vectors[0].size)
@@ -202,7 +202,7 @@ IPCReply ESDevice::GetStoredTMD(const IOCtlVRequest& request)
 
   memory.CopyToEmu(request.io_vectors[0].address, raw_tmd.data(), raw_tmd.size());
 
-  INFO_LOG_FMT(IOS_ES, "GetStoredTMD: title {:016x} (buffer size: {})", title_id, MaxCount);
+  INFO_LOG_FMT(IOS_ES, "GetStoredTMD: title {:016x} (buffer size: {})", title_id, max_count);
   return IPCReply(IPC_SUCCESS);
 }
 

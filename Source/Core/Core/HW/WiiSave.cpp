@@ -45,11 +45,11 @@ namespace WiiSave
 {
 using Md5 = std::array<u8, 0x10>;
 
-constexpr std::array<u8, 0x10> s_sd_initial_iv{{0x21, 0x67, 0x12, 0xE6, 0xAA, 0x1F, 0x68, 0x9F,
+constexpr std::array<u8, 0x10> S_SD_INITIAL_IV{{0x21, 0x67, 0x12, 0xE6, 0xAA, 0x1F, 0x68, 0x9F,
                                                 0x95, 0xC5, 0xA2, 0x23, 0x24, 0xDC, 0x6A, 0x98}};
-constexpr Md5 s_md5_blanker{{0x0E, 0x65, 0x37, 0x81, 0x99, 0xBE, 0x45, 0x17, 0xAB, 0x06, 0xEC, 0x22,
+constexpr Md5 S_MD5_BLANKER{{0x0E, 0x65, 0x37, 0x81, 0x99, 0xBE, 0x45, 0x17, 0xAB, 0x06, 0xEC, 0x22,
                              0x45, 0x1A, 0x57, 0x93}};
-constexpr u32 s_ng_id = 0x0403AC68;
+constexpr u32 S_NG_ID = 0x0403AC68;
 
 void StorageDeleter::operator()(Storage* p) const
 {
@@ -117,7 +117,7 @@ public:
       return {};
     }
     header.tid = m_tid;
-    header.md5 = s_md5_blanker;
+    header.md5 = S_MD5_BLANKER;
     const u8 mode = GetBinMode(banner_path);
     if (!mode || !banner->Read(header.banner, header.banner_size))
       return {};
@@ -136,7 +136,7 @@ public:
     BkHeader bk_hdr{};
     bk_hdr.size = BK_LISTED_SZ;
     bk_hdr.magic = BK_HDR_MAGIC;
-    bk_hdr.ngid = s_ng_id;
+    bk_hdr.ngid = S_NG_ID;
     bk_hdr.number_of_files = static_cast<u32>(m_files_list.size());
     bk_hdr.size_of_files = m_files_size;
     bk_hdr.total_size = m_files_size + FULL_CERT_SZ;
@@ -288,7 +288,7 @@ public:
     if (!m_file.Seek(0, File::SeekOrigin::Begin) || !m_file.ReadArray(&header, 1))
       return {};
 
-    std::array<u8, 0x10> iv = s_sd_initial_iv;
+    std::array<u8, 0x10> iv = S_SD_INITIAL_IV;
     m_iosc.Decrypt(IOS::HLE::IOSC::HANDLE_SD_KEY, iv.data(), reinterpret_cast<const u8*>(&header),
                    sizeof(Header), reinterpret_cast<u8*>(&header), IOS::PID_ES);
     const u32 banner_size = header.banner_size;
@@ -301,7 +301,7 @@ public:
     }
 
     Md5 md5_file = header.md5;
-    header.md5 = s_md5_blanker;
+    header.md5 = S_MD5_BLANKER;
     Md5 md5_calc;
     mbedtls_md5_ret(reinterpret_cast<const u8*>(&header), sizeof(Header), md5_calc.data());
     if (md5_file != md5_calc)
@@ -380,7 +380,7 @@ public:
   bool WriteHeader(const Header& header) override
   {
     Header encrypted_header;
-    std::array<u8, 0x10> iv = s_sd_initial_iv;
+    std::array<u8, 0x10> iv = S_SD_INITIAL_IV;
     m_iosc.Encrypt(IOS::HLE::IOSC::HANDLE_SD_KEY, iv.data(), reinterpret_cast<const u8*>(&header),
                    sizeof(Header), reinterpret_cast<u8*>(&encrypted_header), IOS::PID_ES);
     return m_file.Seek(0, File::SeekOrigin::Begin) && m_file.WriteArray(&encrypted_header, 1);
@@ -465,10 +465,10 @@ private:
     // Write signatures.
     if (!m_file.Seek(0, File::SeekOrigin::End))
       return false;
-    const u32 SIGNATURE_END_MAGIC = Common::swap32(0x2f536969);
+    const u32 signature_end_magic = Common::swap32(0x2f536969);
     const IOS::CertECC device_certificate = m_iosc.GetDeviceCertificate();
     return m_file.WriteArray(ap_sig.data(), ap_sig.size()) &&
-           m_file.WriteArray(&SIGNATURE_END_MAGIC, 1) &&
+           m_file.WriteArray(&signature_end_magic, 1) &&
            m_file.WriteArray(&device_certificate, 1) && m_file.WriteArray(&ap_cert, 1);
   }
 

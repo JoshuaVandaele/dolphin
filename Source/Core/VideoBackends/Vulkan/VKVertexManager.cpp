@@ -103,13 +103,13 @@ bool VertexManager::Initialize()
   }
 
   static constexpr std::array<std::pair<TexelBufferFormat, VkFormat>, NUM_TEXEL_BUFFER_FORMATS>
-      format_mapping = {{
+      FORMAT_MAPPING = {{
           {TEXEL_BUFFER_FORMAT_R8_UINT, VK_FORMAT_R8_UINT},
           {TEXEL_BUFFER_FORMAT_R16_UINT, VK_FORMAT_R16_UINT},
           {TEXEL_BUFFER_FORMAT_RGBA8_UINT, VK_FORMAT_R8G8B8A8_UINT},
           {TEXEL_BUFFER_FORMAT_R32G32_UINT, VK_FORMAT_R32G32_UINT},
       }};
-  for (const auto& it : format_mapping)
+  for (const auto& it : FORMAT_MAPPING)
   {
     if ((m_texel_buffer_views[it.first] = CreateTexelBufferView(m_texel_stream_buffer->GetBuffer(),
                                                                 it.second)) == VK_NULL_HANDLE)

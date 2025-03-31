@@ -116,19 +116,19 @@ static bool ImportWAD(IOS::HLE::Kernel& ios, const DiscIO::VolumeWAD& wad,
     const std::array<u8, 32> dummy_data{};
     for (const std::string path : {"/shared2/ec/shopsetu.log", "/shared2/succession/shop.log"})
     {
-      constexpr IOS::HLE::FS::Mode rw_mode = IOS::HLE::FS::Mode::ReadWrite;
+      constexpr IOS::HLE::FS::Mode RW_MODE = IOS::HLE::FS::Mode::ReadWrite;
       if (fs->CreateFullPath(IOS::SYSMENU_UID, IOS::SYSMENU_GID, path, 0,
-                             {rw_mode, rw_mode, rw_mode}) != IOS::HLE::FS::ResultCode::Success)
+                             {RW_MODE, RW_MODE, RW_MODE}) != IOS::HLE::FS::ResultCode::Success)
       {
         return false;
       }
 
-      const auto old_handle = fs->OpenFile(IOS::SYSMENU_UID, IOS::SYSMENU_GID, path, rw_mode);
+      const auto old_handle = fs->OpenFile(IOS::SYSMENU_UID, IOS::SYSMENU_GID, path, RW_MODE);
       if (old_handle)
         continue;
 
       const auto new_handle = fs->CreateAndOpenFile(IOS::SYSMENU_UID, IOS::SYSMENU_GID, path,
-                                                    {rw_mode, rw_mode, rw_mode});
+                                                    {RW_MODE, RW_MODE, RW_MODE});
       if (!new_handle || !new_handle->Write(dummy_data.data(), dummy_data.size()))
         return false;
     }
@@ -315,12 +315,12 @@ std::string SystemUpdater::GetDeviceRegion()
   if (tmd.IsValid())
   {
     const DiscIO::Region region = tmd.GetRegion();
-    static const std::map<DiscIO::Region, std::string> regions = {{DiscIO::Region::NTSC_J, "JPN"},
+    static const std::map<DiscIO::Region, std::string> REGIONS = {{DiscIO::Region::NTSC_J, "JPN"},
                                                                   {DiscIO::Region::NTSC_U, "USA"},
                                                                   {DiscIO::Region::PAL, "EUR"},
                                                                   {DiscIO::Region::NTSC_K, "KOR"},
                                                                   {DiscIO::Region::Unknown, "EUR"}};
-    return regions.at(region);
+    return REGIONS.at(region);
   }
   return "";
 }

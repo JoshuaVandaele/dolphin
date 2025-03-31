@@ -37,8 +37,8 @@ const std::string& GetScmRevStr()
 
 const std::string& GetScmRevGitStr()
 {
-  static const std::string scm_rev_git_str = SCM_REV_STR;
-  return scm_rev_git_str;
+  static const std::string SCM_REV_GIT_STR = SCM_REV_STR;
+  return SCM_REV_GIT_STR;
 }
 
 const std::string& GetScmDescStr()
@@ -55,8 +55,8 @@ const std::string& GetScmBranchStr()
 
 const std::string& GetUserAgentStr()
 {
-  static const std::string user_agent_str = EMULATOR_NAME "/" SCM_DESC_STR;
-  return user_agent_str;
+  static const std::string USER_AGENT_STR = EMULATOR_NAME "/" SCM_DESC_STR;
+  return USER_AGENT_STR;
 }
 
 const std::string& GetScmDistributorStr()
@@ -78,9 +78,9 @@ const std::string& GetNetplayDolphinVer()
 #elif __APPLE__
   static const std::string netplay_dolphin_ver = SCM_DESC_STR " Mac";
 #else
-  static const std::string netplay_dolphin_ver = SCM_DESC_STR " Lin";
+  static const std::string NETPLAY_DOLPHIN_VER = SCM_DESC_STR " Lin";
 #endif
-  return netplay_dolphin_ver;
+  return NETPLAY_DOLPHIN_VER;
 }
 
 int GetScmCommitsAheadMaster()

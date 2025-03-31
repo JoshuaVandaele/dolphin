@@ -164,9 +164,9 @@ NetPlayClient::NetPlayClient(const std::string& address, const u16 port, NetPlay
     // sent packets before a connection is deemed disconnected
     enet_peer_timeout(m_server, 0, PEER_TIMEOUT.count(), PEER_TIMEOUT.count());
 
-    ENetEvent netEvent;
-    int net = enet_host_service(m_client, &netEvent, 5000);
-    if (net > 0 && netEvent.type == ENET_EVENT_TYPE_CONNECT)
+    ENetEvent net_event;
+    int net = enet_host_service(m_client, &net_event, 5000);
+    if (net > 0 && net_event.type == ENET_EVENT_TYPE_CONNECT)
     {
       if (Connect())
       {
@@ -211,17 +211,17 @@ NetPlayClient::NetPlayClient(const std::string& address, const u16 port, NetPlay
 
     while (m_connecting)
     {
-      ENetEvent netEvent;
+      ENetEvent net_event;
       if (m_traversal_client)
         m_traversal_client->HandleResends();
 
-      while (enet_host_service(m_client, &netEvent, 4) > 0)
+      while (enet_host_service(m_client, &net_event, 4) > 0)
       {
         sf::Packet rpac;
-        switch (netEvent.type)
+        switch (net_event.type)
         {
         case ENET_EVENT_TYPE_CONNECT:
-          m_server = netEvent.peer;
+          m_server = net_event.peer;
 
           // Update time in milliseconds of no acknowledgment of
           // sent packets before a connection is deemed disconnected
@@ -257,17 +257,17 @@ bool NetPlayClient::Connect()
   enet_host_flush(m_client);
   sf::Packet rpac;
   // TODO: make this not hang
-  ENetEvent netEvent;
+  ENetEvent net_event;
   int net;
-  while ((net = enet_host_service(m_client, &netEvent, 5000)) > 0 &&
-         static_cast<int>(netEvent.type) == Common::ENet::SKIPPABLE_EVENT)
+  while ((net = enet_host_service(m_client, &net_event, 5000)) > 0 &&
+         static_cast<int>(net_event.type) == Common::ENet::SKIPPABLE_EVENT)
   {
     // ignore packets from traversal server
   }
-  if (net > 0 && netEvent.type == ENET_EVENT_TYPE_RECEIVE)
+  if (net > 0 && net_event.type == ENET_EVENT_TYPE_RECEIVE)
   {
-    rpac.append(netEvent.packet->data, netEvent.packet->dataLength);
-    enet_packet_destroy(netEvent.packet);
+    rpac.append(net_event.packet->data, net_event.packet->dataLength);
+    enet_packet_destroy(net_event.packet);
   }
   else
   {
@@ -1152,7 +1152,7 @@ void NetPlayClient::OnSyncSaveDataWii(sf::Packet& packet)
   auto temp_fs = std::make_unique<IOS::HLE::FS::HostFileSystem>(path);
   std::vector<u64> titles;
 
-  constexpr IOS::HLE::FS::Modes fs_modes{
+  constexpr IOS::HLE::FS::Modes FS_MODES{
       IOS::HLE::FS::Mode::ReadWrite,
       IOS::HLE::FS::Mode::ReadWrite,
       IOS::HLE::FS::Mode::ReadWrite,
@@ -1168,9 +1168,9 @@ void NetPlayClient::OnSyncSaveDataWii(sf::Packet& packet)
     auto buffer = DecompressPacketIntoBuffer(packet);
 
     temp_fs->CreateFullPath(IOS::PID_KERNEL, IOS::PID_KERNEL, "/shared2/menu/FaceLib/", 0,
-                            fs_modes);
+                            FS_MODES);
     auto file = temp_fs->CreateAndOpenFile(IOS::PID_KERNEL, IOS::PID_KERNEL,
-                                           Common::GetMiiDatabasePath(), fs_modes);
+                                           Common::GetMiiDatabasePath(), FS_MODES);
 
     if (!buffer || !file || !file->Write(buffer->data(), buffer->size()))
     {
@@ -1189,7 +1189,7 @@ void NetPlayClient::OnSyncSaveDataWii(sf::Packet& packet)
     u64 title_id = Common::PacketReadU64(packet);
     titles.push_back(title_id);
     temp_fs->CreateFullPath(IOS::PID_KERNEL, IOS::PID_KERNEL,
-                            Common::GetTitleDataPath(title_id) + '/', 0, fs_modes);
+                            Common::GetTitleDataPath(title_id) + '/', 0, FS_MODES);
     auto save = WiiSave::MakeNandStorage(temp_fs.get(), title_id);
 
     bool exists;
@@ -1546,7 +1546,7 @@ u32 NetPlayClient::GetPlayersMaxPing() const
 
 void NetPlayClient::Disconnect()
 {
-  ENetEvent netEvent;
+  ENetEvent net_event;
   m_connecting = false;
   m_connection_state = ConnectionState::Failure;
   if (m_server)
@@ -1554,12 +1554,12 @@ void NetPlayClient::Disconnect()
   else
     return;
 
-  while (enet_host_service(m_client, &netEvent, 3000) > 0)
+  while (enet_host_service(m_client, &net_event, 3000) > 0)
   {
-    switch (netEvent.type)
+    switch (net_event.type)
     {
     case ENET_EVENT_TYPE_RECEIVE:
-      enet_packet_destroy(netEvent.packet);
+      enet_packet_destroy(net_event.packet);
       break;
     case ENET_EVENT_TYPE_DISCONNECT:
       m_server = nullptr;
@@ -1605,11 +1605,11 @@ void NetPlayClient::ThreadFunc()
 
   while (m_do_loop.IsSet())
   {
-    ENetEvent netEvent;
+    ENetEvent net_event;
     int net;
     if (m_traversal_client)
       m_traversal_client->HandleResends();
-    net = enet_host_service(m_client, &netEvent, 250);
+    net = enet_host_service(m_client, &net_event, 250);
     while (!m_async_queue.Empty())
     {
       INFO_LOG_FMT(NETPLAY, "Processing async queue event.");
@@ -1623,7 +1623,7 @@ void NetPlayClient::ThreadFunc()
     if (net > 0)
     {
       sf::Packet rpac;
-      switch (netEvent.type)
+      switch (net_event.type)
       {
       case ENET_EVENT_TYPE_CONNECT:
         INFO_LOG_FMT(NETPLAY, "enet_host_service: connect event");
@@ -1631,10 +1631,10 @@ void NetPlayClient::ThreadFunc()
       case ENET_EVENT_TYPE_RECEIVE:
         INFO_LOG_FMT(NETPLAY, "enet_host_service: receive event");
 
-        rpac.append(netEvent.packet->data, netEvent.packet->dataLength);
+        rpac.append(net_event.packet->data, net_event.packet->dataLength);
         OnData(rpac);
 
-        enet_packet_destroy(netEvent.packet);
+        enet_packet_destroy(net_event.packet);
         break;
       case ENET_EVENT_TYPE_DISCONNECT:
         INFO_LOG_FMT(NETPLAY, "enet_host_service: disconnect event");
@@ -1647,10 +1647,10 @@ void NetPlayClient::ThreadFunc()
         break;
       default:
         // not a valid switch case due to not technically being part of the enum
-        if (static_cast<int>(netEvent.type) == Common::ENet::SKIPPABLE_EVENT)
+        if (static_cast<int>(net_event.type) == Common::ENet::SKIPPABLE_EVENT)
           INFO_LOG_FMT(NETPLAY, "enet_host_service: skippable packet event");
         else
-          ERROR_LOG_FMT(NETPLAY, "enet_host_service: unknown event type: {}", int(netEvent.type));
+          ERROR_LOG_FMT(NETPLAY, "enet_host_service: unknown event type: {}", int(net_event.type));
         break;
       }
     }

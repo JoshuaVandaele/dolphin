@@ -185,13 +185,13 @@ void WatchWidget::Update()
     auto* hex = new QTableWidgetItem;
     auto* decimal = new QTableWidgetItem;
     auto* string = new QTableWidgetItem;
-    auto* floatValue = new QTableWidgetItem;
+    auto* float_value = new QTableWidgetItem;
 
-    auto* lockValue = new QTableWidgetItem;
-    lockValue->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
+    auto* lock_value = new QTableWidgetItem;
+    lock_value->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable);
 
     std::array<QTableWidgetItem*, NUM_COLUMNS> items = {label,  address,    hex,      decimal,
-                                                        string, floatValue, lockValue};
+                                                        string, float_value, lock_value};
 
     QBrush brush = QPalette().brush(QPalette::Text);
 
@@ -208,8 +208,8 @@ void WatchWidget::Update()
         decimal->setText(QString::number(PowerPC::MMU::HostRead_U32(guard, entry.address)));
         string->setText(
             QString::fromStdString(PowerPC::MMU::HostGetString(guard, entry.address, 32)));
-        floatValue->setText(QString::number(PowerPC::MMU::HostRead_F32(guard, entry.address)));
-        lockValue->setCheckState(entry.locked ? Qt::Checked : Qt::Unchecked);
+        float_value->setText(QString::number(PowerPC::MMU::HostRead_F32(guard, entry.address)));
+        lock_value->setCheckState(entry.locked ? Qt::Checked : Qt::Unchecked);
       }
     }
 

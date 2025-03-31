@@ -182,7 +182,7 @@ private:
   using WorkBlock = CyclicArray<XmmReg, 4>;
 
   ATTRIBUTE_TARGET("ssse3")
-  static inline __m128i byterev_16B(__m128i x)
+  static inline __m128i Byterev16B(__m128i x)
   {
     return _mm_shuffle_epi8(x, _mm_set_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
   }
@@ -210,7 +210,7 @@ private:
     WorkBlock w;
     auto msg_block = (const __m128i*)msg;
     for (size_t i = 0; i < w.size(); i++)
-      w[i] = byterev_16B(_mm_loadu_si128(&msg_block[i]));
+      w[i] = Byterev16B(_mm_loadu_si128(&msg_block[i]));
 
     // 0: abcd, 1: e
     auto abcde = state;
@@ -249,8 +249,8 @@ private:
   virtual Digest GetDigest() override
   {
     Digest digest;
-    _mm_storeu_si128((__m128i*)&digest[0], byterev_16B(state[0]));
-    u32 hi = _mm_cvtsi128_si32(byterev_16B(state[1]));
+    _mm_storeu_si128((__m128i*)&digest[0], Byterev16B(state[0]));
+    u32 hi = _mm_cvtsi128_si32(Byterev16B(state[1]));
     std::memcpy(&digest[sizeof(__m128i)], &hi, sizeof(hi));
     return digest;
   }
@@ -388,7 +388,7 @@ Digest CalculateDigest(const u8* msg, size_t len)
 
 std::string DigestToString(const Digest& digest)
 {
-  static constexpr std::array<char, 16> lookup = {'0', '1', '2', '3', '4', '5', '6', '7',
+  static constexpr std::array<char, 16> LOOKUP = {'0', '1', '2', '3', '4', '5', '6', '7',
                                                   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
   std::string hash;
   hash.reserve(digest.size() * 2);
@@ -396,8 +396,8 @@ std::string DigestToString(const Digest& digest)
   {
     const u8 upper = static_cast<u8>((digest[i] >> 4) & 0xf);
     const u8 lower = static_cast<u8>(digest[i] & 0xf);
-    hash.push_back(lookup[upper]);
-    hash.push_back(lookup[lower]);
+    hash.push_back(LOOKUP[upper]);
+    hash.push_back(LOOKUP[lower]);
   }
   return hash;
 }

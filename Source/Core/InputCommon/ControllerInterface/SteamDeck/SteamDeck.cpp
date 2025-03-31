@@ -249,23 +249,23 @@ Device::Device(hid_device* device) : m_device{device}
 
   // 0x4000 LSBs = 1 g
   // final output in m/s^2
-  constexpr auto accel_scale = 16384.0 / MathUtil::GRAVITY_ACCELERATION;
-  AddInput(new MotionInput("Accel Up",        m_latest_input.accel_z, -accel_scale));
-  AddInput(new MotionInput("Accel Down",      m_latest_input.accel_z, accel_scale));
-  AddInput(new MotionInput("Accel Left",      m_latest_input.accel_x, accel_scale));
-  AddInput(new MotionInput("Accel Right",     m_latest_input.accel_x, -accel_scale));
-  AddInput(new MotionInput("Accel Forward",   m_latest_input.accel_y, -accel_scale));
-  AddInput(new MotionInput("Accel Backward",  m_latest_input.accel_y, accel_scale));
+  constexpr auto ACCEL_SCALE = 16384.0 / MathUtil::GRAVITY_ACCELERATION;
+  AddInput(new MotionInput("Accel Up",        m_latest_input.accel_z, -ACCEL_SCALE));
+  AddInput(new MotionInput("Accel Down",      m_latest_input.accel_z, ACCEL_SCALE));
+  AddInput(new MotionInput("Accel Left",      m_latest_input.accel_x, ACCEL_SCALE));
+  AddInput(new MotionInput("Accel Right",     m_latest_input.accel_x, -ACCEL_SCALE));
+  AddInput(new MotionInput("Accel Forward",   m_latest_input.accel_y, -ACCEL_SCALE));
+  AddInput(new MotionInput("Accel Backward",  m_latest_input.accel_y, ACCEL_SCALE));
 
   // 16.384 (?) LSBs = 1 deg / s
   // final output in rads / s
-  constexpr auto gyro_scale = 16.384 * 360.0 / MathUtil::TAU;
-  AddInput(new MotionInput("Gyro Pitch Up",   m_latest_input.gyro_pitch, gyro_scale));
-  AddInput(new MotionInput("Gyro Pitch Down", m_latest_input.gyro_pitch, -gyro_scale));
-  AddInput(new MotionInput("Gyro Roll Left",  m_latest_input.gyro_roll,  -gyro_scale));
-  AddInput(new MotionInput("Gyro Roll Right", m_latest_input.gyro_roll,  gyro_scale));
-  AddInput(new MotionInput("Gyro Yaw Left",   m_latest_input.gyro_yaw,   gyro_scale));
-  AddInput(new MotionInput("Gyro Yaw Right",  m_latest_input.gyro_yaw,   -gyro_scale));
+  constexpr auto GYRO_SCALE = 16.384 * 360.0 / MathUtil::TAU;
+  AddInput(new MotionInput("Gyro Pitch Up",   m_latest_input.gyro_pitch, GYRO_SCALE));
+  AddInput(new MotionInput("Gyro Pitch Down", m_latest_input.gyro_pitch, -GYRO_SCALE));
+  AddInput(new MotionInput("Gyro Roll Left",  m_latest_input.gyro_roll,  -GYRO_SCALE));
+  AddInput(new MotionInput("Gyro Roll Right", m_latest_input.gyro_roll,  GYRO_SCALE));
+  AddInput(new MotionInput("Gyro Yaw Left",   m_latest_input.gyro_yaw,   GYRO_SCALE));
+  AddInput(new MotionInput("Gyro Yaw Right",  m_latest_input.gyro_yaw,   -GYRO_SCALE));
   // clang-format on
 }
 

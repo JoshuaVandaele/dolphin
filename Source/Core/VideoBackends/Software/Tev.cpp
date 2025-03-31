@@ -81,17 +81,17 @@ void Tev::DrawColorRegular(const TevStageCombiner::ColorCombiner& cc, const Inpu
 {
   for (int i = BLU_C; i <= RED_C; i++)
   {
-    const InputRegType& InputReg = inputs[i];
+    const InputRegType& input_reg = inputs[i];
 
-    const u16 c = InputReg.c + (InputReg.c >> 7);
+    const u16 c = input_reg.c + (input_reg.c >> 7);
 
-    s32 temp = InputReg.a * (256 - c) + (InputReg.b * c);
+    s32 temp = input_reg.a * (256 - c) + (input_reg.b * c);
     temp <<= s_ScaleLShiftLUT[cc.scale];
     temp += (cc.scale == TevScale::Divide2) ? 0 : (cc.op == TevOp::Sub) ? 127 : 128;
     temp >>= 8;
     temp = cc.op == TevOp::Sub ? -temp : temp;
 
-    s32 result = ((InputReg.d + s_BiasLUT[cc.bias]) << s_ScaleLShiftLUT[cc.scale]) + temp;
+    s32 result = ((input_reg.d + s_BiasLUT[cc.bias]) << s_ScaleLShiftLUT[cc.scale]) + temp;
     result = result >> s_ScaleRShiftLUT[cc.scale];
 
     Reg[cc.dest][i] = result;
@@ -139,16 +139,16 @@ void Tev::DrawColorCompare(const TevStageCombiner::ColorCombiner& cc, const Inpu
 
 void Tev::DrawAlphaRegular(const TevStageCombiner::AlphaCombiner& ac, const InputRegType inputs[4])
 {
-  const InputRegType& InputReg = inputs[ALP_C];
+  const InputRegType& input_reg = inputs[ALP_C];
 
-  const u16 c = InputReg.c + (InputReg.c >> 7);
+  const u16 c = input_reg.c + (input_reg.c >> 7);
 
-  s32 temp = InputReg.a * (256 - c) + (InputReg.b * c);
+  s32 temp = input_reg.a * (256 - c) + (input_reg.b * c);
   temp <<= s_ScaleLShiftLUT[ac.scale];
   temp += (ac.scale == TevScale::Divide2) ? 0 : (ac.op == TevOp::Sub) ? 127 : 128;
   temp = ac.op == TevOp::Sub ? (-temp >> 8) : (temp >> 8);
 
-  s32 result = ((InputReg.d + s_BiasLUT[ac.bias]) << s_ScaleLShiftLUT[ac.scale]) + temp;
+  s32 result = ((input_reg.d + s_BiasLUT[ac.bias]) << s_ScaleLShiftLUT[ac.scale]) + temp;
   result = result >> s_ScaleRShiftLUT[ac.scale];
 
   Reg[ac.dest].a = result;
@@ -289,11 +289,11 @@ void Tev::Indirect(unsigned int stageNum, s32 s, s32 t)
   }
 
   // bias select
-  const s16 biasValue = indirect.fmt == IndTexFormat::ITF_8 ? -128 : 1;
+  const s16 bias_value = indirect.fmt == IndTexFormat::ITF_8 ? -128 : 1;
   s16 bias[3];
-  bias[0] = indirect.bias_s ? biasValue : 0;
-  bias[1] = indirect.bias_t ? biasValue : 0;
-  bias[2] = indirect.bias_u ? biasValue : 0;
+  bias[0] = indirect.bias_s ? bias_value : 0;
+  bias[1] = indirect.bias_t ? bias_value : 0;
+  bias[2] = indirect.bias_u ? bias_value : 0;
 
   // format
   switch (indirect.fmt)
@@ -403,60 +403,60 @@ void Tev::Draw()
     Reg[static_cast<TevOutput>(i)].a = pixel_shader_manager.constants.colors[i][3];
   }
 
-  for (unsigned int stageNum = 0; stageNum < bpmem.genMode.numindstages; stageNum++)
+  for (unsigned int stage_num = 0; stage_num < bpmem.genMode.numindstages; stage_num++)
   {
-    const int stageNum2 = stageNum >> 1;
-    const int stageOdd = stageNum & 1;
+    const int stage_num2 = stage_num >> 1;
+    const int stage_odd = stage_num & 1;
 
-    u32 texcoordSel = bpmem.tevindref.getTexCoord(stageNum);
-    const u32 texmap = bpmem.tevindref.getTexMap(stageNum);
+    u32 texcoord_sel = bpmem.tevindref.getTexCoord(stage_num);
+    const u32 texmap = bpmem.tevindref.getTexMap(stage_num);
 
     // Quirk: when the tex coord is not less than the number of tex gens (i.e. the tex coord does
     // not exist), then tex coord 0 is used (though sometimes glitchy effects happen on console).
     // This affects the Mario portrait in Luigi's Mansion, where the developers forgot to set
     // the number of tex gens to 2 (bug 11462).
-    if (texcoordSel >= bpmem.genMode.numtexgens)
-      texcoordSel = 0;
+    if (texcoord_sel >= bpmem.genMode.numtexgens)
+      texcoord_sel = 0;
 
-    const TEXSCALE& texscale = bpmem.texscale[stageNum2];
-    const s32 scaleS = stageOdd ? texscale.ss1 : texscale.ss0;
-    const s32 scaleT = stageOdd ? texscale.ts1 : texscale.ts0;
+    const TEXSCALE& texscale = bpmem.texscale[stage_num2];
+    const s32 scale_s = stage_odd ? texscale.ss1 : texscale.ss0;
+    const s32 scale_t = stage_odd ? texscale.ts1 : texscale.ts0;
 
-    TextureSampler::Sample(Uv[texcoordSel].s >> scaleS, Uv[texcoordSel].t >> scaleT,
-                           IndirectLod[stageNum], IndirectLinear[stageNum], texmap,
-                           IndirectTex[stageNum]);
+    TextureSampler::Sample(Uv[texcoord_sel].s >> scale_s, Uv[texcoord_sel].t >> scale_t,
+                           IndirectLod[stage_num], IndirectLinear[stage_num], texmap,
+                           IndirectTex[stage_num]);
   }
 
-  for (unsigned int stageNum = 0; stageNum <= bpmem.genMode.numtevstages; stageNum++)
+  for (unsigned int stage_num = 0; stage_num <= bpmem.genMode.numtevstages; stage_num++)
   {
-    const int stageNum2 = stageNum >> 1;
-    const int stageOdd = stageNum & 1;
-    const TwoTevStageOrders& order = bpmem.tevorders[stageNum2];
+    const int stage_num2 = stage_num >> 1;
+    const int stage_odd = stage_num & 1;
+    const TwoTevStageOrders& order = bpmem.tevorders[stage_num2];
 
     // stage combiners
-    const TevStageCombiner::ColorCombiner& cc = bpmem.combiners[stageNum].colorC;
-    const TevStageCombiner::AlphaCombiner& ac = bpmem.combiners[stageNum].alphaC;
+    const TevStageCombiner::ColorCombiner& cc = bpmem.combiners[stage_num].colorC;
+    const TevStageCombiner::AlphaCombiner& ac = bpmem.combiners[stage_num].alphaC;
 
-    u32 texcoordSel = order.getTexCoord(stageOdd);
-    const u32 texmap = order.getTexMap(stageOdd);
+    u32 texcoord_sel = order.getTexCoord(stage_odd);
+    const u32 texmap = order.getTexMap(stage_odd);
 
     // Quirk: when the tex coord is not less than the number of tex gens (i.e. the tex coord does
     // not exist), then tex coord 0 is used (though sometimes glitchy effects happen on console).
-    if (texcoordSel >= bpmem.genMode.numtexgens)
-      texcoordSel = 0;
+    if (texcoord_sel >= bpmem.genMode.numtexgens)
+      texcoord_sel = 0;
 
-    Indirect(stageNum, Uv[texcoordSel].s, Uv[texcoordSel].t);
+    Indirect(stage_num, Uv[texcoord_sel].s, Uv[texcoord_sel].t);
 
     // sample texture
-    if (order.getEnable(stageOdd))
+    if (order.getEnable(stage_odd))
     {
       // RGBA
       u8 texel[4];
 
       if (bpmem.genMode.numtexgens > 0)
       {
-        TextureSampler::Sample(TexCoord.s, TexCoord.t, TextureLod[stageNum],
-                               TextureLinear[stageNum], texmap, texel);
+        TextureSampler::Sample(TexCoord.s, TexCoord.t, TextureLod[stage_num],
+                               TextureLinear[stage_num], texmap, texel);
       }
       else
       {
@@ -478,15 +478,15 @@ void Tev::Draw()
     }
 
     // set konst for this stage
-    const auto kc = bpmem.tevksel.GetKonstColor(stageNum);
-    const auto ka = bpmem.tevksel.GetKonstAlpha(stageNum);
+    const auto kc = bpmem.tevksel.GetKonstColor(stage_num);
+    const auto ka = bpmem.tevksel.GetKonstAlpha(stage_num);
     StageKonst.r = m_KonstLUT[kc].r;
     StageKonst.g = m_KonstLUT[kc].g;
     StageKonst.b = m_KonstLUT[kc].b;
     StageKonst.a = m_KonstLUT[ka].a;
 
     // set color
-    SetRasColor(order.getColorChan(stageOdd), ac.rswap);
+    SetRasColor(order.getColorChan(stage_odd), ac.rswap);
 
     // combine inputs
     InputRegType inputs[4];
@@ -652,12 +652,12 @@ void Tev::Draw()
     }
 
     // lerp from output to fog color
-    const u32 fogInt = (u32)(fog * 256);
-    const u32 invFog = 256 - fogInt;
+    const u32 fog_int = (u32)(fog * 256);
+    const u32 inv_fog = 256 - fog_int;
 
-    output[RED_C] = (output[RED_C] * invFog + fogInt * bpmem.fog.color.r) >> 8;
-    output[GRN_C] = (output[GRN_C] * invFog + fogInt * bpmem.fog.color.g) >> 8;
-    output[BLU_C] = (output[BLU_C] * invFog + fogInt * bpmem.fog.color.b) >> 8;
+    output[RED_C] = (output[RED_C] * inv_fog + fog_int * bpmem.fog.color.r) >> 8;
+    output[GRN_C] = (output[GRN_C] * inv_fog + fog_int * bpmem.fog.color.g) >> 8;
+    output[BLU_C] = (output[BLU_C] * inv_fog + fog_int * bpmem.fog.color.b) >> 8;
   }
 
   if (bpmem.GetEmulatedZ() == EmulatedZ::Late)

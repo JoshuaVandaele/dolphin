@@ -61,9 +61,9 @@ bool BootCore(Core::System& system, std::unique_ptr<BootParameters> boot,
   if (!boot)
     return false;
 
-  SConfig& StartUp = SConfig::GetInstance();
+  SConfig& start_up = SConfig::GetInstance();
 
-  if (!StartUp.SetPathsAndGameMetadata(system, *boot))
+  if (!start_up.SetPathsAndGameMetadata(system, *boot))
     return false;
 
   // Movie settings
@@ -94,7 +94,7 @@ bool BootCore(Core::System& system, std::unique_ptr<BootParameters> boot,
       return false;
 
     Config::AddLayer(ConfigLoaders::GenerateNetPlayConfigLoader(*netplay_settings));
-    StartUp.bCopyWiiSaveNetplay = netplay_settings->savedata_load;
+    start_up.bCopyWiiSaveNetplay = netplay_settings->savedata_load;
   }
 
   // Override out-of-region languages/countries to prevent games from crashing or behaving oddly
@@ -102,19 +102,19 @@ bool BootCore(Core::System& system, std::unique_ptr<BootParameters> boot,
   {
     Config::SetCurrent(
         Config::MAIN_GC_LANGUAGE,
-        DiscIO::ToGameCubeLanguage(StartUp.GetLanguageAdjustedForRegion(false, StartUp.m_region)));
+        DiscIO::ToGameCubeLanguage(start_up.GetLanguageAdjustedForRegion(false, start_up.m_region)));
 
     if (system.IsWii())
     {
       const u32 wii_language =
-          static_cast<u32>(StartUp.GetLanguageAdjustedForRegion(true, StartUp.m_region));
+          static_cast<u32>(start_up.GetLanguageAdjustedForRegion(true, start_up.m_region));
       if (wii_language != Config::Get(Config::SYSCONF_LANGUAGE))
         Config::SetCurrent(Config::SYSCONF_LANGUAGE, wii_language);
 
       const u8 country_code = static_cast<u8>(Config::Get(Config::SYSCONF_COUNTRY));
-      if (StartUp.m_region != DiscIO::SysConfCountryToRegion(country_code))
+      if (start_up.m_region != DiscIO::SysConfCountryToRegion(country_code))
       {
-        switch (StartUp.m_region)
+        switch (start_up.m_region)
         {
         case DiscIO::Region::NTSC_J:
           Config::SetCurrent(Config::SYSCONF_COUNTRY, 0x01);  // Japan
@@ -137,7 +137,7 @@ bool BootCore(Core::System& system, std::unique_ptr<BootParameters> boot,
 
   // Some NTSC Wii games such as Doc Louis's Punch-Out!! and
   // 1942 (Virtual Console) crash if the PAL60 option is enabled
-  if (system.IsWii() && DiscIO::IsNTSC(StartUp.m_region) && Config::Get(Config::SYSCONF_PAL60))
+  if (system.IsWii() && DiscIO::IsNTSC(start_up.m_region) && Config::Get(Config::SYSCONF_PAL60))
     Config::SetCurrent(Config::SYSCONF_PAL60, false);
 
   // Disable loading time emulation for Riivolution-patched games until we have proper emulation.
@@ -175,7 +175,7 @@ bool BootCore(Core::System& system, std::unique_ptr<BootParameters> boot,
     return Core::Init(
         system,
         std::make_unique<BootParameters>(
-            BootParameters::IPL{StartUp.m_region,
+            BootParameters::IPL{start_up.m_region,
                                 std::move(std::get<BootParameters::Disc>(boot->parameters))},
             std::move(boot->boot_session_data)),
         wsi);

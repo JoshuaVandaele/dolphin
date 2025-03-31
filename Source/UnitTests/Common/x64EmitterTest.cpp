@@ -70,7 +70,7 @@ const std::vector<NamedReg> xmmnames{
     {XMM12, "xmm12"}, {XMM13, "xmm13"}, {XMM14, "xmm14"}, {XMM15, "xmm15"},
 };
 
-const std::vector<NamedReg> ymmnames{
+const std::vector<NamedReg> YMMNAMES{
     {YMM0, "ymm0"},   {YMM1, "ymm1"},   {YMM2, "ymm2"},   {YMM3, "ymm3"},
     {YMM4, "ymm4"},   {YMM5, "ymm5"},   {YMM6, "ymm6"},   {YMM7, "ymm7"},
     {YMM8, "ymm8"},   {YMM9, "ymm9"},   {YMM10, "ymm10"}, {YMM11, "ymm11"},
@@ -87,7 +87,7 @@ struct
     {CC_L, "l"},   {CC_NL, "nl"},   {CC_LE, "le"}, {CC_NLE, "nle"},
 };
 
-class x64EmitterTest : public testing::Test
+class X64EmitterTest : public testing::Test
 {
 protected:
   void SetUp() override
@@ -145,7 +145,7 @@ protected:
       disasmed += "\n";
     }
 
-    auto NormalizeAssembly = [](const std::string& str) -> std::string {
+    auto normalize_assembly = [](const std::string& str) -> std::string {
       // Normalize assembly code to make it suitable for equality checks.
       // In particular:
       //   * Replace all whitespace characters by a single space.
@@ -184,8 +184,8 @@ protected:
       }
       return out;
     };
-    std::string expected_norm = NormalizeAssembly(expected);
-    std::string disasmed_norm = NormalizeAssembly(disasmed);
+    std::string expected_norm = normalize_assembly(expected);
+    std::string disasmed_norm = normalize_assembly(disasmed);
 
     EXPECT_EQ(expected_norm, disasmed_norm);
 
@@ -208,7 +208,7 @@ protected:
 };
 
 #define TEST_INSTR_NO_OPERANDS(Name, ExpectedDisasm)                                               \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     emitter->Name();                                                                               \
     ExpectDisassembly(ExpectedDisasm);                                                             \
@@ -240,7 +240,7 @@ TEST_INSTR_NO_OPERANDS(CDQE, "cdqe")
 TEST_INSTR_NO_OPERANDS(XCHG_AHAL, "xchg al, ah")
 TEST_INSTR_NO_OPERANDS(RDTSC, "rdtsc")
 
-TEST_F(x64EmitterTest, NOP_MultiByte)
+TEST_F(X64EmitterTest, NOP_MultiByte)
 {
   // 2 bytes is "rep nop", still a simple nop.
   emitter->NOP(2);
@@ -258,7 +258,7 @@ TEST_F(x64EmitterTest, NOP_MultiByte)
                     "multibyte nop");
 }
 
-TEST_F(x64EmitterTest, PUSH_Register)
+TEST_F(X64EmitterTest, PUSH_Register)
 {
   for (const auto& r : reg64names)
   {
@@ -267,7 +267,7 @@ TEST_F(x64EmitterTest, PUSH_Register)
   }
 }
 
-TEST_F(x64EmitterTest, PUSH_Immediate)
+TEST_F(X64EmitterTest, PUSH_Immediate)
 {
   emitter->PUSH(64, Imm8(0xf0));
   ExpectDisassembly("push 0xfffffffffffffff0");
@@ -280,13 +280,13 @@ TEST_F(x64EmitterTest, PUSH_Immediate)
   ExpectDisassembly("push 0xffffffffc0d0e0f0");
 }
 
-TEST_F(x64EmitterTest, PUSH_MComplex)
+TEST_F(X64EmitterTest, PUSH_MComplex)
 {
   emitter->PUSH(64, MComplex(RAX, RBX, SCALE_2, 4));
   ExpectDisassembly("push qword ptr ds:[rax+rbx*2+4]");
 }
 
-TEST_F(x64EmitterTest, POP_Register)
+TEST_F(X64EmitterTest, POP_Register)
 {
   for (const auto& r : reg64names)
   {
@@ -295,7 +295,7 @@ TEST_F(x64EmitterTest, POP_Register)
   }
 }
 
-TEST_F(x64EmitterTest, JMP)
+TEST_F(X64EmitterTest, JMP)
 {
   emitter->NOP(1);
   emitter->JMP(code_buffer, XEmitter::Jump::Short);
@@ -306,7 +306,7 @@ TEST_F(x64EmitterTest, JMP)
   ExpectBytes({/* nop */ 0x90, /* near jmp */ 0xe9, /* offset -6 */ 0xfa, 0xff, 0xff, 0xff});
 }
 
-TEST_F(x64EmitterTest, JMPptr_Register)
+TEST_F(X64EmitterTest, JMPptr_Register)
 {
   for (const auto& r : reg64names)
   {
@@ -315,7 +315,7 @@ TEST_F(x64EmitterTest, JMPptr_Register)
   }
 }
 
-TEST_F(x64EmitterTest, J)
+TEST_F(X64EmitterTest, J)
 {
   FixupBranch jump = emitter->J(XEmitter::Jump::Short);
   emitter->NOP(1);
@@ -328,7 +328,7 @@ TEST_F(x64EmitterTest, J)
   ExpectBytes({/* near jmp */ 0xe9, /* offset 1 */ 0x1, 0x0, 0x0, 0x0, /* nop */ 0x90});
 }
 
-TEST_F(x64EmitterTest, CALL)
+TEST_F(X64EmitterTest, CALL)
 {
   FixupBranch call = emitter->CALL();
   emitter->NOP(6);
@@ -346,7 +346,7 @@ TEST_F(x64EmitterTest, CALL)
                     "call .-11");
 }
 
-TEST_F(x64EmitterTest, J_CC)
+TEST_F(X64EmitterTest, J_CC)
 {
   for (const auto& [condition_code, condition_name] : ccnames)
   {
@@ -371,12 +371,12 @@ TEST_F(x64EmitterTest, J_CC)
   // the target is calculated from the address of the next instruction.
 
   const u8* const code_start = emitter->GetCodePtr();
-  constexpr int short_jump_bytes = 2;
-  const u8* const next_byte_after_short_jump_instruction = code_start + short_jump_bytes;
+  constexpr int SHORT_JUMP_BYTES = 2;
+  const u8* const next_byte_after_short_jump_instruction = code_start + SHORT_JUMP_BYTES;
 
-  constexpr int longest_backward_short_jump = 0x80;
+  constexpr int LONGEST_BACKWARD_SHORT_JUMP = 0x80;
   const u8* const furthest_byte_reachable_with_backward_short_jump =
-      next_byte_after_short_jump_instruction - longest_backward_short_jump;
+      next_byte_after_short_jump_instruction - LONGEST_BACKWARD_SHORT_JUMP;
   emitter->J_CC(CC_O, furthest_byte_reachable_with_backward_short_jump);
   ExpectBytes({/* JO opcode */ 0x70, /* offset -128 */ 0x80});
 
@@ -388,9 +388,9 @@ TEST_F(x64EmitterTest, J_CC)
   // 4 bytes further away from the jump target than it would be with a short jump.
   ExpectBytes({/* two byte JO opcode */ 0x0f, 0x80, /* offset -133 */ 0x7b, 0xff, 0xff, 0xff});
 
-  constexpr int longest_forward_short_jump = 0x7f;
+  constexpr int LONGEST_FORWARD_SHORT_JUMP = 0x7f;
   const u8* const furthest_byte_reachable_with_forward_short_jump =
-      next_byte_after_short_jump_instruction + longest_forward_short_jump;
+      next_byte_after_short_jump_instruction + LONGEST_FORWARD_SHORT_JUMP;
   emitter->J_CC(CC_O, furthest_byte_reachable_with_forward_short_jump);
   ExpectBytes({/* JO opcode */ 0x70, /* offset 127 */ 0x7f});
 
@@ -403,7 +403,7 @@ TEST_F(x64EmitterTest, J_CC)
   ExpectBytes({/* two byte JO opcode */ 0x0f, 0x80, /* offset 124 */ 0x7c, 0x0, 0x0, 0x0});
 }
 
-TEST_F(x64EmitterTest, SETcc)
+TEST_F(X64EmitterTest, SETcc)
 {
   for (const auto& cc : ccnames)
   {
@@ -420,7 +420,7 @@ TEST_F(x64EmitterTest, SETcc)
   }
 }
 
-TEST_F(x64EmitterTest, CMOVcc_Register)
+TEST_F(X64EmitterTest, CMOVcc_Register)
 {
   for (const auto& cc : ccnames)
   {
@@ -439,7 +439,7 @@ TEST_F(x64EmitterTest, CMOVcc_Register)
 }
 
 #define BITSEARCH_TEST(Name)                                                                       \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \
@@ -469,7 +469,7 @@ BITSEARCH_TEST(BSF);
 BITSEARCH_TEST(LZCNT);
 BITSEARCH_TEST(TZCNT);
 
-TEST_F(x64EmitterTest, PREFETCH)
+TEST_F(X64EmitterTest, PREFETCH)
 {
   emitter->PREFETCH(XEmitter::PrefetchLevel::NTA, MatR(R12));
   emitter->PREFETCH(XEmitter::PrefetchLevel::T0, MatR(R12));
@@ -482,7 +482,7 @@ TEST_F(x64EmitterTest, PREFETCH)
                     "prefetcht2 byte ptr ds:[r12]");
 }
 
-TEST_F(x64EmitterTest, MOVNTI)
+TEST_F(X64EmitterTest, MOVNTI)
 {
   emitter->MOVNTI(32, MatR(RAX), R12);
   emitter->MOVNTI(32, M(code_buffer), R12);
@@ -496,7 +496,7 @@ TEST_F(x64EmitterTest, MOVNTI)
 }
 
 // Grouped together since these 3 instructions do exactly the same thing.
-TEST_F(x64EmitterTest, MOVNT_DQ_PS_PD)
+TEST_F(X64EmitterTest, MOVNT_DQ_PS_PD)
 {
   for (const auto& r : xmmnames)
   {
@@ -514,7 +514,7 @@ TEST_F(x64EmitterTest, MOVNT_DQ_PS_PD)
 }
 
 #define MUL_DIV_TEST(Name)                                                                         \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \
@@ -541,7 +541,7 @@ MUL_DIV_TEST(IDIV)
 // TODO: More complex IMUL variants.
 
 #define SHIFT_TEST(Name)                                                                           \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \
@@ -570,7 +570,7 @@ SHIFT_TEST(SHR)
 SHIFT_TEST(SAR)
 
 #define BT_TEST(Name)                                                                              \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \
@@ -604,7 +604,7 @@ BT_TEST(BTC)
 // TODO: LEA tests
 
 #define ONE_OP_ARITH_TEST(Name)                                                                    \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \
@@ -630,7 +630,7 @@ ONE_OP_ARITH_TEST(NOT)
 ONE_OP_ARITH_TEST(NEG)
 
 #define TWO_OP_ARITH_TEST(Name)                                                                    \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \
@@ -673,7 +673,7 @@ TWO_OP_ARITH_TEST(OR)
 TWO_OP_ARITH_TEST(XOR)
 TWO_OP_ARITH_TEST(MOV)
 
-TEST_F(x64EmitterTest, MOV64)
+TEST_F(X64EmitterTest, MOV64)
 {
   for (size_t i = 0; i < reg64names.size(); i++)
   {
@@ -695,7 +695,7 @@ TEST_F(x64EmitterTest, MOV64)
   }
 }
 
-TEST_F(x64EmitterTest, MOV_AtReg)
+TEST_F(X64EmitterTest, MOV_AtReg)
 {
   for (const auto& src : reg64names)
   {
@@ -708,7 +708,7 @@ TEST_F(x64EmitterTest, MOV_AtReg)
   }
 }
 
-TEST_F(x64EmitterTest, MOV_RegSum)
+TEST_F(X64EmitterTest, MOV_RegSum)
 {
   for (const auto& src2 : reg64names)
   {
@@ -725,7 +725,7 @@ TEST_F(x64EmitterTest, MOV_RegSum)
   }
 }
 
-TEST_F(x64EmitterTest, MOV_Disp)
+TEST_F(X64EmitterTest, MOV_Disp)
 {
   for (const auto& dest : reg64names)
   {
@@ -744,7 +744,7 @@ TEST_F(x64EmitterTest, MOV_Disp)
   }
 }
 
-TEST_F(x64EmitterTest, MOV_Scaled)
+TEST_F(X64EmitterTest, MOV_Scaled)
 {
   for (const auto& src : reg64names)
   {
@@ -757,7 +757,7 @@ TEST_F(x64EmitterTest, MOV_Scaled)
   }
 }
 
-TEST_F(x64EmitterTest, MOV_Complex)
+TEST_F(X64EmitterTest, MOV_Complex)
 {
   for (const auto& src1 : reg64names)
   {
@@ -790,7 +790,7 @@ TEST_F(x64EmitterTest, MOV_Complex)
 // TWO_OP_ARITH_TEST(XCHG)
 // TWO_OP_ARITH_TEST(TEST)
 
-TEST_F(x64EmitterTest, BSWAP)
+TEST_F(X64EmitterTest, BSWAP)
 {
   struct
   {
@@ -808,7 +808,7 @@ TEST_F(x64EmitterTest, BSWAP)
     }
 }
 
-TEST_F(x64EmitterTest, MOVSX)
+TEST_F(X64EmitterTest, MOVSX)
 {
   emitter->MOVSX(16, 8, RAX, R(AH));
   emitter->MOVSX(32, 8, RAX, R(R12));
@@ -824,7 +824,7 @@ TEST_F(x64EmitterTest, MOVSX)
                     "movsxd r12, esp");
 }
 
-TEST_F(x64EmitterTest, MOVZX)
+TEST_F(X64EmitterTest, MOVZX)
 {
   emitter->MOVZX(16, 8, RAX, R(AH));
   emitter->MOVZX(32, 8, R12, R(RBP));
@@ -838,7 +838,7 @@ TEST_F(x64EmitterTest, MOVZX)
                     "movzx ecx, si");
 }
 
-TEST_F(x64EmitterTest, MOVBE)
+TEST_F(X64EmitterTest, MOVBE)
 {
   emitter->MOVBE(16, RAX, MatR(R12));
   emitter->MOVBE(16, MatR(RAX), R12);
@@ -854,20 +854,20 @@ TEST_F(x64EmitterTest, MOVBE)
                     "movbe qword ptr ds:[rax], r12");
 }
 
-TEST_F(x64EmitterTest, STMXCSR)
+TEST_F(X64EmitterTest, STMXCSR)
 {
   emitter->STMXCSR(MatR(R12));
   ExpectDisassembly("stmxcsr dword ptr ds:[r12]");
 }
 
-TEST_F(x64EmitterTest, LDMXCSR)
+TEST_F(X64EmitterTest, LDMXCSR)
 {
   emitter->LDMXCSR(MatR(R12));
   ExpectDisassembly("ldmxcsr dword ptr ds:[r12]");
 }
 
 #define TWO_OP_SSE_TEST(Name, MemBits)                                                             \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     for (const auto& r1 : xmmnames)                                                                \
     {                                                                                              \
@@ -939,7 +939,7 @@ TWO_OP_SSE_TEST(UCOMISD, "qword")
 
 // register-only instructions
 #define TWO_OP_SSE_REG_TEST(Name, MemBits)                                                         \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     for (const auto& r1 : xmmnames)                                                                \
     {                                                                                              \
@@ -956,7 +956,7 @@ TWO_OP_SSE_REG_TEST(MOVLHPS, "qword")
 
 // "register + memory"-only instructions
 #define TWO_OP_SSE_MEM_TEST(Name, MemBits)                                                         \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     for (const auto& r1 : xmmnames)                                                                \
     {                                                                                              \
@@ -977,7 +977,7 @@ TWO_OP_SSE_MEM_TEST(MOVHPD, "qword")
 // TODO: more SSE MOVs
 // TODO: MOVMSK
 
-TEST_F(x64EmitterTest, MASKMOVDQU)
+TEST_F(X64EmitterTest, MASKMOVDQU)
 {
   for (const auto& r1 : xmmnames)
   {
@@ -989,7 +989,7 @@ TEST_F(x64EmitterTest, MASKMOVDQU)
   }
 }
 
-TEST_F(x64EmitterTest, LDDQU)
+TEST_F(X64EmitterTest, LDDQU)
 {
   for (const auto& r : xmmnames)
   {
@@ -1077,7 +1077,7 @@ TWO_OP_SSE_TEST(BLENDVPS, "dqword")
 TWO_OP_SSE_TEST(BLENDVPD, "dqword")
 
 #define TWO_OP_PLUS_IMM_SSE_TEST(Name, MemBits)                                                    \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     for (const auto& r1 : xmmnames)                                                                \
     {                                                                                              \
@@ -1096,7 +1096,7 @@ TWO_OP_PLUS_IMM_SSE_TEST(BLENDPD, "dqword")
 
 // for VEX GPR instructions that take the form op reg, r/m, reg
 #define VEX_RMR_TEST(Name)                                                                         \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \
@@ -1129,7 +1129,7 @@ VEX_RMR_TEST(BZHI)
 
 // for VEX GPR instructions that take the form op reg, reg, r/m
 #define VEX_RRM_TEST(Name)                                                                         \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \
@@ -1161,7 +1161,7 @@ VEX_RRM_TEST(ANDN)
 
 // for VEX GPR instructions that take the form op reg, r/m
 #define VEX_RM_TEST(Name)                                                                          \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \
@@ -1191,7 +1191,7 @@ VEX_RM_TEST(BLSI)
 
 // for VEX GPR instructions that take the form op reg, r/m, imm
 #define VEX_RMI_TEST(Name)                                                                         \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \
@@ -1219,7 +1219,7 @@ VEX_RMI_TEST(RORX)
 
 // for AVX instructions that take the form op reg, reg, r/m
 #define AVX_RRM_TEST(Name, sizename)                                                               \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \
@@ -1296,7 +1296,7 @@ FMA3_TEST(VFMADDSUB, P, true)
 FMA3_TEST(VFMSUBADD, P, true)
 
 #define AVX_RRMI_TEST(Name, MemBits)                                                               \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     for (const auto& r1 : xmmnames)                                                                \
     {                                                                                              \
@@ -1322,7 +1322,7 @@ AVX_RRMI_TEST(VBLENDPD, "dqword")
 
 // for VEX instructions that take the form op reg, reg, r/m, reg OR reg, reg, reg, r/m
 #define VEX_RRMR_RRRM_TEST(Name, sizename)                                                         \
-  TEST_F(x64EmitterTest, Name)                                                                     \
+  TEST_F(X64EmitterTest, Name)                                                                     \
   {                                                                                                \
     struct                                                                                         \
     {                                                                                              \

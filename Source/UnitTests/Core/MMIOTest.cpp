@@ -32,25 +32,25 @@ TEST(UniqueID, UniqueEnough)
 
 TEST(IsMMIOAddress, SpecialAddresses)
 {
-  constexpr bool is_wii = true;
+  constexpr bool IS_WII = true;
 
   // WG Pipe address, should not be handled by MMIO.
-  EXPECT_FALSE(MMIO::IsMMIOAddress(GPFifo::GATHER_PIPE_PHYSICAL_ADDRESS, is_wii));
+  EXPECT_FALSE(MMIO::IsMMIOAddress(GPFifo::GATHER_PIPE_PHYSICAL_ADDRESS, IS_WII));
 
   // Locked L1 cache allocation.
-  EXPECT_FALSE(MMIO::IsMMIOAddress(0xE0000000, is_wii));
+  EXPECT_FALSE(MMIO::IsMMIOAddress(0xE0000000, IS_WII));
 
   // Uncached mirror of MEM1, shouldn't be handled by MMIO
-  EXPECT_FALSE(MMIO::IsMMIOAddress(0xC0000000, is_wii));
+  EXPECT_FALSE(MMIO::IsMMIOAddress(0xC0000000, IS_WII));
 
   // Effective address of an MMIO register; MMIO only deals with physical
   // addresses.
-  EXPECT_FALSE(MMIO::IsMMIOAddress(0xCC0000E0, is_wii));
+  EXPECT_FALSE(MMIO::IsMMIOAddress(0xCC0000E0, IS_WII));
 
   // And let's check some valid addresses too
-  EXPECT_TRUE(MMIO::IsMMIOAddress(0x0C0000E0, is_wii));  // GameCube MMIOs
-  EXPECT_TRUE(MMIO::IsMMIOAddress(0x0D00008C, is_wii));  // Wii MMIOs
-  EXPECT_TRUE(MMIO::IsMMIOAddress(0x0D800F10, is_wii));  // Mirror of Wii MMIOs
+  EXPECT_TRUE(MMIO::IsMMIOAddress(0x0C0000E0, IS_WII));  // GameCube MMIOs
+  EXPECT_TRUE(MMIO::IsMMIOAddress(0x0D00008C, IS_WII));  // Wii MMIOs
+  EXPECT_TRUE(MMIO::IsMMIOAddress(0x0D800F10, IS_WII));  // Mirror of Wii MMIOs
 }
 
 class MappingTest : public testing::Test

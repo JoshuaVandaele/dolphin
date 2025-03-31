@@ -43,12 +43,12 @@ QVariant BranchWatchTableModel::headerData(int section, Qt::Orientation orientat
   if (orientation == Qt::Vertical || role != Qt::DisplayRole)
     return QVariant();
 
-  static constexpr std::array<const char*, Column::NumberOfColumns> headers = {
+  static constexpr std::array<const char*, Column::NumberOfColumns> HEADERS = {
       QT_TR_NOOP("Instr."),        QT_TR_NOOP("Cond."),
       QT_TR_NOOP("Origin"),        QT_TR_NOOP("Destination"),
       QT_TR_NOOP("Recent Hits"),   QT_TR_NOOP("Total Hits"),
       QT_TR_NOOP("Origin Symbol"), QT_TR_NOOP("Destination Symbol")};
-  return tr(headers[section]);
+  return tr(HEADERS[section]);
 }
 
 int BranchWatchTableModel::rowCount(const QModelIndex& parent) const
@@ -125,11 +125,11 @@ void BranchWatchTableModel::OnWipeRecentHits()
   const int row_count = rowCount();
   if (row_count <= 0)
     return;
-  static const QList<int> roles = {Qt::DisplayRole};
+  static const QList<int> ROLES = {Qt::DisplayRole};
   m_branch_watch.UpdateHitsSnapshot();
   const int last = row_count - 1;
   emit dataChanged(createIndex(0, Column::RecentHits), createIndex(last, Column::RecentHits),
-                   roles);
+                   ROLES);
 }
 
 void BranchWatchTableModel::OnWipeInspection()
@@ -137,12 +137,12 @@ void BranchWatchTableModel::OnWipeInspection()
   const int row_count = rowCount();
   if (row_count <= 0)
     return;
-  static const QList<int> roles = {Qt::FontRole, Qt::ForegroundRole};
+  static const QList<int> ROLES = {Qt::FontRole, Qt::ForegroundRole};
   m_branch_watch.ClearSelectionInspection();
   const int last = row_count - 1;
-  emit dataChanged(createIndex(0, Column::Origin), createIndex(last, Column::Destination), roles);
+  emit dataChanged(createIndex(0, Column::Origin), createIndex(last, Column::Destination), ROLES);
   emit dataChanged(createIndex(0, Column::OriginSymbol), createIndex(last, Column::DestinSymbol),
-                   roles);
+                   ROLES);
 }
 
 void BranchWatchTableModel::OnDebugFontChanged(const QFont& font)
@@ -173,11 +173,11 @@ void BranchWatchTableModel::UpdateSymbols()
   const int row_count = rowCount();
   if (row_count <= 0)
     return;
-  static const QList<int> roles = {Qt::DisplayRole};
+  static const QList<int> ROLES = {Qt::DisplayRole};
   PrefetchSymbols();
   const int last = row_count - 1;
   emit dataChanged(createIndex(0, Column::OriginSymbol), createIndex(last, Column::DestinSymbol),
-                   roles);
+                   ROLES);
 }
 
 void BranchWatchTableModel::UpdateHits()
@@ -185,9 +185,9 @@ void BranchWatchTableModel::UpdateHits()
   const int row_count = rowCount();
   if (row_count <= 0)
     return;
-  static const QList<int> roles = {Qt::DisplayRole};
+  static const QList<int> ROLES = {Qt::DisplayRole};
   const int last = row_count - 1;
-  emit dataChanged(createIndex(0, Column::RecentHits), createIndex(last, Column::TotalHits), roles);
+  emit dataChanged(createIndex(0, Column::RecentHits), createIndex(last, Column::TotalHits), ROLES);
 }
 
 void BranchWatchTableModel::SetInspected(const QModelIndex& index)
@@ -219,9 +219,9 @@ void BranchWatchTableModel::SetInspected(const QModelIndex& index)
 void BranchWatchTableModel::SetInspected(const QModelIndex& index,
                                          Core::BranchWatchSelectionInspection inspection)
 {
-  static const QList<int> roles = {Qt::FontRole, Qt::ForegroundRole};
+  static const QList<int> ROLES = {Qt::FontRole, Qt::ForegroundRole};
   m_branch_watch.SetSelectedInspected(index.row(), inspection);
-  emit dataChanged(index, index, roles);
+  emit dataChanged(index, index, ROLES);
 }
 
 void BranchWatchTableModel::SetOriginInspected(u32 origin_addr)

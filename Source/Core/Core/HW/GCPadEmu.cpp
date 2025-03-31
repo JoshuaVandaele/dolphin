@@ -17,7 +17,7 @@
 #include "InputCommon/ControllerEmu/StickGate.h"
 #include "InputCommon/GCPadStatus.h"
 
-static const u16 button_bitmasks[] = {
+static const u16 BUTTON_BITMASKS[] = {
     PAD_BUTTON_A,
     PAD_BUTTON_B,
     PAD_BUTTON_X,
@@ -27,12 +27,12 @@ static const u16 button_bitmasks[] = {
     0  // MIC HAX
 };
 
-static const u16 trigger_bitmasks[] = {
+static const u16 TRIGGER_BITMASKS[] = {
     PAD_TRIGGER_L,
     PAD_TRIGGER_R,
 };
 
-static const u16 dpad_bitmasks[] = {PAD_BUTTON_UP, PAD_BUTTON_DOWN, PAD_BUTTON_LEFT,
+static const u16 DPAD_BITMASKS[] = {PAD_BUTTON_UP, PAD_BUTTON_DOWN, PAD_BUTTON_LEFT,
                                     PAD_BUTTON_RIGHT};
 
 GCPad::GCPad(const unsigned int index) : m_index(index)
@@ -139,7 +139,7 @@ GCPadStatus GCPad::GetInput() const
   }
 
   // buttons
-  m_buttons->GetState(&pad.button, button_bitmasks, m_input_override_function);
+  m_buttons->GetState(&pad.button, BUTTON_BITMASKS, m_input_override_function);
 
   // set analog A/B analog to full or w/e, prolly not needed
   if (pad.button & PAD_BUTTON_A)
@@ -148,7 +148,7 @@ GCPadStatus GCPad::GetInput() const
     pad.analogB = 0xFF;
 
   // dpad
-  m_dpad->GetState(&pad.button, dpad_bitmasks, m_input_override_function);
+  m_dpad->GetState(&pad.button, DPAD_BITMASKS, m_input_override_function);
 
   // sticks
   const auto main_stick_state = m_main_stick->GetState(m_input_override_function);
@@ -161,7 +161,7 @@ GCPadStatus GCPad::GetInput() const
 
   // triggers
   std::array<ControlState, 2> triggers;
-  m_triggers->GetState(&pad.button, trigger_bitmasks, triggers.data(), m_input_override_function);
+  m_triggers->GetState(&pad.button, TRIGGER_BITMASKS, triggers.data(), m_input_override_function);
   pad.triggerLeft = MapFloat<u8>(triggers[0], 0);
   pad.triggerRight = MapFloat<u8>(triggers[1], 0);
 

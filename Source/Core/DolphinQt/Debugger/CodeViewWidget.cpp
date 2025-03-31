@@ -71,13 +71,13 @@ private:
     painter->setClipRect(option.rect);
     painter->setPen(m_parent->palette().text().color());
 
-    constexpr u32 x_offset_in_branch_for_vertical_line = 10;
+    constexpr u32 X_OFFSET_IN_BRANCH_FOR_VERTICAL_LINE = 10;
     const u32 addr = m_parent->AddressForRow(index.row());
     for (const CodeViewBranch& branch : m_parent->m_branches)
     {
       const int y_center = option.rect.top() + option.rect.height() / 2;
       const int x_left = option.rect.left() + WIDTH_PER_BRANCH_ARROW * branch.indentation;
-      const int x_right = x_left + x_offset_in_branch_for_vertical_line;
+      const int x_right = x_left + X_OFFSET_IN_BRANCH_FOR_VERTICAL_LINE;
 
       if (branch.is_link)
       {
@@ -212,7 +212,7 @@ static u32 GetBranchFromAddress(const Core::CPUThreadGuard& guard, u32 addr)
 void CodeViewWidget::FontBasedSizing()
 {
   // just text width is too small with some fonts, so increase by a bit
-  constexpr int extra_text_width = 8;
+  constexpr int EXTRA_TEXT_WIDTH = 8;
 
   const QFontMetrics fm(font());
 
@@ -221,7 +221,7 @@ void CodeViewWidget::FontBasedSizing()
   horizontalHeader()->setMinimumSectionSize(rowh + 5);
   setColumnWidth(CODE_VIEW_COLUMN_BREAKPOINT, rowh + 5);
   setColumnWidth(CODE_VIEW_COLUMN_ADDRESS,
-                 fm.boundingRect(QStringLiteral("80000000")).width() + extra_text_width);
+                 fm.boundingRect(QStringLiteral("80000000")).width() + EXTRA_TEXT_WIDTH);
 
   // The longest instruction is technically 'ps_merge00' (0x10000420u), but those instructions are
   // very rare and would needlessly increase the column size, so let's go with 'rlwinm.' instead.
@@ -233,11 +233,11 @@ void CodeViewWidget::FontBasedSizing()
   const std::string ins = (split == std::string::npos ? disas : disas.substr(0, split));
   const std::string param = (split == std::string::npos ? "" : disas.substr(split + 1));
   setColumnWidth(CODE_VIEW_COLUMN_INSTRUCTION,
-                 fm.boundingRect(QString::fromStdString(ins)).width() + extra_text_width);
+                 fm.boundingRect(QString::fromStdString(ins)).width() + EXTRA_TEXT_WIDTH);
   setColumnWidth(CODE_VIEW_COLUMN_PARAMETERS,
-                 fm.boundingRect(QString::fromStdString(param)).width() + extra_text_width);
+                 fm.boundingRect(QString::fromStdString(param)).width() + EXTRA_TEXT_WIDTH);
   setColumnWidth(CODE_VIEW_COLUMN_DESCRIPTION,
-                 fm.boundingRect(QChar(u'0')).width() * 25 + extra_text_width);
+                 fm.boundingRect(QChar(u'0')).width() * 25 + EXTRA_TEXT_WIDTH);
 
   Update();
 }

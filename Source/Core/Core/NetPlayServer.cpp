@@ -155,10 +155,10 @@ NetPlayServer::NetPlayServer(const u16 port, const bool forward_port, NetPlayUI*
   }
   else
   {
-    ENetAddress serverAddr;
-    serverAddr.host = ENET_HOST_ANY;
-    serverAddr.port = port;
-    m_server = enet_host_create(&serverAddr, 10, CHANNEL_COUNT, 0, 0);
+    ENetAddress server_addr;
+    server_addr.host = ENET_HOST_ANY;
+    server_addr.port = port;
+    m_server = enet_host_create(&server_addr, 10, CHANNEL_COUNT, 0, 0);
     if (m_server != nullptr)
     {
       m_server->mtu = std::min(m_server->mtu, NetPlay::MAX_ENET_MTU);
@@ -275,11 +275,11 @@ void NetPlayServer::ThreadFunc()
       m_update_pings = false;
     }
 
-    ENetEvent netEvent;
+    ENetEvent net_event;
     int net;
     if (m_traversal_client)
       m_traversal_client->HandleResends();
-    net = enet_host_service(m_server, &netEvent, 1000);
+    net = enet_host_service(m_server, &net_event, 1000);
     while (!m_async_queue.Empty())
     {
       INFO_LOG_FMT(NETPLAY, "Processing async queue event.");
@@ -302,14 +302,14 @@ void NetPlayServer::ThreadFunc()
     }
     if (net > 0)
     {
-      switch (netEvent.type)
+      switch (net_event.type)
       {
       case ENET_EVENT_TYPE_CONNECT:
       {
         // Actual client initialization is deferred to the receive event, so here
         // we'll just log the new connection.
-        INFO_LOG_FMT(NETPLAY, "Peer connected from: {:x}:{}", netEvent.peer->address.host,
-                     netEvent.peer->address.port);
+        INFO_LOG_FMT(NETPLAY, "Peer connected from: {:x}:{}", net_event.peer->address.host,
+                     net_event.peer->address.port);
       }
       break;
       case ENET_EVENT_TYPE_RECEIVE:
@@ -317,36 +317,36 @@ void NetPlayServer::ThreadFunc()
         INFO_LOG_FMT(NETPLAY, "enet_host_service: receive event");
 
         sf::Packet rpac;
-        rpac.append(netEvent.packet->data, netEvent.packet->dataLength);
+        rpac.append(net_event.packet->data, net_event.packet->dataLength);
 
-        if (!netEvent.peer->data)
+        if (!net_event.peer->data)
         {
           // uninitialized client, we'll assume this is their initialization packet
           ConnectionError error;
           {
-            INFO_LOG_FMT(NETPLAY, "Initializing peer {:x}:{}", netEvent.peer->address.host,
-                         netEvent.peer->address.port);
+            INFO_LOG_FMT(NETPLAY, "Initializing peer {:x}:{}", net_event.peer->address.host,
+                         net_event.peer->address.port);
             std::lock_guard lkg(m_crit.game);
-            error = OnConnect(netEvent.peer, rpac);
+            error = OnConnect(net_event.peer, rpac);
           }
 
           if (error != ConnectionError::NoError)
           {
             INFO_LOG_FMT(NETPLAY, "Error {} initializing peer {:x}:{}", u8(error),
-                         netEvent.peer->address.host, netEvent.peer->address.port);
+                         net_event.peer->address.host, net_event.peer->address.port);
 
             sf::Packet spac;
             spac << error;
             // don't need to lock, this client isn't in the client map
-            Send(netEvent.peer, spac);
+            Send(net_event.peer, spac);
 
-            ClearPeerPlayerId(netEvent.peer);
-            enet_peer_disconnect_later(netEvent.peer, 0);
+            ClearPeerPlayerId(net_event.peer);
+            enet_peer_disconnect_later(net_event.peer, 0);
           }
         }
         else
         {
-          auto it = m_players.find(*PeerPlayerId(netEvent.peer));
+          auto it = m_players.find(*PeerPlayerId(net_event.peer));
           Client& client = it->second;
           if (OnData(rpac, client) != 0)
           {
@@ -356,14 +356,14 @@ void NetPlayServer::ThreadFunc()
             std::lock_guard lkg(m_crit.game);
             OnDisconnect(client);
 
-            ClearPeerPlayerId(netEvent.peer);
+            ClearPeerPlayerId(net_event.peer);
           }
           else
           {
             INFO_LOG_FMT(NETPLAY, "successfully handled packet from client {}", client.pid);
           }
         }
-        enet_packet_destroy(netEvent.packet);
+        enet_packet_destroy(net_event.packet);
       }
       break;
       case ENET_EVENT_TYPE_DISCONNECT:
@@ -371,12 +371,12 @@ void NetPlayServer::ThreadFunc()
         INFO_LOG_FMT(NETPLAY, "enet_host_service: disconnect event");
 
         std::lock_guard lkg(m_crit.game);
-        if (!netEvent.peer->data)
+        if (!net_event.peer->data)
         {
           ERROR_LOG_FMT(NETPLAY, "enet_host_service: no peer data");
           break;
         }
-        const auto player_id = *PeerPlayerId(netEvent.peer);
+        const auto player_id = *PeerPlayerId(net_event.peer);
         auto it = m_players.find(player_id);
         if (it != m_players.end())
         {
@@ -384,7 +384,7 @@ void NetPlayServer::ThreadFunc()
           INFO_LOG_FMT(NETPLAY, "Disconnecting client {}.", client.pid);
           OnDisconnect(client);
 
-          ClearPeerPlayerId(netEvent.peer);
+          ClearPeerPlayerId(net_event.peer);
         }
         else
         {
@@ -394,10 +394,10 @@ void NetPlayServer::ThreadFunc()
       break;
       default:
         // not a valid switch case due to not technically being part of the enum
-        if (static_cast<int>(netEvent.type) == Common::ENet::SKIPPABLE_EVENT)
+        if (static_cast<int>(net_event.type) == Common::ENet::SKIPPABLE_EVENT)
           INFO_LOG_FMT(NETPLAY, "enet_host_service: skippable packet event");
         else
-          ERROR_LOG_FMT(NETPLAY, "enet_host_service: unknown event type: {}", int(netEvent.type));
+          ERROR_LOG_FMT(NETPLAY, "enet_host_service: unknown event type: {}", int(net_event.type));
         break;
       }
     }
@@ -2053,12 +2053,12 @@ bool NetPlayServer::SyncCodes()
   // Find all INI files
   const auto game_id = game->GetGameID();
   const auto revision = game->GetRevision();
-  Common::IniFile globalIni;
+  Common::IniFile global_ini;
   for (const std::string& filename : ConfigLoaders::GetGameIniFilenames(game_id, revision))
-    globalIni.Load(File::GetSysDirectory() + GAMESETTINGS_DIR DIR_SEP + filename, true);
-  Common::IniFile localIni;
+    global_ini.Load(File::GetSysDirectory() + GAMESETTINGS_DIR DIR_SEP + filename, true);
+  Common::IniFile local_ini;
   for (const std::string& filename : ConfigLoaders::GetGameIniFilenames(game_id, revision))
-    localIni.Load(File::GetUserPath(D_GAMESETTINGS_IDX) + filename, true);
+    local_ini.Load(File::GetUserPath(D_GAMESETTINGS_IDX) + filename, true);
 
   // Initialize Number of Synced Players
   m_codes_synced_players = 0;
@@ -2072,7 +2072,7 @@ bool NetPlayServer::SyncCodes()
   }
   // Sync Gecko Codes
   {
-    std::vector<Gecko::GeckoCode> codes = Gecko::LoadCodes(globalIni, localIni);
+    std::vector<Gecko::GeckoCode> codes = Gecko::LoadCodes(global_ini, local_ini);
 
 #ifdef USE_RETRO_ACHIEVEMENTS
     AchievementManager::GetInstance().FilterApprovedGeckoCodes(codes, game_id, revision);
@@ -2127,7 +2127,7 @@ bool NetPlayServer::SyncCodes()
 
   // Sync AR Codes
   {
-    std::vector<ActionReplay::ARCode> codes = ActionReplay::LoadCodes(globalIni, localIni);
+    std::vector<ActionReplay::ARCode> codes = ActionReplay::LoadCodes(global_ini, local_ini);
 #ifdef USE_RETRO_ACHIEVEMENTS
     AchievementManager::GetInstance().FilterApprovedARCodes(codes, game_id, revision);
 #endif  // USE_RETRO_ACHIEVEMENTS

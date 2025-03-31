@@ -56,7 +56,7 @@ using namespace IOS::HLE::USB::SkylanderCrypto;
 //  File::IOFile f(temp_dir + "/decrypted.sky", "wb");
 //  f.WriteBytes(decrypted.data(), decrypted.size());
 //
-static constexpr std::array<u8, IOS::HLE::USB::FIGURE_SIZE> decrypted_figure = {
+static constexpr std::array<u8, IOS::HLE::USB::FIGURE_SIZE> DECRYPTED_FIGURE = {
     0x01, 0x23, 0x45, 0x67, 0x00, 0x81, 0x01, 0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0xD6, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0xCB, 0x7D,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -147,30 +147,30 @@ TEST(Skylanders, Keygen)
 TEST(Skylanders, Checksums)
 {
   std::array<u8, 2> actual = {};
-  ComputeChecksumType0(decrypted_figure.data(), actual.data());
-  EXPECT_EQ(Common::BitCastPtr<u16>(decrypted_figure.data() + 0x1E),
+  ComputeChecksumType0(DECRYPTED_FIGURE.data(), actual.data());
+  EXPECT_EQ(Common::BitCastPtr<u16>(DECRYPTED_FIGURE.data() + 0x1E),
             Common::BitCastPtr<u16>(actual.data()));
 
   u16 area_offset = 0x80;
 
   for (u8 i = 0; i < 2; i++)
   {
-    ComputeChecksumType3(decrypted_figure.data() + area_offset + 0x50, actual.data());
-    EXPECT_EQ(Common::BitCastPtr<u16>(decrypted_figure.data() + area_offset + 0xA),
+    ComputeChecksumType3(DECRYPTED_FIGURE.data() + area_offset + 0x50, actual.data());
+    EXPECT_EQ(Common::BitCastPtr<u16>(DECRYPTED_FIGURE.data() + area_offset + 0xA),
               Common::BitCastPtr<u16>(actual.data()));
 
-    ComputeChecksumType2(decrypted_figure.data() + area_offset + 0x10, actual.data());
-    EXPECT_EQ(Common::BitCastPtr<u16>(decrypted_figure.data() + area_offset + 0xC),
+    ComputeChecksumType2(DECRYPTED_FIGURE.data() + area_offset + 0x10, actual.data());
+    EXPECT_EQ(Common::BitCastPtr<u16>(DECRYPTED_FIGURE.data() + area_offset + 0xC),
               Common::BitCastPtr<u16>(actual.data()));
 
-    ComputeChecksumType1(decrypted_figure.data() + area_offset, actual.data());
-    EXPECT_EQ(Common::BitCastPtr<u16>(decrypted_figure.data() + area_offset + 0xE),
+    ComputeChecksumType1(DECRYPTED_FIGURE.data() + area_offset, actual.data());
+    EXPECT_EQ(Common::BitCastPtr<u16>(DECRYPTED_FIGURE.data() + area_offset + 0xE),
               Common::BitCastPtr<u16>(actual.data()));
 
     area_offset += 0x90;
 
-    ComputeChecksumType6(decrypted_figure.data() + area_offset, actual.data());
-    EXPECT_EQ(Common::BitCastPtr<u16>(decrypted_figure.data() + area_offset),
+    ComputeChecksumType6(DECRYPTED_FIGURE.data() + area_offset, actual.data());
+    EXPECT_EQ(Common::BitCastPtr<u16>(DECRYPTED_FIGURE.data() + area_offset),
               Common::BitCastPtr<u16>(actual.data()));
 
     area_offset += 0x130;

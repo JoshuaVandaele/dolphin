@@ -18,18 +18,18 @@ namespace
 {
 bool IsQualifier(std::string_view value)
 {
-  static constexpr std::array<std::string_view, 7> qualifiers = {
+  static constexpr std::array<std::string_view, 7> QUALIFIERS = {
       "attribute", "const", "highp", "lowp", "mediump", "uniform", "varying",
   };
-  return Common::Contains(qualifiers, value);
+  return Common::Contains(QUALIFIERS, value);
 }
 
 bool IsBuiltInMacro(std::string_view value)
 {
-  static constexpr std::array<std::string_view, 5> built_in = {
+  static constexpr std::array<std::string_view, 5> BUILT_IN = {
       "__LINE__", "__FILE__", "__VERSION__", "GL_core_profile", "GL_compatibility_profile",
   };
-  return Common::Contains(built_in, value);
+  return Common::Contains(BUILT_IN, value);
 }
 
 std::vector<std::string> GlobalConflicts(std::string_view source)

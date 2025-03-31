@@ -48,7 +48,7 @@ GLuint ProgramShaderCache::s_last_VAO = 0;
 static std::unique_ptr<StreamBuffer> s_buffer;
 static int num_failures = 0;
 
-static GLuint CurrentProgram = 0;
+static GLuint current_program = 0;
 ProgramShaderCache::PipelineProgramMap ProgramShaderCache::s_pipeline_programs;
 std::mutex ProgramShaderCache::s_pipeline_program_lock;
 static std::string s_glsl_header;
@@ -96,18 +96,18 @@ void SHADER::SetProgramVariables()
   glUseProgram(glprogid);
 
   // Bind UBO and texture samplers
-  GLint PSBlock_id = glGetUniformBlockIndex(glprogid, "PSBlock");
-  GLint VSBlock_id = glGetUniformBlockIndex(glprogid, "VSBlock");
-  GLint GSBlock_id = glGetUniformBlockIndex(glprogid, "GSBlock");
-  GLint UBERBlock_id = glGetUniformBlockIndex(glprogid, "UBERBlock");
-  if (PSBlock_id != -1)
-    glUniformBlockBinding(glprogid, PSBlock_id, 1);
-  if (VSBlock_id != -1)
-    glUniformBlockBinding(glprogid, VSBlock_id, 2);
-  if (GSBlock_id != -1)
-    glUniformBlockBinding(glprogid, GSBlock_id, 4);
-  if (UBERBlock_id != -1)
-    glUniformBlockBinding(glprogid, UBERBlock_id, 5);
+  GLint ps_block_id = glGetUniformBlockIndex(glprogid, "PSBlock");
+  GLint vs_block_id = glGetUniformBlockIndex(glprogid, "VSBlock");
+  GLint gs_block_id = glGetUniformBlockIndex(glprogid, "GSBlock");
+  GLint uber_block_id = glGetUniformBlockIndex(glprogid, "UBERBlock");
+  if (ps_block_id != -1)
+    glUniformBlockBinding(glprogid, ps_block_id, 1);
+  if (vs_block_id != -1)
+    glUniformBlockBinding(glprogid, vs_block_id, 2);
+  if (gs_block_id != -1)
+    glUniformBlockBinding(glprogid, gs_block_id, 4);
+  if (uber_block_id != -1)
+    glUniformBlockBinding(glprogid, uber_block_id, 5);
 
   // Bind Texture Samplers
   for (int a = 0; a < 8; ++a)
@@ -121,7 +121,7 @@ void SHADER::SetProgramVariables()
   }
 
   // Restore previous program binding.
-  glUseProgram(CurrentProgram);
+  glUseProgram(current_program);
 }
 
 void SHADER::SetProgramBindings(bool is_compute)
@@ -164,11 +164,11 @@ void SHADER::SetProgramBindings(bool is_compute)
 
 void SHADER::Bind() const
 {
-  if (CurrentProgram != glprogid)
+  if (current_program != glprogid)
   {
     INCSTAT(g_stats.this_frame.num_shader_changes);
     glUseProgram(glprogid);
-    CurrentProgram = glprogid;
+    current_program = glprogid;
   }
 }
 
@@ -330,17 +330,17 @@ GLuint ProgramShaderCache::CompileSingleShader(GLenum type, std::string_view cod
 {
   const GLuint result = glCreateShader(type);
 
-  constexpr GLsizei num_strings = 2;
-  const std::array<const char*, num_strings> src{
+  constexpr GLsizei NUM_STRINGS = 2;
+  const std::array<const char*, NUM_STRINGS> src{
       s_glsl_header.data(),
       code.data(),
   };
-  const std::array<GLint, num_strings> src_sizes{
+  const std::array<GLint, NUM_STRINGS> src_sizes{
       static_cast<GLint>(s_glsl_header.size()),
       static_cast<GLint>(code.size()),
   };
 
-  glShaderSource(result, num_strings, src.data(), src_sizes.data());
+  glShaderSource(result, NUM_STRINGS, src.data(), src_sizes.data());
   glCompileShader(result);
 
   if (!CheckShaderCompileResult(result, type, code))
@@ -355,11 +355,11 @@ GLuint ProgramShaderCache::CompileSingleShader(GLenum type, std::string_view cod
 
 bool ProgramShaderCache::CheckShaderCompileResult(GLuint id, GLenum type, std::string_view code)
 {
-  GLint compileStatus;
-  glGetShaderiv(id, GL_COMPILE_STATUS, &compileStatus);
+  GLint compile_status;
+  glGetShaderiv(id, GL_COMPILE_STATUS, &compile_status);
   GLsizei length = 0;
   glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-  if (compileStatus != GL_TRUE || length > 1)
+  if (compile_status != GL_TRUE || length > 1)
   {
     std::string info_log;
     info_log.resize(length);
@@ -382,7 +382,7 @@ bool ProgramShaderCache::CheckShaderCompileResult(GLuint id, GLenum type, std::s
       break;
     }
 
-    if (compileStatus != GL_TRUE)
+    if (compile_status != GL_TRUE)
     {
       ERROR_LOG_FMT(VIDEO, "{} failed compilation:\n{}", prefix, info_log);
 
@@ -412,16 +412,16 @@ bool ProgramShaderCache::CheckShaderCompileResult(GLuint id, GLenum type, std::s
 bool ProgramShaderCache::CheckProgramLinkResult(GLuint id, std::string_view vcode,
                                                 std::string_view pcode, std::string_view gcode)
 {
-  GLint linkStatus;
-  glGetProgramiv(id, GL_LINK_STATUS, &linkStatus);
+  GLint link_status;
+  glGetProgramiv(id, GL_LINK_STATUS, &link_status);
   GLsizei length = 0;
   glGetProgramiv(id, GL_INFO_LOG_LENGTH, &length);
-  if (linkStatus != GL_TRUE || length > 1)
+  if (link_status != GL_TRUE || length > 1)
   {
     std::string info_log;
     info_log.resize(length);
     glGetProgramInfoLog(id, length, &length, &info_log[0]);
-    if (linkStatus != GL_TRUE)
+    if (link_status != GL_TRUE)
     {
       ERROR_LOG_FMT(VIDEO, "Program failed linking:\n{}", info_log);
       std::string filename = VideoBackendBase::BadShaderFilename("p", num_failures++);
@@ -474,7 +474,7 @@ void ProgramShaderCache::Init()
   CreateHeader();
   CreateAttributelessVAO();
 
-  CurrentProgram = 0;
+  current_program = 0;
 }
 
 void ProgramShaderCache::Shutdown()
@@ -513,12 +513,12 @@ void ProgramShaderCache::CreateAttributelessVAO()
 
 void ProgramShaderCache::BindVertexFormat(const GLVertexFormat* vertex_format)
 {
-  u32 new_VAO = vertex_format ? vertex_format->VAO : s_attributeless_VAO;
-  if (s_last_VAO == new_VAO)
+  u32 new_vao = vertex_format ? vertex_format->VAO : s_attributeless_VAO;
+  if (s_last_VAO == new_vao)
     return;
 
-  glBindVertexArray(new_VAO);
-  s_last_VAO = new_VAO;
+  glBindVertexArray(new_vao);
+  s_last_VAO = new_vao;
 }
 
 void ProgramShaderCache::ReBindVertexFormat()
@@ -545,7 +545,7 @@ void ProgramShaderCache::InvalidateVertexFormatIfBound(GLuint vao)
 
 void ProgramShaderCache::InvalidateLastProgram()
 {
-  CurrentProgram = 0;
+  current_program = 0;
 }
 
 PipelineProgram* ProgramShaderCache::GetPipelineProgram(const GLVertexFormat* vertex_format,
@@ -677,33 +677,33 @@ void ProgramShaderCache::CreateHeader()
 {
   GlslVersion v = g_ogl_config.eSupportedGLSLVersion;
   bool is_glsles = v >= GlslEs300;
-  std::string SupportedESPointSize;
-  std::string SupportedESTextureBuffer;
+  std::string supported_es_point_size;
+  std::string supported_es_texture_buffer;
   switch (g_ogl_config.SupportedESPointSize)
   {
   case EsPointSizeType::PointSizeOes:
-    SupportedESPointSize = "#extension GL_OES_geometry_point_size : enable";
+    supported_es_point_size = "#extension GL_OES_geometry_point_size : enable";
     break;
   case EsPointSizeType::PointSizeExt:
-    SupportedESPointSize = "#extension GL_EXT_geometry_point_size : enable";
+    supported_es_point_size = "#extension GL_EXT_geometry_point_size : enable";
     break;
   case EsPointSizeType::PointSizeNone:
   default:
-    SupportedESPointSize = "";
+    supported_es_point_size = "";
     break;
   }
 
   switch (g_ogl_config.SupportedESTextureBuffer)
   {
   case EsTexbufType::TexbufExt:
-    SupportedESTextureBuffer = "#extension GL_EXT_texture_buffer : enable";
+    supported_es_texture_buffer = "#extension GL_EXT_texture_buffer : enable";
     break;
   case EsTexbufType::TexbufOes:
-    SupportedESTextureBuffer = "#extension GL_OES_texture_buffer : enable";
+    supported_es_texture_buffer = "#extension GL_OES_texture_buffer : enable";
     break;
   case EsTexbufType::TexbufCore:
   case EsTexbufType::TexbufNone:
-    SupportedESTextureBuffer = "";
+    supported_es_texture_buffer = "";
     break;
   }
 
@@ -868,12 +868,12 @@ void ProgramShaderCache::CreateHeader()
           "",
       v < Glsl400 && g_backend_info.bSupportsSSAA ? "#extension GL_ARB_sample_shading : enable" :
                                                     "",
-      SupportedESPointSize,
+      supported_es_point_size,
       g_ogl_config.bSupportsAEP ? "#extension GL_ANDROID_extension_pack_es31a : enable" : "",
       v < Glsl140 && g_backend_info.bSupportsPaletteConversion ?
           "#extension GL_ARB_texture_buffer_object : enable" :
           "",
-      SupportedESTextureBuffer,
+      supported_es_texture_buffer,
       is_glsles && g_backend_info.bSupportsDualSourceBlend ?
           "#extension GL_EXT_blend_func_extended : enable" :
           ""

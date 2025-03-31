@@ -11,10 +11,10 @@
 #include "InputCommon/ControllerEmu/ControlGroup/Buttons.h"
 #include "InputCommon/GCPadStatus.h"
 
-static const u16 dpad_bitmasks[] = {PAD_BUTTON_UP, PAD_BUTTON_DOWN, PAD_BUTTON_LEFT,
+static const u16 DPAD_BITMASKS[] = {PAD_BUTTON_UP, PAD_BUTTON_DOWN, PAD_BUTTON_LEFT,
                                     PAD_BUTTON_RIGHT};
 
-static const u16 button_bitmasks[] = {PAD_BUTTON_B,  PAD_BUTTON_A,  PAD_TRIGGER_L,
+static const u16 BUTTON_BITMASKS[] = {PAD_BUTTON_B,  PAD_BUTTON_A,  PAD_TRIGGER_L,
                                       PAD_TRIGGER_R, PAD_TRIGGER_Z, PAD_BUTTON_START};
 
 GBAPad::GBAPad(const unsigned int index) : m_reset_pending(false), m_index(index)
@@ -69,10 +69,10 @@ GCPadStatus GBAPad::GetInput()
   GCPadStatus pad = {};
 
   // Buttons
-  m_buttons->GetState(&pad.button, button_bitmasks, m_input_override_function);
+  m_buttons->GetState(&pad.button, BUTTON_BITMASKS, m_input_override_function);
 
   // DPad
-  m_dpad->GetState(&pad.button, dpad_bitmasks, m_input_override_function);
+  m_dpad->GetState(&pad.button, DPAD_BITMASKS, m_input_override_function);
 
   // Use X button as a reset signal
   if (m_reset_pending)

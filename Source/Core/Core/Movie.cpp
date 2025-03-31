@@ -346,8 +346,8 @@ void MovieManager::SignalDiscChange(const std::string& new_path)
   {
     size_t size_of_path_without_filename = new_path.find_last_of("/\\") + 1;
     std::string filename = new_path.substr(size_of_path_without_filename);
-    constexpr size_t maximum_length = sizeof(DTMHeader::discChange);
-    if (filename.length() > maximum_length)
+    constexpr size_t MAXIMUM_LENGTH = sizeof(DTMHeader::discChange);
+    if (filename.length() > MAXIMUM_LENGTH)
     {
       PanicAlertFmtT("The disc change to \"{0}\" could not be saved in the .dtm file.\n"
                      "The filename of the disc image must not be longer than 40 characters.",
@@ -728,7 +728,7 @@ static std::string GenerateWiiInputDisplayString(int index, const DesiredWiimote
         },
         [&](const Classic::DesiredState& cc) {
           const auto bt = cc.GetButtons();
-          constexpr std::pair<u16, const char*> named_buttons[] = {
+          constexpr std::pair<u16, const char*> NAMED_BUTTONS[] = {
               {Classic::PAD_LEFT, "LEFT"},    {Classic::PAD_RIGHT, "RIGHT"},
               {Classic::PAD_DOWN, "DOWN"},    {Classic::PAD_UP, "UP"},
               {Classic::BUTTON_A, "A"},       {Classic::BUTTON_B, "B"},
@@ -737,7 +737,7 @@ static std::string GenerateWiiInputDisplayString(int index, const DesiredWiimote
               {Classic::BUTTON_PLUS, "+"},    {Classic::BUTTON_MINUS, "-"},
               {Classic::BUTTON_HOME, "HOME"},
           };
-          for (auto& [value, name] : named_buttons)
+          for (auto& [value, name] : NAMED_BUTTONS)
           {
             if (bt & value)
             {
@@ -745,17 +745,17 @@ static std::string GenerateWiiInputDisplayString(int index, const DesiredWiimote
               display_str += name;
             }
           }
-          constexpr auto trigger_max = (1 << Classic::TRIGGER_BITS) - 1;
-          display_str += Analog1DToString(cc.GetLeftTrigger().value, " L", trigger_max);
-          display_str += Analog1DToString(cc.GetRightTrigger().value, " R", trigger_max);
+          constexpr auto TRIGGER_MAX = (1 << Classic::TRIGGER_BITS) - 1;
+          display_str += Analog1DToString(cc.GetLeftTrigger().value, " L", TRIGGER_MAX);
+          display_str += Analog1DToString(cc.GetRightTrigger().value, " R", TRIGGER_MAX);
 
-          constexpr auto lstick_max = (1 << Classic::LEFT_STICK_BITS) - 1;
+          constexpr auto LSTICK_MAX = (1 << Classic::LEFT_STICK_BITS) - 1;
           const auto left_stick = cc.GetLeftStick().value;
-          display_str += Analog2DToString(left_stick.x, left_stick.y, " ANA", lstick_max);
+          display_str += Analog2DToString(left_stick.x, left_stick.y, " ANA", LSTICK_MAX);
 
-          constexpr auto rstick_max = (1 << Classic::RIGHT_STICK_BITS) - 1;
+          constexpr auto RSTICK_MAX = (1 << Classic::RIGHT_STICK_BITS) - 1;
           const auto right_stick = cc.GetRightStick().value;
-          display_str += Analog2DToString(right_stick.x, right_stick.y, " R-ANA", rstick_max);
+          display_str += Analog2DToString(right_stick.x, right_stick.y, " R-ANA", RSTICK_MAX);
         },
         [&](const Guitar::DesiredState&) { display_str += " Guitar"; },
         [&](const Drums::DesiredState&) { display_str += " Drums"; },
@@ -1015,17 +1015,17 @@ void MovieManager::LoadInput(const std::string& movie_path)
   if (m_system.IsWii())
     ChangeWiiPads(true);
 
-  u64 totalSavedBytes = t_record.GetSize() - 256;
+  u64 total_saved_bytes = t_record.GetSize() - 256;
 
-  bool afterEnd = false;
+  bool after_end = false;
   // This can only happen if the user manually deletes data from the dtm.
-  if (m_current_byte > totalSavedBytes)
+  if (m_current_byte > total_saved_bytes)
   {
     PanicAlertFmtT(
         "Warning: You loaded a save whose movie ends before the current frame in the save "
         "(byte {0} < {1}) (frame {2} < {3}). You should load another save before continuing.",
-        totalSavedBytes + 256, m_current_byte + 256, m_temp_header.frameCount, m_current_frame);
-    afterEnd = true;
+        total_saved_bytes + 256, m_current_byte + 256, m_temp_header.frameCount, m_current_frame);
+    after_end = true;
   }
 
   if (!m_read_only || m_temp_input.empty())
@@ -1035,17 +1035,17 @@ void MovieManager::LoadInput(const std::string& movie_path)
     m_total_input_count = m_temp_header.inputCount;
     m_total_tick_count = m_tick_count_at_last_input = m_temp_header.tickCount;
 
-    m_temp_input.resize(static_cast<size_t>(totalSavedBytes));
+    m_temp_input.resize(static_cast<size_t>(total_saved_bytes));
     t_record.ReadBytes(m_temp_input.data(), m_temp_input.size());
   }
   else if (m_current_byte > 0)
   {
-    if (m_current_byte > totalSavedBytes)
+    if (m_current_byte > total_saved_bytes)
     {
     }
     else if (m_current_byte > m_temp_input.size())
     {
-      afterEnd = true;
+      after_end = true;
       PanicAlertFmtT(
           "Warning: You loaded a save that's after the end of the current movie. (byte {0} "
           "> {1}) (input {2} > {3}). You should load another save before continuing, or load "
@@ -1056,14 +1056,14 @@ void MovieManager::LoadInput(const std::string& movie_path)
     else if (m_current_byte > 0 && !m_temp_input.empty())
     {
       // verify identical from movie start to the save's current frame
-      std::vector<u8> movInput(m_current_byte);
-      t_record.ReadArray(movInput.data(), movInput.size());
+      std::vector<u8> mov_input(m_current_byte);
+      t_record.ReadArray(mov_input.data(), mov_input.size());
 
-      const auto mismatch_result = std::ranges::mismatch(movInput, m_temp_input);
+      const auto mismatch_result = std::ranges::mismatch(mov_input, m_temp_input);
 
-      if (mismatch_result.in1 != movInput.end())
+      if (mismatch_result.in1 != mov_input.end())
       {
-        const ptrdiff_t mismatch_index = std::distance(movInput.begin(), mismatch_result.in1);
+        const ptrdiff_t mismatch_index = std::distance(mov_input.begin(), mismatch_result.in1);
 
         // this is a "you did something wrong" alert for the user's benefit.
         // we'll try to say what's going on in excruciating detail, otherwise the user might not
@@ -1078,16 +1078,16 @@ void MovieManager::LoadInput(const std::string& movie_path)
                          "read-only mode off. Otherwise you'll probably get a desync.",
                          byte_offset, byte_offset);
 
-          std::ranges::copy(movInput, m_temp_input.begin());
+          std::ranges::copy(mov_input, m_temp_input.begin());
         }
         else
         {
           const ptrdiff_t frame = mismatch_index / sizeof(ControllerState);
-          ControllerState curPadState;
-          memcpy(&curPadState, &m_temp_input[frame * sizeof(ControllerState)],
+          ControllerState cur_pad_state;
+          memcpy(&cur_pad_state, &m_temp_input[frame * sizeof(ControllerState)],
                  sizeof(ControllerState));
-          ControllerState movPadState;
-          memcpy(&movPadState, &movInput[frame * sizeof(ControllerState)], sizeof(ControllerState));
+          ControllerState mov_pad_state;
+          memcpy(&mov_pad_state, &mov_input[frame * sizeof(ControllerState)], sizeof(ControllerState));
           PanicAlertFmtT(
               "Warning: You loaded a save whose movie mismatches on frame {0}. You should load "
               "another save before continuing, or load this state with read-only mode off. "
@@ -1103,17 +1103,17 @@ void MovieManager::LoadInput(const std::string& movie_path)
               "Start={24}, A={25}, B={26}, X={27}, Y={28}, Z={29}, DUp={30}, DDown={31}, "
               "DLeft={32}, DRight={33}, L={34}, R={35}, LT={36}, RT={37}, AnalogX={38}, "
               "AnalogY={39}, CX={40}, CY={41}, Connected={42}",
-              frame, m_total_frames, m_temp_header.frameCount, frame, curPadState.Start,
-              curPadState.A, curPadState.B, curPadState.X, curPadState.Y, curPadState.Z,
-              curPadState.DPadUp, curPadState.DPadDown, curPadState.DPadLeft, curPadState.DPadRight,
-              curPadState.L, curPadState.R, curPadState.TriggerL, curPadState.TriggerR,
-              curPadState.AnalogStickX, curPadState.AnalogStickY, curPadState.CStickX,
-              curPadState.CStickY, curPadState.is_connected, frame, movPadState.Start,
-              movPadState.A, movPadState.B, movPadState.X, movPadState.Y, movPadState.Z,
-              movPadState.DPadUp, movPadState.DPadDown, movPadState.DPadLeft, movPadState.DPadRight,
-              movPadState.L, movPadState.R, movPadState.TriggerL, movPadState.TriggerR,
-              movPadState.AnalogStickX, movPadState.AnalogStickY, movPadState.CStickX,
-              movPadState.CStickY, curPadState.is_connected);
+              frame, m_total_frames, m_temp_header.frameCount, frame, cur_pad_state.Start,
+              cur_pad_state.A, cur_pad_state.B, cur_pad_state.X, cur_pad_state.Y, cur_pad_state.Z,
+              cur_pad_state.DPadUp, cur_pad_state.DPadDown, cur_pad_state.DPadLeft, cur_pad_state.DPadRight,
+              cur_pad_state.L, cur_pad_state.R, cur_pad_state.TriggerL, cur_pad_state.TriggerR,
+              cur_pad_state.AnalogStickX, cur_pad_state.AnalogStickY, cur_pad_state.CStickX,
+              cur_pad_state.CStickY, cur_pad_state.is_connected, frame, mov_pad_state.Start,
+              mov_pad_state.A, mov_pad_state.B, mov_pad_state.X, mov_pad_state.Y, mov_pad_state.Z,
+              mov_pad_state.DPadUp, mov_pad_state.DPadDown, mov_pad_state.DPadLeft, mov_pad_state.DPadRight,
+              mov_pad_state.L, mov_pad_state.R, mov_pad_state.TriggerL, mov_pad_state.TriggerR,
+              mov_pad_state.AnalogStickX, mov_pad_state.AnalogStickY, mov_pad_state.CStickX,
+              mov_pad_state.CStickY, cur_pad_state.is_connected);
         }
       }
     }
@@ -1122,7 +1122,7 @@ void MovieManager::LoadInput(const std::string& movie_path)
 
   m_save_config = m_temp_header.bSaveConfig;
 
-  if (!afterEnd)
+  if (!after_end)
   {
     if (m_read_only)
     {
@@ -1397,8 +1397,8 @@ void MovieManager::SaveRecording(const std::string& filename)
 
   if (success && m_recording_from_save_state)
   {
-    std::string stateFilename = filename + ".sav";
-    success = File::CopyRegularFile(File::GetUserPath(D_STATESAVES_IDX) + "dtm.sav", stateFilename);
+    std::string state_filename = filename + ".sav";
+    success = File::CopyRegularFile(File::GetUserPath(D_STATESAVES_IDX) + "dtm.sav", state_filename);
   }
 
   if (success)

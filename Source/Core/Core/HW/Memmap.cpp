@@ -197,19 +197,19 @@ bool MemoryManager::InitFastmemArena()
   // 4 GiB view for enabled address translation
   // 2 GiB guard
 
-  constexpr size_t ppc_view_size = 0x1'0000'0000;
-  constexpr size_t guard_size = 0x8000'0000;
-  constexpr size_t memory_size = ppc_view_size * 2 + guard_size * 3;
+  constexpr size_t PPC_VIEW_SIZE = 0x1'0000'0000;
+  constexpr size_t GUARD_SIZE = 0x8000'0000;
+  constexpr size_t MEMORY_SIZE = PPC_VIEW_SIZE * 2 + GUARD_SIZE * 3;
 
-  m_fastmem_arena = m_arena.ReserveMemoryRegion(memory_size);
+  m_fastmem_arena = m_arena.ReserveMemoryRegion(MEMORY_SIZE);
   if (!m_fastmem_arena)
   {
     PanicAlertFmt("Memory::InitFastmemArena(): Failed finding a memory base.");
     return false;
   }
 
-  m_physical_base = m_fastmem_arena + guard_size;
-  m_logical_base = m_fastmem_arena + ppc_view_size + guard_size * 2;
+  m_physical_base = m_fastmem_arena + GUARD_SIZE;
+  m_logical_base = m_fastmem_arena + PPC_VIEW_SIZE + GUARD_SIZE * 2;
 
   for (const PhysicalMemoryRegion& region : m_physical_regions)
   {
@@ -229,7 +229,7 @@ bool MemoryManager::InitFastmemArena()
   }
 
   m_is_fastmem_arena_initialized = true;
-  m_fastmem_arena_size = memory_size;
+  m_fastmem_arena_size = MEMORY_SIZE;
   return true;
 }
 

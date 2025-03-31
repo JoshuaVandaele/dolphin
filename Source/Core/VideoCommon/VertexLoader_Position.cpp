@@ -30,7 +30,7 @@ constexpr float PosScale(float val, [[maybe_unused]] float scale)
 }
 
 template <typename T, int N>
-void Pos_ReadDirect(VertexLoader* loader)
+void PosReadDirect(VertexLoader* loader)
 {
   static_assert(N <= 3, "N > 3 is not sane!");
   const auto scale = loader->m_posScale;
@@ -47,7 +47,7 @@ void Pos_ReadDirect(VertexLoader* loader)
 }
 
 template <typename I, typename T, int N>
-void Pos_ReadIndex(VertexLoader* loader)
+void PosReadIndex(VertexLoader* loader)
 {
   static_assert(std::is_unsigned<I>::value, "Only unsigned I is sane!");
   static_assert(N <= 3, "N > 3 is not sane!");
@@ -74,7 +74,7 @@ using ComponentCountRow = Common::EnumMap<TPipelineFunction, CoordComponentCount
 using ComponentFormatTable = Common::EnumMap<ComponentCountRow, ComponentFormat::InvalidFloat7>;
 using Table = Common::EnumMap<ComponentFormatTable, VertexComponentFormat::Index16>;
 
-constexpr Table s_table_read_position = {
+constexpr Table S_TABLE_READ_POSITION = {
     ComponentFormatTable({
         ComponentCountRow(nullptr, nullptr),
         ComponentCountRow(nullptr, nullptr),
@@ -86,34 +86,34 @@ constexpr Table s_table_read_position = {
         ComponentCountRow(nullptr, nullptr),
     }),
     ComponentFormatTable({
-        ComponentCountRow(Pos_ReadDirect<u8, 2>, Pos_ReadDirect<u8, 3>),
-        ComponentCountRow(Pos_ReadDirect<s8, 2>, Pos_ReadDirect<s8, 3>),
-        ComponentCountRow(Pos_ReadDirect<u16, 2>, Pos_ReadDirect<u16, 3>),
-        ComponentCountRow(Pos_ReadDirect<s16, 2>, Pos_ReadDirect<s16, 3>),
-        ComponentCountRow(Pos_ReadDirect<float, 2>, Pos_ReadDirect<float, 3>),
-        ComponentCountRow(Pos_ReadDirect<float, 2>, Pos_ReadDirect<float, 3>),
-        ComponentCountRow(Pos_ReadDirect<float, 2>, Pos_ReadDirect<float, 3>),
-        ComponentCountRow(Pos_ReadDirect<float, 2>, Pos_ReadDirect<float, 3>),
+        ComponentCountRow(PosReadDirect<u8, 2>, PosReadDirect<u8, 3>),
+        ComponentCountRow(PosReadDirect<s8, 2>, PosReadDirect<s8, 3>),
+        ComponentCountRow(PosReadDirect<u16, 2>, PosReadDirect<u16, 3>),
+        ComponentCountRow(PosReadDirect<s16, 2>, PosReadDirect<s16, 3>),
+        ComponentCountRow(PosReadDirect<float, 2>, PosReadDirect<float, 3>),
+        ComponentCountRow(PosReadDirect<float, 2>, PosReadDirect<float, 3>),
+        ComponentCountRow(PosReadDirect<float, 2>, PosReadDirect<float, 3>),
+        ComponentCountRow(PosReadDirect<float, 2>, PosReadDirect<float, 3>),
     }),
     ComponentFormatTable({
-        ComponentCountRow(Pos_ReadIndex<u8, u8, 2>, Pos_ReadIndex<u8, u8, 3>),
-        ComponentCountRow(Pos_ReadIndex<u8, s8, 2>, Pos_ReadIndex<u8, s8, 3>),
-        ComponentCountRow(Pos_ReadIndex<u8, u16, 2>, Pos_ReadIndex<u8, u16, 3>),
-        ComponentCountRow(Pos_ReadIndex<u8, s16, 2>, Pos_ReadIndex<u8, s16, 3>),
-        ComponentCountRow(Pos_ReadIndex<u8, float, 2>, Pos_ReadIndex<u8, float, 3>),
-        ComponentCountRow(Pos_ReadIndex<u8, float, 2>, Pos_ReadIndex<u8, float, 3>),
-        ComponentCountRow(Pos_ReadIndex<u8, float, 2>, Pos_ReadIndex<u8, float, 3>),
-        ComponentCountRow(Pos_ReadIndex<u8, float, 2>, Pos_ReadIndex<u8, float, 3>),
+        ComponentCountRow(PosReadIndex<u8, u8, 2>, PosReadIndex<u8, u8, 3>),
+        ComponentCountRow(PosReadIndex<u8, s8, 2>, PosReadIndex<u8, s8, 3>),
+        ComponentCountRow(PosReadIndex<u8, u16, 2>, PosReadIndex<u8, u16, 3>),
+        ComponentCountRow(PosReadIndex<u8, s16, 2>, PosReadIndex<u8, s16, 3>),
+        ComponentCountRow(PosReadIndex<u8, float, 2>, PosReadIndex<u8, float, 3>),
+        ComponentCountRow(PosReadIndex<u8, float, 2>, PosReadIndex<u8, float, 3>),
+        ComponentCountRow(PosReadIndex<u8, float, 2>, PosReadIndex<u8, float, 3>),
+        ComponentCountRow(PosReadIndex<u8, float, 2>, PosReadIndex<u8, float, 3>),
     }),
     ComponentFormatTable({
-        ComponentCountRow(Pos_ReadIndex<u16, u8, 2>, Pos_ReadIndex<u16, u8, 3>),
-        ComponentCountRow(Pos_ReadIndex<u16, s8, 2>, Pos_ReadIndex<u16, s8, 3>),
-        ComponentCountRow(Pos_ReadIndex<u16, u16, 2>, Pos_ReadIndex<u16, u16, 3>),
-        ComponentCountRow(Pos_ReadIndex<u16, s16, 2>, Pos_ReadIndex<u16, s16, 3>),
-        ComponentCountRow(Pos_ReadIndex<u16, float, 2>, Pos_ReadIndex<u16, float, 3>),
-        ComponentCountRow(Pos_ReadIndex<u16, float, 2>, Pos_ReadIndex<u16, float, 3>),
-        ComponentCountRow(Pos_ReadIndex<u16, float, 2>, Pos_ReadIndex<u16, float, 3>),
-        ComponentCountRow(Pos_ReadIndex<u16, float, 2>, Pos_ReadIndex<u16, float, 3>),
+        ComponentCountRow(PosReadIndex<u16, u8, 2>, PosReadIndex<u16, u8, 3>),
+        ComponentCountRow(PosReadIndex<u16, s8, 2>, PosReadIndex<u16, s8, 3>),
+        ComponentCountRow(PosReadIndex<u16, u16, 2>, PosReadIndex<u16, u16, 3>),
+        ComponentCountRow(PosReadIndex<u16, s16, 2>, PosReadIndex<u16, s16, 3>),
+        ComponentCountRow(PosReadIndex<u16, float, 2>, PosReadIndex<u16, float, 3>),
+        ComponentCountRow(PosReadIndex<u16, float, 2>, PosReadIndex<u16, float, 3>),
+        ComponentCountRow(PosReadIndex<u16, float, 2>, PosReadIndex<u16, float, 3>),
+        ComponentCountRow(PosReadIndex<u16, float, 2>, PosReadIndex<u16, float, 3>),
     }),
 };
 }  // Anonymous namespace
@@ -122,5 +122,5 @@ TPipelineFunction VertexLoader_Position::GetFunction(VertexComponentFormat type,
                                                      ComponentFormat format,
                                                      CoordComponentCount elements)
 {
-  return s_table_read_position[type][format][elements];
+  return S_TABLE_READ_POSITION[type][format][elements];
 }

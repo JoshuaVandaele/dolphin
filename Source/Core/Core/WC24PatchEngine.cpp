@@ -21,7 +21,7 @@
 
 namespace WC24PatchEngine
 {
-static constexpr std::array<u64, 15> s_wc24_channels{
+static constexpr std::array<u64, 15> S_WC24_CHANNELS{
     Titles::NINTENDO_CHANNEL_NTSC_U,
     Titles::NINTENDO_CHANNEL_NTSC_J,
     Titles::NINTENDO_CHANNEL_PAL,
@@ -87,7 +87,7 @@ static void LoadPatchSection(const Common::IniFile& ini)
 static bool IsWC24Channel()
 {
   const auto& sconfig = SConfig::GetInstance();
-  return Common::Contains(s_wc24_channels, sconfig.GetTitleID());
+  return Common::Contains(S_WC24_CHANNELS, sconfig.GetTitleID());
 }
 
 static void LoadPatches()

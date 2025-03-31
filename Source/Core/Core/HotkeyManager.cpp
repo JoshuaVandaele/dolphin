@@ -23,7 +23,7 @@
 #include "InputCommon/GCPadStatus.h"
 
 // clang-format off
-constexpr std::array<const char*, NUM_HOTKEYS> s_hotkey_labels{{
+constexpr std::array<const char*, NUM_HOTKEYS> S_HOTKEY_LABELS{{
     _trans("Open"),
     _trans("Change Disc"),
     _trans("Eject Disc"),
@@ -202,7 +202,7 @@ constexpr std::array<const char*, NUM_HOTKEYS> s_hotkey_labels{{
     _trans("Show Infinity Base")
 }};
 // clang-format on
-static_assert(NUM_HOTKEYS == s_hotkey_labels.size(), "Wrong count of hotkey_labels");
+static_assert(NUM_HOTKEYS == S_HOTKEY_LABELS.size(), "Wrong count of hotkey_labels");
 
 namespace HotkeyManagerEmu
 {
@@ -332,7 +332,7 @@ struct HotkeyGroupInfo
   bool ignore_focus = false;
 };
 
-constexpr std::array<HotkeyGroupInfo, NUM_HOTKEY_GROUPS> s_groups_info = {
+constexpr std::array<HotkeyGroupInfo, NUM_HOTKEY_GROUPS> S_GROUPS_INFO = {
 #ifdef USE_RETRO_ACHIEVEMENTS
     {{_trans("General"), HK_OPEN, HK_OPEN_ACHIEVEMENTS},
 #else   // USE_RETRO_ACHIEVEMENTS
@@ -372,11 +372,11 @@ HotkeyManager::HotkeyManager()
   for (std::size_t group = 0; group < m_hotkey_groups.size(); group++)
   {
     m_hotkey_groups[group] =
-        (m_keys[group] = new ControllerEmu::Buttons(s_groups_info[group].name));
+        (m_keys[group] = new ControllerEmu::Buttons(S_GROUPS_INFO[group].name));
     groups.emplace_back(m_hotkey_groups[group]);
-    for (int key = s_groups_info[group].first; key <= s_groups_info[group].last; key++)
+    for (int key = S_GROUPS_INFO[group].first; key <= S_GROUPS_INFO[group].last; key++)
     {
-      m_keys[group]->AddInput(ControllerEmu::Translatability::Translate, s_hotkey_labels[key]);
+      m_keys[group]->AddInput(ControllerEmu::Translatability::Translate, S_HOTKEY_LABELS[key]);
     }
   }
 }
@@ -398,12 +398,12 @@ InputConfig* HotkeyManager::GetConfig() const
 void HotkeyManager::GetInput(HotkeyStatus* kb, bool ignore_focus)
 {
   const auto lock = GetStateLock();
-  for (std::size_t group = 0; group < s_groups_info.size(); group++)
+  for (std::size_t group = 0; group < S_GROUPS_INFO.size(); group++)
   {
-    if (s_groups_info[group].ignore_focus != ignore_focus)
+    if (S_GROUPS_INFO[group].ignore_focus != ignore_focus)
       continue;
 
-    const int group_count = (s_groups_info[group].last - s_groups_info[group].first) + 1;
+    const int group_count = (S_GROUPS_INFO[group].last - S_GROUPS_INFO[group].first) + 1;
     std::vector<u32> bitmasks(group_count);
     for (size_t key = 0; key < bitmasks.size(); key++)
       bitmasks[key] = static_cast<u32>(1 << key);
@@ -421,14 +421,14 @@ ControllerEmu::ControlGroup* HotkeyManager::GetHotkeyGroup(HotkeyGroup group) co
 int HotkeyManager::FindGroupByID(int id) const
 {
   const auto i =
-      std::ranges::find_if(s_groups_info, [id](const auto& entry) { return entry.last >= id; });
+      std::ranges::find_if(S_GROUPS_INFO, [id](const auto& entry) { return entry.last >= id; });
 
-  return static_cast<int>(std::distance(s_groups_info.begin(), i));
+  return static_cast<int>(std::distance(S_GROUPS_INFO.begin(), i));
 }
 
 int HotkeyManager::GetIndexForGroup(int group, int id) const
 {
-  return id - s_groups_info[group].first;
+  return id - S_GROUPS_INFO[group].first;
 }
 
 void HotkeyManager::LoadDefaults(const ControllerInterface& ciface)

@@ -260,7 +260,7 @@ bool IsExceptionHandlerSupported()
 static struct sigaction old_sa_segv;
 static struct sigaction old_sa_bus;
 
-static void sigsegv_handler(int sig, siginfo_t* info, void* raw_context)
+static void SigsegvHandler(int sig, siginfo_t* info, void* raw_context)
 {
   if (sig != SIGSEGV && sig != SIGBUS)
   {
@@ -341,7 +341,7 @@ void InstallExceptionHandler()
     PanicAlertFmt("sigaltstack failed");
   struct sigaction sa;
   sa.sa_handler = nullptr;
-  sa.sa_sigaction = &sigsegv_handler;
+  sa.sa_sigaction = &SigsegvHandler;
   sa.sa_flags = SA_SIGINFO;
   sigemptyset(&sa.sa_mask);
   sigaction(SIGSEGV, &sa, &old_sa_segv);

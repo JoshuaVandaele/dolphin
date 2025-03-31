@@ -87,7 +87,7 @@ void NetIPTopDevice::DoState(PointerWrap& p)
   Device::DoState(p);
 }
 
-static std::optional<u32> inet_pton(const char* src)
+static std::optional<u32> InetPton(const char* src)
 {
   int saw_digit = 0;
   int octets = 0;
@@ -217,7 +217,7 @@ static std::vector<InterfaceRouting> GetSystemInterfaceRouting()
 
 #elif defined(__linux__)
   constexpr int BUFF_SIZE = 8192;
-  constexpr timeval socket_timeout{.tv_sec = 2, .tv_usec = 0};
+  constexpr timeval SOCKET_TIMEOUT{.tv_sec = 2, .tv_usec = 0};
   unsigned int msg_seq = 0;
   const int sock = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE);
   if (sock < 0)
@@ -226,8 +226,8 @@ static std::vector<InterfaceRouting> GetSystemInterfaceRouting()
     return {};
   }
 
-  if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, static_cast<const void*>(&socket_timeout),
-                 sizeof(socket_timeout)) < 0)
+  if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, static_cast<const void*>(&SOCKET_TIMEOUT),
+                 sizeof(SOCKET_TIMEOUT)) < 0)
   {
     ERROR_LOG_FMT(IOS_NET, "Failed to set netlink socket recv timeout: {}",
                   Common::StrNetworkError());
@@ -640,9 +640,9 @@ IPCReply NetIPTopDevice::HandleListenRequest(const IOCtlRequest& request)
   auto& memory = system.GetMemory();
 
   u32 fd = memory.Read_U32(request.buffer_in);
-  u32 BACKLOG = memory.Read_U32(request.buffer_in + 0x04);
+  u32 backlog = memory.Read_U32(request.buffer_in + 0x04);
   auto socket_manager = GetEmulationKernel().GetSocketManager();
-  u32 ret = listen(socket_manager->GetHostSocket(fd), BACKLOG);
+  u32 ret = listen(socket_manager->GetHostSocket(fd), backlog);
 
   request.Log(GetDeviceName(), Common::Log::LogType::IOS_WC24);
   return IPCReply(socket_manager->GetNetErrorCode(ret, "SO_LISTEN", false));
@@ -798,10 +798,10 @@ IPCReply NetIPTopDevice::HandleInetAToNRequest(const IOCtlRequest& request)
   auto& memory = system.GetMemory();
 
   const std::string hostname = memory.GetString(request.buffer_in);
-  hostent* remoteHost = gethostbyname(hostname.c_str());
+  hostent* remote_host = gethostbyname(hostname.c_str());
 
-  if (remoteHost == nullptr || remoteHost->h_addr_list == nullptr ||
-      remoteHost->h_addr_list[0] == nullptr)
+  if (remote_host == nullptr || remote_host->h_addr_list == nullptr ||
+      remote_host->h_addr_list[0] == nullptr)
   {
     INFO_LOG_FMT(IOS_NET,
                  "IOCTL_SO_INETATON = -1 "
@@ -812,7 +812,7 @@ IPCReply NetIPTopDevice::HandleInetAToNRequest(const IOCtlRequest& request)
     return IPCReply(0);
   }
 
-  const auto ip = Common::swap32(reinterpret_cast<u8*>(remoteHost->h_addr_list[0]));
+  const auto ip = Common::swap32(reinterpret_cast<u8*>(remote_host->h_addr_list[0]));
   memory.Write_U32(ip, request.buffer_out);
 
   INFO_LOG_FMT(IOS_NET,
@@ -832,7 +832,7 @@ IPCReply NetIPTopDevice::HandleInetPToNRequest(const IOCtlRequest& request)
   const std::string address = memory.GetString(request.buffer_in);
   INFO_LOG_FMT(IOS_NET, "IOCTL_SO_INETPTON (Translating: {})", address);
 
-  const std::optional<u32> result = inet_pton(address.c_str());
+  const std::optional<u32> result = InetPton(address.c_str());
   if (!result)
     return IPCReply(0);
 
@@ -918,7 +918,7 @@ IPCReply NetIPTopDevice::HandleGetHostByNameRequest(const IOCtlRequest& request)
   auto& memory = system.GetMemory();
 
   const std::string hostname = memory.GetString(request.buffer_in);
-  hostent* remoteHost = gethostbyname(hostname.c_str());
+  hostent* remote_host = gethostbyname(hostname.c_str());
 
   INFO_LOG_FMT(IOS_NET,
                "IOCTL_SO_GETHOSTBYNAME "
@@ -926,17 +926,17 @@ IPCReply NetIPTopDevice::HandleGetHostByNameRequest(const IOCtlRequest& request)
                hostname, request.buffer_in, request.buffer_in_size, request.buffer_out,
                request.buffer_out_size);
 
-  if (remoteHost == nullptr)
+  if (remote_host == nullptr)
     return IPCReply(-1);
 
-  for (int i = 0; remoteHost->h_aliases[i]; ++i)
+  for (int i = 0; remote_host->h_aliases[i]; ++i)
   {
-    DEBUG_LOG_FMT(IOS_NET, "alias{}:{}", i, remoteHost->h_aliases[i]);
+    DEBUG_LOG_FMT(IOS_NET, "alias{}:{}", i, remote_host->h_aliases[i]);
   }
 
-  for (int i = 0; remoteHost->h_addr_list[i]; ++i)
+  for (int i = 0; remote_host->h_addr_list[i]; ++i)
   {
-    const u32 ip = Common::swap32(*(u32*)(remoteHost->h_addr_list[i]));
+    const u32 ip = Common::swap32(*(u32*)(remote_host->h_addr_list[i]));
     const std::string ip_s =
         fmt::format("{}.{}.{}.{}", ip >> 24, (ip >> 16) & 0xff, (ip >> 8) & 0xff, ip & 0xff);
     DEBUG_LOG_FMT(IOS_NET, "addr{}:{}", i, ip_s);
@@ -946,18 +946,18 @@ IPCReply NetIPTopDevice::HandleGetHostByNameRequest(const IOCtlRequest& request)
   static constexpr u32 GETHOSTBYNAME_STRUCT_SIZE = 0x10;
   static constexpr u32 GETHOSTBYNAME_IP_LIST_OFFSET = 0x110;
   // Limit host name length to avoid buffer overflow.
-  const auto name_length = static_cast<u32>(strlen(remoteHost->h_name)) + 1;
+  const auto name_length = static_cast<u32>(strlen(remote_host->h_name)) + 1;
   if (name_length > (GETHOSTBYNAME_IP_LIST_OFFSET - GETHOSTBYNAME_STRUCT_SIZE))
   {
     ERROR_LOG_FMT(IOS_NET, "Hostname too long in IOCTL_SO_GETHOSTBYNAME");
     return IPCReply(-1);
   }
-  memory.CopyToEmu(request.buffer_out + GETHOSTBYNAME_STRUCT_SIZE, remoteHost->h_name, name_length);
+  memory.CopyToEmu(request.buffer_out + GETHOSTBYNAME_STRUCT_SIZE, remote_host->h_name, name_length);
   memory.Write_U32(request.buffer_out + GETHOSTBYNAME_STRUCT_SIZE, request.buffer_out);
 
   // IP address list; located at offset 0x110.
   u32 num_ip_addr = 0;
-  while (remoteHost->h_addr_list[num_ip_addr])
+  while (remote_host->h_addr_list[num_ip_addr])
     num_ip_addr++;
   // Limit number of IP addresses to avoid buffer overflow.
   // (0x460 - 0x340) / sizeof(pointer) == 72
@@ -966,7 +966,7 @@ IPCReply NetIPTopDevice::HandleGetHostByNameRequest(const IOCtlRequest& request)
   for (u32 i = 0; i < num_ip_addr; ++i)
   {
     u32 addr = request.buffer_out + GETHOSTBYNAME_IP_LIST_OFFSET + i * 4;
-    memory.Write_U32_Swap(*(u32*)(remoteHost->h_addr_list[i]), addr);
+    memory.Write_U32_Swap(*(u32*)(remote_host->h_addr_list[i]), addr);
   }
 
   // List of pointers to IP addresses; located at offset 0x340.
@@ -986,7 +986,7 @@ IPCReply NetIPTopDevice::HandleGetHostByNameRequest(const IOCtlRequest& request)
                    request.buffer_out + 4);
 
   // Returned struct must be ipv4.
-  ASSERT_MSG(IOS_NET, remoteHost->h_addrtype == AF_INET && remoteHost->h_length == sizeof(u32),
+  ASSERT_MSG(IOS_NET, remote_host->h_addrtype == AF_INET && remote_host->h_length == sizeof(u32),
              "returned host info is not IPv4");
   memory.Write_U16(AF_INET, request.buffer_out + 8);
   memory.Write_U16(sizeof(u32), request.buffer_out + 10);
@@ -1258,29 +1258,29 @@ IPCReply NetIPTopDevice::HandleGetAddressInfoRequest(const IOCtlVRequest& reques
 
   // getaddrinfo allows a null pointer for the nodeName or serviceName strings
   // So we have to do a bit of juggling here.
-  std::string nodeNameStr;
-  const char* pNodeName = nullptr;
+  std::string node_name_str;
+  const char* p_node_name = nullptr;
   if (!request.in_vectors.empty() && request.in_vectors[0].size > 0)
   {
-    nodeNameStr = memory.GetString(request.in_vectors[0].address, request.in_vectors[0].size);
+    node_name_str = memory.GetString(request.in_vectors[0].address, request.in_vectors[0].size);
     if (std::optional<std::string> patch =
-            WC24PatchEngine::GetNetworkPatch(nodeNameStr, WC24PatchEngine::IsKD{false}))
+            WC24PatchEngine::GetNetworkPatch(node_name_str, WC24PatchEngine::IsKD{false}))
     {
-      nodeNameStr = patch.value();
+      node_name_str = patch.value();
     }
-    pNodeName = nodeNameStr.c_str();
+    p_node_name = node_name_str.c_str();
   }
 
-  std::string serviceNameStr;
-  const char* pServiceName = nullptr;
+  std::string service_name_str;
+  const char* p_service_name = nullptr;
   if (request.in_vectors.size() > 1 && request.in_vectors[1].size > 0)
   {
-    serviceNameStr = memory.GetString(request.in_vectors[1].address, request.in_vectors[1].size);
-    pServiceName = serviceNameStr.c_str();
+    service_name_str = memory.GetString(request.in_vectors[1].address, request.in_vectors[1].size);
+    p_service_name = service_name_str.c_str();
   }
 
   addrinfo* result = nullptr;
-  int ret = getaddrinfo(pNodeName, pServiceName, hints_valid ? &hints : nullptr, &result);
+  int ret = getaddrinfo(p_node_name, p_service_name, hints_valid ? &hints : nullptr, &result);
   u32 addr = request.io_vectors[0].address;
   u32 sockoffset = addr + 0x460;
   if (ret == 0)

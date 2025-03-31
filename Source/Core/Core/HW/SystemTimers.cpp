@@ -195,15 +195,15 @@ void SystemTimersManager::DecrementerSet()
   auto& core_timing = m_system.GetCoreTiming();
   auto& ppc_state = m_system.GetPPCState();
 
-  u32 decValue = ppc_state.spr[SPR_DEC];
+  u32 dec_value = ppc_state.spr[SPR_DEC];
 
   core_timing.RemoveEvent(m_event_type_decrementer);
-  if ((decValue & 0x80000000) == 0)
+  if ((dec_value & 0x80000000) == 0)
   {
     core_timing.SetFakeDecStartTicks(core_timing.GetTicks());
-    core_timing.SetFakeDecStartValue(decValue);
+    core_timing.SetFakeDecStartValue(dec_value);
 
-    core_timing.ScheduleEvent(decValue * TIMER_RATIO, m_event_type_decrementer);
+    core_timing.ScheduleEvent(dec_value * TIMER_RATIO, m_event_type_decrementer);
   }
 }
 

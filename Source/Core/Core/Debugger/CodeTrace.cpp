@@ -82,21 +82,21 @@ InstructionAttributes CodeTrace::GetInstructionAttributes(const TraceOutput& ins
   std::smatch match;
 
   // Convert sp, rtoc, and ps to r1, r2, and F#. ps is handled like a float operation.
-  static const std::regex replace_sp("(\\W)sp");
-  instr = std::regex_replace(instr, replace_sp, "$1r1");
-  static const std::regex replace_rtoc("rtoc");
-  instr = std::regex_replace(instr, replace_rtoc, "r2");
-  static const std::regex replace_ps("(\\W)p(\\d+)");
-  instr = std::regex_replace(instr, replace_ps, "$1f$2");
+  static const std::regex REPLACE_SP("(\\W)sp");
+  instr = std::regex_replace(instr, REPLACE_SP, "$1r1");
+  static const std::regex REPLACE_RTOC("rtoc");
+  instr = std::regex_replace(instr, REPLACE_RTOC, "r2");
+  static const std::regex REPLACE_PS("(\\W)p(\\d+)");
+  instr = std::regex_replace(instr, REPLACE_PS, "$1f$2");
 
   // Pull all register numbers out and store them. Limited to Reg0 if ps operation, as ps get
   // too complicated to track easily.
   // ex: add r4, r5, r6 -> r4 = Reg0, r5 = Reg1, r6 = Reg2. Reg0 is always the target register.
-  static const std::regex regis(
+  static const std::regex REGIS(
       "\\W([rfp]\\d+)[^r^f]*(?:([rf]\\d+))?[^r^f\\d]*(?:([rf]\\d+))?[^r^f\\d]*(?:([rf]\\d+))?",
       std::regex::optimize);
 
-  if (std::regex_search(instr, match, regis))
+  if (std::regex_search(instr, match, REGIS))
   {
     tmp_attributes.reg0 = match.str(1);
     if (match[2].matched)
@@ -264,21 +264,21 @@ HitType CodeTrace::TraceLogic(const TraceOutput& current_instr, bool first_hit)
     return HitType::SKIP;
 
   // Checks if the intstruction is a type that needs special handling.
-  const auto CompareInstruction = [](std::string_view instruction, const auto& type_compare) {
+  const auto compare_instruction = [](std::string_view instruction, const auto& type_compare) {
     return std::ranges::any_of(
         type_compare, [&instruction](std::string_view s) { return instruction.starts_with(s); });
   };
 
   // Exclusions from updating tracking logic. mt operations are too complex and specialized.
   // Combiner used later.
-  static const std::array<std::string_view, 3> exclude{"dc", "ic", "mt"};
-  static const std::array<std::string_view, 2> compare{"c", "fc"};
+  static const std::array<std::string_view, 3> EXCLUDE{"dc", "ic", "mt"};
+  static const std::array<std::string_view, 2> COMPARE{"c", "fc"};
 
   // rlwimi, at least, can preserve parts of the target register. Not sure if rldimi can too or if
   // there are any others like this.
-  static const std::array<std::string_view, 1> combiner{"rlwimi"};
+  static const std::array<std::string_view, 1> COMBINER{"rlwimi"};
 
-  static const std::array<std::string_view, 2> mover{"mr", "fmr"};
+  static const std::array<std::string_view, 2> MOVER{"mr", "fmr"};
 
   // Link register for when r0 gets overwritten
   if (instr.instruction.starts_with("mflr") && match_reg0)
@@ -292,9 +292,9 @@ HitType CodeTrace::TraceLogic(const TraceOutput& current_instr, bool first_hit)
     return HitType::MOVED;
   }
 
-  if (CompareInstruction(instr.instruction, exclude))
+  if (compare_instruction(instr.instruction, EXCLUDE))
     return HitType::SKIP;
-  else if (CompareInstruction(instr.instruction, compare))
+  else if (compare_instruction(instr.instruction, COMPARE))
     return HitType::PASSIVE;
   else if (match_reg123 && !match_reg0 && (instr.is_store || instr.is_load))
     return HitType::POINTER;
@@ -364,7 +364,7 @@ HitType CodeTrace::TraceLogic(const TraceOutput& current_instr, bool first_hit)
 
       // This should include any instruction that can reach this point and is not ACTIVE. Can only
       // think of mr at this time.
-      if (CompareInstruction(instr.instruction, mover))
+      if (compare_instruction(instr.instruction, MOVER))
         return HitType::MOVED;
 
       return HitType::ACTIVE;
@@ -372,7 +372,7 @@ HitType CodeTrace::TraceLogic(const TraceOutput& current_instr, bool first_hit)
     // If tracked register is overwritten, stop tracking.
     else if (match_reg0 && !match_reg123)
     {
-      if (CompareInstruction(instr.instruction, combiner) || first_hit)
+      if (compare_instruction(instr.instruction, COMBINER) || first_hit)
         return HitType::UPDATED;
 
       m_reg_autotrack.erase(reg_itr);

@@ -16,56 +16,56 @@
 #include "Core/PowerPC/PPCSymbolDB.h"
 #include "Core/System.h"
 
-static void bswap(u32& w)
+static void Bswap(u32& w)
 {
   w = Common::swap32(w);
 }
-static void bswap(u16& w)
+static void Bswap(u16& w)
 {
   w = Common::swap16(w);
 }
 
-static void byteswapHeader(Elf32_Ehdr& ELF_H)
+static void ByteswapHeader(Elf32_Ehdr& ELF_H)
 {
-  bswap(ELF_H.e_type);
-  bswap(ELF_H.e_machine);
-  bswap(ELF_H.e_ehsize);
-  bswap(ELF_H.e_phentsize);
-  bswap(ELF_H.e_phnum);
-  bswap(ELF_H.e_shentsize);
-  bswap(ELF_H.e_shnum);
-  bswap(ELF_H.e_shstrndx);
-  bswap(ELF_H.e_version);
-  bswap(ELF_H.e_entry);
-  bswap(ELF_H.e_phoff);
-  bswap(ELF_H.e_shoff);
-  bswap(ELF_H.e_flags);
+  Bswap(ELF_H.e_type);
+  Bswap(ELF_H.e_machine);
+  Bswap(ELF_H.e_ehsize);
+  Bswap(ELF_H.e_phentsize);
+  Bswap(ELF_H.e_phnum);
+  Bswap(ELF_H.e_shentsize);
+  Bswap(ELF_H.e_shnum);
+  Bswap(ELF_H.e_shstrndx);
+  Bswap(ELF_H.e_version);
+  Bswap(ELF_H.e_entry);
+  Bswap(ELF_H.e_phoff);
+  Bswap(ELF_H.e_shoff);
+  Bswap(ELF_H.e_flags);
 }
 
-static void byteswapSegment(Elf32_Phdr& sec)
+static void ByteswapSegment(Elf32_Phdr& sec)
 {
-  bswap(sec.p_align);
-  bswap(sec.p_filesz);
-  bswap(sec.p_flags);
-  bswap(sec.p_memsz);
-  bswap(sec.p_offset);
-  bswap(sec.p_paddr);
-  bswap(sec.p_vaddr);
-  bswap(sec.p_type);
+  Bswap(sec.p_align);
+  Bswap(sec.p_filesz);
+  Bswap(sec.p_flags);
+  Bswap(sec.p_memsz);
+  Bswap(sec.p_offset);
+  Bswap(sec.p_paddr);
+  Bswap(sec.p_vaddr);
+  Bswap(sec.p_type);
 }
 
-static void byteswapSection(Elf32_Shdr& sec)
+static void ByteswapSection(Elf32_Shdr& sec)
 {
-  bswap(sec.sh_addr);
-  bswap(sec.sh_addralign);
-  bswap(sec.sh_entsize);
-  bswap(sec.sh_flags);
-  bswap(sec.sh_info);
-  bswap(sec.sh_link);
-  bswap(sec.sh_name);
-  bswap(sec.sh_offset);
-  bswap(sec.sh_size);
-  bswap(sec.sh_type);
+  Bswap(sec.sh_addr);
+  Bswap(sec.sh_addralign);
+  Bswap(sec.sh_entsize);
+  Bswap(sec.sh_flags);
+  Bswap(sec.sh_info);
+  Bswap(sec.sh_link);
+  Bswap(sec.sh_name);
+  Bswap(sec.sh_offset);
+  Bswap(sec.sh_size);
+  Bswap(sec.sh_type);
 }
 
 ElfReader::ElfReader(std::vector<u8> buffer) : BootExecutableReader(std::move(buffer))
@@ -90,19 +90,19 @@ void ElfReader::Initialize(u8* ptr)
   base = (char*)ptr;
   base32 = (u32*)ptr;
   header = (Elf32_Ehdr*)ptr;
-  byteswapHeader(*header);
+  ByteswapHeader(*header);
 
   segments = (Elf32_Phdr*)(base + header->e_phoff);
   sections = (Elf32_Shdr*)(base + header->e_shoff);
 
   for (int i = 0; i < GetNumSegments(); i++)
   {
-    byteswapSegment(segments[i]);
+    ByteswapSegment(segments[i]);
   }
 
   for (int i = 0; i < GetNumSections(); i++)
   {
-    byteswapSection(sections[i]);
+    ByteswapSection(sections[i]);
   }
   entryPoint = header->e_entry;
 
@@ -114,11 +114,11 @@ const char* ElfReader::GetSectionName(int section) const
   if (sections[section].sh_type == SHT_NULL)
     return nullptr;
 
-  int nameOffset = sections[section].sh_name;
+  int name_offset = sections[section].sh_name;
   char* ptr = (char*)GetSectionDataPtr(header->e_shstrndx);
 
   if (ptr)
-    return ptr + nameOffset;
+    return ptr + name_offset;
   else
     return nullptr;
 }
@@ -148,19 +148,19 @@ bool ElfReader::LoadIntoMemory(Core::System& system, bool only_in_mem1) const
 
     if (p->p_type == PT_LOAD)
     {
-      u32 writeAddr = p->p_vaddr;
+      u32 write_addr = p->p_vaddr;
       const u8* src = GetSegmentPtr(i);
-      u32 srcSize = p->p_filesz;
-      u32 dstSize = p->p_memsz;
+      u32 src_size = p->p_filesz;
+      u32 dst_size = p->p_memsz;
 
       if (only_in_mem1 && p->p_vaddr >= memory.GetRamSizeReal())
         continue;
 
-      memory.CopyToEmu(writeAddr, src, srcSize);
-      if (srcSize < dstSize)
-        memory.Memset(writeAddr + srcSize, 0, dstSize - srcSize);  // zero out bss
+      memory.CopyToEmu(write_addr, src, src_size);
+      if (src_size < dst_size)
+        memory.Memset(write_addr + src_size, 0, dst_size - src_size);  // zero out bss
 
-      INFO_LOG_FMT(BOOT, "Loadable Segment Copied to {:08x}, size {:08x}", writeAddr, p->p_memsz);
+      INFO_LOG_FMT(BOOT, "Loadable Segment Copied to {:08x}, size {:08x}", write_addr, p->p_memsz);
     }
   }
 
@@ -183,17 +183,17 @@ SectionID ElfReader::GetSectionByName(const char* name, int firstSection) const
 bool ElfReader::LoadSymbols(const Core::CPUThreadGuard& guard, PPCSymbolDB& ppc_symbol_db,
                             const std::string& filename) const
 {
-  bool hasSymbols = false;
+  bool has_symbols = false;
   SectionID sec = GetSectionByName(".symtab");
   if (sec != -1)
   {
-    int stringSection = sections[sec].sh_link;
-    const char* stringBase = (const char*)GetSectionDataPtr(stringSection);
+    int string_section = sections[sec].sh_link;
+    const char* string_base = (const char*)GetSectionDataPtr(string_section);
 
     // We have a symbol table!
     Elf32_Sym* symtab = (Elf32_Sym*)(GetSectionDataPtr(sec));
-    int numSymbols = sections[sec].sh_size / sizeof(Elf32_Sym);
-    for (int sym = 0; sym < numSymbols; sym++)
+    int num_symbols = sections[sec].sh_size / sizeof(Elf32_Sym);
+    for (int sym = 0; sym < num_symbols; sym++)
     {
       int size = Common::swap32(symtab[sym].st_size);
       if (size == 0)
@@ -201,11 +201,11 @@ bool ElfReader::LoadSymbols(const Core::CPUThreadGuard& guard, PPCSymbolDB& ppc_
 
       // int bind = symtab[sym].st_info >> 4;
       int type = symtab[sym].st_info & 0xF;
-      int sectionIndex = Common::swap16(symtab[sym].st_shndx);
+      int section_index = Common::swap16(symtab[sym].st_shndx);
       int value = Common::swap32(symtab[sym].st_value);
-      const char* name = stringBase + Common::swap32(symtab[sym].st_name);
+      const char* name = string_base + Common::swap32(symtab[sym].st_name);
       if (bRelocate)
-        value += sectionAddrs[sectionIndex];
+        value += sectionAddrs[section_index];
 
       auto symtype = Common::Symbol::Type::Data;
       switch (type)
@@ -220,11 +220,11 @@ bool ElfReader::LoadSymbols(const Core::CPUThreadGuard& guard, PPCSymbolDB& ppc_
         continue;
       }
       ppc_symbol_db.AddKnownSymbol(guard, value, size, name, filename, symtype);
-      hasSymbols = true;
+      has_symbols = true;
     }
   }
   ppc_symbol_db.Index();
-  return hasSymbols;
+  return has_symbols;
 }
 
 bool ElfReader::IsWii() const
@@ -236,8 +236,8 @@ bool ElfReader::IsWii() const
   // better heuristic are welcome.
 
   // Swap these once, instead of swapping every word in the file.
-  u32 HID4_pattern = Common::swap32(0x7c13fba6);
-  u32 HID4_mask = Common::swap32(0xfc1fffff);
+  u32 hi_d4_pattern = Common::swap32(0x7c13fba6);
+  u32 hi_d4_mask = Common::swap32(0xfc1fffff);
 
   for (int i = 0; i < GetNumSegments(); ++i)
   {
@@ -246,7 +246,7 @@ bool ElfReader::IsWii() const
       u32* code = (u32*)GetSegmentPtr(i);
       for (u32 j = 0; j < GetSegmentSize(i) / sizeof(u32); ++j)
       {
-        if ((code[j] & HID4_mask) == HID4_pattern)
+        if ((code[j] & hi_d4_mask) == hi_d4_pattern)
           return true;
       }
     }

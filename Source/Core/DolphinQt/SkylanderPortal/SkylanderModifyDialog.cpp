@@ -132,7 +132,7 @@ void SkylanderModifyDialog::PopulateSkylanderOptions(QVBoxLayout* layout)
   auto* edit_hero =
       new QLineEdit(QStringLiteral("%1").arg(m_figure_data.skylander_data.hero_level));
 
-  auto toUtf16 = QStringDecoder(QStringDecoder::Utf16);
+  auto to_utf16 = QStringDecoder(QStringDecoder::Utf16);
   auto* hbox_nick = new QHBoxLayout();
   auto* label_nick = new QLabel(tr("Nickname:"));
   auto* edit_nick = new QLineEdit(QString::fromUtf16(

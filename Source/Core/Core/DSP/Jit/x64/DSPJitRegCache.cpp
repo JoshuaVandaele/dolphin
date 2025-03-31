@@ -18,7 +18,7 @@ namespace DSP::JIT::x64
 {
 // Ordered in order of prefered use.
 // Not all of these are actually available
-constexpr std::array<X64Reg, 15> s_allocation_order = {
+constexpr std::array<X64Reg, 15> S_ALLOCATION_ORDER = {
     {R8, R9, R10, R11, R12, R13, R14, R15, RSI, RDI, RBX, RCX, RDX, RAX, RBP}};
 
 #ifdef __GNUC__
@@ -947,7 +947,7 @@ X64Reg DSPJitRegCache::SpillXReg()
 {
   int max_use_ctr_diff = 0;
   X64Reg least_recent_use_reg = INVALID_REG;
-  for (X64Reg reg : s_allocation_order)
+  for (X64Reg reg : S_ALLOCATION_ORDER)
   {
     if (m_xregs[reg].guest_reg <= DSP_REG_MAX_MEM_BACKED && !m_regs[m_xregs[reg].guest_reg].used)
     {
@@ -967,7 +967,7 @@ X64Reg DSPJitRegCache::SpillXReg()
   }
 
   // just choose one.
-  for (X64Reg reg : s_allocation_order)
+  for (X64Reg reg : S_ALLOCATION_ORDER)
   {
     if (m_xregs[reg].guest_reg <= DSP_REG_MAX_MEM_BACKED && !m_regs[m_xregs[reg].guest_reg].used)
     {
@@ -998,7 +998,7 @@ void DSPJitRegCache::SpillXReg(X64Reg reg)
 
 X64Reg DSPJitRegCache::FindFreeXReg() const
 {
-  for (X64Reg x : s_allocation_order)
+  for (X64Reg x : S_ALLOCATION_ORDER)
   {
     if (m_xregs[x].guest_reg == DSP_REG_NONE)
     {

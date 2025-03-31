@@ -157,7 +157,7 @@ void DSPAssembler::ShowWarning(fmt::format_string<Args...> format, Args&&... arg
   fmt::print(stderr, "{}\nWARNING: {}\n\n", m_location, msg);
 }
 
-static char* skip_spaces(char* ptr)
+static char* SkipSpaces(char* ptr)
 {
   while (*ptr == ' ')
     ptr++;
@@ -422,13 +422,13 @@ u32 DSPAssembler::ParseExpression(const char* ptr)
 u32 DSPAssembler::GetParams(char* parstr, param_t* par)
 {
   u32 count = 0;
-  char* tmpstr = skip_spaces(parstr);
+  char* tmpstr = SkipSpaces(parstr);
   tmpstr = strtok(tmpstr, ",\x00");
   for (int i = 0; i < 10; i++)
   {
     if (tmpstr == nullptr)
       break;
-    tmpstr = skip_spaces(tmpstr);
+    tmpstr = SkipSpaces(tmpstr);
     if (strlen(tmpstr) == 0)
       break;
     if (tmpstr)
@@ -504,7 +504,7 @@ const DSPOPCTemplate* DSPAssembler::FindOpcode(std::string name, size_t par_coun
 }
 
 // weird...
-static u16 get_mask_shifted_down(u16 mask)
+static u16 GetMaskShiftedDown(u16 mask)
 {
   while (!(mask & 1))
     mask >>= 1;
@@ -538,7 +538,7 @@ bool DSPAssembler::VerifyParams(const DSPOPCTemplate* opc, param_t* par, size_t 
         {
           int value = (opc->params[i].type >> 8) & 0x1f;
           if ((int)par[i].val < value ||
-              (int)par[i].val > value + get_mask_shifted_down(opc->params[i].mask))
+              (int)par[i].val > value + GetMaskShiftedDown(opc->params[i].mask))
           {
             ShowError(AssemblerError::InvalidRegister);
           }
@@ -628,7 +628,7 @@ bool DSPAssembler::VerifyParams(const DSPOPCTemplate* opc, param_t* par, size_t 
     else if ((opc->params[i].type & 3) != 0 && (par[i].type & 3) != 0)
     {
       // modified by Hermes: test NUMBER range
-      int value = get_mask_shifted_down(opc->params[i].mask);
+      int value = GetMaskShiftedDown(opc->params[i].mask);
       unsigned int valueu = 0xffff & ~(value >> 1);
       if ((int)par[i].val < 0)
       {

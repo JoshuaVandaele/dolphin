@@ -13,26 +13,26 @@ namespace Common::FPU
 {
 // Get the default SSE states here.
 static u32 saved_sse_state = _mm_getcsr();
-static const u32 default_sse_state = _mm_getcsr();
+static const u32 DEFAULT_SSE_STATE = _mm_getcsr();
 
 void SetSIMDMode(RoundMode rounding_mode, bool non_ieee_mode)
 {
   // OR-mask for disabling FPU exceptions (bits 7-12 in the MXCSR register)
-  const u32 EXCEPTION_MASK = 0x1F80;
+  const u32 exception_mask = 0x1F80;
   // Flush-To-Zero (non-IEEE mode: denormal outputs are set to +/- 0)
-  const u32 FTZ = 0x8000;
+  const u32 ftz = 0x8000;
   // lookup table for FPSCR.RN-to-MXCSR.RC translation
-  static const u32 simd_rounding_table[] = {
-      (0 << 13) | EXCEPTION_MASK,  // nearest
-      (3 << 13) | EXCEPTION_MASK,  // zero
-      (2 << 13) | EXCEPTION_MASK,  // +inf
-      (1 << 13) | EXCEPTION_MASK,  // -inf
+  static const u32 SIMD_ROUNDING_TABLE[] = {
+      (0 << 13) | exception_mask,  // nearest
+      (3 << 13) | exception_mask,  // zero
+      (2 << 13) | exception_mask,  // +inf
+      (1 << 13) | exception_mask,  // -inf
   };
-  u32 csr = simd_rounding_table[rounding_mode];
+  u32 csr = SIMD_ROUNDING_TABLE[rounding_mode];
 
   if (non_ieee_mode)
   {
-    csr |= FTZ;
+    csr |= ftz;
   }
   _mm_setcsr(csr);
 }
@@ -47,6 +47,6 @@ void LoadSIMDState()
 }
 void LoadDefaultSIMDState()
 {
-  _mm_setcsr(default_sse_state);
+  _mm_setcsr(DEFAULT_SSE_STATE);
 }
 }  // namespace Common::FPU

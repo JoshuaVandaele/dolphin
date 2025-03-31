@@ -11,13 +11,13 @@ namespace
 {
 // The encrypted bytes corresponding to the following settings, in order:
 //   "key" = "val"
-Common::SettingsBuffer BUFFER_A{0x91, 0x91, 0x90, 0xEE, 0xD1, 0x2F, 0xF0, 0x34, 0x79};
+Common::SettingsBuffer buffer_a{0x91, 0x91, 0x90, 0xEE, 0xD1, 0x2F, 0xF0, 0x34, 0x79};
 
 // The encrypted bytes corresponding to the following settings, in order:
 //   "key1" = "val1"
 //   "key2" = "val2"
 //   "foo" = "bar"
-Common::SettingsBuffer BUFFER_B{0x91, 0x91, 0x90, 0xE2, 0x9A, 0x38, 0xFD, 0x55, 0x42, 0xEA, 0xC4,
+Common::SettingsBuffer buffer_b{0x91, 0x91, 0x90, 0xE2, 0x9A, 0x38, 0xFD, 0x55, 0x42, 0xEA, 0xC4,
                                 0xF6, 0x5E, 0xF,  0xDF, 0xE7, 0xC3, 0x0A, 0xBB, 0x9C, 0x50, 0xB1,
                                 0x10, 0x82, 0xB4, 0x8A, 0x0D, 0xBE, 0xCD, 0x72, 0xF4};
 
@@ -27,7 +27,7 @@ Common::SettingsBuffer BUFFER_B{0x91, 0x91, 0x90, 0xE2, 0x9A, 0x38, 0xFD, 0x55, 
 // This setting triggers the edge case fixed in PR #8704: the key's first and only byte matches the
 // first byte of the initial encryption key, resulting in a null encoded byte on the first attempt
 // to encode the line.
-Common::SettingsBuffer BUFFER_C{0xF0, 0x0E, 0xD4, 0xB2, 0xAA, 0x44};
+Common::SettingsBuffer buffer_c{0xF0, 0x0E, 0xD4, 0xB2, 0xAA, 0x44};
 
 // The encrypted bytes corresponding to the following setting:
 //   "\xFA\xE9" = "a"
@@ -40,7 +40,7 @@ Common::SettingsBuffer BUFFER_C{0xF0, 0x0E, 0xD4, 0xB2, 0xAA, 0x44};
 // 2. The key's second byte matches the first byte of the encryption key after two
 // rotations, resulting in a null encoded byte on the second attempt to encode the line (with a
 // single LF inserted before the line).
-Common::SettingsBuffer BUFFER_D{0xF0, 0xFE, 0x13, 0x3A, 0x9A, 0x2F, 0x91, 0x33};
+Common::SettingsBuffer buffer_d{0xF0, 0xFE, 0x13, 0x3A, 0x9A, 0x2F, 0x91, 0x33};
 }  // namespace
 
 TEST(SettingsWriterTest, EncryptSingleSetting)
@@ -49,12 +49,12 @@ TEST(SettingsWriterTest, EncryptSingleSetting)
   writer.AddSetting("key", "val");
   Common::SettingsBuffer buffer = writer.GetBytes();
 
-  EXPECT_TRUE(std::ranges::equal(buffer, BUFFER_A));
+  EXPECT_TRUE(std::ranges::equal(buffer, buffer_a));
 }
 
 TEST(SettingsReaderTest, DecryptSingleSetting)
 {
-  const Common::SettingsReader reader(BUFFER_A);
+  const Common::SettingsReader reader(buffer_a);
   EXPECT_EQ(reader.GetValue("key"), "val");
 }
 
@@ -66,12 +66,12 @@ TEST(SettingsWriterTest, EncryptMultipleSettings)
   writer.AddSetting("foo", "bar");
   Common::SettingsBuffer buffer = writer.GetBytes();
 
-  EXPECT_TRUE(std::ranges::equal(buffer, BUFFER_B));
+  EXPECT_TRUE(std::ranges::equal(buffer, buffer_b));
 }
 
 TEST(SettingsReaderTest, DecryptMultipleSettings)
 {
-  const Common::SettingsReader reader(BUFFER_B);
+  const Common::SettingsReader reader(buffer_b);
   EXPECT_EQ(reader.GetValue("key1"), "val1");
   EXPECT_EQ(reader.GetValue("key2"), "val2");
   EXPECT_EQ(reader.GetValue("foo"), "bar");
@@ -83,7 +83,7 @@ TEST(SettingsWriterTest, EncryptAddsLFOnNullChar)
   writer.AddSetting("\xFA", "a");
   Common::SettingsBuffer buffer = writer.GetBytes();
 
-  EXPECT_TRUE(std::ranges::equal(buffer, BUFFER_C));
+  EXPECT_TRUE(std::ranges::equal(buffer, buffer_c));
 }
 
 TEST(SettingsWriterTest, EncryptAddsLFOnNullCharTwice)
@@ -92,17 +92,17 @@ TEST(SettingsWriterTest, EncryptAddsLFOnNullCharTwice)
   writer.AddSetting("\xFA\xE9", "a");
   Common::SettingsBuffer buffer = writer.GetBytes();
 
-  EXPECT_TRUE(std::ranges::equal(buffer, BUFFER_D));
+  EXPECT_TRUE(std::ranges::equal(buffer, buffer_d));
 }
 
 TEST(SettingsReaderTest, DecryptSingleAddedLF)
 {
-  const Common::SettingsReader reader(BUFFER_C);
+  const Common::SettingsReader reader(buffer_c);
   EXPECT_EQ(reader.GetValue("\xFA"), "a");
 }
 
 TEST(SettingsReaderTest, DecryptTwoAddedLFs)
 {
-  const Common::SettingsReader reader(BUFFER_D);
+  const Common::SettingsReader reader(buffer_d);
   EXPECT_EQ(reader.GetValue("\xFA\xE9"), "a");
 }

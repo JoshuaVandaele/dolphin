@@ -169,8 +169,8 @@ void PerformanceMetrics::DrawImGuiStats(const float backbuffer_scale)
 
     if (ImGui::Begin("PerformanceGraphs", nullptr, imgui_flags))
     {
-      static constexpr std::size_t num_ticks = 17;
-      static constexpr std::array<double, num_ticks> tick_marks = {0.0,
+      static constexpr std::size_t NUM_TICKS = 17;
+      static constexpr std::array<double, NUM_TICKS> TICK_MARKS = {0.0,
                                                                    1000.0 / 360.0,
                                                                    1000.0 / 240.0,
                                                                    1000.0 / 180.0,
@@ -219,7 +219,7 @@ void PerformanceMetrics::DrawImGuiStats(const float backbuffer_scale)
                           ImPlotAxisFlags_Lock | ImPlotAxisFlags_Invert | ImPlotAxisFlags_NoLabel |
                               ImPlotAxisFlags_NoHighlight);
         ImPlot::SetupAxisFormat(ImAxis_Y1, "%.1f");
-        ImPlot::SetupAxisTicks(ImAxis_Y1, tick_marks.data(), num_ticks);
+        ImPlot::SetupAxisTicks(ImAxis_Y1, TICK_MARKS.data(), NUM_TICKS);
         ImPlot::SetupAxesLimits(0, total_frame_time, 0, m_graph_max_time, ImGuiCond_Always);
         ImPlot::SetupLegend(ImPlotLocation_SouthEast, ImPlotLegendFlags_None);
         m_vps_counter.ImPlotPlotLines("V-Blank (ms)");

@@ -365,36 +365,36 @@ void AXWiiUCode::ReadPB(Memory::MemoryManager& memory, u32 addr, AXPBWii& pb)
   // The Wii PB memory layout changed twice.
   // For HLE, we use the largest struct version.
   char* dst = (char*)&pb;
-  constexpr size_t updates_begin = offsetof(AXPBWii, updates);
-  constexpr size_t updates_end = offsetof(AXPBWii, updates) + sizeof(PBUpdatesWii);
-  constexpr size_t gap_begin = offsetof(AXPBWii, hpf) + sizeof(PBHighPassFilter);
-  constexpr size_t gap_end = offsetof(AXPBWii, biquad) + sizeof(PBBiquadFilter);
+  constexpr size_t UPDATES_BEGIN = offsetof(AXPBWii, updates);
+  constexpr size_t UPDATES_END = offsetof(AXPBWii, updates) + sizeof(PBUpdatesWii);
+  constexpr size_t GAP_BEGIN = offsetof(AXPBWii, hpf) + sizeof(PBHighPassFilter);
+  constexpr size_t GAP_END = offsetof(AXPBWii, biquad) + sizeof(PBBiquadFilter);
   switch (m_crc)
   {
   case 0x7699af32:
   case 0xfa450138:
     // The hpf field is a bit smaller than the biquad. Skip the difference.
-    memory.CopyFromEmuSwapped<u16>((u16*)dst, addr, gap_begin);
-    memset(dst + gap_begin, 0, gap_end - gap_begin);
-    memory.CopyFromEmuSwapped<u16>((u16*)(dst + gap_end), addr + gap_begin, sizeof(pb) - gap_end);
+    memory.CopyFromEmuSwapped<u16>((u16*)dst, addr, GAP_BEGIN);
+    memset(dst + GAP_BEGIN, 0, GAP_END - GAP_BEGIN);
+    memory.CopyFromEmuSwapped<u16>((u16*)(dst + GAP_END), addr + GAP_BEGIN, sizeof(pb) - GAP_END);
     break;
   case 0xd9c4bf34:
   case 0xadbc06bd:
     // Skip updates field and skip gap after hpf.
-    memory.CopyFromEmuSwapped<u16>((u16*)dst, addr, updates_begin);
-    memset(dst + updates_begin, 0, sizeof(PBUpdatesWii));
-    memory.CopyFromEmuSwapped<u16>((u16*)(dst + updates_end), addr + updates_begin,
-                                   gap_begin - updates_end);
-    memset(dst + gap_begin, 0, gap_end - gap_begin);
-    memory.CopyFromEmuSwapped<u16>((u16*)(dst + gap_end), addr + gap_begin, sizeof(pb) - gap_end);
+    memory.CopyFromEmuSwapped<u16>((u16*)dst, addr, UPDATES_BEGIN);
+    memset(dst + UPDATES_BEGIN, 0, sizeof(PBUpdatesWii));
+    memory.CopyFromEmuSwapped<u16>((u16*)(dst + UPDATES_END), addr + UPDATES_BEGIN,
+                                   GAP_BEGIN - UPDATES_END);
+    memset(dst + GAP_BEGIN, 0, GAP_END - GAP_BEGIN);
+    memory.CopyFromEmuSwapped<u16>((u16*)(dst + GAP_END), addr + GAP_BEGIN, sizeof(pb) - GAP_END);
     break;
   case 0x347112ba:
   case 0x4cc52064:
     // Just skip updates field.
-    memory.CopyFromEmuSwapped<u16>((u16*)dst, addr, updates_begin);
-    memset(dst + updates_begin, 0, sizeof(PBUpdatesWii));
-    memory.CopyFromEmuSwapped<u16>((u16*)(dst + updates_end), addr + updates_begin,
-                                   sizeof(pb) - updates_end);
+    memory.CopyFromEmuSwapped<u16>((u16*)dst, addr, UPDATES_BEGIN);
+    memset(dst + UPDATES_BEGIN, 0, sizeof(PBUpdatesWii));
+    memory.CopyFromEmuSwapped<u16>((u16*)(dst + UPDATES_END), addr + UPDATES_BEGIN,
+                                   sizeof(pb) - UPDATES_END);
     break;
   }
 }
@@ -402,31 +402,31 @@ void AXWiiUCode::ReadPB(Memory::MemoryManager& memory, u32 addr, AXPBWii& pb)
 void AXWiiUCode::WritePB(Memory::MemoryManager& memory, u32 addr, const AXPBWii& pb)
 {
   const char* src = (const char*)&pb;
-  constexpr size_t updates_begin = offsetof(AXPBWii, updates);
-  constexpr size_t updates_end = offsetof(AXPBWii, updates) + sizeof(PBUpdatesWii);
-  constexpr size_t gap_begin = offsetof(AXPBWii, hpf) + sizeof(PBHighPassFilter);
-  constexpr size_t gap_end = offsetof(AXPBWii, biquad) + sizeof(PBBiquadFilter);
+  constexpr size_t UPDATES_BEGIN = offsetof(AXPBWii, updates);
+  constexpr size_t UPDATES_END = offsetof(AXPBWii, updates) + sizeof(PBUpdatesWii);
+  constexpr size_t GAP_BEGIN = offsetof(AXPBWii, hpf) + sizeof(PBHighPassFilter);
+  constexpr size_t GAP_END = offsetof(AXPBWii, biquad) + sizeof(PBBiquadFilter);
   switch (m_crc)
   {
   case 0x7699af32:
   case 0xfa450138:
-    memory.CopyToEmuSwapped<u16>(addr, (const u16*)src, gap_begin);
-    memory.CopyToEmuSwapped<u16>(addr + gap_begin, (const u16*)(src + gap_end),
-                                 sizeof(pb) - gap_end);
+    memory.CopyToEmuSwapped<u16>(addr, (const u16*)src, GAP_BEGIN);
+    memory.CopyToEmuSwapped<u16>(addr + GAP_BEGIN, (const u16*)(src + GAP_END),
+                                 sizeof(pb) - GAP_END);
     break;
   case 0xd9c4bf34:
   case 0xadbc06bd:
-    memory.CopyToEmuSwapped<u16>(addr, (const u16*)src, updates_begin);
-    memory.CopyToEmuSwapped<u16>(addr + updates_begin, (const u16*)(src + updates_end),
-                                 gap_begin - updates_end);
-    memory.CopyToEmuSwapped<u16>(addr + gap_begin, (const u16*)(src + gap_end),
-                                 sizeof(pb) - gap_end);
+    memory.CopyToEmuSwapped<u16>(addr, (const u16*)src, UPDATES_BEGIN);
+    memory.CopyToEmuSwapped<u16>(addr + UPDATES_BEGIN, (const u16*)(src + UPDATES_END),
+                                 GAP_BEGIN - UPDATES_END);
+    memory.CopyToEmuSwapped<u16>(addr + GAP_BEGIN, (const u16*)(src + GAP_END),
+                                 sizeof(pb) - GAP_END);
     break;
   case 0x347112ba:
   case 0x4cc52064:
-    memory.CopyToEmuSwapped<u16>(addr, (const u16*)src, updates_begin);
-    memory.CopyToEmuSwapped<u16>(addr + updates_begin, (const u16*)(src + updates_end),
-                                 sizeof(pb) - updates_end);
+    memory.CopyToEmuSwapped<u16>(addr, (const u16*)src, UPDATES_BEGIN);
+    memory.CopyToEmuSwapped<u16>(addr + UPDATES_BEGIN, (const u16*)(src + UPDATES_END),
+                                 sizeof(pb) - UPDATES_END);
     break;
   }
 }
@@ -435,7 +435,7 @@ void AXWiiUCode::ProcessPBList(u32 pb_addr)
 {
   // Samples per millisecond. In theory DSP sampling rate can be changed from
   // 32KHz to 48KHz, but AX always process at 32KHz.
-  constexpr u32 spms = 32;
+  constexpr u32 SPMS = 32;
 
   AXPBWii pb;
 
@@ -459,13 +459,13 @@ void AXWiiUCode::ProcessPBList(u32 pb_addr)
       for (int curr_ms = 0; curr_ms < 3; ++curr_ms)
       {
         ApplyUpdatesForMs(curr_ms, pb, pb.updates.num_updates, updates);
-        ProcessVoice(static_cast<HLEAccelerator*>(m_accelerator.get()), pb, buffers, spms,
+        ProcessVoice(static_cast<HLEAccelerator*>(m_accelerator.get()), pb, buffers, SPMS,
                      ConvertMixerControl(HILO_TO_32(pb.mixer_control)),
                      m_coeffs_checksum ? m_coeffs.data() : nullptr, m_new_filter);
 
         // Forward the buffers
         for (auto& ptr : buffers.regular_ptrs)
-          ptr += spms;
+          ptr += SPMS;
         for (auto& ptr : buffers.wiimote_ptrs)
           ptr += 6;
       }

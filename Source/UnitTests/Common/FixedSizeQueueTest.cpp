@@ -56,28 +56,28 @@ TEST(FixedSizeQueue, RingBuffer)
 class NonTrivialTypeTestData
 {
 public:
-  static inline int num_objects = 0;
-  static inline int total_constructed = 0;
-  static inline int default_constructed = 0;
-  static inline int total_destructed = 0;
+  static inline int m_num_objects = 0;
+  static inline int m_total_constructed = 0;
+  static inline int m_default_constructed = 0;
+  static inline int m_total_destructed = 0;
 
   NonTrivialTypeTestData()
   {
-    num_objects++;
-    total_constructed++;
-    default_constructed++;
+    m_num_objects++;
+    m_total_constructed++;
+    m_default_constructed++;
   }
 
   NonTrivialTypeTestData(int /*val*/)
   {
-    num_objects++;
-    total_constructed++;
+    m_num_objects++;
+    m_total_constructed++;
   }
 
   ~NonTrivialTypeTestData()
   {
-    num_objects--;
-    total_destructed++;
+    m_num_objects--;
+    m_total_destructed++;
   }
 };
 
@@ -88,27 +88,27 @@ TEST(FixedSizeQueue, NonTrivialTypes)
 
   EXPECT_EQ(0u, q.size());
 
-  EXPECT_EQ(2, NonTrivialTypeTestData::num_objects);
-  EXPECT_EQ(2, NonTrivialTypeTestData::total_constructed);
-  EXPECT_EQ(2, NonTrivialTypeTestData::default_constructed);
-  EXPECT_EQ(0, NonTrivialTypeTestData::total_destructed);
+  EXPECT_EQ(2, NonTrivialTypeTestData::m_num_objects);
+  EXPECT_EQ(2, NonTrivialTypeTestData::m_total_constructed);
+  EXPECT_EQ(2, NonTrivialTypeTestData::m_default_constructed);
+  EXPECT_EQ(0, NonTrivialTypeTestData::m_total_destructed);
 
   q.emplace(4);
   q.emplace(6);
   q.emplace(8);
 
-  EXPECT_EQ(2, NonTrivialTypeTestData::num_objects);
-  EXPECT_EQ(2 + 3, NonTrivialTypeTestData::total_constructed);
-  EXPECT_EQ(2, NonTrivialTypeTestData::default_constructed);
-  EXPECT_EQ(3, NonTrivialTypeTestData::total_destructed);
+  EXPECT_EQ(2, NonTrivialTypeTestData::m_num_objects);
+  EXPECT_EQ(2 + 3, NonTrivialTypeTestData::m_total_constructed);
+  EXPECT_EQ(2, NonTrivialTypeTestData::m_default_constructed);
+  EXPECT_EQ(3, NonTrivialTypeTestData::m_total_destructed);
   EXPECT_EQ(2u, q.size());
 
   q.pop();
   q.pop();
 
-  EXPECT_EQ(2, NonTrivialTypeTestData::num_objects);
-  EXPECT_EQ(2 + 3 + 2, NonTrivialTypeTestData::total_constructed);
-  EXPECT_EQ(2 + 2, NonTrivialTypeTestData::default_constructed);
-  EXPECT_EQ(3 + 2, NonTrivialTypeTestData::total_destructed);
+  EXPECT_EQ(2, NonTrivialTypeTestData::m_num_objects);
+  EXPECT_EQ(2 + 3 + 2, NonTrivialTypeTestData::m_total_constructed);
+  EXPECT_EQ(2 + 2, NonTrivialTypeTestData::m_default_constructed);
+  EXPECT_EQ(3 + 2, NonTrivialTypeTestData::m_total_destructed);
   EXPECT_EQ(0u, q.size());
 }

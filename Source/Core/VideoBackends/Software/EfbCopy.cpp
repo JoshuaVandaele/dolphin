@@ -15,7 +15,7 @@ namespace EfbCopy
 {
 void ClearEfb()
 {
-  u32 clearColor = (bpmem.clearcolorAR & 0xff) << 24 | bpmem.clearcolorGB << 8 |
+  u32 clear_color = (bpmem.clearcolorAR & 0xff) << 24 | bpmem.clearcolorGB << 8 |
                    (bpmem.clearcolorAR & 0xff00) >> 8;
 
   int left = bpmem.copyTexSrcXY.x;
@@ -27,7 +27,7 @@ void ClearEfb()
   {
     for (u16 x = left; x <= right; x++)
     {
-      EfbInterface::SetColor(x, y, (u8*)(&clearColor));
+      EfbInterface::SetColor(x, y, (u8*)(&clear_color));
       EfbInterface::SetDepth(x, y, bpmem.clearZValue);
     }
   }

@@ -11,7 +11,7 @@
 
 int SignalDaemon::s_sigterm_fd[2];
 
-static constexpr char message[] =
+static constexpr char MESSAGE[] =
     "\nA signal was received. A second signal will force Dolphin to stop.\n";
 
 SignalDaemon::SignalDaemon(QObject* parent) : QObject(parent)
@@ -46,7 +46,7 @@ void SignalDaemon::OnNotifierActivated()
 
 void SignalDaemon::HandleInterrupt(int)
 {
-  if (write(STDERR_FILENO, message, sizeof(message)) != sizeof(message))
+  if (write(STDERR_FILENO, MESSAGE, sizeof(MESSAGE)) != sizeof(MESSAGE))
   {
     // Not much we can do here.
   }

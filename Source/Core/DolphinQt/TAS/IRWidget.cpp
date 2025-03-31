@@ -67,17 +67,17 @@ void IRWidget::paintEvent(QPaintEvent* event)
 
 void IRWidget::mousePressEvent(QMouseEvent* event)
 {
-  handleMouseEvent(event);
+  HandleMouseEvent(event);
   m_ignore_movement = event->button() == Qt::RightButton;
 }
 
 void IRWidget::mouseMoveEvent(QMouseEvent* event)
 {
   if (!m_ignore_movement)
-    handleMouseEvent(event);
+    HandleMouseEvent(event);
 }
 
-void IRWidget::handleMouseEvent(QMouseEvent* event)
+void IRWidget::HandleMouseEvent(QMouseEvent* event)
 {
   u16 prev_x = m_x;
   u16 prev_y = m_y;

@@ -155,7 +155,7 @@ void ProcessorInterfaceManager::UpdateException()
     ppc_state.Exceptions &= ~EXCEPTION_EXTERNAL_INT;
 }
 
-static const char* Debug_GetInterruptName(u32 cause_mask)
+static const char* DebugGetInterruptName(u32 cause_mask)
 {
   switch (cause_mask)
   {
@@ -203,13 +203,13 @@ void ProcessorInterfaceManager::SetInterrupt(u32 cause_mask, bool set)
   if (set && !(m_interrupt_cause & cause_mask))
   {
     DEBUG_LOG_FMT(PROCESSORINTERFACE, "Setting Interrupt {} (set)",
-                  Debug_GetInterruptName(cause_mask));
+                  DebugGetInterruptName(cause_mask));
   }
 
   if (!set && (m_interrupt_cause & cause_mask))
   {
     DEBUG_LOG_FMT(PROCESSORINTERFACE, "Setting Interrupt {} (clear)",
-                  Debug_GetInterruptName(cause_mask));
+                  DebugGetInterruptName(cause_mask));
   }
 
   if (set)

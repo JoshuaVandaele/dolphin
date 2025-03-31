@@ -647,10 +647,10 @@ static void AddGCAdapter(libusb_device* device)
   }
   for (u8 ic = 0; ic < config->bNumInterfaces; ic++)
   {
-    const libusb_interface* interfaceContainer = &config->interface[ic];
-    for (int i = 0; i < interfaceContainer->num_altsetting; i++)
+    const libusb_interface* interface_container = &config->interface[ic];
+    for (int i = 0; i < interface_container->num_altsetting; i++)
     {
-      const libusb_interface_descriptor* interface = &interfaceContainer->altsetting[i];
+      const libusb_interface_descriptor* interface = &interface_container->altsetting[i];
       for (u8 e = 0; e < interface->bNumEndpoints; e++)
       {
         const libusb_endpoint_descriptor* endpoint = &interface->endpoint[e];

@@ -432,10 +432,10 @@ void JitBaseBlockCache::LinkBlockExits(JitBlock& block)
   {
     if (!e.linkStatus)
     {
-      JitBlock* destinationBlock = GetBlockFromStartAddress(e.exitAddress, block.feature_flags);
-      if (destinationBlock)
+      JitBlock* destination_block = GetBlockFromStartAddress(e.exitAddress, block.feature_flags);
+      if (destination_block)
       {
-        WriteLinkBlock(e, destinationBlock);
+        WriteLinkBlock(e, destination_block);
         e.linkStatus = true;
       }
     }
@@ -468,12 +468,12 @@ void JitBaseBlockCache::UnlinkBlock(const JitBlock& block)
   const auto it = links_to.find(block.effectiveAddress);
   if (it == links_to.end())
     return;
-  for (JitBlock* sourceBlock : it->second)
+  for (JitBlock* source_block : it->second)
   {
-    if (sourceBlock->feature_flags != block.feature_flags)
+    if (source_block->feature_flags != block.feature_flags)
       continue;
 
-    for (auto& e : sourceBlock->linkData)
+    for (auto& e : source_block->linkData)
     {
       if (e.exitAddress == block.effectiveAddress)
       {

@@ -14,7 +14,7 @@
 // English
 // This is just a template. Most/all fields are updated with sane(r) values at runtime.
 // clang-format off
-const Sram sram_dump = {Common::BigEndianValue<u32>{0},
+const Sram SRAM_DUMP = {Common::BigEndianValue<u32>{0},
                         {Common::BigEndianValue<u16>{0x2c}, Common::BigEndianValue<u16>{0xffd0}, 0,
                          0, 0, 0, 0, 0, {0x20 | SramFlags::kOobeDone | SramFlags::kStereo}},
                         {{
@@ -38,12 +38,12 @@ void InitSRAM(Sram* sram, const std::string& filename)
     if (!file.ReadArray(sram, 1))
     {
       ERROR_LOG_FMT(EXPANSIONINTERFACE, "EXI IPL-DEV: Could not read all of SRAM");
-      *sram = sram_dump;
+      *sram = SRAM_DUMP;
     }
   }
   else
   {
-    *sram = sram_dump;
+    *sram = SRAM_DUMP;
   }
 }
 

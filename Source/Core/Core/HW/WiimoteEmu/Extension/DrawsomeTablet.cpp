@@ -17,7 +17,7 @@
 
 namespace WiimoteEmu
 {
-constexpr std::array<u8, 6> drawsome_tablet_id{{0xff, 0x00, 0xa4, 0x20, 0x00, 0x13}};
+constexpr std::array<u8, 6> DRAWSOME_TABLET_ID{{0xff, 0x00, 0xa4, 0x20, 0x00, 0x13}};
 
 // i18n: The "Drawsome" (combination of "Draw" and "Awesome") tablet wiimote extension by Ubisoft.
 DrawsomeTablet::DrawsomeTablet() : Extension3rdParty("Drawsome", _trans("Drawsome Tablet"))
@@ -92,7 +92,7 @@ void DrawsomeTablet::Reset()
 {
   EncryptedExtension::Reset();
 
-  m_reg.identifier = drawsome_tablet_id;
+  m_reg.identifier = DRAWSOME_TABLET_ID;
 
   // Assuming calibration data is 0xff filled.
   m_reg.calibration.fill(0xff);

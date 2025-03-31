@@ -45,8 +45,8 @@ void ROMUCode::HandleMail(u32 mail)
     // wait for beginning of UCode
     if ((mail & 0xFFFF0000) != 0x80F30000)
     {
-      u32 Message = 0xFEEE0000 | (mail & 0xFFFF);
-      m_mail_handler.PushMail(Message);
+      u32 message = 0xFEEE0000 | (mail & 0xFFFF);
+      m_mail_handler.PushMail(message);
     }
     else
     {

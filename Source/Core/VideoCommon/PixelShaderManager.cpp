@@ -93,8 +93,8 @@ void PixelShaderManager::SetConstants()
       // bpmem.fogRange.Base.Center = realcenter + 342;
       int center = ((u32)bpmem.fogRange.Base.Center) - 342;
       // normalize center to make calculations easy
-      float ScreenSpaceCenter = center / (2.0f * xfmem.viewport.wd);
-      ScreenSpaceCenter = (ScreenSpaceCenter * 2.0f) - 1.0f;
+      float screen_space_center = center / (2.0f * xfmem.viewport.wd);
+      screen_space_center = (screen_space_center * 2.0f) - 1.0f;
       // bpmem.fogRange.K seems to be  a table of precalculated coefficients for the adjust factor
       // observations: bpmem.fogRange.K[0].LO appears to be the lowest value and
       // bpmem.fogRange.K[4].HI the largest
@@ -102,16 +102,16 @@ void PixelShaderManager::SetConstants()
       // they are the coefficients from the center to the border of the screen
       // so to simplify I use the hi coefficient as K in the shader taking 256 as the scale
       // TODO: Shouldn't this be EFBToScaledXf?
-      constants.fogf[2] = ScreenSpaceCenter;
+      constants.fogf[2] = screen_space_center;
       constants.fogf[3] = static_cast<float>(
           g_framebuffer_manager->EFBToScaledX(static_cast<int>(2.0f * xfmem.viewport.wd)));
 
       for (size_t i = 0, vec_index = 0; i < std::size(bpmem.fogRange.K); i++)
       {
-        constexpr float scale = 4.0f;
-        constants.fogrange[vec_index / 4][vec_index % 4] = bpmem.fogRange.K[i].GetValue(0) * scale;
+        constexpr float SCALE = 4.0f;
+        constants.fogrange[vec_index / 4][vec_index % 4] = bpmem.fogRange.K[i].GetValue(0) * SCALE;
         vec_index++;
-        constants.fogrange[vec_index / 4][vec_index % 4] = bpmem.fogRange.K[i].GetValue(1) * scale;
+        constants.fogrange[vec_index / 4][vec_index % 4] = bpmem.fogRange.K[i].GetValue(1) * SCALE;
         vec_index++;
       }
     }

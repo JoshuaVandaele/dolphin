@@ -184,9 +184,9 @@ WiimoteDevice::SChannel* WiimoteDevice::FindChannelWithPSM(u16 psm)
 u16 WiimoteDevice::GenerateChannelID() const
 {
   // "Identifiers from 0x0001 to 0x003F are reserved"
-  constexpr u16 starting_id = 0x40;
+  constexpr u16 STARTING_ID = 0x40;
 
-  u16 cid = starting_id;
+  u16 cid = STARTING_ID;
 
   while (m_channels.contains(cid))
     ++cid;

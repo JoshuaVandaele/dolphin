@@ -45,7 +45,7 @@
 
 using namespace BPFunctions;
 
-static constexpr Common::EnumMap<float, GammaCorrection::Invalid2_2> s_gammaLUT = {1.0f, 1.7f, 2.2f,
+static constexpr Common::EnumMap<float, GammaCorrection::Invalid2_2> S_GAMMA_LUT = {1.0f, 1.7f, 2.2f,
                                                                                    2.2f};
 
 void BPInit()
@@ -243,19 +243,19 @@ static void BPWritten(PixelShaderManager& pixel_shader_manager, XFStateManager& 
     // The values in bpmem.copyTexSrcXY and bpmem.copyTexSrcWH are updated in case 0x49 and 0x4a in
     // this function
 
-    u32 destAddr = bpmem.copyTexDest << 5;
-    u32 destStride = bpmem.copyDestStride << 5;
+    u32 dest_addr = bpmem.copyTexDest << 5;
+    u32 dest_stride = bpmem.copyDestStride << 5;
 
-    MathUtil::Rectangle<s32> srcRect;
-    srcRect.left = bpmem.copyTexSrcXY.x;
-    srcRect.top = bpmem.copyTexSrcXY.y;
+    MathUtil::Rectangle<s32> src_rect;
+    src_rect.left = bpmem.copyTexSrcXY.x;
+    src_rect.top = bpmem.copyTexSrcXY.y;
 
     // Here Width+1 like Height, otherwise some textures are corrupted already since the native
     // resolution.
-    srcRect.right = bpmem.copyTexSrcXY.x + bpmem.copyTexSrcWH.x + 1;
-    srcRect.bottom = bpmem.copyTexSrcXY.y + bpmem.copyTexSrcWH.y + 1;
+    src_rect.right = bpmem.copyTexSrcXY.x + bpmem.copyTexSrcWH.x + 1;
+    src_rect.bottom = bpmem.copyTexSrcXY.y + bpmem.copyTexSrcWH.y + 1;
 
-    const UPE_Copy PE_copy = bpmem.triggerEFBCopy;
+    const UPE_Copy pe_copy = bpmem.triggerEFBCopy;
 
     // Since the copy X and Y coordinates/sizes are 10-bit, the game can configure a copy region up
     // to 1024x1024. Hardware tests have found that the number of bytes written does not depend on
@@ -270,18 +270,18 @@ static void BPWritten(PixelShaderManager& pixel_shader_manager, XFStateManager& 
     // to the EFB borders for over-offset copies. The arcade virtual console games (e.g. 1942) are
     // known for configuring these out-of-range copies.
 
-    if (u32(srcRect.right) > EFB_WIDTH || u32(srcRect.bottom) > EFB_HEIGHT)
+    if (u32(src_rect.right) > EFB_WIDTH || u32(src_rect.bottom) > EFB_HEIGHT)
     {
-      WARN_LOG_FMT(VIDEO, "Oversized EFB copy: {}x{} (offset {},{} stride {})", srcRect.GetWidth(),
-                   srcRect.GetHeight(), srcRect.left, srcRect.top, destStride);
+      WARN_LOG_FMT(VIDEO, "Oversized EFB copy: {}x{} (offset {},{} stride {})", src_rect.GetWidth(),
+                   src_rect.GetHeight(), src_rect.left, src_rect.top, dest_stride);
 
-      if (u32(srcRect.left) >= EFB_WIDTH || u32(srcRect.top) >= EFB_HEIGHT)
+      if (u32(src_rect.left) >= EFB_WIDTH || u32(src_rect.top) >= EFB_HEIGHT)
       {
         // This is not a sane src rectangle, it doesn't touch any valid image data at all
         // Just ignore it
         // Apparently Mario Kart Wii in wifi mode can generate a deformed EFB copy of size 4x4
         // at offset (328,1020)
-        if (PE_copy.copy_to_xfb == 1)
+        if (pe_copy.copy_to_xfb == 1)
         {
           // Make sure we disable Bounding box to match the side effects of the non-failure path
           g_bounding_box->Disable(pixel_shader_manager);
@@ -291,23 +291,23 @@ static void BPWritten(PixelShaderManager& pixel_shader_manager, XFStateManager& 
       }
 
       // Clamp the copy region to fit within EFB. So that we don't end up with a stretched image.
-      srcRect.right = std::clamp<int>(srcRect.right, 0, EFB_WIDTH);
-      srcRect.bottom = std::clamp<int>(srcRect.bottom, 0, EFB_HEIGHT);
+      src_rect.right = std::clamp<int>(src_rect.right, 0, EFB_WIDTH);
+      src_rect.bottom = std::clamp<int>(src_rect.bottom, 0, EFB_HEIGHT);
     }
 
-    const u32 copy_width = srcRect.GetWidth();
-    const u32 copy_height = srcRect.GetHeight();
+    const u32 copy_width = src_rect.GetWidth();
+    const u32 copy_height = src_rect.GetHeight();
 
     // Check if we are to copy from the EFB or draw to the XFB
-    if (PE_copy.copy_to_xfb == 0)
+    if (pe_copy.copy_to_xfb == 0)
     {
       // bpmem.zcontrol.pixel_format to PixelFormat::Z24 is when the game wants to copy from ZBuffer
       // (Zbuffer uses 24-bit Format)
       bool is_depth_copy = bpmem.zcontrol.pixel_format == PixelFormat::Z24;
       g_texture_cache->CopyRenderTargetToTexture(
-          destAddr, PE_copy.tp_realFormat(), copy_width, copy_height, destStride, is_depth_copy,
-          srcRect, PE_copy.intensity_fmt && PE_copy.auto_conv, PE_copy.half_scale, 1.0f,
-          s_gammaLUT[PE_copy.gamma], bpmem.triggerEFBCopy.clamp_top,
+          dest_addr, pe_copy.tp_realFormat(), copy_width, copy_height, dest_stride, is_depth_copy,
+          src_rect, pe_copy.intensity_fmt && pe_copy.auto_conv, pe_copy.half_scale, 1.0f,
+          S_GAMMA_LUT[pe_copy.gamma], bpmem.triggerEFBCopy.clamp_top,
           bpmem.triggerEFBCopy.clamp_bottom, bpmem.copyfilter.GetCoefficients());
     }
     else
@@ -317,26 +317,26 @@ static void BPWritten(PixelShaderManager& pixel_shader_manager, XFStateManager& 
       // the number of lines copied is determined by the y scale * source efb height
       g_bounding_box->Disable(pixel_shader_manager);
 
-      float yScale;
-      if (PE_copy.scale_invert)
-        yScale = 256.0f / static_cast<float>(bpmem.dispcopyyscale);
+      float y_scale;
+      if (pe_copy.scale_invert)
+        y_scale = 256.0f / static_cast<float>(bpmem.dispcopyyscale);
       else
-        yScale = static_cast<float>(bpmem.dispcopyyscale) / 256.0f;
+        y_scale = static_cast<float>(bpmem.dispcopyyscale) / 256.0f;
 
-      float num_xfb_lines = 1.0f + bpmem.copyTexSrcWH.y * yScale;
+      float num_xfb_lines = 1.0f + bpmem.copyTexSrcWH.y * y_scale;
 
       u32 height = static_cast<u32>(num_xfb_lines);
 
       DEBUG_LOG_FMT(VIDEO,
                     "RenderToXFB: destAddr: {:08x} | srcRect [{} {} {} {}] | fbWidth: {} | "
                     "fbStride: {} | fbHeight: {} | yScale: {}",
-                    destAddr, srcRect.left, srcRect.top, srcRect.right, srcRect.bottom,
-                    bpmem.copyTexSrcWH.x + 1, destStride, height, yScale);
+                    dest_addr, src_rect.left, src_rect.top, src_rect.right, src_rect.bottom,
+                    bpmem.copyTexSrcWH.x + 1, dest_stride, height, y_scale);
 
       bool is_depth_copy = bpmem.zcontrol.pixel_format == PixelFormat::Z24;
       g_texture_cache->CopyRenderTargetToTexture(
-          destAddr, EFBCopyFormat::XFB, copy_width, height, destStride, is_depth_copy, srcRect,
-          false, false, yScale, s_gammaLUT[PE_copy.gamma], bpmem.triggerEFBCopy.clamp_top,
+          dest_addr, EFBCopyFormat::XFB, copy_width, height, dest_stride, is_depth_copy, src_rect,
+          false, false, y_scale, S_GAMMA_LUT[pe_copy.gamma], bpmem.triggerEFBCopy.clamp_top,
           bpmem.triggerEFBCopy.clamp_bottom, bpmem.copyfilter.GetCoefficients());
 
       // This is as closest as we have to an "end of the frame"
@@ -359,22 +359,22 @@ static void BPWritten(PixelShaderManager& pixel_shader_manager, XFStateManager& 
       {
         // below div two to convert from bytes to pixels - it expects width, not stride
         u64 ticks = system.GetCoreTiming().GetTicks();
-        g_presenter->ImmediateSwap(destAddr, destStride / 2, destStride, height, ticks);
+        g_presenter->ImmediateSwap(dest_addr, dest_stride / 2, dest_stride, height, ticks);
       }
       else
       {
         if (system.GetFifoPlayer().IsRunningWithFakeVideoInterfaceUpdates())
         {
           auto& vi = system.GetVideoInterface();
-          vi.FakeVIUpdate(destAddr, srcRect.GetWidth(), destStride, height);
+          vi.FakeVIUpdate(dest_addr, src_rect.GetWidth(), dest_stride, height);
         }
       }
     }
 
     // Clear the rectangular region after copying it.
-    if (PE_copy.clear)
+    if (pe_copy.clear)
     {
-      ClearScreen(srcRect);
+      ClearScreen(src_rect);
     }
 
     return;

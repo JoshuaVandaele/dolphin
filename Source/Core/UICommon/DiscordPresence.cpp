@@ -105,8 +105,8 @@ std::string ArtworkForGameId()
   const bool is_wii = Core::System::GetInstance().IsWii();
   const std::string region_code = SConfig::GetInstance().GetGameTDBImageRegionCode(is_wii, region);
 
-  static constexpr char cover_url[] = "https://discord.dolphin-emu.org/cover-art/{}/{}.png";
-  return fmt::format(cover_url, region_code, SConfig::GetInstance().GetGameTDBID());
+  static constexpr char COVER_URL[] = "https://discord.dolphin-emu.org/cover-art/{}/{}.png";
+  return fmt::format(COVER_URL, region_code, SConfig::GetInstance().GetGameTDBID());
 }
 
 }  // namespace

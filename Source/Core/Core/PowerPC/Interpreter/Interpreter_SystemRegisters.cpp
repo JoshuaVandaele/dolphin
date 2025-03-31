@@ -509,7 +509,7 @@ void Interpreter::mtspr(Interpreter& interpreter, UGeckoInstruction inst)
     // TODO: Support thermal interrupts when enabled.
     constexpr u32 SIMULATED_TEMP = 42;  // °C
 
-    auto UpdateThermalReg = [&ppc_state](UReg_THRM12* reg) {
+    auto update_thermal_reg = [&ppc_state](UReg_THRM12* reg) {
       if (!THRM3(ppc_state).E || !reg->V)
       {
         reg->TIV = 0;
@@ -524,8 +524,8 @@ void Interpreter::mtspr(Interpreter& interpreter, UGeckoInstruction inst)
       }
     };
 
-    UpdateThermalReg(&THRM1(ppc_state));
-    UpdateThermalReg(&THRM2(ppc_state));
+    update_thermal_reg(&THRM1(ppc_state));
+    update_thermal_reg(&THRM2(ppc_state));
     break;
   }
   }

@@ -170,9 +170,9 @@ constexpr std::array<u8, 256> s_key_codes_azerty{
     0x00,  // Nothing interesting past this point.
 };
 #else
-constexpr std::array<u8, 256> s_key_codes_qwerty{};
+constexpr std::array<u8, 256> S_KEY_CODES_QWERTY{};
 
-constexpr std::array<u8, 256> s_key_codes_azerty{};
+constexpr std::array<u8, 256> S_KEY_CODES_AZERTY{};
 #endif
 }  // Anonymous namespace
 
@@ -255,11 +255,11 @@ void USB_KBD::Update()
         switch (m_keyboard_layout)
         {
         case KBD_LAYOUT_QWERTY:
-          key_code = s_key_codes_qwerty[i];
+          key_code = S_KEY_CODES_QWERTY[i];
           break;
 
         case KBD_LAYOUT_AZERTY:
-          key_code = s_key_codes_azerty[i];
+          key_code = S_KEY_CODES_AZERTY[i];
           break;
         }
 

@@ -42,40 +42,40 @@ constexpr ExtendedMnemonicDesc INVALID_EXT_MNEMONIC = {0, nullptr};
 
 // All operands as referenced by the Gekko/Broadway user manual
 // See section 12.1.2 under Chapter 12
-constexpr OperandDesc OpDesc_A = OperandDesc{Mask(11, 15), {16, false}};
-constexpr OperandDesc OpDesc_B = OperandDesc{Mask(16, 20), {11, false}};
-constexpr OperandDesc OpDesc_BD = OperandDesc{Mask(16, 29), {0, true}};
-constexpr OperandDesc OpDesc_BI = OperandDesc{Mask(11, 15), {16, false}};
-constexpr OperandDesc OpDesc_BO = OperandDesc{Mask(6, 10), {21, false}};
-constexpr OperandDesc OpDesc_C = OperandDesc{Mask(21, 25), {6, false}};
-constexpr OperandDesc OpDesc_Crba = OperandDesc{Mask(11, 15), {16, false}};
-constexpr OperandDesc OpDesc_Crbb = OperandDesc{Mask(16, 20), {11, false}};
-constexpr OperandDesc OpDesc_Crbd = OperandDesc{Mask(6, 10), {21, false}};
-constexpr OperandDesc OpDesc_Crfd = OperandDesc{Mask(6, 8), {23, false}};
-constexpr OperandDesc OpDesc_Crfs = OperandDesc{Mask(11, 13), {18, false}};
-constexpr OperandDesc OpDesc_CRM = OperandDesc{Mask(12, 19), {12, false}};
-constexpr OperandDesc OpDesc_D = OperandDesc{Mask(6, 10), {21, false}};
-constexpr OperandDesc OpDesc_FM = OperandDesc{Mask(7, 14), {17, false}};
-constexpr OperandDesc OpDesc_W1 = OperandDesc{Mask(16, 16), {15, false}};
-constexpr OperandDesc OpDesc_W2 = OperandDesc{Mask(21, 21), {10, false}};
-constexpr OperandDesc OpDesc_IMM = OperandDesc{Mask(16, 19), {12, false}};
-constexpr OperandDesc OpDesc_L = OperandDesc{Mask(10, 10), {21, false}};
-constexpr OperandDesc OpDesc_LI = OperandDesc{Mask(6, 29), {0, true}};
-constexpr OperandDesc OpDesc_MB = OperandDesc{Mask(21, 25), {6, false}};
-constexpr OperandDesc OpDesc_ME = OperandDesc{Mask(26, 30), {1, false}};
-constexpr OperandDesc OpDesc_NB = OperandDesc{Mask(16, 20), {11, false}};
-constexpr OperandDesc OpDesc_Offd = OperandDesc{Mask(16, 31), {0, true}};
-constexpr OperandDesc OpDesc_OffdPs = OperandDesc{Mask(20, 31), {0, true}};
-constexpr OperandDesc OpDesc_S = OperandDesc{Mask(6, 10), {21, false}};
-constexpr OperandDesc OpDesc_SH = OperandDesc{Mask(16, 20), {11, false}};
-constexpr OperandDesc OpDesc_SIMM = OperandDesc{Mask(16, 31), {0, true}};
-constexpr OperandDesc OpDesc_SPR = OperandDesc{Mask(11, 20), {11, false}};
-constexpr OperandDesc OpDesc_SR = OperandDesc{Mask(12, 15), {16, false}};
-constexpr OperandDesc OpDesc_TO = OperandDesc{Mask(6, 10), {21, false}};
-constexpr OperandDesc OpDesc_TPR = OperandDesc{Mask(11, 20), {11, false}};
-constexpr OperandDesc OpDesc_UIMM = OperandDesc{Mask(16, 31), {0, false}};
-constexpr OperandDesc OpDesc_I1 = OperandDesc{Mask(17, 19), {12, false}};
-constexpr OperandDesc OpDesc_I2 = OperandDesc{Mask(22, 24), {7, false}};
+constexpr OperandDesc OP_DESC_A = OperandDesc{Mask(11, 15), {16, false}};
+constexpr OperandDesc OP_DESC_B = OperandDesc{Mask(16, 20), {11, false}};
+constexpr OperandDesc OP_DESC_BD = OperandDesc{Mask(16, 29), {0, true}};
+constexpr OperandDesc OP_DESC_BI = OperandDesc{Mask(11, 15), {16, false}};
+constexpr OperandDesc OP_DESC_BO = OperandDesc{Mask(6, 10), {21, false}};
+constexpr OperandDesc OP_DESC_C = OperandDesc{Mask(21, 25), {6, false}};
+constexpr OperandDesc OP_DESC_CRBA = OperandDesc{Mask(11, 15), {16, false}};
+constexpr OperandDesc OP_DESC_CRBB = OperandDesc{Mask(16, 20), {11, false}};
+constexpr OperandDesc OP_DESC_CRBD = OperandDesc{Mask(6, 10), {21, false}};
+constexpr OperandDesc OP_DESC_CRFD = OperandDesc{Mask(6, 8), {23, false}};
+constexpr OperandDesc OP_DESC_CRFS = OperandDesc{Mask(11, 13), {18, false}};
+constexpr OperandDesc OP_DESC_CRM = OperandDesc{Mask(12, 19), {12, false}};
+constexpr OperandDesc OP_DESC_D = OperandDesc{Mask(6, 10), {21, false}};
+constexpr OperandDesc OP_DESC_FM = OperandDesc{Mask(7, 14), {17, false}};
+constexpr OperandDesc OP_DESC_W1 = OperandDesc{Mask(16, 16), {15, false}};
+constexpr OperandDesc OP_DESC_W2 = OperandDesc{Mask(21, 21), {10, false}};
+constexpr OperandDesc OP_DESC_IMM = OperandDesc{Mask(16, 19), {12, false}};
+constexpr OperandDesc OP_DESC_L = OperandDesc{Mask(10, 10), {21, false}};
+constexpr OperandDesc OP_DESC_LI = OperandDesc{Mask(6, 29), {0, true}};
+constexpr OperandDesc OP_DESC_MB = OperandDesc{Mask(21, 25), {6, false}};
+constexpr OperandDesc OP_DESC_ME = OperandDesc{Mask(26, 30), {1, false}};
+constexpr OperandDesc OP_DESC_NB = OperandDesc{Mask(16, 20), {11, false}};
+constexpr OperandDesc OP_DESC_OFFD = OperandDesc{Mask(16, 31), {0, true}};
+constexpr OperandDesc OP_DESC_OFFD_PS = OperandDesc{Mask(20, 31), {0, true}};
+constexpr OperandDesc OP_DESC_S = OperandDesc{Mask(6, 10), {21, false}};
+constexpr OperandDesc OP_DESC_SH = OperandDesc{Mask(16, 20), {11, false}};
+constexpr OperandDesc OP_DESC_SIMM = OperandDesc{Mask(16, 31), {0, true}};
+constexpr OperandDesc OP_DESC_SPR = OperandDesc{Mask(11, 20), {11, false}};
+constexpr OperandDesc OP_DESC_SR = OperandDesc{Mask(12, 15), {16, false}};
+constexpr OperandDesc OP_DESC_TO = OperandDesc{Mask(6, 10), {21, false}};
+constexpr OperandDesc OP_DESC_TPR = OperandDesc{Mask(11, 20), {11, false}};
+constexpr OperandDesc OP_DESC_UIMM = OperandDesc{Mask(16, 31), {0, false}};
+constexpr OperandDesc OP_DESC_I1 = OperandDesc{Mask(17, 19), {12, false}};
+constexpr OperandDesc OP_DESC_I2 = OperandDesc{Mask(22, 24), {7, false}};
 }  // namespace
 
 void OperandList::Insert(size_t before, u32 val)
@@ -675,293 +675,293 @@ extern const CaseInsensitiveDict<ParseInfo, '.', '_', '+', '-'> extended_mnemoni
 // Defines all basic mnemonics that Broadway/Gekko supports
 extern const std::array<MnemonicDesc, NUM_MNEMONICS* VARIANT_PERMUTATIONS> mnemonics = {
     // A-2
-    OERC_MNEMONIC(31, InsertVal(266, 22, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // add
-    OERC_MNEMONIC(31, InsertVal(10, 22, 30), OpDesc_D, OpDesc_A, OpDesc_B),   // addc
-    OERC_MNEMONIC(31, InsertVal(138, 22, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // adde
-    BASIC_MNEMONIC(14, OpDesc_D, OpDesc_A, OpDesc_SIMM),                      // addi
-    BASIC_MNEMONIC(12, OpDesc_D, OpDesc_A, OpDesc_SIMM),                      // addic
-    BASIC_MNEMONIC(13, OpDesc_D, OpDesc_A, OpDesc_SIMM),                      // addic.
-    BASIC_MNEMONIC(15, OpDesc_D, OpDesc_A, OpDesc_SIMM),                      // addis
-    OERC_MNEMONIC(31, InsertVal(234, 22, 30), OpDesc_D, OpDesc_A),            // addme
-    OERC_MNEMONIC(31, InsertVal(202, 22, 30), OpDesc_D, OpDesc_A),            // addze
-    OERC_MNEMONIC(31, InsertVal(491, 22, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // divw
-    OERC_MNEMONIC(31, InsertVal(459, 22, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // divwu
-    RC_MNEMONIC(31, InsertVal(75, 22, 30), OpDesc_D, OpDesc_A, OpDesc_B),     // mulhw
-    RC_MNEMONIC(31, InsertVal(11, 22, 30), OpDesc_D, OpDesc_A, OpDesc_B),     // mulhwu
-    BASIC_MNEMONIC(7, OpDesc_D, OpDesc_A, OpDesc_SIMM),                       // mulli
-    OERC_MNEMONIC(31, InsertVal(235, 22, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // mullw
-    OERC_MNEMONIC(31, InsertVal(104, 22, 30), OpDesc_D, OpDesc_A),            // neg
-    OERC_MNEMONIC(31, InsertVal(40, 22, 30), OpDesc_D, OpDesc_A, OpDesc_B),   // subf
-    OERC_MNEMONIC(31, InsertVal(8, 22, 30), OpDesc_D, OpDesc_A, OpDesc_B),    // subfc
-    OERC_MNEMONIC(31, InsertVal(136, 22, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // subfe
-    BASIC_MNEMONIC(8, OpDesc_D, OpDesc_A, OpDesc_SIMM),                       // subfic
-    OERC_MNEMONIC(31, InsertVal(232, 22, 30), OpDesc_D, OpDesc_A),            // subfme
-    OERC_MNEMONIC(31, InsertVal(200, 22, 30), OpDesc_D, OpDesc_A),            // subfze
+    OERC_MNEMONIC(31, InsertVal(266, 22, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // add
+    OERC_MNEMONIC(31, InsertVal(10, 22, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),   // addc
+    OERC_MNEMONIC(31, InsertVal(138, 22, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // adde
+    BASIC_MNEMONIC(14, OP_DESC_D, OP_DESC_A, OP_DESC_SIMM),                      // addi
+    BASIC_MNEMONIC(12, OP_DESC_D, OP_DESC_A, OP_DESC_SIMM),                      // addic
+    BASIC_MNEMONIC(13, OP_DESC_D, OP_DESC_A, OP_DESC_SIMM),                      // addic.
+    BASIC_MNEMONIC(15, OP_DESC_D, OP_DESC_A, OP_DESC_SIMM),                      // addis
+    OERC_MNEMONIC(31, InsertVal(234, 22, 30), OP_DESC_D, OP_DESC_A),            // addme
+    OERC_MNEMONIC(31, InsertVal(202, 22, 30), OP_DESC_D, OP_DESC_A),            // addze
+    OERC_MNEMONIC(31, InsertVal(491, 22, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // divw
+    OERC_MNEMONIC(31, InsertVal(459, 22, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // divwu
+    RC_MNEMONIC(31, InsertVal(75, 22, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),     // mulhw
+    RC_MNEMONIC(31, InsertVal(11, 22, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),     // mulhwu
+    BASIC_MNEMONIC(7, OP_DESC_D, OP_DESC_A, OP_DESC_SIMM),                       // mulli
+    OERC_MNEMONIC(31, InsertVal(235, 22, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // mullw
+    OERC_MNEMONIC(31, InsertVal(104, 22, 30), OP_DESC_D, OP_DESC_A),            // neg
+    OERC_MNEMONIC(31, InsertVal(40, 22, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),   // subf
+    OERC_MNEMONIC(31, InsertVal(8, 22, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),    // subfc
+    OERC_MNEMONIC(31, InsertVal(136, 22, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // subfe
+    BASIC_MNEMONIC(8, OP_DESC_D, OP_DESC_A, OP_DESC_SIMM),                       // subfic
+    OERC_MNEMONIC(31, InsertVal(232, 22, 30), OP_DESC_D, OP_DESC_A),            // subfme
+    OERC_MNEMONIC(31, InsertVal(200, 22, 30), OP_DESC_D, OP_DESC_A),            // subfze
 
     // A-3
-    MNEMONIC(31, InsertVal(0, 21, 30), OpDesc_Crfd, OpDesc_L, OpDesc_A, OpDesc_B),   // cmp
-    BASIC_MNEMONIC(11, OpDesc_Crfd, OpDesc_L, OpDesc_A, OpDesc_SIMM),                // cmpi
-    MNEMONIC(31, InsertVal(32, 21, 30), OpDesc_Crfd, OpDesc_L, OpDesc_A, OpDesc_B),  // cmpl
-    BASIC_MNEMONIC(10, OpDesc_Crfd, OpDesc_L, OpDesc_A, OpDesc_UIMM),                // cmpli
+    MNEMONIC(31, InsertVal(0, 21, 30), OP_DESC_CRFD, OP_DESC_L, OP_DESC_A, OP_DESC_B),   // cmp
+    BASIC_MNEMONIC(11, OP_DESC_CRFD, OP_DESC_L, OP_DESC_A, OP_DESC_SIMM),                // cmpi
+    MNEMONIC(31, InsertVal(32, 21, 30), OP_DESC_CRFD, OP_DESC_L, OP_DESC_A, OP_DESC_B),  // cmpl
+    BASIC_MNEMONIC(10, OP_DESC_CRFD, OP_DESC_L, OP_DESC_A, OP_DESC_UIMM),                // cmpli
 
     // A-4
-    RC_MNEMONIC(31, InsertVal(28, 21, 30), OpDesc_A, OpDesc_S, OpDesc_B),   // and
-    RC_MNEMONIC(31, InsertVal(60, 21, 30), OpDesc_A, OpDesc_S, OpDesc_B),   // andc
-    BASIC_MNEMONIC(28, OpDesc_A, OpDesc_S, OpDesc_UIMM),                    // andi.
-    BASIC_MNEMONIC(29, OpDesc_A, OpDesc_S, OpDesc_UIMM),                    // andis.
-    RC_MNEMONIC(31, InsertVal(26, 21, 30), OpDesc_A, OpDesc_S),             // cntlzw
-    RC_MNEMONIC(31, InsertVal(284, 21, 30), OpDesc_A, OpDesc_S, OpDesc_B),  // eqv
-    RC_MNEMONIC(31, InsertVal(954, 21, 30), OpDesc_A, OpDesc_S),            // extsb
-    RC_MNEMONIC(31, InsertVal(922, 21, 30), OpDesc_A, OpDesc_S),            // extsh
-    RC_MNEMONIC(31, InsertVal(476, 21, 30), OpDesc_A, OpDesc_S, OpDesc_B),  // nand
-    RC_MNEMONIC(31, InsertVal(124, 21, 30), OpDesc_A, OpDesc_S, OpDesc_B),  // nor
-    RC_MNEMONIC(31, InsertVal(444, 21, 30), OpDesc_A, OpDesc_S, OpDesc_B),  // or
-    RC_MNEMONIC(31, InsertVal(412, 21, 30), OpDesc_A, OpDesc_S, OpDesc_B),  // orc
-    BASIC_MNEMONIC(24, OpDesc_A, OpDesc_S, OpDesc_UIMM),                    // ori
-    BASIC_MNEMONIC(25, OpDesc_A, OpDesc_S, OpDesc_UIMM),                    // oris
-    RC_MNEMONIC(31, InsertVal(316, 21, 30), OpDesc_A, OpDesc_S, OpDesc_B),  // xor
-    BASIC_MNEMONIC(26, OpDesc_A, OpDesc_S, OpDesc_UIMM),                    // xori
-    BASIC_MNEMONIC(27, OpDesc_A, OpDesc_S, OpDesc_UIMM),                    // xoris
+    RC_MNEMONIC(31, InsertVal(28, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_B),   // and
+    RC_MNEMONIC(31, InsertVal(60, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_B),   // andc
+    BASIC_MNEMONIC(28, OP_DESC_A, OP_DESC_S, OP_DESC_UIMM),                    // andi.
+    BASIC_MNEMONIC(29, OP_DESC_A, OP_DESC_S, OP_DESC_UIMM),                    // andis.
+    RC_MNEMONIC(31, InsertVal(26, 21, 30), OP_DESC_A, OP_DESC_S),             // cntlzw
+    RC_MNEMONIC(31, InsertVal(284, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_B),  // eqv
+    RC_MNEMONIC(31, InsertVal(954, 21, 30), OP_DESC_A, OP_DESC_S),            // extsb
+    RC_MNEMONIC(31, InsertVal(922, 21, 30), OP_DESC_A, OP_DESC_S),            // extsh
+    RC_MNEMONIC(31, InsertVal(476, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_B),  // nand
+    RC_MNEMONIC(31, InsertVal(124, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_B),  // nor
+    RC_MNEMONIC(31, InsertVal(444, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_B),  // or
+    RC_MNEMONIC(31, InsertVal(412, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_B),  // orc
+    BASIC_MNEMONIC(24, OP_DESC_A, OP_DESC_S, OP_DESC_UIMM),                    // ori
+    BASIC_MNEMONIC(25, OP_DESC_A, OP_DESC_S, OP_DESC_UIMM),                    // oris
+    RC_MNEMONIC(31, InsertVal(316, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_B),  // xor
+    BASIC_MNEMONIC(26, OP_DESC_A, OP_DESC_S, OP_DESC_UIMM),                    // xori
+    BASIC_MNEMONIC(27, OP_DESC_A, OP_DESC_S, OP_DESC_UIMM),                    // xoris
 
     // A-5
-    RC_MNEMONIC(20, 0, OpDesc_A, OpDesc_S, OpDesc_SH, OpDesc_MB, OpDesc_ME),  // rlwimi
-    RC_MNEMONIC(21, 0, OpDesc_A, OpDesc_S, OpDesc_SH, OpDesc_MB, OpDesc_ME),  // rlwinm
-    RC_MNEMONIC(23, 0, OpDesc_A, OpDesc_S, OpDesc_B, OpDesc_MB, OpDesc_ME),   // rlwnm
+    RC_MNEMONIC(20, 0, OP_DESC_A, OP_DESC_S, OP_DESC_SH, OP_DESC_MB, OP_DESC_ME),  // rlwimi
+    RC_MNEMONIC(21, 0, OP_DESC_A, OP_DESC_S, OP_DESC_SH, OP_DESC_MB, OP_DESC_ME),  // rlwinm
+    RC_MNEMONIC(23, 0, OP_DESC_A, OP_DESC_S, OP_DESC_B, OP_DESC_MB, OP_DESC_ME),   // rlwnm
 
     // A-6
-    RC_MNEMONIC(31, InsertVal(24, 21, 30), OpDesc_A, OpDesc_S, OpDesc_B),    // slw
-    RC_MNEMONIC(31, InsertVal(792, 21, 30), OpDesc_A, OpDesc_S, OpDesc_B),   // sraw
-    RC_MNEMONIC(31, InsertVal(824, 21, 30), OpDesc_A, OpDesc_S, OpDesc_SH),  // srawi
-    RC_MNEMONIC(31, InsertVal(536, 21, 30), OpDesc_A, OpDesc_S, OpDesc_B),   // srw
+    RC_MNEMONIC(31, InsertVal(24, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_B),    // slw
+    RC_MNEMONIC(31, InsertVal(792, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_B),   // sraw
+    RC_MNEMONIC(31, InsertVal(824, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_SH),  // srawi
+    RC_MNEMONIC(31, InsertVal(536, 21, 30), OP_DESC_A, OP_DESC_S, OP_DESC_B),   // srw
 
     // A-7
-    RC_MNEMONIC(63, InsertVal(21, 26, 30), OpDesc_D, OpDesc_A, OpDesc_B),            // fadd
-    RC_MNEMONIC(59, InsertVal(21, 26, 30), OpDesc_D, OpDesc_A, OpDesc_B),            // fadds
-    RC_MNEMONIC(63, InsertVal(18, 26, 30), OpDesc_D, OpDesc_A, OpDesc_B),            // fdiv
-    RC_MNEMONIC(59, InsertVal(18, 26, 30), OpDesc_D, OpDesc_A, OpDesc_B),            // fdivs
-    RC_MNEMONIC(63, InsertVal(25, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C),            // fmul
-    RC_MNEMONIC(59, InsertVal(25, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C),            // fmuls
-    RC_MNEMONIC(59, InsertVal(24, 26, 30), OpDesc_D, OpDesc_B),                      // fres
-    RC_MNEMONIC(63, InsertVal(26, 26, 30), OpDesc_D, OpDesc_B),                      // frsqrte
-    RC_MNEMONIC(63, InsertVal(20, 26, 30), OpDesc_D, OpDesc_A, OpDesc_B),            // fsub
-    RC_MNEMONIC(59, InsertVal(20, 26, 30), OpDesc_D, OpDesc_A, OpDesc_B),            // fsubs
-    RC_MNEMONIC(63, InsertVal(23, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // fsel
+    RC_MNEMONIC(63, InsertVal(21, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),            // fadd
+    RC_MNEMONIC(59, InsertVal(21, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),            // fadds
+    RC_MNEMONIC(63, InsertVal(18, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),            // fdiv
+    RC_MNEMONIC(59, InsertVal(18, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),            // fdivs
+    RC_MNEMONIC(63, InsertVal(25, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C),            // fmul
+    RC_MNEMONIC(59, InsertVal(25, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C),            // fmuls
+    RC_MNEMONIC(59, InsertVal(24, 26, 30), OP_DESC_D, OP_DESC_B),                      // fres
+    RC_MNEMONIC(63, InsertVal(26, 26, 30), OP_DESC_D, OP_DESC_B),                      // frsqrte
+    RC_MNEMONIC(63, InsertVal(20, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),            // fsub
+    RC_MNEMONIC(59, InsertVal(20, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),            // fsubs
+    RC_MNEMONIC(63, InsertVal(23, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // fsel
 
     // A-8
-    RC_MNEMONIC(63, InsertVal(29, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // fmadd
-    RC_MNEMONIC(59, InsertVal(29, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // fmadds
-    RC_MNEMONIC(63, InsertVal(28, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // fmsub
-    RC_MNEMONIC(59, InsertVal(28, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // fmsubs
-    RC_MNEMONIC(63, InsertVal(31, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // fnmadd
-    RC_MNEMONIC(59, InsertVal(31, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // fnmadds
-    RC_MNEMONIC(63, InsertVal(30, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // fnmsub
-    RC_MNEMONIC(59, InsertVal(30, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // fnmsubs
+    RC_MNEMONIC(63, InsertVal(29, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // fmadd
+    RC_MNEMONIC(59, InsertVal(29, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // fmadds
+    RC_MNEMONIC(63, InsertVal(28, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // fmsub
+    RC_MNEMONIC(59, InsertVal(28, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // fmsubs
+    RC_MNEMONIC(63, InsertVal(31, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // fnmadd
+    RC_MNEMONIC(59, InsertVal(31, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // fnmadds
+    RC_MNEMONIC(63, InsertVal(30, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // fnmsub
+    RC_MNEMONIC(59, InsertVal(30, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // fnmsubs
 
     // A-9
-    RC_MNEMONIC(63, InsertVal(14, 21, 30), OpDesc_D, OpDesc_B),  // fctiw
-    RC_MNEMONIC(63, InsertVal(15, 21, 30), OpDesc_D, OpDesc_B),  // fctiwz
-    RC_MNEMONIC(63, InsertVal(12, 21, 30), OpDesc_D, OpDesc_B),  // frsp
+    RC_MNEMONIC(63, InsertVal(14, 21, 30), OP_DESC_D, OP_DESC_B),  // fctiw
+    RC_MNEMONIC(63, InsertVal(15, 21, 30), OP_DESC_D, OP_DESC_B),  // fctiwz
+    RC_MNEMONIC(63, InsertVal(12, 21, 30), OP_DESC_D, OP_DESC_B),  // frsp
 
     // A-10
-    MNEMONIC(63, InsertVal(32, 21, 30), OpDesc_Crfd, OpDesc_A, OpDesc_B),  // fcmpo
-    MNEMONIC(63, InsertVal(0, 21, 30), OpDesc_Crfd, OpDesc_A, OpDesc_B),   // fcmpu
+    MNEMONIC(63, InsertVal(32, 21, 30), OP_DESC_CRFD, OP_DESC_A, OP_DESC_B),  // fcmpo
+    MNEMONIC(63, InsertVal(0, 21, 30), OP_DESC_CRFD, OP_DESC_A, OP_DESC_B),   // fcmpu
 
     // A-11
-    MNEMONIC(63, InsertVal(64, 21, 30), OpDesc_Crfd, OpDesc_Crfs),     // mcrfs
-    RC_MNEMONIC(63, InsertVal(583, 21, 30), OpDesc_D),                 // mffs
-    RC_MNEMONIC(63, InsertVal(70, 21, 30), OpDesc_Crbd),               // mtfsb0
-    RC_MNEMONIC(63, InsertVal(38, 21, 30), OpDesc_Crbd),               // mtfsb1
-    RC_MNEMONIC(63, InsertVal(711, 21, 30), OpDesc_FM, OpDesc_B),      // mtfsf
-    RC_MNEMONIC(63, InsertVal(134, 21, 30), OpDesc_Crfd, OpDesc_IMM),  // mtfsfi
+    MNEMONIC(63, InsertVal(64, 21, 30), OP_DESC_CRFD, OP_DESC_CRFS),     // mcrfs
+    RC_MNEMONIC(63, InsertVal(583, 21, 30), OP_DESC_D),                 // mffs
+    RC_MNEMONIC(63, InsertVal(70, 21, 30), OP_DESC_CRBD),               // mtfsb0
+    RC_MNEMONIC(63, InsertVal(38, 21, 30), OP_DESC_CRBD),               // mtfsb1
+    RC_MNEMONIC(63, InsertVal(711, 21, 30), OP_DESC_FM, OP_DESC_B),      // mtfsf
+    RC_MNEMONIC(63, InsertVal(134, 21, 30), OP_DESC_CRFD, OP_DESC_IMM),  // mtfsfi
 
     // A-12
-    BASIC_MNEMONIC(34, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lbz
-    BASIC_MNEMONIC(35, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lbzu
-    MNEMONIC(31, InsertVal(119, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lbzux
-    MNEMONIC(31, InsertVal(87, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),   // lbzx
-    BASIC_MNEMONIC(42, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lha
-    BASIC_MNEMONIC(43, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lhau
-    MNEMONIC(31, InsertVal(375, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lhaux
-    MNEMONIC(31, InsertVal(343, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lhax
-    BASIC_MNEMONIC(40, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lhz
-    BASIC_MNEMONIC(41, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lhzu
-    MNEMONIC(31, InsertVal(311, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lhzux
-    MNEMONIC(31, InsertVal(279, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lhzx
-    BASIC_MNEMONIC(32, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lwz
-    BASIC_MNEMONIC(33, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lwzu
-    MNEMONIC(31, InsertVal(55, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),   // lwzux
-    MNEMONIC(31, InsertVal(23, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),   // lwzx
+    BASIC_MNEMONIC(34, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lbz
+    BASIC_MNEMONIC(35, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lbzu
+    MNEMONIC(31, InsertVal(119, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lbzux
+    MNEMONIC(31, InsertVal(87, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),   // lbzx
+    BASIC_MNEMONIC(42, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lha
+    BASIC_MNEMONIC(43, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lhau
+    MNEMONIC(31, InsertVal(375, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lhaux
+    MNEMONIC(31, InsertVal(343, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lhax
+    BASIC_MNEMONIC(40, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lhz
+    BASIC_MNEMONIC(41, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lhzu
+    MNEMONIC(31, InsertVal(311, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lhzux
+    MNEMONIC(31, InsertVal(279, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lhzx
+    BASIC_MNEMONIC(32, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lwz
+    BASIC_MNEMONIC(33, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lwzu
+    MNEMONIC(31, InsertVal(55, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),   // lwzux
+    MNEMONIC(31, InsertVal(23, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),   // lwzx
 
     // A-13
-    BASIC_MNEMONIC(38, OpDesc_S, OpDesc_Offd, OpDesc_A),                 // stb
-    BASIC_MNEMONIC(39, OpDesc_S, OpDesc_Offd, OpDesc_A),                 // stbu
-    MNEMONIC(31, InsertVal(247, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // stbux
-    MNEMONIC(31, InsertVal(215, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // stbx
-    BASIC_MNEMONIC(44, OpDesc_S, OpDesc_Offd, OpDesc_A),                 // sth
-    BASIC_MNEMONIC(45, OpDesc_S, OpDesc_Offd, OpDesc_A),                 // sthu
-    MNEMONIC(31, InsertVal(439, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // sthux
-    MNEMONIC(31, InsertVal(407, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // sthx
-    BASIC_MNEMONIC(36, OpDesc_S, OpDesc_Offd, OpDesc_A),                 // stw
-    BASIC_MNEMONIC(37, OpDesc_S, OpDesc_Offd, OpDesc_A),                 // stwu
-    MNEMONIC(31, InsertVal(183, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // stwux
-    MNEMONIC(31, InsertVal(151, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // stwx
+    BASIC_MNEMONIC(38, OP_DESC_S, OP_DESC_OFFD, OP_DESC_A),                 // stb
+    BASIC_MNEMONIC(39, OP_DESC_S, OP_DESC_OFFD, OP_DESC_A),                 // stbu
+    MNEMONIC(31, InsertVal(247, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // stbux
+    MNEMONIC(31, InsertVal(215, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // stbx
+    BASIC_MNEMONIC(44, OP_DESC_S, OP_DESC_OFFD, OP_DESC_A),                 // sth
+    BASIC_MNEMONIC(45, OP_DESC_S, OP_DESC_OFFD, OP_DESC_A),                 // sthu
+    MNEMONIC(31, InsertVal(439, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // sthux
+    MNEMONIC(31, InsertVal(407, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // sthx
+    BASIC_MNEMONIC(36, OP_DESC_S, OP_DESC_OFFD, OP_DESC_A),                 // stw
+    BASIC_MNEMONIC(37, OP_DESC_S, OP_DESC_OFFD, OP_DESC_A),                 // stwu
+    MNEMONIC(31, InsertVal(183, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // stwux
+    MNEMONIC(31, InsertVal(151, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // stwx
 
     // A-14
-    MNEMONIC(31, InsertVal(790, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lhbrx
-    MNEMONIC(31, InsertVal(534, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lwbrx
-    MNEMONIC(31, InsertVal(918, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // sthbrx
-    MNEMONIC(31, InsertVal(662, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // stwbrx
+    MNEMONIC(31, InsertVal(790, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lhbrx
+    MNEMONIC(31, InsertVal(534, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lwbrx
+    MNEMONIC(31, InsertVal(918, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // sthbrx
+    MNEMONIC(31, InsertVal(662, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // stwbrx
 
     // A-15
-    BASIC_MNEMONIC(46, OpDesc_D, OpDesc_Offd, OpDesc_A),  // lmw
-    BASIC_MNEMONIC(47, OpDesc_S, OpDesc_Offd, OpDesc_A),  // stmw
+    BASIC_MNEMONIC(46, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),  // lmw
+    BASIC_MNEMONIC(47, OP_DESC_S, OP_DESC_OFFD, OP_DESC_A),  // stmw
 
     // A-16
-    MNEMONIC(31, InsertVal(597, 21, 30), OpDesc_D, OpDesc_A, OpDesc_NB),  // lswi
-    MNEMONIC(31, InsertVal(533, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),   // lswx
-    MNEMONIC(31, InsertVal(725, 21, 30), OpDesc_S, OpDesc_A, OpDesc_NB),  // stswi
-    MNEMONIC(31, InsertVal(661, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),   // stswx
+    MNEMONIC(31, InsertVal(597, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_NB),  // lswi
+    MNEMONIC(31, InsertVal(533, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),   // lswx
+    MNEMONIC(31, InsertVal(725, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_NB),  // stswi
+    MNEMONIC(31, InsertVal(661, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),   // stswx
 
     // A-17
     MNEMONIC(31, InsertVal(854, 21, 30)),                               // eieio
     MNEMONIC(19, InsertVal(150, 21, 30)),                               // isync
-    MNEMONIC(31, InsertVal(20, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lwarx
-    MNEMONIC(31, InsertVal(150, 21, 30) | InsertVal(1, 31, 31), OpDesc_S, OpDesc_A,
-             OpDesc_B),                    // stwcx.
+    MNEMONIC(31, InsertVal(20, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lwarx
+    MNEMONIC(31, InsertVal(150, 21, 30) | InsertVal(1, 31, 31), OP_DESC_S, OP_DESC_A,
+             OP_DESC_B),                    // stwcx.
     MNEMONIC(31, InsertVal(598, 21, 30)),  // sync
 
     // A-18
-    BASIC_MNEMONIC(50, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lfd
-    BASIC_MNEMONIC(51, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lfdu
-    MNEMONIC(31, InsertVal(631, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lfdux
-    MNEMONIC(31, InsertVal(599, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lfdx
-    BASIC_MNEMONIC(48, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lfs
-    BASIC_MNEMONIC(49, OpDesc_D, OpDesc_Offd, OpDesc_A),                 // lfsu
-    MNEMONIC(31, InsertVal(567, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lfsux
-    MNEMONIC(31, InsertVal(535, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // lfsx
+    BASIC_MNEMONIC(50, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lfd
+    BASIC_MNEMONIC(51, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lfdu
+    MNEMONIC(31, InsertVal(631, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lfdux
+    MNEMONIC(31, InsertVal(599, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lfdx
+    BASIC_MNEMONIC(48, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lfs
+    BASIC_MNEMONIC(49, OP_DESC_D, OP_DESC_OFFD, OP_DESC_A),                 // lfsu
+    MNEMONIC(31, InsertVal(567, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lfsux
+    MNEMONIC(31, InsertVal(535, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // lfsx
 
     // A-19
-    BASIC_MNEMONIC(54, OpDesc_S, OpDesc_Offd, OpDesc_A),                 // stfd
-    BASIC_MNEMONIC(55, OpDesc_S, OpDesc_Offd, OpDesc_A),                 // stfdu
-    MNEMONIC(31, InsertVal(759, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // stfdux
-    MNEMONIC(31, InsertVal(727, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // stfdx
-    MNEMONIC(31, InsertVal(983, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // stfiwx
-    BASIC_MNEMONIC(52, OpDesc_S, OpDesc_Offd, OpDesc_A),                 // stfs
-    BASIC_MNEMONIC(53, OpDesc_S, OpDesc_Offd, OpDesc_A),                 // stfsu
-    MNEMONIC(31, InsertVal(695, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // stfsux
-    MNEMONIC(31, InsertVal(663, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // stfsx
+    BASIC_MNEMONIC(54, OP_DESC_S, OP_DESC_OFFD, OP_DESC_A),                 // stfd
+    BASIC_MNEMONIC(55, OP_DESC_S, OP_DESC_OFFD, OP_DESC_A),                 // stfdu
+    MNEMONIC(31, InsertVal(759, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // stfdux
+    MNEMONIC(31, InsertVal(727, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // stfdx
+    MNEMONIC(31, InsertVal(983, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // stfiwx
+    BASIC_MNEMONIC(52, OP_DESC_S, OP_DESC_OFFD, OP_DESC_A),                 // stfs
+    BASIC_MNEMONIC(53, OP_DESC_S, OP_DESC_OFFD, OP_DESC_A),                 // stfsu
+    MNEMONIC(31, InsertVal(695, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // stfsux
+    MNEMONIC(31, InsertVal(663, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // stfsx
 
     // A-20
-    RC_MNEMONIC(63, InsertVal(264, 21, 30), OpDesc_D, OpDesc_B),  // fabs
-    RC_MNEMONIC(63, InsertVal(72, 21, 30), OpDesc_D, OpDesc_B),   // fmr
-    RC_MNEMONIC(63, InsertVal(136, 21, 30), OpDesc_D, OpDesc_B),  // fnabs
-    RC_MNEMONIC(63, InsertVal(40, 21, 30), OpDesc_D, OpDesc_B),   // fneg
+    RC_MNEMONIC(63, InsertVal(264, 21, 30), OP_DESC_D, OP_DESC_B),  // fabs
+    RC_MNEMONIC(63, InsertVal(72, 21, 30), OP_DESC_D, OP_DESC_B),   // fmr
+    RC_MNEMONIC(63, InsertVal(136, 21, 30), OP_DESC_D, OP_DESC_B),  // fnabs
+    RC_MNEMONIC(63, InsertVal(40, 21, 30), OP_DESC_D, OP_DESC_B),   // fneg
 
     // A-21
-    AALK_MNEMONIC(18, 0, OpDesc_LI),                                // b
-    AALK_MNEMONIC(16, 0, OpDesc_BO, OpDesc_BI, OpDesc_BD),          // bc
-    LK_MNEMONIC(19, InsertVal(528, 21, 30), OpDesc_BO, OpDesc_BI),  // bcctr
-    LK_MNEMONIC(19, InsertVal(16, 21, 30), OpDesc_BO, OpDesc_BI),   // bclr
+    AALK_MNEMONIC(18, 0, OP_DESC_LI),                                // b
+    AALK_MNEMONIC(16, 0, OP_DESC_BO, OP_DESC_BI, OP_DESC_BD),          // bc
+    LK_MNEMONIC(19, InsertVal(528, 21, 30), OP_DESC_BO, OP_DESC_BI),  // bcctr
+    LK_MNEMONIC(19, InsertVal(16, 21, 30), OP_DESC_BO, OP_DESC_BI),   // bclr
 
     // A-22
-    MNEMONIC(19, InsertVal(257, 21, 30), OpDesc_Crbd, OpDesc_Crba, OpDesc_Crbb),  // crand
-    MNEMONIC(19, InsertVal(129, 21, 30), OpDesc_Crbd, OpDesc_Crba, OpDesc_Crbb),  // crandc
-    MNEMONIC(19, InsertVal(289, 21, 30), OpDesc_Crbd, OpDesc_Crba, OpDesc_Crbb),  // creqv
-    MNEMONIC(19, InsertVal(225, 21, 30), OpDesc_Crbd, OpDesc_Crba, OpDesc_Crbb),  // crnand
-    MNEMONIC(19, InsertVal(33, 21, 30), OpDesc_Crbd, OpDesc_Crba, OpDesc_Crbb),   // crnor
-    MNEMONIC(19, InsertVal(449, 21, 30), OpDesc_Crbd, OpDesc_Crba, OpDesc_Crbb),  // cror
-    MNEMONIC(19, InsertVal(417, 21, 30), OpDesc_Crbd, OpDesc_Crba, OpDesc_Crbb),  // crorc
-    MNEMONIC(19, InsertVal(193, 21, 30), OpDesc_Crbd, OpDesc_Crba, OpDesc_Crbb),  // crxor
-    MNEMONIC(19, InsertVal(0, 21, 30), OpDesc_Crfd, OpDesc_Crfs),                 // mcrf
+    MNEMONIC(19, InsertVal(257, 21, 30), OP_DESC_CRBD, OP_DESC_CRBA, OP_DESC_CRBB),  // crand
+    MNEMONIC(19, InsertVal(129, 21, 30), OP_DESC_CRBD, OP_DESC_CRBA, OP_DESC_CRBB),  // crandc
+    MNEMONIC(19, InsertVal(289, 21, 30), OP_DESC_CRBD, OP_DESC_CRBA, OP_DESC_CRBB),  // creqv
+    MNEMONIC(19, InsertVal(225, 21, 30), OP_DESC_CRBD, OP_DESC_CRBA, OP_DESC_CRBB),  // crnand
+    MNEMONIC(19, InsertVal(33, 21, 30), OP_DESC_CRBD, OP_DESC_CRBA, OP_DESC_CRBB),   // crnor
+    MNEMONIC(19, InsertVal(449, 21, 30), OP_DESC_CRBD, OP_DESC_CRBA, OP_DESC_CRBB),  // cror
+    MNEMONIC(19, InsertVal(417, 21, 30), OP_DESC_CRBD, OP_DESC_CRBA, OP_DESC_CRBB),  // crorc
+    MNEMONIC(19, InsertVal(193, 21, 30), OP_DESC_CRBD, OP_DESC_CRBA, OP_DESC_CRBB),  // crxor
+    MNEMONIC(19, InsertVal(0, 21, 30), OP_DESC_CRFD, OP_DESC_CRFS),                 // mcrf
 
     // A-23
     MNEMONIC(19, InsertVal(50, 21, 30)),  // rfi
     MNEMONIC(17, InsertVal(1, 30, 30)),   // sc
 
     // A-24
-    MNEMONIC(31, InsertVal(4, 21, 30), OpDesc_TO, OpDesc_A, OpDesc_B),  // tw
-    BASIC_MNEMONIC(3, OpDesc_TO, OpDesc_A, OpDesc_SIMM),                // twi
+    MNEMONIC(31, InsertVal(4, 21, 30), OP_DESC_TO, OP_DESC_A, OP_DESC_B),  // tw
+    BASIC_MNEMONIC(3, OP_DESC_TO, OP_DESC_A, OP_DESC_SIMM),                // twi
 
     // A-25
-    MNEMONIC(31, InsertVal(512, 21, 30), OpDesc_Crfd),           // mcrxr
-    MNEMONIC(31, InsertVal(19, 21, 30), OpDesc_D),               // mfcr
-    MNEMONIC(31, InsertVal(83, 21, 30), OpDesc_D),               // mfmsr
-    MNEMONIC(31, InsertVal(339, 21, 30), OpDesc_D, OpDesc_SPR),  // mfspr
-    MNEMONIC(31, InsertVal(371, 21, 30), OpDesc_D, OpDesc_TPR),  // mftb
-    MNEMONIC(31, InsertVal(144, 21, 30), OpDesc_CRM, OpDesc_S),  // mtcrf
-    MNEMONIC(31, InsertVal(146, 21, 30), OpDesc_S),              // mtmsr
-    MNEMONIC(31, InsertVal(467, 21, 30), OpDesc_SPR, OpDesc_D),  // mtspr
+    MNEMONIC(31, InsertVal(512, 21, 30), OP_DESC_CRFD),           // mcrxr
+    MNEMONIC(31, InsertVal(19, 21, 30), OP_DESC_D),               // mfcr
+    MNEMONIC(31, InsertVal(83, 21, 30), OP_DESC_D),               // mfmsr
+    MNEMONIC(31, InsertVal(339, 21, 30), OP_DESC_D, OP_DESC_SPR),  // mfspr
+    MNEMONIC(31, InsertVal(371, 21, 30), OP_DESC_D, OP_DESC_TPR),  // mftb
+    MNEMONIC(31, InsertVal(144, 21, 30), OP_DESC_CRM, OP_DESC_S),  // mtcrf
+    MNEMONIC(31, InsertVal(146, 21, 30), OP_DESC_S),              // mtmsr
+    MNEMONIC(31, InsertVal(467, 21, 30), OP_DESC_SPR, OP_DESC_D),  // mtspr
 
     // A-26
-    MNEMONIC(31, InsertVal(86, 21, 30), OpDesc_A, OpDesc_B),    // dcbf
-    MNEMONIC(31, InsertVal(470, 21, 30), OpDesc_A, OpDesc_B),   // dcbi
-    MNEMONIC(31, InsertVal(54, 21, 30), OpDesc_A, OpDesc_B),    // dcbst
-    MNEMONIC(31, InsertVal(278, 21, 30), OpDesc_A, OpDesc_B),   // dcbt
-    MNEMONIC(31, InsertVal(246, 21, 30), OpDesc_A, OpDesc_B),   // dcbtst
-    MNEMONIC(31, InsertVal(1014, 21, 30), OpDesc_A, OpDesc_B),  // dcbz
-    MNEMONIC(31, InsertVal(982, 21, 30), OpDesc_A, OpDesc_B),   // icbi
+    MNEMONIC(31, InsertVal(86, 21, 30), OP_DESC_A, OP_DESC_B),    // dcbf
+    MNEMONIC(31, InsertVal(470, 21, 30), OP_DESC_A, OP_DESC_B),   // dcbi
+    MNEMONIC(31, InsertVal(54, 21, 30), OP_DESC_A, OP_DESC_B),    // dcbst
+    MNEMONIC(31, InsertVal(278, 21, 30), OP_DESC_A, OP_DESC_B),   // dcbt
+    MNEMONIC(31, InsertVal(246, 21, 30), OP_DESC_A, OP_DESC_B),   // dcbtst
+    MNEMONIC(31, InsertVal(1014, 21, 30), OP_DESC_A, OP_DESC_B),  // dcbz
+    MNEMONIC(31, InsertVal(982, 21, 30), OP_DESC_A, OP_DESC_B),   // icbi
 
     // A-27
-    MNEMONIC(31, InsertVal(595, 21, 30), OpDesc_D, OpDesc_SR),  // mfsr
-    MNEMONIC(31, InsertVal(659, 21, 30), OpDesc_D, OpDesc_B),   // mfsrin
-    MNEMONIC(31, InsertVal(210, 21, 30), OpDesc_SR, OpDesc_S),  // mtsr
-    MNEMONIC(31, InsertVal(242, 21, 30), OpDesc_S, OpDesc_B),   // mtsrin
+    MNEMONIC(31, InsertVal(595, 21, 30), OP_DESC_D, OP_DESC_SR),  // mfsr
+    MNEMONIC(31, InsertVal(659, 21, 30), OP_DESC_D, OP_DESC_B),   // mfsrin
+    MNEMONIC(31, InsertVal(210, 21, 30), OP_DESC_SR, OP_DESC_S),  // mtsr
+    MNEMONIC(31, InsertVal(242, 21, 30), OP_DESC_S, OP_DESC_B),   // mtsrin
 
     // A-28
-    MNEMONIC(31, InsertVal(306, 21, 30), OpDesc_B),  // tlbie
+    MNEMONIC(31, InsertVal(306, 21, 30), OP_DESC_B),  // tlbie
     MNEMONIC(31, InsertVal(566, 21, 30)),            // tlbsync
 
     // A-29
-    MNEMONIC(31, InsertVal(310, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),  // eciwx
-    MNEMONIC(31, InsertVal(438, 21, 30), OpDesc_S, OpDesc_A, OpDesc_B),  // ecowx
+    MNEMONIC(31, InsertVal(310, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),  // eciwx
+    MNEMONIC(31, InsertVal(438, 21, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B),  // ecowx
 
     // A-30
-    MNEMONIC(4, InsertVal(6, 25, 30), OpDesc_D, OpDesc_A, OpDesc_B, OpDesc_W2,
-             OpDesc_I2),  // psq_lx
-    MNEMONIC(4, InsertVal(7, 25, 30), OpDesc_S, OpDesc_A, OpDesc_B, OpDesc_W2,
-             OpDesc_I2),  // psq_stx
-    MNEMONIC(4, InsertVal(38, 25, 30), OpDesc_D, OpDesc_A, OpDesc_B, OpDesc_W2,
-             OpDesc_I2),  // psq_lux
-    MNEMONIC(4, InsertVal(39, 25, 30), OpDesc_S, OpDesc_A, OpDesc_B, OpDesc_W2,
-             OpDesc_I2),                                                          // psq_stux
-    BASIC_MNEMONIC(56, OpDesc_D, OpDesc_OffdPs, OpDesc_A, OpDesc_W1, OpDesc_I1),  // psq_l
-    BASIC_MNEMONIC(57, OpDesc_D, OpDesc_OffdPs, OpDesc_A, OpDesc_W1, OpDesc_I1),  // psq_lu
-    BASIC_MNEMONIC(60, OpDesc_S, OpDesc_OffdPs, OpDesc_A, OpDesc_W1, OpDesc_I1),  // psq_st
-    BASIC_MNEMONIC(61, OpDesc_S, OpDesc_OffdPs, OpDesc_A, OpDesc_W1, OpDesc_I1),  // psq_stu
+    MNEMONIC(4, InsertVal(6, 25, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B, OP_DESC_W2,
+             OP_DESC_I2),  // psq_lx
+    MNEMONIC(4, InsertVal(7, 25, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B, OP_DESC_W2,
+             OP_DESC_I2),  // psq_stx
+    MNEMONIC(4, InsertVal(38, 25, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B, OP_DESC_W2,
+             OP_DESC_I2),  // psq_lux
+    MNEMONIC(4, InsertVal(39, 25, 30), OP_DESC_S, OP_DESC_A, OP_DESC_B, OP_DESC_W2,
+             OP_DESC_I2),                                                          // psq_stux
+    BASIC_MNEMONIC(56, OP_DESC_D, OP_DESC_OFFD_PS, OP_DESC_A, OP_DESC_W1, OP_DESC_I1),  // psq_l
+    BASIC_MNEMONIC(57, OP_DESC_D, OP_DESC_OFFD_PS, OP_DESC_A, OP_DESC_W1, OP_DESC_I1),  // psq_lu
+    BASIC_MNEMONIC(60, OP_DESC_S, OP_DESC_OFFD_PS, OP_DESC_A, OP_DESC_W1, OP_DESC_I1),  // psq_st
+    BASIC_MNEMONIC(61, OP_DESC_S, OP_DESC_OFFD_PS, OP_DESC_A, OP_DESC_W1, OP_DESC_I1),  // psq_stu
 
     // A-31
-    RC_MNEMONIC(4, InsertVal(18, 26, 30), OpDesc_D, OpDesc_A, OpDesc_B),            // ps_div
-    RC_MNEMONIC(4, InsertVal(20, 26, 30), OpDesc_D, OpDesc_A, OpDesc_B),            // ps_sub
-    RC_MNEMONIC(4, InsertVal(21, 26, 30), OpDesc_D, OpDesc_A, OpDesc_B),            // ps_add
-    RC_MNEMONIC(4, InsertVal(23, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // ps_sel
-    RC_MNEMONIC(4, InsertVal(24, 26, 30), OpDesc_D, OpDesc_B),                      // ps_res
-    RC_MNEMONIC(4, InsertVal(25, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C),            // ps_mul
-    RC_MNEMONIC(4, InsertVal(26, 26, 30), OpDesc_D, OpDesc_B),                      // ps_rsqrte
-    RC_MNEMONIC(4, InsertVal(28, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // ps_msub
-    RC_MNEMONIC(4, InsertVal(29, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // ps_madd
-    RC_MNEMONIC(4, InsertVal(30, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // ps_nmsub
-    RC_MNEMONIC(4, InsertVal(31, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // ps_nmadd
-    RC_MNEMONIC(4, InsertVal(40, 21, 30), OpDesc_D, OpDesc_B),                      // ps_neg
-    RC_MNEMONIC(4, InsertVal(72, 21, 30), OpDesc_D, OpDesc_B),                      // ps_mr
-    RC_MNEMONIC(4, InsertVal(136, 21, 30), OpDesc_D, OpDesc_B),                     // ps_nabs
-    RC_MNEMONIC(4, InsertVal(264, 21, 30), OpDesc_D, OpDesc_B),                     // ps_abs
+    RC_MNEMONIC(4, InsertVal(18, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),            // ps_div
+    RC_MNEMONIC(4, InsertVal(20, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),            // ps_sub
+    RC_MNEMONIC(4, InsertVal(21, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),            // ps_add
+    RC_MNEMONIC(4, InsertVal(23, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // ps_sel
+    RC_MNEMONIC(4, InsertVal(24, 26, 30), OP_DESC_D, OP_DESC_B),                      // ps_res
+    RC_MNEMONIC(4, InsertVal(25, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C),            // ps_mul
+    RC_MNEMONIC(4, InsertVal(26, 26, 30), OP_DESC_D, OP_DESC_B),                      // ps_rsqrte
+    RC_MNEMONIC(4, InsertVal(28, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // ps_msub
+    RC_MNEMONIC(4, InsertVal(29, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // ps_madd
+    RC_MNEMONIC(4, InsertVal(30, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // ps_nmsub
+    RC_MNEMONIC(4, InsertVal(31, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // ps_nmadd
+    RC_MNEMONIC(4, InsertVal(40, 21, 30), OP_DESC_D, OP_DESC_B),                      // ps_neg
+    RC_MNEMONIC(4, InsertVal(72, 21, 30), OP_DESC_D, OP_DESC_B),                      // ps_mr
+    RC_MNEMONIC(4, InsertVal(136, 21, 30), OP_DESC_D, OP_DESC_B),                     // ps_nabs
+    RC_MNEMONIC(4, InsertVal(264, 21, 30), OP_DESC_D, OP_DESC_B),                     // ps_abs
 
     // A-32
-    RC_MNEMONIC(4, InsertVal(10, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // ps_sum0
-    RC_MNEMONIC(4, InsertVal(11, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // ps_sum1
-    RC_MNEMONIC(4, InsertVal(12, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C),            // ps_muls0
-    RC_MNEMONIC(4, InsertVal(13, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C),            // ps_muls1
-    RC_MNEMONIC(4, InsertVal(14, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // ps_madds0
-    RC_MNEMONIC(4, InsertVal(15, 26, 30), OpDesc_D, OpDesc_A, OpDesc_C, OpDesc_B),  // ps_madds1
-    MNEMONIC(4, InsertVal(0, 21, 30), OpDesc_Crfd, OpDesc_A, OpDesc_B),             // ps_cmpu0
-    MNEMONIC(4, InsertVal(32, 21, 30), OpDesc_Crfd, OpDesc_A, OpDesc_B),            // ps_cmpo0
-    MNEMONIC(4, InsertVal(64, 21, 30), OpDesc_Crfd, OpDesc_A, OpDesc_B),            // ps_cmpu1
-    MNEMONIC(4, InsertVal(96, 21, 30), OpDesc_Crfd, OpDesc_A, OpDesc_B),            // ps_cmpo1
-    RC_MNEMONIC(4, InsertVal(528, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),           // ps_merge00
-    RC_MNEMONIC(4, InsertVal(560, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),           // ps_merge01
-    RC_MNEMONIC(4, InsertVal(592, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),           // ps_merge10
-    RC_MNEMONIC(4, InsertVal(624, 21, 30), OpDesc_D, OpDesc_A, OpDesc_B),           // ps_merge11
-    MNEMONIC(4, InsertVal(1014, 21, 30), OpDesc_A, OpDesc_B),                       // dcbz_l
+    RC_MNEMONIC(4, InsertVal(10, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // ps_sum0
+    RC_MNEMONIC(4, InsertVal(11, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // ps_sum1
+    RC_MNEMONIC(4, InsertVal(12, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C),            // ps_muls0
+    RC_MNEMONIC(4, InsertVal(13, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C),            // ps_muls1
+    RC_MNEMONIC(4, InsertVal(14, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // ps_madds0
+    RC_MNEMONIC(4, InsertVal(15, 26, 30), OP_DESC_D, OP_DESC_A, OP_DESC_C, OP_DESC_B),  // ps_madds1
+    MNEMONIC(4, InsertVal(0, 21, 30), OP_DESC_CRFD, OP_DESC_A, OP_DESC_B),             // ps_cmpu0
+    MNEMONIC(4, InsertVal(32, 21, 30), OP_DESC_CRFD, OP_DESC_A, OP_DESC_B),            // ps_cmpo0
+    MNEMONIC(4, InsertVal(64, 21, 30), OP_DESC_CRFD, OP_DESC_A, OP_DESC_B),            // ps_cmpu1
+    MNEMONIC(4, InsertVal(96, 21, 30), OP_DESC_CRFD, OP_DESC_A, OP_DESC_B),            // ps_cmpo1
+    RC_MNEMONIC(4, InsertVal(528, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),           // ps_merge00
+    RC_MNEMONIC(4, InsertVal(560, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),           // ps_merge01
+    RC_MNEMONIC(4, InsertVal(592, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),           // ps_merge10
+    RC_MNEMONIC(4, InsertVal(624, 21, 30), OP_DESC_D, OP_DESC_A, OP_DESC_B),           // ps_merge11
+    MNEMONIC(4, InsertVal(1014, 21, 30), OP_DESC_A, OP_DESC_B),                       // dcbz_l
 };
 
 namespace
@@ -1412,54 +1412,54 @@ extern const std::array<ExtendedMnemonicDesc, NUM_EXT_MNEMONICS* VARIANT_PERMUTA
 
 namespace
 {
-constexpr TransitionF HasPlusOrMinus = [](char c) { return c == '+' || c == '-'; };
-constexpr TransitionF HasDigit = [](char c) -> bool { return std::isdigit(c); };
-constexpr TransitionF HasE = [](char c) { return c == 'e'; };
-constexpr TransitionF HasDot = [](char c) { return c == '.'; };
+constexpr TransitionF HAS_PLUS_OR_MINUS = [](char c) { return c == '+' || c == '-'; };
+constexpr TransitionF HAS_DIGIT = [](char c) -> bool { return std::isdigit(c); };
+constexpr TransitionF HAS_E = [](char c) { return c == 'e'; };
+constexpr TransitionF HAS_DOT = [](char c) { return c == '.'; };
 
 // Normal string characters
-constexpr TransitionF HasNormal = [](char c) { return c != '\n' && c != '"' && c != '\\'; };
+constexpr TransitionF HAS_NORMAL = [](char c) { return c != '\n' && c != '"' && c != '\\'; };
 // Invalid characters in string
-constexpr TransitionF HasInvalid = [](char c) { return c == '\n'; };
+constexpr TransitionF HAS_INVALID = [](char c) { return c == '\n'; };
 // Octal digits
-constexpr TransitionF HasOctal = [](char c) { return c >= '0' && c <= '7'; };
+constexpr TransitionF HAS_OCTAL = [](char c) { return c >= '0' && c <= '7'; };
 // Hex digits
-constexpr TransitionF HasHex = [](char c) -> bool { return std::isxdigit(c); };
+constexpr TransitionF HAS_HEX = [](char c) -> bool { return std::isxdigit(c); };
 // Normal - octal
-constexpr TransitionF HasNormalMinusOctal = [](char c) { return HasNormal(c) && !HasOctal(c); };
+constexpr TransitionF HAS_NORMAL_MINUS_OCTAL = [](char c) { return HAS_NORMAL(c) && !HAS_OCTAL(c); };
 // Normal - hex
-constexpr TransitionF HasNormalMinusHex = [](char c) { return HasNormal(c) && !HasHex(c); };
+constexpr TransitionF HAS_NORMAL_MINUS_HEX = [](char c) { return HAS_NORMAL(c) && !HAS_HEX(c); };
 // Escape start
-constexpr TransitionF HasEscape = [](char c) { return c == '\\'; };
+constexpr TransitionF HAS_ESCAPE = [](char c) { return c == '\\'; };
 // All single-character escapes
-constexpr TransitionF HasSCE = [](char c) { return !HasOctal(c) && c != 'x' && c != '\n'; };
+constexpr TransitionF HAS_SCE = [](char c) { return !HAS_OCTAL(c) && c != 'x' && c != '\n'; };
 // Hex escape
-constexpr TransitionF HasHexStart = [](char c) { return c == 'x'; };
-constexpr TransitionF HasQuote = [](char c) { return c == '"'; };
+constexpr TransitionF HAS_HEX_START = [](char c) { return c == 'x'; };
+constexpr TransitionF HAS_QUOTE = [](char c) { return c == '"'; };
 }  // namespace
 
 extern const std::vector<DfaNode> float_dfa = {
-    {{DfaEdge(HasPlusOrMinus, 1), DfaEdge(HasDigit, 2), DfaEdge(HasDot, 5)},
+    {{DfaEdge(HAS_PLUS_OR_MINUS, 1), DfaEdge(HAS_DIGIT, 2), DfaEdge(HAS_DOT, 5)},
      "Invalid float: No numeric value"},
 
-    {{DfaEdge(HasDigit, 2), DfaEdge(HasDot, 5)}, "Invalid float: No numeric value"},
+    {{DfaEdge(HAS_DIGIT, 2), DfaEdge(HAS_DOT, 5)}, "Invalid float: No numeric value"},
 
-    {{DfaEdge(HasDigit, 2), DfaEdge(HasDot, 3), DfaEdge(HasE, 7)}, std::nullopt},
-    {{DfaEdge(HasDigit, 4)}, "Invalid float: No numeric value after decimal point"},
-    {{DfaEdge(HasDigit, 4), DfaEdge(HasE, 7)}, std::nullopt},
+    {{DfaEdge(HAS_DIGIT, 2), DfaEdge(HAS_DOT, 3), DfaEdge(HAS_E, 7)}, std::nullopt},
+    {{DfaEdge(HAS_DIGIT, 4)}, "Invalid float: No numeric value after decimal point"},
+    {{DfaEdge(HAS_DIGIT, 4), DfaEdge(HAS_E, 7)}, std::nullopt},
 
-    {{DfaEdge(HasDigit, 6)}, "Invalid float: No numeric value after decimal point"},
-    {{DfaEdge(HasDigit, 6), DfaEdge(HasE, 7)}, std::nullopt},
+    {{DfaEdge(HAS_DIGIT, 6)}, "Invalid float: No numeric value after decimal point"},
+    {{DfaEdge(HAS_DIGIT, 6), DfaEdge(HAS_E, 7)}, std::nullopt},
 
-    {{DfaEdge(HasDigit, 9), DfaEdge(HasPlusOrMinus, 8)},
+    {{DfaEdge(HAS_DIGIT, 9), DfaEdge(HAS_PLUS_OR_MINUS, 8)},
      "Invalid float: No numeric value following exponent signifier"},
-    {{DfaEdge(HasDigit, 9)}, "Invalid float: No numeric value following exponent signifier"},
-    {{DfaEdge(HasDigit, 9)}, std::nullopt},
+    {{DfaEdge(HAS_DIGIT, 9)}, "Invalid float: No numeric value following exponent signifier"},
+    {{DfaEdge(HAS_DIGIT, 9)}, std::nullopt},
 };
 
 extern const std::vector<DfaNode> string_dfa = {
     // Base character check
-    {{DfaEdge(HasNormal, 0), DfaEdge(HasInvalid, 1), DfaEdge(HasQuote, 2), DfaEdge(HasEscape, 3)},
+    {{DfaEdge(HAS_NORMAL, 0), DfaEdge(HAS_INVALID, 1), DfaEdge(HAS_QUOTE, 2), DfaEdge(HAS_ESCAPE, 3)},
      "Invalid string: No terminating \""},
 
     // Invalid (unescaped newline)
@@ -1468,20 +1468,20 @@ extern const std::vector<DfaNode> string_dfa = {
     {{}, std::nullopt},
 
     // Escape character breakout
-    {{DfaEdge(HasSCE, 0), DfaEdge(HasInvalid, 1), DfaEdge(HasOctal, 4), DfaEdge(HasHexStart, 6)},
+    {{DfaEdge(HAS_SCE, 0), DfaEdge(HAS_INVALID, 1), DfaEdge(HAS_OCTAL, 4), DfaEdge(HAS_HEX_START, 6)},
      "Invalid string: No terminating \""},
 
     // Octal characters, at most 3
-    {{DfaEdge(HasNormalMinusOctal, 0), DfaEdge(HasInvalid, 1), DfaEdge(HasQuote, 2),
-      DfaEdge(HasEscape, 3), DfaEdge(HasOctal, 5)},
+    {{DfaEdge(HAS_NORMAL_MINUS_OCTAL, 0), DfaEdge(HAS_INVALID, 1), DfaEdge(HAS_QUOTE, 2),
+      DfaEdge(HAS_ESCAPE, 3), DfaEdge(HAS_OCTAL, 5)},
      "Invalid string: No terminating \""},
-    {{DfaEdge(HasNormal, 0), DfaEdge(HasInvalid, 1), DfaEdge(HasQuote, 2), DfaEdge(HasEscape, 3)},
+    {{DfaEdge(HAS_NORMAL, 0), DfaEdge(HAS_INVALID, 1), DfaEdge(HAS_QUOTE, 2), DfaEdge(HAS_ESCAPE, 3)},
      "Invalid string: No terminating \""},
 
     // Hex characters, 1 or more
-    {{DfaEdge(HasHex, 7)}, "Invalid string: bad hex escape"},
-    {{DfaEdge(HasNormalMinusHex, 0), DfaEdge(HasInvalid, 1), DfaEdge(HasQuote, 2),
-      DfaEdge(HasEscape, 3), DfaEdge(HasHex, 7)},
+    {{DfaEdge(HAS_HEX, 7)}, "Invalid string: bad hex escape"},
+    {{DfaEdge(HAS_NORMAL_MINUS_HEX, 0), DfaEdge(HAS_INVALID, 1), DfaEdge(HAS_QUOTE, 2),
+      DfaEdge(HAS_ESCAPE, 3), DfaEdge(HAS_HEX, 7)},
      "Invalid string: No terminating \""},
 };
 }  // namespace Common::GekkoAssembler::detail

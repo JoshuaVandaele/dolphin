@@ -35,18 +35,18 @@ bool AbstractFramebuffer::ValidateConfig(
   // Currently we only expose a single mip level for render target textures.
   // MSAA textures are not supported with mip levels on most backends, and it simplifies our
   // handling of framebuffers.
-  auto CheckAttachment = [](const AbstractTexture* tex) {
+  auto check_attachment = [](const AbstractTexture* tex) {
     return tex->GetConfig().IsRenderTarget() && tex->GetConfig().levels == 1;
   };
-  if ((color_attachment && !CheckAttachment(color_attachment)) ||
-      (depth_attachment && !CheckAttachment(depth_attachment)))
+  if ((color_attachment && !check_attachment(color_attachment)) ||
+      (depth_attachment && !check_attachment(depth_attachment)))
   {
     return false;
   }
 
   for (auto* attachment : additional_color_attachments)
   {
-    if (!CheckAttachment(attachment))
+    if (!check_attachment(attachment))
     {
       return false;
     }

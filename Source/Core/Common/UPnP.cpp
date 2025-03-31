@@ -76,7 +76,7 @@ static bool InitUPnP()
 
     int desc_xml_size = 0;
     std::unique_ptr<char, decltype(&std::free)> desc_xml(nullptr, std::free);
-    int statusCode = 200;
+    int status_code = 200;
 #if MINIUPNPC_API_VERSION >= 16
     desc_xml.reset(
         static_cast<char*>(miniwget_getaddr(dev->descURL, &desc_xml_size, s_our_ip.data(),
@@ -85,7 +85,7 @@ static bool InitUPnP()
     desc_xml.reset(static_cast<char*>(miniwget_getaddr(
         dev->descURL, &desc_xml_size, s_our_ip.data(), static_cast<int>(s_our_ip.size()), 0)));
 #endif
-    if (desc_xml && statusCode == 200)
+    if (desc_xml && status_code == 200)
     {
       parserootdesc(desc_xml.get(), desc_xml_size, &s_data);
       GetUPNPUrls(&s_urls, &s_data, dev->descURL, 0);

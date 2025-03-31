@@ -19,7 +19,7 @@
 #include "Core/System.h"
 
 // dequantize table
-const float m_dequantizeTable[] = {
+const float M_DEQUANTIZE_TABLE[] = {
     1.0 / (1ULL << 0),  1.0 / (1ULL << 1),  1.0 / (1ULL << 2),  1.0 / (1ULL << 3),
     1.0 / (1ULL << 4),  1.0 / (1ULL << 5),  1.0 / (1ULL << 6),  1.0 / (1ULL << 7),
     1.0 / (1ULL << 8),  1.0 / (1ULL << 9),  1.0 / (1ULL << 10), 1.0 / (1ULL << 11),
@@ -39,7 +39,7 @@ const float m_dequantizeTable[] = {
 };
 
 // quantize table
-const float m_quantizeTable[] = {
+const float M_QUANTIZE_TABLE[] = {
     (1ULL << 0),        (1ULL << 1),        (1ULL << 2),        (1ULL << 3),
     (1ULL << 4),        (1ULL << 5),        (1ULL << 6),        (1ULL << 7),
     (1ULL << 8),        (1ULL << 9),        (1ULL << 10),       (1ULL << 11),
@@ -61,11 +61,11 @@ const float m_quantizeTable[] = {
 template <typename SType>
 SType ScaleAndClamp(double ps, u32 st_scale)
 {
-  const float conv_ps = float(ps) * m_quantizeTable[st_scale];
-  constexpr float min = float(std::numeric_limits<SType>::min());
-  constexpr float max = float(std::numeric_limits<SType>::max());
+  const float conv_ps = float(ps) * M_QUANTIZE_TABLE[st_scale];
+  constexpr float MIN = float(std::numeric_limits<SType>::min());
+  constexpr float MAX = float(std::numeric_limits<SType>::max());
 
-  return SType(std::clamp(conv_ps, min, max));
+  return SType(std::clamp(conv_ps, MIN, MAX));
 }
 
 template <typename T>
@@ -172,7 +172,7 @@ void QuantizeAndStore(PowerPC::MMU& mmu, double ps0, double ps1, u32 addr, u32 i
   }
 }
 
-static void Helper_Quantize(PowerPC::MMU& mmu, const PowerPC::PowerPCState* ppcs, u32 addr,
+static void HelperQuantize(PowerPC::MMU& mmu, const PowerPC::PowerPCState* ppcs, u32 addr,
                             u32 instI, u32 instRS, u32 instW)
 {
   const UGQR gqr(ppcs->spr[SPR_GQR0 + instI]);
@@ -236,20 +236,20 @@ std::pair<double, double> LoadAndDequantize(PowerPC::MMU& mmu, u32 addr, u32 ins
   if (instW != 0)
   {
     const U value = ReadUnpaired<U>(mmu, addr);
-    ps0 = float(T(value)) * m_dequantizeTable[ld_scale];
+    ps0 = float(T(value)) * M_DEQUANTIZE_TABLE[ld_scale];
     ps1 = 1.0f;
   }
   else
   {
     const auto [first, second] = ReadPair<U>(mmu, addr);
-    ps0 = float(T(first)) * m_dequantizeTable[ld_scale];
-    ps1 = float(T(second)) * m_dequantizeTable[ld_scale];
+    ps0 = float(T(first)) * M_DEQUANTIZE_TABLE[ld_scale];
+    ps1 = float(T(second)) * M_DEQUANTIZE_TABLE[ld_scale];
   }
   // ps0 and ps1 always contain finite and normal numbers. So we can just cast them to double
   return {static_cast<double>(ps0), static_cast<double>(ps1)};
 }
 
-static void Helper_Dequantize(PowerPC::MMU& mmu, PowerPC::PowerPCState* ppcs, u32 addr, u32 instI,
+static void HelperDequantize(PowerPC::MMU& mmu, PowerPC::PowerPCState* ppcs, u32 addr, u32 instI,
                               u32 instRD, u32 instW)
 {
   const UGQR gqr(ppcs->spr[SPR_GQR0 + instI]);
@@ -318,8 +318,8 @@ void Interpreter::psq_l(Interpreter& interpreter, UGeckoInstruction inst)
     return;
   }
 
-  const u32 EA = inst.RA ? (ppc_state.gpr[inst.RA] + u32(inst.SIMM_12)) : u32(inst.SIMM_12);
-  Helper_Dequantize(interpreter.m_mmu, &ppc_state, EA, inst.I, inst.RD, inst.W);
+  const u32 ea = inst.RA ? (ppc_state.gpr[inst.RA] + u32(inst.SIMM_12)) : u32(inst.SIMM_12);
+  HelperDequantize(interpreter.m_mmu, &ppc_state, ea, inst.I, inst.RD, inst.W);
 }
 
 void Interpreter::psq_lu(Interpreter& interpreter, UGeckoInstruction inst)
@@ -331,15 +331,15 @@ void Interpreter::psq_lu(Interpreter& interpreter, UGeckoInstruction inst)
     return;
   }
 
-  const u32 EA = ppc_state.gpr[inst.RA] + u32(inst.SIMM_12);
-  Helper_Dequantize(interpreter.m_mmu, &ppc_state, EA, inst.I, inst.RD, inst.W);
+  const u32 ea = ppc_state.gpr[inst.RA] + u32(inst.SIMM_12);
+  HelperDequantize(interpreter.m_mmu, &ppc_state, ea, inst.I, inst.RD, inst.W);
 
   if ((ppc_state.Exceptions & EXCEPTION_DSI) != 0)
   {
     return;
   }
 
-  ppc_state.gpr[inst.RA] = EA;
+  ppc_state.gpr[inst.RA] = ea;
 }
 
 void Interpreter::psq_st(Interpreter& interpreter, UGeckoInstruction inst)
@@ -351,8 +351,8 @@ void Interpreter::psq_st(Interpreter& interpreter, UGeckoInstruction inst)
     return;
   }
 
-  const u32 EA = inst.RA ? (ppc_state.gpr[inst.RA] + u32(inst.SIMM_12)) : u32(inst.SIMM_12);
-  Helper_Quantize(interpreter.m_mmu, &ppc_state, EA, inst.I, inst.RS, inst.W);
+  const u32 ea = inst.RA ? (ppc_state.gpr[inst.RA] + u32(inst.SIMM_12)) : u32(inst.SIMM_12);
+  HelperQuantize(interpreter.m_mmu, &ppc_state, ea, inst.I, inst.RS, inst.W);
 }
 
 void Interpreter::psq_stu(Interpreter& interpreter, UGeckoInstruction inst)
@@ -364,57 +364,57 @@ void Interpreter::psq_stu(Interpreter& interpreter, UGeckoInstruction inst)
     return;
   }
 
-  const u32 EA = ppc_state.gpr[inst.RA] + u32(inst.SIMM_12);
-  Helper_Quantize(interpreter.m_mmu, &ppc_state, EA, inst.I, inst.RS, inst.W);
+  const u32 ea = ppc_state.gpr[inst.RA] + u32(inst.SIMM_12);
+  HelperQuantize(interpreter.m_mmu, &ppc_state, ea, inst.I, inst.RS, inst.W);
 
   if ((ppc_state.Exceptions & EXCEPTION_DSI) != 0)
   {
     return;
   }
 
-  ppc_state.gpr[inst.RA] = EA;
+  ppc_state.gpr[inst.RA] = ea;
 }
 
 void Interpreter::psq_lx(Interpreter& interpreter, UGeckoInstruction inst)
 {
   auto& ppc_state = interpreter.m_ppc_state;
-  const u32 EA =
+  const u32 ea =
       inst.RA ? (ppc_state.gpr[inst.RA] + ppc_state.gpr[inst.RB]) : ppc_state.gpr[inst.RB];
-  Helper_Dequantize(interpreter.m_mmu, &ppc_state, EA, inst.Ix, inst.RD, inst.Wx);
+  HelperDequantize(interpreter.m_mmu, &ppc_state, ea, inst.Ix, inst.RD, inst.Wx);
 }
 
 void Interpreter::psq_stx(Interpreter& interpreter, UGeckoInstruction inst)
 {
   auto& ppc_state = interpreter.m_ppc_state;
-  const u32 EA =
+  const u32 ea =
       inst.RA ? (ppc_state.gpr[inst.RA] + ppc_state.gpr[inst.RB]) : ppc_state.gpr[inst.RB];
-  Helper_Quantize(interpreter.m_mmu, &ppc_state, EA, inst.Ix, inst.RS, inst.Wx);
+  HelperQuantize(interpreter.m_mmu, &ppc_state, ea, inst.Ix, inst.RS, inst.Wx);
 }
 
 void Interpreter::psq_lux(Interpreter& interpreter, UGeckoInstruction inst)
 {
   auto& ppc_state = interpreter.m_ppc_state;
-  const u32 EA = ppc_state.gpr[inst.RA] + ppc_state.gpr[inst.RB];
-  Helper_Dequantize(interpreter.m_mmu, &ppc_state, EA, inst.Ix, inst.RD, inst.Wx);
+  const u32 ea = ppc_state.gpr[inst.RA] + ppc_state.gpr[inst.RB];
+  HelperDequantize(interpreter.m_mmu, &ppc_state, ea, inst.Ix, inst.RD, inst.Wx);
 
   if ((ppc_state.Exceptions & EXCEPTION_DSI) != 0)
   {
     return;
   }
 
-  ppc_state.gpr[inst.RA] = EA;
+  ppc_state.gpr[inst.RA] = ea;
 }
 
 void Interpreter::psq_stux(Interpreter& interpreter, UGeckoInstruction inst)
 {
   auto& ppc_state = interpreter.m_ppc_state;
-  const u32 EA = ppc_state.gpr[inst.RA] + ppc_state.gpr[inst.RB];
-  Helper_Quantize(interpreter.m_mmu, &ppc_state, EA, inst.Ix, inst.RS, inst.Wx);
+  const u32 ea = ppc_state.gpr[inst.RA] + ppc_state.gpr[inst.RB];
+  HelperQuantize(interpreter.m_mmu, &ppc_state, ea, inst.Ix, inst.RS, inst.Wx);
 
   if ((ppc_state.Exceptions & EXCEPTION_DSI) != 0)
   {
     return;
   }
 
-  ppc_state.gpr[inst.RA] = EA;
+  ppc_state.gpr[inst.RA] = ea;
 }

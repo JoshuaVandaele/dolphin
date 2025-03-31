@@ -22,16 +22,16 @@ void IniFile::ParseLine(std::string_view line, std::string* keyOut, std::string*
   if (line.empty() || line.front() == '#')
     return;
 
-  size_t firstEquals = line.find('=');
+  size_t first_equals = line.find('=');
 
-  if (firstEquals != std::string::npos)
+  if (first_equals != std::string::npos)
   {
     // Yes, a valid line!
-    *keyOut = StripWhitespace(line.substr(0, firstEquals));
+    *keyOut = StripWhitespace(line.substr(0, first_equals));
 
     if (valueOut)
     {
-      *valueOut = StripQuotes(StripWhitespace(line.substr(firstEquals + 1, std::string::npos)));
+      *valueOut = StripQuotes(StripWhitespace(line.substr(first_equals + 1, std::string::npos)));
     }
   }
 }
@@ -103,15 +103,15 @@ bool IniFile::Section::GetLines(std::vector<std::string>* lines, const bool remo
 
     if (remove_comments)
     {
-      size_t commentPos = stripped_line.find('#');
-      if (commentPos == 0)
+      size_t comment_pos = stripped_line.find('#');
+      if (comment_pos == 0)
       {
         continue;
       }
 
-      if (commentPos != std::string::npos)
+      if (comment_pos != std::string::npos)
       {
-        stripped_line = StripWhitespace(stripped_line.substr(0, commentPos));
+        stripped_line = StripWhitespace(stripped_line.substr(0, comment_pos));
       }
     }
 

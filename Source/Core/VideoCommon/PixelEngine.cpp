@@ -126,16 +126,16 @@ void PixelEngineManager::RegisterMMIO(MMIO::Mapping* mmio, u32 base)
                  MMIO::ComplexWrite<u16>([](Core::System& system, u32, u16 val) {
                    auto& pe = system.GetPixelEngine();
 
-                   UPECtrlReg tmpCtrl{.hex = val};
+                   UPECtrlReg tmp_ctrl{.hex = val};
 
-                   if (tmpCtrl.pe_token)
+                   if (tmp_ctrl.pe_token)
                      pe.m_signal_token_interrupt = false;
 
-                   if (tmpCtrl.pe_finish)
+                   if (tmp_ctrl.pe_finish)
                      pe.m_signal_finish_interrupt = false;
 
-                   pe.m_control.pe_token_enable = tmpCtrl.pe_token_enable.Value();
-                   pe.m_control.pe_finish_enable = tmpCtrl.pe_finish_enable.Value();
+                   pe.m_control.pe_token_enable = tmp_ctrl.pe_token_enable.Value();
+                   pe.m_control.pe_finish_enable = tmp_ctrl.pe_finish_enable.Value();
                    pe.m_control.pe_token = false;   // this flag is write only
                    pe.m_control.pe_finish = false;  // this flag is write only
 

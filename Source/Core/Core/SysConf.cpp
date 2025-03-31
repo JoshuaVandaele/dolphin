@@ -142,8 +142,8 @@ bool SysConf::Save() const
   buffer.reserve(SYSCONF_SIZE);
 
   // Header
-  constexpr std::array<u8, 4> version{{'S', 'C', 'v', '0'}};
-  buffer.insert(buffer.end(), version.cbegin(), version.cend());
+  constexpr std::array<u8, 4> VERSION{{'S', 'C', 'v', '0'}};
+  buffer.insert(buffer.end(), VERSION.cbegin(), VERSION.cend());
   AppendToBuffer<u16>(&buffer, static_cast<u16>(m_entries.size()));
 
   const size_t entries_begin_offset = buffer.size() + sizeof(u16) * (m_entries.size() + 1);
@@ -191,20 +191,20 @@ bool SysConf::Save() const
 
   // Make sure the buffer size is 0x4000 bytes now and write the footer.
   buffer.resize(SYSCONF_SIZE);
-  constexpr std::array<u8, 4> footer = {{'S', 'C', 'e', 'd'}};
-  std::ranges::copy(footer, buffer.end() - footer.size());
+  constexpr std::array<u8, 4> FOOTER = {{'S', 'C', 'e', 'd'}};
+  std::ranges::copy(FOOTER, buffer.end() - FOOTER.size());
 
   // Write the new data.
   const std::string temp_file = "/tmp/SYSCONF";
-  constexpr auto rw_mode = IOS::HLE::FS::Mode::ReadWrite;
+  constexpr auto RW_MODE = IOS::HLE::FS::Mode::ReadWrite;
   {
     auto file = m_fs->CreateAndOpenFile(IOS::SYSMENU_UID, IOS::SYSMENU_GID, temp_file,
-                                        {rw_mode, rw_mode, rw_mode});
+                                        {RW_MODE, RW_MODE, RW_MODE});
     if (!file || !file->Write(buffer.data(), buffer.size()))
       return false;
   }
   m_fs->CreateDirectory(IOS::SYSMENU_UID, IOS::SYSMENU_GID, "/shared2/sys", 0,
-                        {rw_mode, rw_mode, rw_mode});
+                        {RW_MODE, RW_MODE, RW_MODE});
   const auto result =
       m_fs->Rename(IOS::SYSMENU_UID, IOS::SYSMENU_GID, temp_file, "/shared2/sys/SYSCONF");
   return result == IOS::HLE::FS::ResultCode::Success;

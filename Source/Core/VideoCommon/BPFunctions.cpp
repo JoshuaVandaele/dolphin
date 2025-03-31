@@ -298,19 +298,19 @@ void SetBlendMode()
 */
 void ClearScreen(const MathUtil::Rectangle<int>& rc)
 {
-  bool colorEnable = (bpmem.blendmode.colorupdate != 0);
-  bool alphaEnable = (bpmem.blendmode.alphaupdate != 0);
-  bool zEnable = (bpmem.zmode.updateenable != 0);
+  bool color_enable = (bpmem.blendmode.colorupdate != 0);
+  bool alpha_enable = (bpmem.blendmode.alphaupdate != 0);
+  bool z_enable = (bpmem.zmode.updateenable != 0);
   auto pixel_format = bpmem.zcontrol.pixel_format;
 
   // (1): Disable unused color channels
   if (pixel_format == PixelFormat::RGB8_Z24 || pixel_format == PixelFormat::RGB565_Z16 ||
       pixel_format == PixelFormat::Z24)
   {
-    alphaEnable = false;
+    alpha_enable = false;
   }
 
-  if (colorEnable || alphaEnable || zEnable)
+  if (color_enable || alpha_enable || z_enable)
   {
     u32 color = (bpmem.clearcolorAR << 16) | bpmem.clearcolorGB;
     u32 z = bpmem.clearZValue;
@@ -325,7 +325,7 @@ void ClearScreen(const MathUtil::Rectangle<int>& rc)
       color = RGBA8ToRGB565ToRGBA8(color);
       z = Z24ToZ16ToZ24(z);
     }
-    g_framebuffer_manager->ClearEFB(rc, colorEnable, alphaEnable, zEnable, color, z);
+    g_framebuffer_manager->ClearEFB(rc, color_enable, alpha_enable, z_enable, color, z);
   }
 }
 

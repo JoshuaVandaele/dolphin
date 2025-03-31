@@ -772,15 +772,15 @@ bool FramebufferManager::CreateReadbackFramebuffer()
 
 void FramebufferManager::DestroyReadbackFramebuffer()
 {
-  auto DestroyCache = [](EFBCacheData& data) {
+  auto destroy_cache = [](EFBCacheData& data) {
     data.readback_texture.reset();
     data.framebuffer.reset();
     data.texture.reset();
     data.needs_refresh = false;
     data.has_active_tiles = false;
   };
-  DestroyCache(m_efb_color_cache);
-  DestroyCache(m_efb_depth_cache);
+  destroy_cache(m_efb_color_cache);
+  destroy_cache(m_efb_depth_cache);
 }
 
 void FramebufferManager::PopulateEFBCache(bool depth, u32 tile_index, bool async)

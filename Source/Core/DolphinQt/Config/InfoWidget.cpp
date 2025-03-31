@@ -83,7 +83,7 @@ QGroupBox* InfoWidget::CreateFileDetails()
 
 QGroupBox* InfoWidget::CreateGameDetails()
 {
-  const QString UNKNOWN_NAME = tr("Unknown");
+  const QString unknown_name = tr("Unknown");
 
   QGroupBox* group = new QGroupBox(tr("Game Details"));
   QFormLayout* layout = new QFormLayout;
@@ -97,11 +97,11 @@ QGroupBox* InfoWidget::CreateGameDetails()
 
   QLineEdit* internal_name =
       CreateValueDisplay(is_disc_based ? tr("%1 (Disc %2, Revision %3)")
-                                             .arg(game_name.isEmpty() ? UNKNOWN_NAME : game_name)
+                                             .arg(game_name.isEmpty() ? unknown_name : game_name)
                                              .arg(m_game.GetDiscNumber() + 1)
                                              .arg(m_game.GetRevision()) :
                                          tr("%1 (Revision %3)")
-                                             .arg(game_name.isEmpty() ? UNKNOWN_NAME : game_name)
+                                             .arg(game_name.isEmpty() ? unknown_name : game_name)
                                              .arg(m_game.GetRevision()));
 
   QString game_id_string = QString::fromStdString(m_game.GetGameID());
@@ -116,7 +116,7 @@ QGroupBox* InfoWidget::CreateGameDetails()
   const std::string game_maker = m_game.GetMaker(UICommon::GameFile::Variant::LongAndNotCustom);
 
   QLineEdit* maker =
-      CreateValueDisplay((game_maker.empty() ? UNKNOWN_NAME.toStdString() : game_maker) + " (" +
+      CreateValueDisplay((game_maker.empty() ? unknown_name.toStdString() : game_maker) + " (" +
                          m_game.GetMakerID() + ")");
 
   layout->addRow(tr("Name:"), internal_name);

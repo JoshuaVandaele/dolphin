@@ -432,7 +432,7 @@ void OnScreenUI::SetScale(float backbuffer_scale)
 }
 void OnScreenUI::SetKeyMap(const DolphinKeyMap& key_map)
 {
-  static constexpr DolphinKeyMap dolphin_to_imgui_map = {
+  static constexpr DolphinKeyMap DOLPHIN_TO_IMGUI_MAP = {
       ImGuiKey_Tab,       ImGuiKey_LeftArrow, ImGuiKey_RightArrow, ImGuiKey_UpArrow,
       ImGuiKey_DownArrow, ImGuiKey_PageUp,    ImGuiKey_PageDown,   ImGuiKey_Home,
       ImGuiKey_End,       ImGuiKey_Insert,    ImGuiKey_Delete,     ImGuiKey_Backspace,
@@ -449,7 +449,7 @@ void OnScreenUI::SetKeyMap(const DolphinKeyMap& key_map)
   m_dolphin_to_imgui_map.clear();
   for (int dolphin_key = 0; dolphin_key <= static_cast<int>(DolphinKey::Z); dolphin_key++)
   {
-    const int imgui_key = dolphin_to_imgui_map[DolphinKey(dolphin_key)];
+    const int imgui_key = DOLPHIN_TO_IMGUI_MAP[DolphinKey(dolphin_key)];
     if (imgui_key >= 0)
     {
       const int mapped_key = key_map[DolphinKey(dolphin_key)];

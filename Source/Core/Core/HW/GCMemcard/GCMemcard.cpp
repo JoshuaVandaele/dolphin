@@ -309,20 +309,20 @@ bool GCMemcard::IsShiftJIS() const
 
 bool GCMemcard::Save()
 {
-  File::IOFile mcdFile(m_filename, "wb");
-  mcdFile.Seek(0, File::SeekOrigin::Begin);
+  File::IOFile mcd_file(m_filename, "wb");
+  mcd_file.Seek(0, File::SeekOrigin::Begin);
 
-  mcdFile.WriteBytes(&m_header_block, BLOCK_SIZE);
-  mcdFile.WriteBytes(&m_directory_blocks[0], BLOCK_SIZE);
-  mcdFile.WriteBytes(&m_directory_blocks[1], BLOCK_SIZE);
-  mcdFile.WriteBytes(&m_bat_blocks[0], BLOCK_SIZE);
-  mcdFile.WriteBytes(&m_bat_blocks[1], BLOCK_SIZE);
+  mcd_file.WriteBytes(&m_header_block, BLOCK_SIZE);
+  mcd_file.WriteBytes(&m_directory_blocks[0], BLOCK_SIZE);
+  mcd_file.WriteBytes(&m_directory_blocks[1], BLOCK_SIZE);
+  mcd_file.WriteBytes(&m_bat_blocks[0], BLOCK_SIZE);
+  mcd_file.WriteBytes(&m_bat_blocks[1], BLOCK_SIZE);
   for (unsigned int i = 0; i < m_size_blocks - MC_FST_BLOCKS; ++i)
   {
-    mcdFile.WriteBytes(m_data_blocks[i].m_block.data(), m_data_blocks[i].m_block.size());
+    mcd_file.WriteBytes(m_data_blocks[i].m_block.data(), m_data_blocks[i].m_block.size());
   }
 
-  return mcdFile.Close();
+  return mcd_file.Close();
 }
 
 static std::pair<u16, u16> CalculateMemcardChecksums(const u8* data, size_t size)
@@ -638,10 +638,10 @@ std::pair<u16, u16> BlockAlloc::CalculateChecksums() const
   std::array<u8, sizeof(BlockAlloc)> raw;
   memcpy(raw.data(), this, raw.size());
 
-  constexpr size_t checksum_area_start = offsetof(BlockAlloc, m_update_counter);
-  constexpr size_t checksum_area_end = sizeof(BlockAlloc);
-  constexpr size_t checksum_area_size = checksum_area_end - checksum_area_start;
-  return CalculateMemcardChecksums(&raw[checksum_area_start], checksum_area_size);
+  constexpr size_t CHECKSUM_AREA_START = offsetof(BlockAlloc, m_update_counter);
+  constexpr size_t CHECKSUM_AREA_END = sizeof(BlockAlloc);
+  constexpr size_t CHECKSUM_AREA_SIZE = CHECKSUM_AREA_END - CHECKSUM_AREA_START;
+  return CalculateMemcardChecksums(&raw[CHECKSUM_AREA_START], CHECKSUM_AREA_SIZE);
 }
 
 GCMemcardErrorCode BlockAlloc::CheckForErrors(u16 size_mbits) const
@@ -694,20 +694,20 @@ GCMemcardGetSaveDataRetVal GCMemcard::GetSaveData(u8 index, std::vector<GCMBlock
     return GCMemcardGetSaveDataRetVal::NOMEMCARD;
 
   const u16 block = DEntry_FirstBlock(index);
-  const u16 BlockCount = DEntry_BlockCount(index);
+  const u16 block_count = DEntry_BlockCount(index);
 
-  if ((block == 0xFFFF) || (BlockCount == 0xFFFF))
+  if ((block == 0xFFFF) || (block_count == 0xFFFF))
   {
     return GCMemcardGetSaveDataRetVal::FAIL;
   }
 
-  u16 nextBlock = block;
-  for (int i = 0; i < BlockCount; ++i)
+  u16 next_block = block;
+  for (int i = 0; i < block_count; ++i)
   {
-    if ((!nextBlock) || (nextBlock == 0xFFFF))
+    if ((!next_block) || (next_block == 0xFFFF))
       return GCMemcardGetSaveDataRetVal::FAIL;
-    Blocks.push_back(m_data_blocks[nextBlock - MC_FST_BLOCKS]);
-    nextBlock = GetActiveBat().GetNextBlock(nextBlock);
+    Blocks.push_back(m_data_blocks[next_block - MC_FST_BLOCKS]);
+    next_block = GetActiveBat().GetNextBlock(next_block);
   }
   return GCMemcardGetSaveDataRetVal::SUCCESS;
 }
@@ -733,52 +733,52 @@ GCMemcardImportFileRetVal GCMemcard::ImportFile(const Savefile& savefile)
   }
 
   // find first free data block
-  u16 firstBlock =
+  u16 first_block =
       GetActiveBat().NextFreeBlock(m_size_blocks, GetActiveBat().m_last_allocated_block);
-  if (firstBlock == 0xFFFF)
+  if (first_block == 0xFFFF)
     return GCMemcardImportFileRetVal::OUTOFBLOCKS;
-  Directory UpdatedDir = GetActiveDirectory();
+  Directory updated_dir = GetActiveDirectory();
 
   // find first free dir entry
   for (int i = 0; i < DIRLEN; i++)
   {
-    if (UpdatedDir.m_dir_entries[i].m_gamecode == DEntry::UNINITIALIZED_GAMECODE)
+    if (updated_dir.m_dir_entries[i].m_gamecode == DEntry::UNINITIALIZED_GAMECODE)
     {
-      UpdatedDir.m_dir_entries[i] = direntry;
-      UpdatedDir.m_dir_entries[i].m_first_block = firstBlock;
-      UpdatedDir.m_dir_entries[i].m_copy_counter = UpdatedDir.m_dir_entries[i].m_copy_counter + 1;
+      updated_dir.m_dir_entries[i] = direntry;
+      updated_dir.m_dir_entries[i].m_first_block = first_block;
+      updated_dir.m_dir_entries[i].m_copy_counter = updated_dir.m_dir_entries[i].m_copy_counter + 1;
       break;
     }
   }
-  UpdatedDir.m_update_counter = UpdatedDir.m_update_counter + 1;
-  UpdateDirectory(UpdatedDir);
+  updated_dir.m_update_counter = updated_dir.m_update_counter + 1;
+  UpdateDirectory(updated_dir);
 
-  int fileBlocks = direntry.m_block_count;
+  int file_blocks = direntry.m_block_count;
 
   std::vector<GCMBlock> blocks = savefile.blocks;
   FZEROGX_MakeSaveGameValid(m_header_block, direntry, blocks);
   PSO_MakeSaveGameValid(m_header_block, direntry, blocks);
 
-  BlockAlloc UpdatedBat = GetActiveBat();
-  u16 nextBlock;
+  BlockAlloc updated_bat = GetActiveBat();
+  u16 next_block;
   // keep assuming no freespace fragmentation, and copy over all the data
-  for (int i = 0; i < fileBlocks; ++i)
+  for (int i = 0; i < file_blocks; ++i)
   {
-    if (firstBlock == 0xFFFF)
+    if (first_block == 0xFFFF)
       PanicAlertFmt("Fatal Error");
-    m_data_blocks[firstBlock - MC_FST_BLOCKS] = blocks[i];
-    if (i == fileBlocks - 1)
-      nextBlock = 0xFFFF;
+    m_data_blocks[first_block - MC_FST_BLOCKS] = blocks[i];
+    if (i == file_blocks - 1)
+      next_block = 0xFFFF;
     else
-      nextBlock = UpdatedBat.NextFreeBlock(m_size_blocks, firstBlock + 1);
-    UpdatedBat.m_map[firstBlock - MC_FST_BLOCKS] = nextBlock;
-    UpdatedBat.m_last_allocated_block = firstBlock;
-    firstBlock = nextBlock;
+      next_block = updated_bat.NextFreeBlock(m_size_blocks, first_block + 1);
+    updated_bat.m_map[first_block - MC_FST_BLOCKS] = next_block;
+    updated_bat.m_last_allocated_block = first_block;
+    first_block = next_block;
   }
 
-  UpdatedBat.m_free_blocks = UpdatedBat.m_free_blocks - fileBlocks;
-  UpdatedBat.m_update_counter = UpdatedBat.m_update_counter + 1;
-  UpdateBat(UpdatedBat);
+  updated_bat.m_free_blocks = updated_bat.m_free_blocks - file_blocks;
+  updated_bat.m_update_counter = updated_bat.m_update_counter + 1;
+  UpdateBat(updated_bat);
 
   FixChecksums();
 
@@ -811,21 +811,21 @@ GCMemcardRemoveFileRetVal GCMemcard::RemoveFile(u8 index)  // index in the direc
   u16 startingblock = GetActiveDirectory().m_dir_entries[index].m_first_block;
   u16 numberofblocks = GetActiveDirectory().m_dir_entries[index].m_block_count;
 
-  BlockAlloc UpdatedBat = GetActiveBat();
-  if (!UpdatedBat.ClearBlocks(startingblock, numberofblocks))
+  BlockAlloc updated_bat = GetActiveBat();
+  if (!updated_bat.ClearBlocks(startingblock, numberofblocks))
     return GCMemcardRemoveFileRetVal::DELETE_FAIL;
-  UpdatedBat.m_update_counter = UpdatedBat.m_update_counter + 1;
-  UpdateBat(UpdatedBat);
+  updated_bat.m_update_counter = updated_bat.m_update_counter + 1;
+  UpdateBat(updated_bat);
 
-  Directory UpdatedDir = GetActiveDirectory();
+  Directory updated_dir = GetActiveDirectory();
 
   // TODO: Deleting a file via the GC BIOS sometimes leaves behind an extra updated directory block
   // here that has an empty file with the filename "Broken File000" where the actual deleted file
   // was. Determine when exactly this happens and if this is neccessary for anything.
 
-  memset(reinterpret_cast<u8*>(&UpdatedDir.m_dir_entries[index]), 0xFF, DENTRY_SIZE);
-  UpdatedDir.m_update_counter = UpdatedDir.m_update_counter + 1;
-  UpdateDirectory(UpdatedDir);
+  memset(reinterpret_cast<u8*>(&updated_dir.m_dir_entries[index]), 0xFF, DENTRY_SIZE);
+  updated_dir.m_update_counter = updated_dir.m_update_counter + 1;
+  UpdateDirectory(updated_dir);
 
   FixChecksums();
 
@@ -847,27 +847,27 @@ std::optional<std::vector<u32>> GCMemcard::ReadBannerRGBA8(u8 index) const
   if (format != MEMORY_CARD_BANNER_FORMAT_CI8 && format != MEMORY_CARD_BANNER_FORMAT_RGB5A3)
     return std::nullopt;
 
-  constexpr u32 pixel_count = MEMORY_CARD_BANNER_WIDTH * MEMORY_CARD_BANNER_HEIGHT;
+  constexpr u32 PIXEL_COUNT = MEMORY_CARD_BANNER_WIDTH * MEMORY_CARD_BANNER_HEIGHT;
   const size_t total_bytes = format == MEMORY_CARD_BANNER_FORMAT_CI8 ?
-                                 (pixel_count + MEMORY_CARD_CI8_PALETTE_ENTRIES * 2) :
-                                 (pixel_count * 2);
+                                 (PIXEL_COUNT + MEMORY_CARD_CI8_PALETTE_ENTRIES * 2) :
+                                 (PIXEL_COUNT * 2);
   const auto data = GetSaveDataBytes(index, offset, total_bytes);
   if (!data || data->size() != total_bytes)
     return std::nullopt;
 
-  std::vector<u32> rgba(pixel_count);
+  std::vector<u32> rgba(PIXEL_COUNT);
   if (format == MEMORY_CARD_BANNER_FORMAT_CI8)
   {
     const u8* pxdata = data->data();
     std::array<u16, MEMORY_CARD_CI8_PALETTE_ENTRIES> paldata;
-    std::memcpy(paldata.data(), data->data() + pixel_count, MEMORY_CARD_CI8_PALETTE_ENTRIES * 2);
+    std::memcpy(paldata.data(), data->data() + PIXEL_COUNT, MEMORY_CARD_CI8_PALETTE_ENTRIES * 2);
     Common::DecodeCI8Image(rgba.data(), pxdata, paldata.data(), MEMORY_CARD_BANNER_WIDTH,
                            MEMORY_CARD_BANNER_HEIGHT);
   }
   else
   {
-    std::array<u16, pixel_count> pxdata;
-    std::memcpy(pxdata.data(), data->data(), pixel_count * 2);
+    std::array<u16, PIXEL_COUNT> pxdata;
+    std::memcpy(pxdata.data(), data->data(), PIXEL_COUNT * 2);
     Common::Decode5A3Image(rgba.data(), pxdata.data(), MEMORY_CARD_BANNER_WIDTH,
                            MEMORY_CARD_BANNER_HEIGHT);
   }
@@ -911,7 +911,7 @@ std::optional<std::vector<GCMemcardAnimationFrameRGBA8>> GCMemcard::ReadAnimRGBA
     return std::nullopt;
 
   // calculate byte length of each individual icon frame and full icon data
-  constexpr u32 pixels_per_frame = MEMORY_CARD_ICON_WIDTH * MEMORY_CARD_ICON_HEIGHT;
+  constexpr u32 PIXELS_PER_FRAME = MEMORY_CARD_ICON_WIDTH * MEMORY_CARD_ICON_HEIGHT;
   u32 data_length = 0;
   u32 frame_count = 0;
   std::array<u32, MEMORY_CARD_ICON_ANIMATION_MAX_FRAMES> frame_offsets;
@@ -931,16 +931,16 @@ std::optional<std::vector<GCMemcardAnimationFrameRGBA8>> GCMemcard::ReadAnimRGBA
 
     if (frame_formats[i] == MEMORY_CARD_ICON_FORMAT_CI8_SHARED_PALETTE)
     {
-      data_length += pixels_per_frame;
+      data_length += PIXELS_PER_FRAME;
       has_shared_palette = true;
     }
     else if (frame_formats[i] == MEMORY_CARD_ICON_FORMAT_RGB5A3)
     {
-      data_length += pixels_per_frame * 2;
+      data_length += PIXELS_PER_FRAME * 2;
     }
     else if (frame_formats[i] == MEMORY_CARD_ICON_FORMAT_CI8_UNIQUE_PALETTE)
     {
-      data_length += pixels_per_frame + 2 * MEMORY_CARD_CI8_PALETTE_ENTRIES;
+      data_length += PIXELS_PER_FRAME + 2 * MEMORY_CARD_CI8_PALETTE_ENTRIES;
     }
   }
 
@@ -969,7 +969,7 @@ std::optional<std::vector<GCMemcardAnimationFrameRGBA8>> GCMemcard::ReadAnimRGBA
   for (u32 i = 0; i < frame_count; ++i)
   {
     GCMemcardAnimationFrameRGBA8& output_frame = output.emplace_back();
-    output_frame.image_data.resize(pixels_per_frame);
+    output_frame.image_data.resize(PIXELS_PER_FRAME);
     output_frame.delay = frame_delays[i];
 
     // Note on how to interpret this inner loop here: In the general case this just degenerates into
@@ -992,9 +992,9 @@ std::optional<std::vector<GCMemcardAnimationFrameRGBA8>> GCMemcard::ReadAnimRGBA
 
       if (frame_formats[j] == MEMORY_CARD_ICON_FORMAT_RGB5A3)
       {
-        std::array<u16, pixels_per_frame> pxdata;
+        std::array<u16, PIXELS_PER_FRAME> pxdata;
         std::memcpy(pxdata.data(), save_data_bytes->data() + frame_offsets[j],
-                    pixels_per_frame * 2);
+                    PIXELS_PER_FRAME * 2);
         Common::Decode5A3Image(output_frame.image_data.data(), pxdata.data(),
                                MEMORY_CARD_ICON_WIDTH, MEMORY_CARD_ICON_HEIGHT);
         break;
@@ -1003,7 +1003,7 @@ std::optional<std::vector<GCMemcardAnimationFrameRGBA8>> GCMemcard::ReadAnimRGBA
       if (frame_formats[j] == MEMORY_CARD_ICON_FORMAT_CI8_UNIQUE_PALETTE)
       {
         std::array<u16, MEMORY_CARD_CI8_PALETTE_ENTRIES> paldata;
-        std::memcpy(paldata.data(), save_data_bytes->data() + frame_offsets[j] + pixels_per_frame,
+        std::memcpy(paldata.data(), save_data_bytes->data() + frame_offsets[j] + PIXELS_PER_FRAME,
                     MEMORY_CARD_CI8_PALETTE_ENTRIES * 2);
         Common::DecodeCI8Image(output_frame.image_data.data(),
                                save_data_bytes->data() + frame_offsets[j], paldata.data(),
@@ -1125,7 +1125,7 @@ s32 GCMemcard::PSO_MakeSaveGameValid(const Header& cardheader, const DEntry& dir
 {
   u32 i, j;
   u32 chksum;
-  u32 crc32LUT[256];
+  u32 crc32_lut[256];
   u32 pso3offset = 0x00;
 
   // check for PSO1&2 system file
@@ -1163,7 +1163,7 @@ s32 GCMemcard::PSO_MakeSaveGameValid(const Header& cardheader, const DEntry& dir
         chksum >>= 1;
     }
 
-    crc32LUT[i] = chksum;
+    crc32_lut[i] = chksum;
   }
 
   // PSO initial crc32 value
@@ -1172,7 +1172,7 @@ s32 GCMemcard::PSO_MakeSaveGameValid(const Header& cardheader, const DEntry& dir
   // calc 32-bit checksum
   for (i = 0x004C; i < 0x0164 + pso3offset; i++)
   {
-    chksum = ((chksum >> 8) & 0xFFFFFF) ^ crc32LUT[(chksum ^ FileBuffer[1].m_block[i]) & 0xFF];
+    chksum = ((chksum >> 8) & 0xFFFFFF) ^ crc32_lut[(chksum ^ FileBuffer[1].m_block[i]) & 0xFF];
   }
 
   // set new checksum
@@ -1281,10 +1281,10 @@ std::pair<u16, u16> Header::CalculateChecksums() const
   std::array<u8, sizeof(Header)> raw;
   memcpy(raw.data(), this, raw.size());
 
-  constexpr size_t checksum_area_start = offsetof(Header, m_data);
-  constexpr size_t checksum_area_end = offsetof(Header, m_checksum);
-  constexpr size_t checksum_area_size = checksum_area_end - checksum_area_start;
-  return CalculateMemcardChecksums(&raw[checksum_area_start], checksum_area_size);
+  constexpr size_t CHECKSUM_AREA_START = offsetof(Header, m_data);
+  constexpr size_t CHECKSUM_AREA_END = offsetof(Header, m_checksum);
+  constexpr size_t CHECKSUM_AREA_SIZE = CHECKSUM_AREA_END - CHECKSUM_AREA_START;
+  return CalculateMemcardChecksums(&raw[CHECKSUM_AREA_START], CHECKSUM_AREA_SIZE);
 }
 
 GCMemcardErrorCode Header::CheckForErrors(u16 card_size_mbits) const
@@ -1345,10 +1345,10 @@ std::pair<u16, u16> Directory::CalculateChecksums() const
   std::array<u8, sizeof(Directory)> raw;
   memcpy(raw.data(), this, raw.size());
 
-  constexpr size_t checksum_area_start = offsetof(Directory, m_dir_entries);
-  constexpr size_t checksum_area_end = offsetof(Directory, m_checksum);
-  constexpr size_t checksum_area_size = checksum_area_end - checksum_area_start;
-  return CalculateMemcardChecksums(&raw[checksum_area_start], checksum_area_size);
+  constexpr size_t CHECKSUM_AREA_START = offsetof(Directory, m_dir_entries);
+  constexpr size_t CHECKSUM_AREA_END = offsetof(Directory, m_checksum);
+  constexpr size_t CHECKSUM_AREA_SIZE = CHECKSUM_AREA_END - CHECKSUM_AREA_START;
+  return CalculateMemcardChecksums(&raw[CHECKSUM_AREA_START], CHECKSUM_AREA_SIZE);
 }
 
 GCMemcardErrorCode Directory::CheckForErrors() const

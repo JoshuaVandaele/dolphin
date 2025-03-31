@@ -23,7 +23,7 @@
 namespace IOS::HLE::USB
 {
 // Information taken from https://disneyinfinity.fandom.com/wiki/Model_Numbers
-const std::array<std::pair<const char*, const u32>, 104> list_infinity_figures = {
+const std::array<std::pair<const char*, const u32>, 104> LIST_INFINITY_FIGURES = {
     {{"The Incredibles - Mr. Incredible", 0x0F4241},
      {"Monsters University - Sulley", 0x0F4242},
      {"Pirates of the Caribbean - Jack Sparrow", 0x0F4243},
@@ -737,12 +737,12 @@ bool InfinityBase::CreateFigure(const std::string& file_path, u32 figure_num)
 
 std::span<const std::pair<const char*, const u32>> InfinityBase::GetFigureList()
 {
-  return list_infinity_figures;
+  return LIST_INFINITY_FIGURES;
 }
 
 std::string InfinityBase::FindFigure(u32 number) const
 {
-  for (auto it = list_infinity_figures.begin(); it != list_infinity_figures.end(); it++)
+  for (auto it = LIST_INFINITY_FIGURES.begin(); it != LIST_INFINITY_FIGURES.end(); it++)
   {
     if (it->second == number)
     {

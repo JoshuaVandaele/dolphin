@@ -166,21 +166,21 @@ void ConvertStringLiteral(std::string_view literal, std::back_insert_iterator<Co
 template <typename T>
 std::optional<T> EvalIntegral(TokenType tp, std::string_view val)
 {
-  constexpr auto hex_step = [](T acc, char c) { return acc << 4 | ConvertNib<T>(c); };
-  constexpr auto dec_step = [](T acc, char c) { return acc * 10 + (c - '0'); };
-  constexpr auto oct_step = [](T acc, char c) { return acc << 3 | (c - '0'); };
-  constexpr auto bin_step = [](T acc, char c) { return acc << 1 | (c - '0'); };
+  constexpr auto HEX_STEP = [](T acc, char c) { return acc << 4 | ConvertNib<T>(c); };
+  constexpr auto DEC_STEP = [](T acc, char c) { return acc * 10 + (c - '0'); };
+  constexpr auto OCT_STEP = [](T acc, char c) { return acc << 3 | (c - '0'); };
+  constexpr auto BIN_STEP = [](T acc, char c) { return acc << 1 | (c - '0'); };
 
   switch (tp)
   {
   case TokenType::HexadecimalLit:
-    return std::accumulate(val.begin() + 2, val.end(), T{0}, hex_step);
+    return std::accumulate(val.begin() + 2, val.end(), T{0}, HEX_STEP);
   case TokenType::DecimalLit:
-    return std::accumulate(val.begin(), val.end(), T{0}, dec_step);
+    return std::accumulate(val.begin(), val.end(), T{0}, DEC_STEP);
   case TokenType::OctalLit:
-    return std::accumulate(val.begin() + 1, val.end(), T{0}, oct_step);
+    return std::accumulate(val.begin() + 1, val.end(), T{0}, OCT_STEP);
   case TokenType::BinaryLit:
-    return std::accumulate(val.begin() + 2, val.end(), T{0}, bin_step);
+    return std::accumulate(val.begin() + 2, val.end(), T{0}, BIN_STEP);
   case TokenType::GPR:
     if (CaseInsensitiveEquals(val, "sp"))
       return T{1};
@@ -188,9 +188,9 @@ std::optional<T> EvalIntegral(TokenType tp, std::string_view val)
       return T{2};
     [[fallthrough]];
   case TokenType::FPR:
-    return std::accumulate(val.begin() + 1, val.end(), T{0}, dec_step);
+    return std::accumulate(val.begin() + 1, val.end(), T{0}, DEC_STEP);
   case TokenType::CRField:
-    return std::accumulate(val.begin() + 2, val.end(), T{0}, dec_step);
+    return std::accumulate(val.begin() + 2, val.end(), T{0}, DEC_STEP);
   case TokenType::SPR:
     return static_cast<T>(*sprg_map.Find(val));
   case TokenType::Lt:
@@ -635,7 +635,7 @@ TokenType Lexer::LexStringLit(std::string_view& invalid_reason, Interval& invali
 TokenType Lexer::ClassifyAlnum() const
 {
   const std::string_view alnum = m_lex_string.substr(m_pos.index, m_scan_pos.index - m_pos.index);
-  constexpr auto valid_regnum = [](std::string_view rn) {
+  constexpr auto VALID_REGNUM = [](std::string_view rn) {
     if (rn.length() == 1 && std::isdigit(rn[0]))
     {
       return true;
@@ -656,7 +656,7 @@ TokenType Lexer::ClassifyAlnum() const
     return false;
   };
 
-  if (std::tolower(alnum[0]) == 'r' && valid_regnum(alnum.substr(1)))
+  if (std::tolower(alnum[0]) == 'r' && VALID_REGNUM(alnum.substr(1)))
   {
     return TokenType::GPR;
   }
@@ -664,7 +664,7 @@ TokenType Lexer::ClassifyAlnum() const
   {
     return TokenType::GPR;
   }
-  else if (std::tolower(alnum[0]) == 'f' && valid_regnum(alnum.substr(1)))
+  else if (std::tolower(alnum[0]) == 'f' && VALID_REGNUM(alnum.substr(1)))
   {
     return TokenType::FPR;
   }

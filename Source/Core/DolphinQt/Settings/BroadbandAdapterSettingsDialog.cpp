@@ -127,8 +127,8 @@ void BroadbandAdapterSettingsDialog::SaveAddress()
   {
   case Type::Ethernet:
   {
-    static const std::regex re_mac_address("([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})");
-    if (!std::regex_match(bba_new_address, re_mac_address))
+    static const std::regex RE_MAC_ADDRESS("([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})");
+    if (!std::regex_match(bba_new_address, RE_MAC_ADDRESS))
     {
       ModalMessageBox::critical(
           this, tr("Broadband Adapter Error"),

@@ -255,30 +255,30 @@ void RunCodeHandler(const Core::CPUThreadGuard& guard)
   // The codehandler will STMW all of the GPR registers, but we need to fix the Stack's Red
   // Zone, the LR, PC (return address) and the volatile floating point registers.
   // Build a function call stack frame.
-  u32 SFP = ppc_state.gpr[1];                     // Stack Frame Pointer
+  u32 sfp = ppc_state.gpr[1];                     // Stack Frame Pointer
   ppc_state.gpr[1] -= 256;                        // Stack's Red Zone
   ppc_state.gpr[1] -= 16 + 2 * 14 * sizeof(u64);  // Our stack frame
                                                   // (HLE_Misc::GeckoReturnTrampoline)
   ppc_state.gpr[1] -= 8;                          // Fake stack frame for codehandler
   ppc_state.gpr[1] &= 0xFFFFFFF0;                 // Align stack to 16bytes
-  u32 SP = ppc_state.gpr[1];                      // Stack Pointer
-  PowerPC::MMU::HostWrite_U32(guard, SP + 8, SP);
+  u32 sp = ppc_state.gpr[1];                      // Stack Pointer
+  PowerPC::MMU::HostWrite_U32(guard, sp + 8, sp);
   // SP + 4 is reserved for the codehandler to save LR to the stack.
-  PowerPC::MMU::HostWrite_U32(guard, SFP, SP + 8);  // Real stack frame
-  PowerPC::MMU::HostWrite_U32(guard, ppc_state.pc, SP + 12);
-  PowerPC::MMU::HostWrite_U32(guard, LR(ppc_state), SP + 16);
-  PowerPC::MMU::HostWrite_U32(guard, ppc_state.cr.Get(), SP + 20);
+  PowerPC::MMU::HostWrite_U32(guard, sfp, sp + 8);  // Real stack frame
+  PowerPC::MMU::HostWrite_U32(guard, ppc_state.pc, sp + 12);
+  PowerPC::MMU::HostWrite_U32(guard, LR(ppc_state), sp + 16);
+  PowerPC::MMU::HostWrite_U32(guard, ppc_state.cr.Get(), sp + 20);
   // Registers FPR0->13 are volatile
   for (u32 i = 0; i < 14; ++i)
   {
-    PowerPC::MMU::HostWrite_U64(guard, ppc_state.ps[i].PS0AsU64(), SP + 24 + 2 * i * sizeof(u64));
+    PowerPC::MMU::HostWrite_U64(guard, ppc_state.ps[i].PS0AsU64(), sp + 24 + 2 * i * sizeof(u64));
     PowerPC::MMU::HostWrite_U64(guard, ppc_state.ps[i].PS1AsU64(),
-                                SP + 24 + (2 * i + 1) * sizeof(u64));
+                                sp + 24 + (2 * i + 1) * sizeof(u64));
   }
   DEBUG_LOG_FMT(ACTIONREPLAY,
                 "GeckoCodes: Initiating phantom branch-and-link. "
                 "PC = {:#010x}, SP = {:#010x}, SFP = {:#010x}",
-                ppc_state.pc, SP, SFP);
+                ppc_state.pc, sp, sfp);
   LR(ppc_state) = HLE_TRAMPOLINE_ADDRESS;
   ppc_state.pc = ppc_state.npc = ENTRY_POINT;
 }

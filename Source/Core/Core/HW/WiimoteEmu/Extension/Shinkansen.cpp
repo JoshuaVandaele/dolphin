@@ -18,7 +18,7 @@
 namespace WiimoteEmu
 {
 // TODO: check this (only the last byte is known good)
-constexpr std::array<u8, 6> shinkansen_id{{0x00, 0x00, 0xa4, 0x20, 0x01, 0x10}};
+constexpr std::array<u8, 6> SHINKANSEN_ID{{0x00, 0x00, 0xa4, 0x20, 0x01, 0x10}};
 
 Shinkansen::Shinkansen() : Extension3rdParty("Shinkansen", _trans("Shinkansen Controller"))
 {
@@ -115,7 +115,7 @@ void Shinkansen::Reset()
   EncryptedExtension::Reset();
 
   m_reg = {};
-  m_reg.identifier = shinkansen_id;
+  m_reg.identifier = SHINKANSEN_ID;
   m_reg.calibration.fill(0xff);
 }
 

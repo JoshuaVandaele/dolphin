@@ -25,10 +25,10 @@ void Jit64::ps_mr(UGeckoInstruction inst)
   if (d == b)
     return;
 
-  RCOpArg Rb = fpr.Use(b, RCMode::Read);
-  RCX64Reg Rd = fpr.Bind(d, RCMode::Write);
-  RegCache::Realize(Rb, Rd);
-  MOVAPD(Rd, Rb);
+  RCOpArg rb = fpr.Use(b, RCMode::Read);
+  RCX64Reg rd = fpr.Bind(d, RCMode::Write);
+  RegCache::Realize(rb, rd);
+  MOVAPD(rd, rb);
 }
 
 void Jit64::ps_sum(UGeckoInstruction inst)
@@ -43,32 +43,32 @@ void Jit64::ps_sum(UGeckoInstruction inst)
   int b = inst.FB;
   int c = inst.FC;
 
-  RCOpArg Ra = fpr.Use(a, RCMode::Read);
-  RCOpArg Rb = fpr.Use(b, RCMode::Read);
-  RCOpArg Rc = fpr.Use(c, RCMode::Read);
-  RCX64Reg Rd = fpr.Bind(d, RCMode::Write);
-  RegCache::Realize(Ra, Rb, Rc, Rd);
+  RCOpArg ra = fpr.Use(a, RCMode::Read);
+  RCOpArg rb = fpr.Use(b, RCMode::Read);
+  RCOpArg rc = fpr.Use(c, RCMode::Read);
+  RCX64Reg rd = fpr.Bind(d, RCMode::Write);
+  RegCache::Realize(ra, rb, rc, rd);
 
   X64Reg tmp = XMM1;
-  MOVDDUP(tmp, Ra);  // {a.ps0, a.ps0}
-  ADDPD(tmp, Rb);    // {a.ps0 + b.ps0, a.ps0 + b.ps1}
+  MOVDDUP(tmp, ra);  // {a.ps0, a.ps0}
+  ADDPD(tmp, rb);    // {a.ps0 + b.ps0, a.ps0 + b.ps1}
   switch (inst.SUBOP5)
   {
   case 10:  // ps_sum0: {a.ps0 + b.ps1, c.ps1}
-    UNPCKHPD(tmp, Rc);
+    UNPCKHPD(tmp, rc);
     break;
   case 11:  // ps_sum1: {c.ps0, a.ps0 + b.ps1}
-    if (Rc.IsSimpleReg())
-      MOVSD(tmp, Rc);
+    if (rc.IsSimpleReg())
+      MOVSD(tmp, rc);
     else
-      MOVLPD(tmp, Rc);
+      MOVLPD(tmp, rc);
     break;
   default:
     PanicAlertFmt("ps_sum WTF!!!");
   }
   // We're intentionally not calling HandleNaNs here.
   // For addition and subtraction specifically, x86's NaN behavior matches PPC's.
-  FinalizeSingleResult(Rd, R(tmp));
+  FinalizeSingleResult(rd, R(tmp));
 }
 
 void Jit64::ps_muls(UGeckoInstruction inst)
@@ -83,30 +83,30 @@ void Jit64::ps_muls(UGeckoInstruction inst)
   int c = inst.FC;
   bool round_input = !js.op->fprIsSingle[c];
 
-  RCOpArg Ra = fpr.Use(a, RCMode::Read);
-  RCOpArg Rc = fpr.Use(c, RCMode::Read);
-  RCX64Reg Rd = fpr.Bind(d, RCMode::Write);
-  RCX64Reg Rc_duplicated = m_accurate_nans ? fpr.Scratch() : fpr.Scratch(XMM1);
-  RegCache::Realize(Ra, Rc, Rd, Rc_duplicated);
+  RCOpArg ra = fpr.Use(a, RCMode::Read);
+  RCOpArg rc = fpr.Use(c, RCMode::Read);
+  RCX64Reg rd = fpr.Bind(d, RCMode::Write);
+  RCX64Reg rc_duplicated = m_accurate_nans ? fpr.Scratch() : fpr.Scratch(XMM1);
+  RegCache::Realize(ra, rc, rd, rc_duplicated);
 
   switch (inst.SUBOP5)
   {
   case 12:  // ps_muls0
-    MOVDDUP(Rc_duplicated, Rc);
+    MOVDDUP(rc_duplicated, rc);
     break;
   case 13:  // ps_muls1
-    avx_op(&XEmitter::VSHUFPD, &XEmitter::SHUFPD, Rc_duplicated, Rc, Rc, 3);
+    AVXOP(&XEmitter::VSHUFPD, &XEmitter::SHUFPD, rc_duplicated, rc, rc, 3);
     break;
   default:
     PanicAlertFmt("ps_muls WTF!!!");
   }
   if (round_input)
-    Force25BitPrecision(XMM1, R(Rc_duplicated), XMM0);
-  else if (XMM1 != Rc_duplicated)
-    MOVAPD(XMM1, Rc_duplicated);
-  MULPD(XMM1, Ra);
-  HandleNaNs(inst, XMM1, XMM0, Ra, std::nullopt, Rc_duplicated);
-  FinalizeSingleResult(Rd, R(XMM1));
+    Force25BitPrecision(XMM1, R(rc_duplicated), XMM0);
+  else if (XMM1 != rc_duplicated)
+    MOVAPD(XMM1, rc_duplicated);
+  MULPD(XMM1, ra);
+  HandleNaNs(inst, XMM1, XMM0, ra, std::nullopt, rc_duplicated);
+  FinalizeSingleResult(rd, R(XMM1));
 }
 
 void Jit64::ps_mergeXX(UGeckoInstruction inst)
@@ -119,29 +119,29 @@ void Jit64::ps_mergeXX(UGeckoInstruction inst)
   int a = inst.FA;
   int b = inst.FB;
 
-  RCOpArg Ra = fpr.Use(a, RCMode::Read);
-  RCOpArg Rb = fpr.Use(b, RCMode::Read);
-  RCX64Reg Rd = fpr.Bind(d, RCMode::Write);
-  RegCache::Realize(Ra, Rb, Rd);
+  RCOpArg ra = fpr.Use(a, RCMode::Read);
+  RCOpArg rb = fpr.Use(b, RCMode::Read);
+  RCX64Reg rd = fpr.Bind(d, RCMode::Write);
+  RegCache::Realize(ra, rb, rd);
 
   switch (inst.SUBOP10)
   {
   case 528:
-    avx_op(&XEmitter::VUNPCKLPD, &XEmitter::UNPCKLPD, Rd, Ra, Rb);
+    AVXOP(&XEmitter::VUNPCKLPD, &XEmitter::UNPCKLPD, rd, ra, rb);
     break;  // 00
   case 560:
     if (d != b)
-      avx_op(&XEmitter::VSHUFPD, &XEmitter::SHUFPD, Rd, Ra, Rb, 2);
-    else if (Ra.IsSimpleReg())
-      MOVSD(Rd, Ra);
+      AVXOP(&XEmitter::VSHUFPD, &XEmitter::SHUFPD, rd, ra, rb, 2);
+    else if (ra.IsSimpleReg())
+      MOVSD(rd, ra);
     else
-      MOVLPD(Rd, Ra);
+      MOVLPD(rd, ra);
     break;  // 01
   case 592:
-    avx_op(&XEmitter::VSHUFPD, &XEmitter::SHUFPD, Rd, Ra, Rb, 1);
+    AVXOP(&XEmitter::VSHUFPD, &XEmitter::SHUFPD, rd, ra, rb, 1);
     break;  // 10
   case 624:
-    avx_op(&XEmitter::VUNPCKHPD, &XEmitter::UNPCKHPD, Rd, Ra, Rb);
+    AVXOP(&XEmitter::VUNPCKHPD, &XEmitter::UNPCKHPD, rd, ra, rb);
     break;  // 11
   default:
     ASSERT_MSG(DYNA_REC, 0, "ps_merge - invalid op");
@@ -158,19 +158,19 @@ void Jit64::ps_rsqrte(UGeckoInstruction inst)
   int d = inst.FD;
 
   RCX64Reg scratch_guard = gpr.Scratch(RSCRATCH_EXTRA);
-  RCX64Reg Rb = fpr.Bind(b, RCMode::Read);
-  RCX64Reg Rd = fpr.Bind(d, RCMode::Write);
-  RegCache::Realize(scratch_guard, Rb, Rd);
+  RCX64Reg rb = fpr.Bind(b, RCMode::Read);
+  RCX64Reg rd = fpr.Bind(d, RCMode::Write);
+  RegCache::Realize(scratch_guard, rb, rd);
 
-  MOVSD(XMM0, Rb);
+  MOVSD(XMM0, rb);
   CALL(asm_routines.frsqrte);
-  MOVSD(Rd, XMM0);
+  MOVSD(rd, XMM0);
 
-  MOVHLPS(XMM0, Rb);
+  MOVHLPS(XMM0, rb);
   CALL(asm_routines.frsqrte);
-  MOVLHPS(Rd, XMM0);
+  MOVLHPS(rd, XMM0);
 
-  FinalizeSingleResult(Rd, Rd);
+  FinalizeSingleResult(rd, rd);
 }
 
 void Jit64::ps_res(UGeckoInstruction inst)
@@ -183,19 +183,19 @@ void Jit64::ps_res(UGeckoInstruction inst)
   int d = inst.FD;
 
   RCX64Reg scratch_guard = gpr.Scratch(RSCRATCH_EXTRA);
-  RCX64Reg Rb = fpr.Bind(b, RCMode::Read);
-  RCX64Reg Rd = fpr.Bind(d, RCMode::Write);
-  RegCache::Realize(scratch_guard, Rb, Rd);
+  RCX64Reg rb = fpr.Bind(b, RCMode::Read);
+  RCX64Reg rd = fpr.Bind(d, RCMode::Write);
+  RegCache::Realize(scratch_guard, rb, rd);
 
-  MOVSD(XMM0, Rb);
+  MOVSD(XMM0, rb);
   CALL(asm_routines.fres);
-  MOVSD(Rd, XMM0);
+  MOVSD(rd, XMM0);
 
-  MOVHLPS(XMM0, Rb);
+  MOVHLPS(XMM0, rb);
   CALL(asm_routines.fres);
-  MOVLHPS(Rd, XMM0);
+  MOVLHPS(rd, XMM0);
 
-  FinalizeSingleResult(Rd, Rd);
+  FinalizeSingleResult(rd, rd);
 }
 
 void Jit64::ps_cmpXX(UGeckoInstruction inst)

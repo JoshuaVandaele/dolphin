@@ -54,7 +54,7 @@ void AXUCode::InitializeShared()
 
 bool AXUCode::LoadResamplingCoefficients(bool require_same_checksum, u32 desired_checksum)
 {
-  constexpr size_t raw_coeffs_size = 0x800 * 2;
+  constexpr size_t RAW_COEFFS_SIZE = 0x800 * 2;
   m_coeffs_checksum = std::nullopt;
 
   const std::array<std::string, 2> filenames{
@@ -66,18 +66,18 @@ bool AXUCode::LoadResamplingCoefficients(bool require_same_checksum, u32 desired
   {
     INFO_LOG_FMT(DSPHLE, "Checking for polyphase resampling coeffs at {}", filename);
 
-    if (File::GetSize(filename) != raw_coeffs_size)
+    if (File::GetSize(filename) != RAW_COEFFS_SIZE)
       continue;
 
     File::IOFile fp(filename, "rb");
-    std::array<u8, raw_coeffs_size> raw_coeffs;
-    fp.ReadBytes(raw_coeffs.data(), raw_coeffs_size);
+    std::array<u8, RAW_COEFFS_SIZE> raw_coeffs;
+    fp.ReadBytes(raw_coeffs.data(), RAW_COEFFS_SIZE);
 
-    u32 checksum = Common::HashAdler32(raw_coeffs.data(), raw_coeffs_size);
+    u32 checksum = Common::HashAdler32(raw_coeffs.data(), RAW_COEFFS_SIZE);
     if (require_same_checksum && checksum != desired_checksum)
       continue;
 
-    std::memcpy(m_coeffs.data(), raw_coeffs.data(), raw_coeffs_size);
+    std::memcpy(m_coeffs.data(), raw_coeffs.data(), RAW_COEFFS_SIZE);
     for (auto& coef : m_coeffs)
       coef = Common::swap16(coef);
 
@@ -425,12 +425,12 @@ void AXUCode::ReadPB(Memory::MemoryManager& memory, u32 addr, AXPB& pb)
 
     char* dst = (char*)&pb;
 
-    constexpr size_t lpf_off = offsetof(AXPB, lpf);
-    constexpr size_t lc_off = offsetof(AXPB, loop_counter);
+    constexpr size_t LPF_OFF = offsetof(AXPB, lpf);
+    constexpr size_t LC_OFF = offsetof(AXPB, loop_counter);
 
-    memory.CopyFromEmuSwapped<u16>((u16*)dst, addr, lpf_off);
-    memset(dst + lpf_off, 0, lc_off - lpf_off);
-    memory.CopyFromEmuSwapped<u16>((u16*)(dst + lc_off), addr + lpf_off, sizeof(pb) - lc_off);
+    memory.CopyFromEmuSwapped<u16>((u16*)dst, addr, LPF_OFF);
+    memset(dst + LPF_OFF, 0, LC_OFF - LPF_OFF);
+    memory.CopyFromEmuSwapped<u16>((u16*)(dst + LC_OFF), addr + LPF_OFF, sizeof(pb) - LC_OFF);
   }
 }
 
@@ -447,11 +447,11 @@ void AXUCode::WritePB(Memory::MemoryManager& memory, u32 addr, const AXPB& pb)
     // We skip lpf in this layout.
 
     const char* src = (const char*)&pb;
-    constexpr size_t lpf_off = offsetof(AXPB, lpf);
-    constexpr size_t lc_off = offsetof(AXPB, loop_counter);
+    constexpr size_t LPF_OFF = offsetof(AXPB, lpf);
+    constexpr size_t LC_OFF = offsetof(AXPB, loop_counter);
 
-    memory.CopyToEmuSwapped<u16>(addr, (const u16*)src, lpf_off);
-    memory.CopyToEmuSwapped<u16>(addr + lpf_off, (const u16*)(src + lc_off), sizeof(pb) - lc_off);
+    memory.CopyToEmuSwapped<u16>(addr, (const u16*)src, LPF_OFF);
+    memory.CopyToEmuSwapped<u16>(addr + LPF_OFF, (const u16*)(src + LC_OFF), sizeof(pb) - LC_OFF);
   }
 }
 
@@ -459,7 +459,7 @@ void AXUCode::ProcessPBList(u32 pb_addr)
 {
   // Samples per millisecond. In theory DSP sampling rate can be changed from
   // 32KHz to 48KHz, but AX always process at 32KHz.
-  constexpr u32 spms = 32;
+  constexpr u32 SPMS = 32;
 
   AXPB pb;
 
@@ -478,13 +478,13 @@ void AXUCode::ProcessPBList(u32 pb_addr)
     {
       ApplyUpdatesForMs(curr_ms, pb, pb.updates.num_updates, updates);
 
-      ProcessVoice(static_cast<HLEAccelerator*>(m_accelerator.get()), pb, buffers, spms,
+      ProcessVoice(static_cast<HLEAccelerator*>(m_accelerator.get()), pb, buffers, SPMS,
                    ConvertMixerControl(pb.mixer_control),
                    m_coeffs_checksum ? m_coeffs.data() : nullptr, false);
 
       // Forward the buffers
       for (auto& ptr : buffers.ptrs)
-        ptr += spms;
+        ptr += SPMS;
     }
 
     WritePB(memory, pb_addr, pb);

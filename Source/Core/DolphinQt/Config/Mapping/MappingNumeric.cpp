@@ -50,8 +50,8 @@ void MappingDouble::ConfigChanged()
   }
   else
   {
-    constexpr auto inf = std::numeric_limits<double>::infinity();
-    setRange(-inf, inf);
+    constexpr auto INF = std::numeric_limits<double>::infinity();
+    setRange(-INF, INF);
     setButtonSymbols(ButtonSymbols::NoButtons);
     suffix += QString::fromUtf8(" 🎮");
   }

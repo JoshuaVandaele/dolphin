@@ -28,12 +28,12 @@ EGLNativeWindowType GLContextEGLX11::GetEGLNativeWindow(EGLConfig config)
   EGLint vid;
   eglGetConfigAttrib(m_egl_display, config, EGL_NATIVE_VISUAL_ID, &vid);
 
-  XVisualInfo visTemplate = {};
-  visTemplate.visualid = vid;
+  XVisualInfo vis_template = {};
+  vis_template.visualid = vid;
 
-  int nVisuals;
+  int n_visuals;
   XVisualInfo* vi = XGetVisualInfo(static_cast<Display*>(m_wsi.display_connection), VisualIDMask,
-                                   &visTemplate, &nVisuals);
+                                   &vis_template, &n_visuals);
 
   if (m_render_window)
     m_render_window.reset();

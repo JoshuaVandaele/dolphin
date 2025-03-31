@@ -232,13 +232,13 @@ bool NANDImporter::ExtractCertificates()
     std::array<u8, 4> search_bytes;
   };
 
-  static constexpr std::array<PEMCertificate, 3> certificates{{
+  static constexpr std::array<PEMCertificate, 3> CERTIFICATES{{
       {"/clientca.pem", {{0x30, 0x82, 0x03, 0xE9}}},
       {"/clientcakey.pem", {{0x30, 0x82, 0x02, 0x5D}}},
       {"/rootca.pem", {{0x30, 0x82, 0x03, 0x7D}}},
   }};
 
-  for (const PEMCertificate& certificate : certificates)
+  for (const PEMCertificate& certificate : CERTIFICATES)
   {
     const auto search_result = std::ranges::search(content_bytes, certificate.search_bytes);
 
@@ -252,16 +252,16 @@ bool NANDImporter::ExtractCertificates()
     const std::string pem_file_path = m_nand_root + std::string(certificate.filename);
     const ptrdiff_t certificate_offset =
         std::distance(content_bytes.begin(), search_result.begin());
-    constexpr int min_offset = 2;
-    if (certificate_offset < min_offset)
+    constexpr int MIN_OFFSET = 2;
+    if (certificate_offset < MIN_OFFSET)
     {
       ERROR_LOG_FMT(
           DISCIO,
           "ExtractCertificates: Invalid certificate offset {:#x}, must be between {:#x} and {:#x}",
-          certificate_offset, min_offset, content_bytes.size());
+          certificate_offset, MIN_OFFSET, content_bytes.size());
       return false;
     }
-    const u16 certificate_size = Common::swap16(&content_bytes[certificate_offset - min_offset]);
+    const u16 certificate_size = Common::swap16(&content_bytes[certificate_offset - MIN_OFFSET]);
     const size_t available_size = content_bytes.size() - static_cast<size_t>(certificate_offset);
     if (certificate_size > available_size)
     {

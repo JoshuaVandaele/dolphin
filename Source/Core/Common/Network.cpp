@@ -28,18 +28,18 @@ namespace Common
 {
 MACAddress GenerateMacAddress(const MACConsumer type)
 {
-  constexpr std::array<u8, 3> oui_bba{{0x00, 0x09, 0xbf}};
-  constexpr std::array<u8, 3> oui_ios{{0x00, 0x17, 0xab}};
+  constexpr std::array<u8, 3> OUI_BBA{{0x00, 0x09, 0xbf}};
+  constexpr std::array<u8, 3> OUI_IOS{{0x00, 0x17, 0xab}};
 
   MACAddress mac{};
 
   switch (type)
   {
   case MACConsumer::BBA:
-    std::ranges::copy(oui_bba, mac.begin());
+    std::ranges::copy(OUI_BBA, mac.begin());
     break;
   case MACConsumer::IOS:
-    std::ranges::copy(oui_ios, mac.begin());
+    std::ranges::copy(OUI_IOS, mac.begin());
     break;
   }
 

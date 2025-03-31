@@ -56,21 +56,21 @@ bool s_abort_on_panic_alert = false;
 
 const char* GetCaption(MsgType style)
 {
-  static const std::string info_caption = GetStringT("Information");
-  static const std::string ques_caption = GetStringT("Question");
-  static const std::string warn_caption = GetStringT("Warning");
-  static const std::string crit_caption = GetStringT("Critical");
+  static const std::string INFO_CAPTION = GetStringT("Information");
+  static const std::string QUES_CAPTION = GetStringT("Question");
+  static const std::string WARN_CAPTION = GetStringT("Warning");
+  static const std::string CRIT_CAPTION = GetStringT("Critical");
 
   switch (style)
   {
   case MsgType::Information:
-    return info_caption.c_str();
+    return INFO_CAPTION.c_str();
   case MsgType::Question:
-    return ques_caption.c_str();
+    return QUES_CAPTION.c_str();
   case MsgType::Warning:
-    return warn_caption.c_str();
+    return WARN_CAPTION.c_str();
   case MsgType::Critical:
-    return crit_caption.c_str();
+    return CRIT_CAPTION.c_str();
   default:
     return "Unhandled caption";
   }

@@ -9,12 +9,12 @@
 
 #include "Common/CommonTypes.h"
 
-static void bn_zero(u8* d, const size_t n)
+static void BnZero(u8* d, const size_t n)
 {
   std::memset(d, 0, n);
 }
 
-static void bn_copy(u8* d, const u8* a, const size_t n)
+static void BnCopy(u8* d, const u8* a, const size_t n)
 {
   std::memcpy(d, a, n);
 }
@@ -56,7 +56,7 @@ void bn_add(u8* d, const u8* a, const u8* b, const u8* N, const size_t n)
 
 void bn_mul(u8* d, const u8* a, const u8* b, const u8* N, const size_t n)
 {
-  bn_zero(d, n);
+  BnZero(d, n);
 
   for (size_t i = 0; i < n; i++)
   {
@@ -73,7 +73,7 @@ void bn_exp(u8* d, const u8* a, const u8* N, const size_t n, const u8* e, const 
 {
   u8 t[512];
 
-  bn_zero(d, n);
+  BnZero(d, n);
   d[n - 1] = 1;
   for (size_t i = 0; i < en; i++)
   {
@@ -83,7 +83,7 @@ void bn_exp(u8* d, const u8* a, const u8* N, const size_t n, const u8* e, const 
       if ((e[i] & mask) != 0)
         bn_mul(d, t, a, N, n);
       else
-        bn_copy(d, t, n);
+        BnCopy(d, t, n);
     }
   }
 }
@@ -93,8 +93,8 @@ void bn_inv(u8* d, const u8* a, const u8* N, const size_t n)
 {
   u8 t[512], s[512];
 
-  bn_copy(t, N, n);
-  bn_zero(s, n);
+  BnCopy(t, N, n);
+  BnZero(s, n);
   s[n - 1] = 2;
   bn_sub_modulus(t, s, n);
   bn_exp(d, a, N, n, t, n);

@@ -38,7 +38,7 @@
 #include "Core/HW/Sram.h"
 #include "Core/NetPlayProto.h"
 
-static const char* MC_HDR = "MC_SYSTEM_AREA";
+static const char* mc_hdr = "MC_SYSTEM_AREA";
 
 static std::string GenerateDefaultGCIFilename(const Memcard::DEntry& entry,
                                               bool card_encoding_is_shift_jis)
@@ -186,7 +186,7 @@ GCMemcardDirectory::GCMemcardDirectory(const std::string& directory, ExpansionIn
 {
   // Use existing header data if available
   {
-    File::IOFile((m_save_directory + MC_HDR), "rb").ReadBytes(&m_hdr, Memcard::BLOCK_SIZE);
+    File::IOFile((m_save_directory + mc_hdr), "rb").ReadBytes(&m_hdr, Memcard::BLOCK_SIZE);
   }
 
   const bool current_game_only = Config::Get(Config::SESSION_GCI_FOLDER_CURRENT_GAME_ONLY);
@@ -268,7 +268,7 @@ void GCMemcardDirectory::FlushThread()
 
   Common::SetCurrentThreadName(fmt::format("Memcard {} flushing thread", m_card_slot).c_str());
 
-  constexpr std::chrono::seconds flush_interval{1};
+  constexpr std::chrono::seconds FLUSH_INTERVAL{1};
   while (true)
   {
     // no-op until signalled
@@ -277,7 +277,7 @@ void GCMemcardDirectory::FlushThread()
     if (m_exiting.TestAndClear())
       return;
     // no-op as long as signalled within flush_interval
-    while (m_flush_trigger.WaitFor(flush_interval))
+    while (m_flush_trigger.WaitFor(FLUSH_INTERVAL))
     {
       if (m_exiting.TestAndClear())
         return;
@@ -568,9 +568,9 @@ s32 GCMemcardDirectory::DirectoryWrite(u32 dest_address, u32 length, const u8* s
   u32 block = dest_address / Memcard::BLOCK_SIZE;
   u32 offset = dest_address % Memcard::BLOCK_SIZE;
   Memcard::Directory* dest = (block == 1) ? &m_dir1 : &m_dir2;
-  u16 Dnum = offset / Memcard::DENTRY_SIZE;
+  u16 dnum = offset / Memcard::DENTRY_SIZE;
 
-  if (Dnum == Memcard::DIRLEN)
+  if (dnum == Memcard::DIRLEN)
   {
     // first 58 bytes should always be 0xff
     // needed to update the update ctr, checksums

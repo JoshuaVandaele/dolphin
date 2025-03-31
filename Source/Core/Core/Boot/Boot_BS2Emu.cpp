@@ -144,16 +144,16 @@ bool CBoot::RunApploader(Core::System& system, const Core::CPUThreadGuard& guard
 
   // Load Apploader to Memory - The apploader is hardcoded to begin at 0x2440 on the disc,
   // but the size can differ between discs. Compare with YAGCD chap 13.
-  constexpr u32 offset = 0x2440;
-  const std::optional<u32> entry = volume.ReadSwapped<u32>(offset + 0x10, partition);
-  const std::optional<u32> size = volume.ReadSwapped<u32>(offset + 0x14, partition);
-  const std::optional<u32> trailer = volume.ReadSwapped<u32>(offset + 0x18, partition);
+  constexpr u32 OFFSET = 0x2440;
+  const std::optional<u32> entry = volume.ReadSwapped<u32>(OFFSET + 0x10, partition);
+  const std::optional<u32> size = volume.ReadSwapped<u32>(OFFSET + 0x14, partition);
+  const std::optional<u32> trailer = volume.ReadSwapped<u32>(OFFSET + 0x18, partition);
   if (!entry || !size || !trailer || *entry == UINT32_MAX || *size + *trailer == UINT32_MAX)
   {
     INFO_LOG_FMT(BOOT, "Invalid apploader. Your disc image is probably corrupted.");
     return false;
   }
-  DVDRead(system, volume, offset + 0x20, 0x01200000, *size + *trailer, partition);
+  DVDRead(system, volume, OFFSET + 0x20, 0x01200000, *size + *trailer, partition);
 
   // TODO - Make Apploader(or just RunFunction()) debuggable!!!
 
@@ -167,21 +167,21 @@ bool CBoot::RunApploader(Core::System& system, const Core::CPUThreadGuard& guard
 
   // Call iAppLoaderEntry.
   DEBUG_LOG_FMT(BOOT, "Call iAppLoaderEntry");
-  const u32 iAppLoaderFuncAddr = is_wii ? 0x80004000 : 0x80003100;
-  ppc_state.gpr[3] = iAppLoaderFuncAddr + 0;
-  ppc_state.gpr[4] = iAppLoaderFuncAddr + 4;
-  ppc_state.gpr[5] = iAppLoaderFuncAddr + 8;
+  const u32 i_app_loader_func_addr = is_wii ? 0x80004000 : 0x80003100;
+  ppc_state.gpr[3] = i_app_loader_func_addr + 0;
+  ppc_state.gpr[4] = i_app_loader_func_addr + 4;
+  ppc_state.gpr[5] = i_app_loader_func_addr + 8;
   RunFunction(system, *entry);
-  const u32 iAppLoaderInit = mmu.Read_U32(iAppLoaderFuncAddr + 0);
-  const u32 iAppLoaderMain = mmu.Read_U32(iAppLoaderFuncAddr + 4);
-  const u32 iAppLoaderClose = mmu.Read_U32(iAppLoaderFuncAddr + 8);
+  const u32 i_app_loader_init = mmu.Read_U32(i_app_loader_func_addr + 0);
+  const u32 i_app_loader_main = mmu.Read_U32(i_app_loader_func_addr + 4);
+  const u32 i_app_loader_close = mmu.Read_U32(i_app_loader_func_addr + 8);
 
   // iAppLoaderInit
   DEBUG_LOG_FMT(BOOT, "Call iAppLoaderInit");
   PowerPC::MMU::HostWrite_U32(guard, 0x4E800020, 0x81300000);  // Write BLR
   HLE::Patch(system, 0x81300000, "AppLoaderReport");           // HLE OSReport for Apploader
   ppc_state.gpr[3] = 0x81300000;
-  RunFunction(system, iAppLoaderInit);
+  RunFunction(system, i_app_loader_init);
 
   // iAppLoaderMain - Here we load the apploader, the DOL (the exe) and the FST (filesystem).
   // To give you an idea about where the stuff is located on the disc take a look at yagcd
@@ -192,7 +192,7 @@ bool CBoot::RunApploader(Core::System& system, const Core::CPUThreadGuard& guard
   ppc_state.gpr[4] = 0x81300008;
   ppc_state.gpr[5] = 0x8130000c;
 
-  RunFunction(system, iAppLoaderMain);
+  RunFunction(system, i_app_loader_main);
 
   // iAppLoaderMain returns 1 if the pointers in R3/R4/R5 were filled with values for DVD copy
   // Typical behaviour is doing it once for each section defined in the DOL header. Some unlicensed
@@ -215,12 +215,12 @@ bool CBoot::RunApploader(Core::System& system, const Core::CPUThreadGuard& guard
     ppc_state.gpr[4] = 0x81300008;
     ppc_state.gpr[5] = 0x8130000c;
 
-    RunFunction(system, iAppLoaderMain);
+    RunFunction(system, i_app_loader_main);
   }
 
   // iAppLoaderClose
   DEBUG_LOG_FMT(BOOT, "call iAppLoaderClose");
-  RunFunction(system, iAppLoaderClose);
+  RunFunction(system, i_app_loader_close);
   HLE::UnPatch(system, "AppLoaderReport");
 
   // return
@@ -355,13 +355,13 @@ static DiscIO::Region CodeRegion(char c)
 
 bool CBoot::SetupWiiMemory(Core::System& system, IOS::HLE::IOSC::ConsoleType console_type)
 {
-  static const std::map<DiscIO::Region, const RegionSetting> region_settings = {
+  static const std::map<DiscIO::Region, const RegionSetting> REGION_SETTINGS = {
       {DiscIO::Region::NTSC_J, {"JPN", "NTSC", "JP", "LJH"}},
       {DiscIO::Region::NTSC_U, {"USA", "NTSC", "US", "LU"}},
       {DiscIO::Region::PAL, {"EUR", "PAL", "EU", "LEH"}},
       {DiscIO::Region::NTSC_K, {"KOR", "NTSC", "KR", "LKH"}}};
-  auto entryPos = region_settings.find(SConfig::GetInstance().m_region);
-  RegionSetting region_setting = entryPos->second;
+  auto entry_pos = REGION_SETTINGS.find(SConfig::GetInstance().m_region);
+  RegionSetting region_setting = entry_pos->second;
 
   std::string serno;
   std::string model = "RVL-001(" + region_setting.area + ")";
@@ -431,9 +431,9 @@ bool CBoot::SetupWiiMemory(Core::System& system, IOS::HLE::IOSC::ConsoleType con
   settings_writer.AddSetting("VIDEO", region_setting.video);
   settings_writer.AddSetting("GAME", region_setting.game);
 
-  constexpr IOS::HLE::FS::Mode rw_mode = IOS::HLE::FS::Mode::ReadWrite;
+  constexpr IOS::HLE::FS::Mode RW_MODE = IOS::HLE::FS::Mode::ReadWrite;
   const auto settings_file = fs->CreateAndOpenFile(IOS::SYSMENU_UID, IOS::SYSMENU_GID,
-                                                   settings_file_path, {rw_mode, rw_mode, rw_mode});
+                                                   settings_file_path, {RW_MODE, RW_MODE, RW_MODE});
   if (!settings_file ||
       !settings_file->Write(settings_writer.GetBytes().data(), settings_writer.GetBytes().size()))
   {
@@ -511,9 +511,9 @@ static void WriteEmptyPlayRecord()
   CreateSystemMenuTitleDirs();
   const std::string file_path = Common::GetTitleDataPath(Titles::SYSTEM_MENU) + "/play_rec.dat";
   const auto fs = Core::System::GetInstance().GetIOS()->GetFS();
-  constexpr IOS::HLE::FS::Mode rw_mode = IOS::HLE::FS::Mode::ReadWrite;
+  constexpr IOS::HLE::FS::Mode RW_MODE = IOS::HLE::FS::Mode::ReadWrite;
   const auto playrec_file = fs->CreateAndOpenFile(IOS::SYSMENU_UID, IOS::SYSMENU_GID, file_path,
-                                                  {rw_mode, rw_mode, rw_mode});
+                                                  {RW_MODE, RW_MODE, RW_MODE});
   if (!playrec_file)
     return;
   std::vector<u8> empty_record(0x80);

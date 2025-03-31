@@ -53,8 +53,8 @@ public:
     if (iv)
       std::memcpy(&iv_tmp[0], iv, BLOCK_SIZE);
 
-    constexpr int mode = (AesMode == Mode::Encrypt) ? MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
-    if (mbedtls_aes_crypt_cbc(const_cast<mbedtls_aes_context*>(&ctx), mode, len, &iv_tmp[0], buf_in,
+    constexpr int MODE = (AesMode == Mode::Encrypt) ? MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
+    if (mbedtls_aes_crypt_cbc(const_cast<mbedtls_aes_context*>(&ctx), MODE, len, &iv_tmp[0], buf_in,
                               buf_out))
       return false;
 
@@ -106,11 +106,11 @@ class ContextAESNI final : public Context
       round_keys[RoundIdx] = rk;
     else
     {
-      constexpr size_t idx = NUM_ROUND_KEYS - RoundIdx - 1;
-      if constexpr (idx == 0 || idx == NUM_ROUND_KEYS - 1)
-        round_keys[idx] = rk;
+      constexpr size_t IDX = NUM_ROUND_KEYS - RoundIdx - 1;
+      if constexpr (IDX == 0 || IDX == NUM_ROUND_KEYS - 1)
+        round_keys[IDX] = rk;
       else
-        round_keys[idx] = _mm_aesimc_si128(rk);
+        round_keys[IDX] = _mm_aesimc_si128(rk);
     }
   }
 
@@ -177,32 +177,32 @@ public:
   ATTRIBUTE_TARGET("aes")
   inline void DecryptPipelined(__m128i* iv, const u8* buf_in, u8* buf_out) const
   {
-    constexpr size_t Depth = NumBlocks;
+    constexpr size_t DEPTH = NumBlocks;
 
-    __m128i block[Depth];
-    for (size_t d = 0; d < Depth; d++)
+    __m128i block[DEPTH];
+    for (size_t d = 0; d < DEPTH; d++)
       block[d] = _mm_loadu_si128(&((const __m128i*)buf_in)[d]);
 
-    __m128i iv_next[1 + Depth];
+    __m128i iv_next[1 + DEPTH];
     iv_next[0] = *iv;
-    for (size_t d = 0; d < Depth; d++)
+    for (size_t d = 0; d < DEPTH; d++)
       iv_next[1 + d] = block[d];
 
-    for (size_t d = 0; d < Depth; d++)
+    for (size_t d = 0; d < DEPTH; d++)
       block[d] = _mm_xor_si128(block[d], round_keys[0]);
 
     // The main speedup is here
     for (size_t i = 1; i < Nr; ++i)
-      for (size_t d = 0; d < Depth; d++)
+      for (size_t d = 0; d < DEPTH; d++)
         block[d] = _mm_aesdec_si128(block[d], round_keys[i]);
-    for (size_t d = 0; d < Depth; d++)
+    for (size_t d = 0; d < DEPTH; d++)
       block[d] = _mm_aesdeclast_si128(block[d], round_keys[Nr]);
 
-    for (size_t d = 0; d < Depth; d++)
+    for (size_t d = 0; d < DEPTH; d++)
       block[d] = _mm_xor_si128(block[d], iv_next[d]);
-    *iv = iv_next[1 + Depth - 1];
+    *iv = iv_next[1 + DEPTH - 1];
 
-    for (size_t d = 0; d < Depth; d++)
+    for (size_t d = 0; d < DEPTH; d++)
       _mm_storeu_si128(&((__m128i*)buf_out)[d], block[d]);
   }
 

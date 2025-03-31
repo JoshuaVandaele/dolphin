@@ -71,7 +71,7 @@ static void WriteData(u8* out, T data)
 }
 
 /* This is the date and time when creating the disk */
-static unsigned int get_serial_id()
+static unsigned int GetSerialId()
 {
   const time_t now = std::time(nullptr);
   const struct tm tm = std::gmtime(&now)[0];
@@ -82,26 +82,26 @@ static unsigned int get_serial_id()
   return lo + (hi << 16);
 }
 
-static unsigned int get_sectors_per_cluster(u64 disk_size)
+static unsigned int GetSectorsPerCluster(u64 disk_size)
 {
-  u64 disk_MB = disk_size / (1024 * 1024);
+  u64 disk_mb = disk_size / (1024 * 1024);
 
-  if (disk_MB < 260)
+  if (disk_mb < 260)
     return 1;
 
-  if (disk_MB < 8192)
+  if (disk_mb < 8192)
     return 4;
 
-  if (disk_MB < 16384)
+  if (disk_mb < 16384)
     return 8;
 
-  if (disk_MB < 32768)
+  if (disk_mb < 32768)
     return 16;
 
   return 32;
 }
 
-static unsigned int get_sectors_per_fat(u64 disk_size, u32 sectors_per_cluster)
+static unsigned int GetSectorsPerFat(u64 disk_size, u32 sectors_per_cluster)
 {
   /* Weird computation from MS - see fatgen103.doc for details */
   disk_size -= RESERVED_SECTORS * BYTES_PER_SECTOR; /* Don't count 32 reserved sectors */
@@ -111,12 +111,12 @@ static unsigned int get_sectors_per_fat(u64 disk_size, u32 sectors_per_cluster)
   return static_cast<u32>((disk_size + (divider - 1)) / divider);
 }
 
-static void boot_sector_init(u8* boot, u8* info, u64 disk_size, const char* label)
+static void BootSectorInit(u8* boot, u8* info, u64 disk_size, const char* label)
 {
-  const u32 sectors_per_cluster = get_sectors_per_cluster(disk_size);
-  const u32 sectors_per_fat = get_sectors_per_fat(disk_size, sectors_per_cluster);
+  const u32 sectors_per_cluster = GetSectorsPerCluster(disk_size);
+  const u32 sectors_per_fat = GetSectorsPerFat(disk_size, sectors_per_cluster);
   const u32 sectors_per_disk = static_cast<u32>(disk_size / BYTES_PER_SECTOR);
-  const u32 serial_id = get_serial_id();
+  const u32 serial_id = GetSerialId();
 
   if (label == nullptr)
     label = "DOLPHINSD";
@@ -165,28 +165,28 @@ static void boot_sector_init(u8* boot, u8* info, u64 disk_size, const char* labe
   WriteData<u32>(info + 508, 0xAA550000);
 }
 
-static void fat_init(u8* fat)
+static void FatInit(u8* fat)
 {
   WriteData<u32>(fat, 0x0ffffff8);      // Reserve cluster 1, media id in low byte
   WriteData<u32>(fat + 4, 0x0fffffff);  // Reserve cluster 2
   WriteData<u32>(fat + 8, 0x0fffffff);  // End of cluster chain for root dir
 }
 
-static bool write_sector(File::IOFile& file, const u8* sector)
+static bool WriteSector(File::IOFile& file, const u8* sector)
 {
   return file.WriteBytes(sector, BYTES_PER_SECTOR);
 }
 
-static bool write_empty(File::IOFile& file, std::size_t count)
+static bool WriteEmpty(File::IOFile& file, std::size_t count)
 {
-  static constexpr u8 empty[64 * 1024] = {};
+  static constexpr u8 EMPTY[64 * 1024] = {};
 
   count *= BYTES_PER_SECTOR;
   while (count > 0)
   {
-    const std::size_t len = std::min(sizeof(empty), count);
+    const std::size_t len = std::min(sizeof(EMPTY), count);
 
-    if (!file.WriteBytes(empty, len))
+    if (!file.WriteBytes(EMPTY, len))
       return false;
 
     count -= len;
@@ -208,10 +208,10 @@ bool SDCardCreate(u64 disk_size /*in MB*/, const std::string& filename)
 
   // Pretty unlikely to overflow.
   const u32 sectors_per_disk = static_cast<u32>(disk_size / BYTES_PER_SECTOR);
-  const u32 sectors_per_fat = get_sectors_per_fat(disk_size, get_sectors_per_cluster(disk_size));
+  const u32 sectors_per_fat = GetSectorsPerFat(disk_size, GetSectorsPerCluster(disk_size));
 
-  boot_sector_init(s_boot_sector, s_fsinfo_sector, disk_size, nullptr);
-  fat_init(s_fat_head);
+  BootSectorInit(s_boot_sector, s_fsinfo_sector, disk_size, nullptr);
+  FatInit(s_fat_head);
 
   File::IOFile file(filename, "wb");
   if (!file)
@@ -233,45 +233,45 @@ bool SDCardCreate(u64 disk_size /*in MB*/, const std::string& filename)
    *  zero sectors
    */
 
-  if (!write_sector(file, s_boot_sector))
+  if (!WriteSector(file, s_boot_sector))
     goto FailWrite;
 
-  if (!write_sector(file, s_fsinfo_sector))
+  if (!WriteSector(file, s_fsinfo_sector))
     goto FailWrite;
 
   if constexpr (BACKUP_BOOT_SECTOR > 0)
   {
-    if (!write_empty(file, BACKUP_BOOT_SECTOR - 2))
+    if (!WriteEmpty(file, BACKUP_BOOT_SECTOR - 2))
       goto FailWrite;
 
-    if (!write_sector(file, s_boot_sector))
+    if (!WriteSector(file, s_boot_sector))
       goto FailWrite;
 
-    if (!write_sector(file, s_fsinfo_sector))
+    if (!WriteSector(file, s_fsinfo_sector))
       goto FailWrite;
 
-    if (!write_empty(file, RESERVED_SECTORS - 2 - BACKUP_BOOT_SECTOR))
+    if (!WriteEmpty(file, RESERVED_SECTORS - 2 - BACKUP_BOOT_SECTOR))
       goto FailWrite;
   }
   else
   {
-    if (!write_empty(file, RESERVED_SECTORS - 2))
+    if (!WriteEmpty(file, RESERVED_SECTORS - 2))
       goto FailWrite;
   }
 
-  if (!write_sector(file, s_fat_head))
+  if (!WriteSector(file, s_fat_head))
     goto FailWrite;
 
-  if (!write_empty(file, sectors_per_fat - 1))
+  if (!WriteEmpty(file, sectors_per_fat - 1))
     goto FailWrite;
 
-  if (!write_sector(file, s_fat_head))
+  if (!WriteSector(file, s_fat_head))
     goto FailWrite;
 
-  if (!write_empty(file, sectors_per_fat - 1))
+  if (!WriteEmpty(file, sectors_per_fat - 1))
     goto FailWrite;
 
-  if (!write_empty(file, sectors_per_disk - RESERVED_SECTORS - 2 * sectors_per_fat))
+  if (!WriteEmpty(file, sectors_per_disk - RESERVED_SECTORS - 2 * sectors_per_fat))
     goto FailWrite;
 
   return true;

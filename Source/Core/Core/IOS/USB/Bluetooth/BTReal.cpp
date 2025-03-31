@@ -562,8 +562,8 @@ void BluetoothRealDevice::FakeSyncButtonEvent(USB::V0IntrMessage& ctrl, const u8
 void BluetoothRealDevice::FakeSyncButtonPressedEvent(USB::V0IntrMessage& ctrl)
 {
   NOTICE_LOG_FMT(IOS_WIIMOTE, "Faking 'sync button pressed' (0x08) event packet");
-  constexpr u8 payload[1] = {0x08};
-  FakeSyncButtonEvent(ctrl, payload, sizeof(payload));
+  constexpr u8 PAYLOAD[1] = {0x08};
+  FakeSyncButtonEvent(ctrl, PAYLOAD, sizeof(PAYLOAD));
   m_sync_button_state = SyncButtonState::Ignored;
 }
 
@@ -571,8 +571,8 @@ void BluetoothRealDevice::FakeSyncButtonPressedEvent(USB::V0IntrMessage& ctrl)
 void BluetoothRealDevice::FakeSyncButtonHeldEvent(USB::V0IntrMessage& ctrl)
 {
   NOTICE_LOG_FMT(IOS_WIIMOTE, "Faking 'sync button held' (0x09) event packet");
-  constexpr u8 payload[1] = {0x09};
-  FakeSyncButtonEvent(ctrl, payload, sizeof(payload));
+  constexpr u8 PAYLOAD[1] = {0x09};
+  FakeSyncButtonEvent(ctrl, PAYLOAD, sizeof(PAYLOAD));
   m_sync_button_state = SyncButtonState::Ignored;
 }
 

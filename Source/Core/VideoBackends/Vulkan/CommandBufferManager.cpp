@@ -45,7 +45,7 @@ bool CommandBufferManager::Initialize()
 
 bool CommandBufferManager::CreateCommandBuffers()
 {
-  static constexpr VkSemaphoreCreateInfo semaphore_create_info = {
+  static constexpr VkSemaphoreCreateInfo SEMAPHORE_CREATE_INFO = {
       VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, nullptr, 0};
 
   VkDevice device = g_vulkan_context->GetDevice();
@@ -87,7 +87,7 @@ bool CommandBufferManager::CreateCommandBuffers()
       return false;
     }
 
-    res = vkCreateSemaphore(device, &semaphore_create_info, nullptr, &resources.semaphore);
+    res = vkCreateSemaphore(device, &SEMAPHORE_CREATE_INFO, nullptr, &resources.semaphore);
     if (res != VK_SUCCESS)
     {
       LOG_VULKAN_ERROR(res, "vkCreateSemaphore failed: ");
@@ -95,7 +95,7 @@ bool CommandBufferManager::CreateCommandBuffers()
     }
   }
 
-  res = vkCreateSemaphore(device, &semaphore_create_info, nullptr, &m_present_semaphore);
+  res = vkCreateSemaphore(device, &SEMAPHORE_CREATE_INFO, nullptr, &m_present_semaphore);
   if (res != VK_SUCCESS)
   {
     LOG_VULKAN_ERROR(res, "vkCreateSemaphore failed: ");

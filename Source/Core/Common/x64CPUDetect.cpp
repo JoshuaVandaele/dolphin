@@ -30,7 +30,7 @@
 #include <sys/types.h>
 #endif
 
-static inline void __cpuidex(int info[4], int function_id, int subfunction_id)
+static inline void Cpuidex(int info[4], int function_id, int subfunction_id)
 {
 #ifdef __FreeBSD__
   // Despite the name, this is just do_cpuid() with ECX as second input.
@@ -46,7 +46,7 @@ static inline void __cpuidex(int info[4], int function_id, int subfunction_id)
 
 constexpr u32 XCR_XFEATURE_ENABLED_MASK = 0;
 
-static u64 xgetbv(u32 index)
+static u64 Xgetbv(u32 index)
 {
   u32 eax, edx;
   __asm__ __volatile__("xgetbv" : "=a"(eax), "=d"(edx) : "c"(index));
@@ -93,10 +93,10 @@ struct CPUIDResult
 };
 static_assert(sizeof(CPUIDResult) == sizeof(u32) * 4);
 
-static inline CPUIDResult cpuid(int function_id, int subfunction_id = 0)
+static inline CPUIDResult Cpuid(int function_id, int subfunction_id = 0)
 {
   CPUIDResult info;
-  __cpuidex((int*)&info, function_id, subfunction_id);
+  Cpuidex((int*)&info, function_id, subfunction_id);
   return info;
 }
 
@@ -121,7 +121,7 @@ void CPUInfo::Detect()
   // boot modern OS anyway.
 
   // Detect CPU's CPUID capabilities and grab vendor string.
-  auto info = cpuid(0);
+  auto info = Cpuid(0);
   const u32 func_id_max = info.eax;
 
   std::string vendor_id;
@@ -142,7 +142,7 @@ void CPUInfo::Detect()
   bool has_sse = false;
   if (func_id_max >= 1)
   {
-    info = cpuid(1);
+    info = Cpuid(1);
     const u32 version = info.eax;
     const u32 family = ((version >> 8) & 0xf) + ((version >> 20) & 0xff);
     const u32 model = ((version >> 4) & 0xf) + ((version >> 12) & 0xf0);
@@ -188,7 +188,7 @@ void CPUInfo::Detect()
     if (((info.ecx >> 28) & 1) && ((info.ecx >> 27) & 1))
     {
       // Check that XSAVE can be used for SSE and AVX
-      if ((xgetbv(XCR_XFEATURE_ENABLED_MASK) & 0b110) == 0b110)
+      if ((Xgetbv(XCR_XFEATURE_ENABLED_MASK) & 0b110) == 0b110)
       {
         bAVX = true;
         if ((info.ecx >> 12) & 1)
@@ -198,7 +198,7 @@ void CPUInfo::Detect()
 
     if (func_id_max >= 7)
     {
-      info = cpuid(7);
+      info = Cpuid(7);
       if ((info.ebx >> 3) & 1)
         bBMI1 = true;
       if ((info.ebx >> 8) & 1)
@@ -208,7 +208,7 @@ void CPUInfo::Detect()
     }
   }
 
-  info = cpuid(0x80000000);
+  info = Cpuid(0x80000000);
   const u32 ext_func_id_max = info.eax;
   if (ext_func_id_max >= 0x80000004)
   {
@@ -216,7 +216,7 @@ void CPUInfo::Detect()
     model_name.resize(sizeof(info) * 3);
     for (u32 i = 0; i < 3; i++)
     {
-      info = cpuid(0x80000002 + i);
+      info = Cpuid(0x80000002 + i);
       memcpy(&model_name[sizeof(info) * i], &info, sizeof(info));
     }
     TruncateToCString(&model_name);
@@ -225,7 +225,7 @@ void CPUInfo::Detect()
   if (ext_func_id_max >= 0x80000001)
   {
     // Check for more features.
-    info = cpuid(0x80000001);
+    info = Cpuid(0x80000001);
     if ((info.ecx >> 5) & 1)
       bLZCNT = true;
     if ((info.ecx >> 16) & 1)

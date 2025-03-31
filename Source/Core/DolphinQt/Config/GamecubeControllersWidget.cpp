@@ -31,7 +31,7 @@
 #include "InputCommon/GCAdapter.h"
 
 using SIDeviceName = std::pair<SerialInterface::SIDevices, const char*>;
-static constexpr std::array s_gc_types = {
+static constexpr std::array S_GC_TYPES = {
     SIDeviceName{SerialInterface::SIDEVICE_NONE, _trans("None")},
     SIDeviceName{SerialInterface::SIDEVICE_GC_CONTROLLER, _trans("Standard Controller")},
     SIDeviceName{SerialInterface::SIDEVICE_WIIU_ADAPTER,
@@ -48,9 +48,9 @@ static constexpr std::array s_gc_types = {
 
 static std::optional<int> ToGCMenuIndex(const SerialInterface::SIDevices sidevice)
 {
-  for (size_t i = 0; i < s_gc_types.size(); ++i)
+  for (size_t i = 0; i < S_GC_TYPES.size(); ++i)
   {
-    if (s_gc_types[i].first == sidevice)
+    if (S_GC_TYPES[i].first == sidevice)
       return static_cast<int>(i);
   }
   return {};
@@ -58,7 +58,7 @@ static std::optional<int> ToGCMenuIndex(const SerialInterface::SIDevices sidevic
 
 static SerialInterface::SIDevices FromGCMenuIndex(const int menudevice)
 {
-  return s_gc_types[menudevice].first;
+  return S_GC_TYPES[menudevice].first;
 }
 
 GamecubeControllersWidget::GamecubeControllersWidget(QWidget* parent) : QWidget(parent)
@@ -86,7 +86,7 @@ void GamecubeControllersWidget::CreateLayout()
     auto* gc_box = m_gc_controller_boxes[i] = new QComboBox();
     auto* gc_button = m_gc_buttons[i] = new NonDefaultQPushButton(tr("Configure"));
 
-    for (const auto& item : s_gc_types)
+    for (const auto& item : S_GC_TYPES)
     {
       gc_box->addItem(tr(item.second));
     }

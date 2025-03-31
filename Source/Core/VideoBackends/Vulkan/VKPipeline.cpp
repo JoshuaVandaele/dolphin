@@ -42,7 +42,7 @@ static bool IsStripPrimitiveTopology(VkPrimitiveTopology topology)
 static VkPipelineRasterizationStateCreateInfo
 GetVulkanRasterizationState(const RasterizationState& state)
 {
-  static constexpr std::array<VkCullModeFlags, 4> cull_modes = {
+  static constexpr std::array<VkCullModeFlags, 4> CULL_MODES = {
       {VK_CULL_MODE_NONE, VK_CULL_MODE_BACK_BIT, VK_CULL_MODE_FRONT_BIT,
        VK_CULL_MODE_FRONT_AND_BACK}};
 
@@ -55,7 +55,7 @@ GetVulkanRasterizationState(const RasterizationState& state)
       depth_clamp,           // VkBool32                                  depthClampEnable
       VK_FALSE,              // VkBool32                                  rasterizerDiscardEnable
       VK_POLYGON_MODE_FILL,  // VkPolygonMode                             polygonMode
-      cull_modes[u32(state.cullmode.Value())],  // VkCullModeFlags        cullMode
+      CULL_MODES[u32(state.cullmode.Value())],  // VkCullModeFlags        cullMode
       VK_FRONT_FACE_CLOCKWISE,                  // VkFrontFace            frontFace
       VK_FALSE,  // VkBool32                                              depthBiasEnable
       0.0f,      // float                                                 depthBiasConstantFactor
@@ -147,44 +147,44 @@ GetVulkanAttachmentBlendState(const BlendingState& state, AbstractPipelineUsage 
 
   if (use_dual_source)
   {
-    static constexpr Common::EnumMap<VkBlendFactor, SrcBlendFactor::InvDstAlpha> src_factors{
+    static constexpr Common::EnumMap<VkBlendFactor, SrcBlendFactor::InvDstAlpha> SRC_FACTORS{
         VK_BLEND_FACTOR_ZERO,       VK_BLEND_FACTOR_ONE,
         VK_BLEND_FACTOR_DST_COLOR,  VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR,
         VK_BLEND_FACTOR_SRC1_ALPHA, VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA,
         VK_BLEND_FACTOR_DST_ALPHA,  VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA,
     };
-    static constexpr Common::EnumMap<VkBlendFactor, DstBlendFactor::InvDstAlpha> dst_factors{
+    static constexpr Common::EnumMap<VkBlendFactor, DstBlendFactor::InvDstAlpha> DST_FACTORS{
         VK_BLEND_FACTOR_ZERO,       VK_BLEND_FACTOR_ONE,
         VK_BLEND_FACTOR_SRC_COLOR,  VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR,
         VK_BLEND_FACTOR_SRC1_ALPHA, VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA,
         VK_BLEND_FACTOR_DST_ALPHA,  VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA,
     };
 
-    vk_state.srcColorBlendFactor = src_factors[state.srcfactor];
-    vk_state.srcAlphaBlendFactor = src_factors[state.srcfactoralpha];
-    vk_state.dstColorBlendFactor = dst_factors[state.dstfactor];
-    vk_state.dstAlphaBlendFactor = dst_factors[state.dstfactoralpha];
+    vk_state.srcColorBlendFactor = SRC_FACTORS[state.srcfactor];
+    vk_state.srcAlphaBlendFactor = SRC_FACTORS[state.srcfactoralpha];
+    vk_state.dstColorBlendFactor = DST_FACTORS[state.dstfactor];
+    vk_state.dstAlphaBlendFactor = DST_FACTORS[state.dstfactoralpha];
   }
   else
   {
-    static constexpr Common::EnumMap<VkBlendFactor, SrcBlendFactor::InvDstAlpha> src_factors{
+    static constexpr Common::EnumMap<VkBlendFactor, SrcBlendFactor::InvDstAlpha> SRC_FACTORS{
         VK_BLEND_FACTOR_ZERO,      VK_BLEND_FACTOR_ONE,
         VK_BLEND_FACTOR_DST_COLOR, VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR,
         VK_BLEND_FACTOR_SRC_ALPHA, VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
         VK_BLEND_FACTOR_DST_ALPHA, VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA,
     };
 
-    static constexpr Common::EnumMap<VkBlendFactor, DstBlendFactor::InvDstAlpha> dst_factors{
+    static constexpr Common::EnumMap<VkBlendFactor, DstBlendFactor::InvDstAlpha> DST_FACTORS{
         VK_BLEND_FACTOR_ZERO,      VK_BLEND_FACTOR_ONE,
         VK_BLEND_FACTOR_SRC_COLOR, VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR,
         VK_BLEND_FACTOR_SRC_ALPHA, VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
         VK_BLEND_FACTOR_DST_ALPHA, VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA,
     };
 
-    vk_state.srcColorBlendFactor = src_factors[state.srcfactor];
-    vk_state.srcAlphaBlendFactor = src_factors[state.srcfactoralpha];
-    vk_state.dstColorBlendFactor = dst_factors[state.dstfactor];
-    vk_state.dstAlphaBlendFactor = dst_factors[state.dstfactoralpha];
+    vk_state.srcColorBlendFactor = SRC_FACTORS[state.srcfactor];
+    vk_state.srcAlphaBlendFactor = SRC_FACTORS[state.srcfactoralpha];
+    vk_state.dstColorBlendFactor = DST_FACTORS[state.dstfactor];
+    vk_state.dstAlphaBlendFactor = DST_FACTORS[state.dstfactoralpha];
   }
 
   if (state.colorupdate)
@@ -208,7 +208,7 @@ GetVulkanColorBlendState(const BlendingState& state,
                          const VkPipelineColorBlendAttachmentState* attachments,
                          uint32_t num_attachments)
 {
-  static constexpr std::array<VkLogicOp, 16> vk_logic_ops = {
+  static constexpr std::array<VkLogicOp, 16> VK_LOGIC_OPS = {
       {VK_LOGIC_OP_CLEAR, VK_LOGIC_OP_AND, VK_LOGIC_OP_AND_REVERSE, VK_LOGIC_OP_COPY,
        VK_LOGIC_OP_AND_INVERTED, VK_LOGIC_OP_NO_OP, VK_LOGIC_OP_XOR, VK_LOGIC_OP_OR,
        VK_LOGIC_OP_NOR, VK_LOGIC_OP_EQUIVALENT, VK_LOGIC_OP_INVERT, VK_LOGIC_OP_OR_REVERSE,
@@ -224,7 +224,7 @@ GetVulkanColorBlendState(const BlendingState& state,
   }
 
   VkLogicOp vk_logic_op =
-      vk_logic_op_enable ? vk_logic_ops[u32(state.logicmode.Value())] : VK_LOGIC_OP_CLEAR;
+      vk_logic_op_enable ? VK_LOGIC_OPS[u32(state.logicmode.Value())] : VK_LOGIC_OP_CLEAR;
 
   VkPipelineColorBlendStateCreateInfo vk_state = {
       VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,  // VkStructureType sType
@@ -276,7 +276,7 @@ std::unique_ptr<VKPipeline> VKPipeline::Create(const AbstractPipelineConfig& con
   }
 
   // Declare descriptors for empty vertex buffers/attributes
-  static const VkPipelineVertexInputStateCreateInfo empty_vertex_input_state = {
+  static const VkPipelineVertexInputStateCreateInfo EMPTY_VERTEX_INPUT_STATE = {
       VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,  // VkStructureType sType
       nullptr,  // const void*                                pNext
       0,        // VkPipelineVertexInputStateCreateFlags       flags
@@ -290,15 +290,15 @@ std::unique_ptr<VKPipeline> VKPipeline::Create(const AbstractPipelineConfig& con
   const VkPipelineVertexInputStateCreateInfo& vertex_input_state =
       config.vertex_format ?
           static_cast<const VertexFormat*>(config.vertex_format)->GetVertexInputStateInfo() :
-          empty_vertex_input_state;
+          EMPTY_VERTEX_INPUT_STATE;
 
   // Input assembly
-  static constexpr std::array<VkPrimitiveTopology, 4> vk_primitive_topologies = {
+  static constexpr std::array<VkPrimitiveTopology, 4> VK_PRIMITIVE_TOPOLOGIES = {
       {VK_PRIMITIVE_TOPOLOGY_POINT_LIST, VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
        VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP}};
   VkPipelineInputAssemblyStateCreateInfo input_assembly_state = {
       VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO, nullptr, 0,
-      vk_primitive_topologies[static_cast<u32>(config.rasterization_state.primitive.Value())],
+      VK_PRIMITIVE_TOPOLOGIES[static_cast<u32>(config.rasterization_state.primitive.Value())],
       VK_FALSE};
 
   // See Vulkan spec, section 19:
@@ -369,28 +369,28 @@ std::unique_ptr<VKPipeline> VKPipeline::Create(const AbstractPipelineConfig& con
                                static_cast<uint32_t>(blend_attachment_states.size()));
 
   // This viewport isn't used, but needs to be specified anyway.
-  static const VkViewport viewport = {0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
-  static const VkRect2D scissor = {{0, 0}, {1, 1}};
-  static const VkPipelineViewportStateCreateInfo viewport_state = {
+  static const VkViewport VIEWPORT = {0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
+  static const VkRect2D SCISSOR = {{0, 0}, {1, 1}};
+  static const VkPipelineViewportStateCreateInfo VIEWPORT_STATE = {
       VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
       nullptr,
       0,          // VkPipelineViewportStateCreateFlags    flags;
       1,          // uint32_t                              viewportCount
-      &viewport,  // const VkViewport*                     pViewports
+      &VIEWPORT,  // const VkViewport*                     pViewports
       1,          // uint32_t                              scissorCount
-      &scissor    // const VkRect2D*                       pScissors
+      &SCISSOR    // const VkRect2D*                       pScissors
   };
 
   // Set viewport and scissor dynamic state so we can change it elsewhere.
-  static const std::array<VkDynamicState, 2> dynamic_states{
+  static const std::array<VkDynamicState, 2> DYNAMIC_STATES{
       VK_DYNAMIC_STATE_VIEWPORT,
       VK_DYNAMIC_STATE_SCISSOR,
   };
-  static const VkPipelineDynamicStateCreateInfo dynamic_state = {
+  static const VkPipelineDynamicStateCreateInfo DYNAMIC_STATE = {
       VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO, nullptr,
       0,                                        // VkPipelineDynamicStateCreateFlags    flags
-      static_cast<u32>(dynamic_states.size()),  // uint32_t dynamicStateCount
-      dynamic_states.data()  // const VkDynamicState*                pDynamicStates
+      static_cast<u32>(DYNAMIC_STATES.size()),  // uint32_t dynamicStateCount
+      DYNAMIC_STATES.data()  // const VkDynamicState*                pDynamicStates
   };
 
   // Combine to full pipeline info structure.
@@ -403,12 +403,12 @@ std::unique_ptr<VKPipeline> VKPipeline::Create(const AbstractPipelineConfig& con
       &vertex_input_state,    // const VkPipelineVertexInputStateCreateInfo*      pVertexInputState
       &input_assembly_state,  // const VkPipelineInputAssemblyStateCreateInfo* pInputAssemblyState
       nullptr,                // const VkPipelineTessellationStateCreateInfo*     pTessellationState
-      &viewport_state,        // const VkPipelineViewportStateCreateInfo*         pViewportState
+      &VIEWPORT_STATE,        // const VkPipelineViewportStateCreateInfo*         pViewportState
       &rasterization_state,  // const VkPipelineRasterizationStateCreateInfo*    pRasterizationState
       &multisample_state,    // const VkPipelineMultisampleStateCreateInfo*      pMultisampleState
       &depth_stencil_state,  // const VkPipelineDepthStencilStateCreateInfo*     pDepthStencilState
       &blend_state,          // const VkPipelineColorBlendStateCreateInfo*       pColorBlendState
-      &dynamic_state,        // const VkPipelineDynamicStateCreateInfo*          pDynamicState
+      &DYNAMIC_STATE,        // const VkPipelineDynamicStateCreateInfo*          pDynamicState
       pipeline_layout,       // VkPipelineLayout                                 layout
       render_pass,           // VkRenderPass                                     renderPass
       0,                     // uint32_t                                         subpass

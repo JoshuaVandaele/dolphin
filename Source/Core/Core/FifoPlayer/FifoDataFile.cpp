@@ -114,22 +114,22 @@ bool FifoDataFile::Save(const std::string& filename)
   PadFile(sizeof(FileHeader), file);
 
   // Add space for frame list
-  u64 frameListOffset = file.Tell();
+  u64 frame_list_offset = file.Tell();
   PadFile(m_Frames.size() * sizeof(FileFrameInfo), file);
 
-  u64 bpMemOffset = file.Tell();
+  u64 bp_mem_offset = file.Tell();
   file.WriteArray(m_BPMem);
 
-  u64 cpMemOffset = file.Tell();
+  u64 cp_mem_offset = file.Tell();
   file.WriteArray(m_CPMem);
 
-  u64 xfMemOffset = file.Tell();
+  u64 xf_mem_offset = file.Tell();
   file.WriteArray(m_XFMem);
 
-  u64 xfRegsOffset = file.Tell();
+  u64 xf_regs_offset = file.Tell();
   file.WriteArray(m_XFRegs);
 
-  u64 texMemOffset = file.Tell();
+  u64 tex_mem_offset = file.Tell();
   file.WriteArray(m_TexMem);
 
   // Write header
@@ -142,22 +142,22 @@ bool FifoDataFile::Save(const std::string& filename)
   else
     header.min_loader_version = MIN_LOADER_VERSION;
 
-  header.bpMemOffset = bpMemOffset;
+  header.bpMemOffset = bp_mem_offset;
   header.bpMemSize = BP_MEM_SIZE;
 
-  header.cpMemOffset = cpMemOffset;
+  header.cpMemOffset = cp_mem_offset;
   header.cpMemSize = CP_MEM_SIZE;
 
-  header.xfMemOffset = xfMemOffset;
+  header.xfMemOffset = xf_mem_offset;
   header.xfMemSize = XF_MEM_SIZE;
 
-  header.xfRegsOffset = xfRegsOffset;
+  header.xfRegsOffset = xf_regs_offset;
   header.xfRegsSize = XF_REGS_SIZE;
 
-  header.texMemOffset = texMemOffset;
+  header.texMemOffset = tex_mem_offset;
   header.texMemSize = TEX_MEM_SIZE;
 
-  header.frameListOffset = frameListOffset;
+  header.frameListOffset = frame_list_offset;
   header.frameCount = (u32)m_Frames.size();
 
   header.flags = m_Flags;
@@ -173,27 +173,27 @@ bool FifoDataFile::Save(const std::string& filename)
   // Write frames list
   for (unsigned int i = 0; i < m_Frames.size(); ++i)
   {
-    const FifoFrameInfo& srcFrame = m_Frames[i];
+    const FifoFrameInfo& src_frame = m_Frames[i];
 
     // Write FIFO data
     file.Seek(0, File::SeekOrigin::End);
-    u64 dataOffset = file.Tell();
-    file.WriteBytes(srcFrame.fifoData.data(), srcFrame.fifoData.size());
+    u64 data_offset = file.Tell();
+    file.WriteBytes(src_frame.fifoData.data(), src_frame.fifoData.size());
 
-    u64 memoryUpdatesOffset = WriteMemoryUpdates(srcFrame.memoryUpdates, file);
+    u64 memory_updates_offset = WriteMemoryUpdates(src_frame.memoryUpdates, file);
 
-    FileFrameInfo dstFrame;
-    dstFrame.fifoDataSize = static_cast<u32>(srcFrame.fifoData.size());
-    dstFrame.fifoDataOffset = dataOffset;
-    dstFrame.fifoStart = srcFrame.fifoStart;
-    dstFrame.fifoEnd = srcFrame.fifoEnd;
-    dstFrame.memoryUpdatesOffset = memoryUpdatesOffset;
-    dstFrame.numMemoryUpdates = static_cast<u32>(srcFrame.memoryUpdates.size());
+    FileFrameInfo dst_frame;
+    dst_frame.fifoDataSize = static_cast<u32>(src_frame.fifoData.size());
+    dst_frame.fifoDataOffset = data_offset;
+    dst_frame.fifoStart = src_frame.fifoStart;
+    dst_frame.fifoEnd = src_frame.fifoEnd;
+    dst_frame.memoryUpdatesOffset = memory_updates_offset;
+    dst_frame.numMemoryUpdates = static_cast<u32>(src_frame.memoryUpdates.size());
 
     // Write frame info
-    u64 frameOffset = frameListOffset + (i * sizeof(FileFrameInfo));
-    file.Seek(frameOffset, File::SeekOrigin::Begin);
-    file.WriteBytes(&dstFrame, sizeof(FileFrameInfo));
+    u64 frame_offset = frame_list_offset + (i * sizeof(FileFrameInfo));
+    file.Seek(frame_offset, File::SeekOrigin::Begin);
+    file.WriteBytes(&dst_frame, sizeof(FileFrameInfo));
   }
 
   if (!file.Close())
@@ -248,10 +248,10 @@ std::unique_ptr<FifoDataFile> FifoDataFile::Load(const std::string& filename, bo
     header.mem2_size = Memory::MEM2_SIZE_RETAIL;
   }
 
-  auto dataFile = std::make_unique<FifoDataFile>();
+  auto data_file = std::make_unique<FifoDataFile>();
 
-  dataFile->m_Flags = header.flags;
-  dataFile->m_Version = header.file_version;
+  data_file->m_Flags = header.flags;
+  data_file->m_Version = header.file_version;
 
   if (flagsOnly)
   {
@@ -262,7 +262,7 @@ std::unique_ptr<FifoDataFile> FifoDataFile::Load(const std::string& filename, bo
     Config::SetCurrent(Config::MAIN_MEM1_SIZE, header.mem1_size);
     Config::SetCurrent(Config::MAIN_MEM2_SIZE, header.mem2_size);
 
-    return dataFile;
+    return data_file;
   }
 
   // To make up for such a hacky thing, here is a catch-all failsafe in case if the above code
@@ -286,63 +286,63 @@ std::unique_ptr<FifoDataFile> FifoDataFile::Load(const std::string& filename, bo
 
   u32 size = std::min<u32>(BP_MEM_SIZE, header.bpMemSize);
   file.Seek(header.bpMemOffset, File::SeekOrigin::Begin);
-  file.ReadArray(dataFile->m_BPMem.data(), size);
+  file.ReadArray(data_file->m_BPMem.data(), size);
 
   size = std::min<u32>(CP_MEM_SIZE, header.cpMemSize);
   file.Seek(header.cpMemOffset, File::SeekOrigin::Begin);
-  file.ReadArray(dataFile->m_CPMem.data(), size);
+  file.ReadArray(data_file->m_CPMem.data(), size);
 
   size = std::min<u32>(XF_MEM_SIZE, header.xfMemSize);
   file.Seek(header.xfMemOffset, File::SeekOrigin::Begin);
-  file.ReadArray(dataFile->m_XFMem.data(), size);
+  file.ReadArray(data_file->m_XFMem.data(), size);
 
   size = std::min<u32>(XF_REGS_SIZE, header.xfRegsSize);
   file.Seek(header.xfRegsOffset, File::SeekOrigin::Begin);
-  file.ReadArray(dataFile->m_XFRegs.data(), size);
+  file.ReadArray(data_file->m_XFRegs.data(), size);
 
   // Texture memory saving was added in version 4.
-  dataFile->m_TexMem.fill(0);
-  if (dataFile->m_Version >= 4)
+  data_file->m_TexMem.fill(0);
+  if (data_file->m_Version >= 4)
   {
     size = std::min<u32>(TEX_MEM_SIZE, header.texMemSize);
     file.Seek(header.texMemOffset, File::SeekOrigin::Begin);
-    file.ReadArray(&dataFile->m_TexMem);
+    file.ReadArray(&data_file->m_TexMem);
   }
 
   if (!file.IsGood())
     return panic_failed_to_read();
 
   // idk what else these could be used for, but it'd be a shame to not make them available.
-  dataFile->m_ram_size_real = header.mem1_size;
-  dataFile->m_exram_size_real = header.mem2_size;
+  data_file->m_ram_size_real = header.mem1_size;
+  data_file->m_exram_size_real = header.mem2_size;
 
   // Read frames
   for (u32 i = 0; i < header.frameCount; ++i)
   {
-    u64 frameOffset = header.frameListOffset + (i * sizeof(FileFrameInfo));
-    file.Seek(frameOffset, File::SeekOrigin::Begin);
-    FileFrameInfo srcFrame;
-    if (!file.ReadBytes(&srcFrame, sizeof(FileFrameInfo)))
+    u64 frame_offset = header.frameListOffset + (i * sizeof(FileFrameInfo));
+    file.Seek(frame_offset, File::SeekOrigin::Begin);
+    FileFrameInfo src_frame;
+    if (!file.ReadBytes(&src_frame, sizeof(FileFrameInfo)))
       return panic_failed_to_read();
 
-    FifoFrameInfo dstFrame;
-    dstFrame.fifoData.resize(srcFrame.fifoDataSize);
-    dstFrame.fifoStart = srcFrame.fifoStart;
-    dstFrame.fifoEnd = srcFrame.fifoEnd;
+    FifoFrameInfo dst_frame;
+    dst_frame.fifoData.resize(src_frame.fifoDataSize);
+    dst_frame.fifoStart = src_frame.fifoStart;
+    dst_frame.fifoEnd = src_frame.fifoEnd;
 
-    file.Seek(srcFrame.fifoDataOffset, File::SeekOrigin::Begin);
-    file.ReadBytes(dstFrame.fifoData.data(), srcFrame.fifoDataSize);
+    file.Seek(src_frame.fifoDataOffset, File::SeekOrigin::Begin);
+    file.ReadBytes(dst_frame.fifoData.data(), src_frame.fifoDataSize);
 
-    ReadMemoryUpdates(srcFrame.memoryUpdatesOffset, srcFrame.numMemoryUpdates,
-                      dstFrame.memoryUpdates, file);
+    ReadMemoryUpdates(src_frame.memoryUpdatesOffset, src_frame.numMemoryUpdates,
+                      dst_frame.memoryUpdates, file);
 
     if (!file.IsGood())
       return panic_failed_to_read();
 
-    dataFile->AddFrame(dstFrame);
+    data_file->AddFrame(dst_frame);
   }
 
-  return dataFile;
+  return data_file;
 }
 
 void FifoDataFile::PadFile(size_t numBytes, File::IOFile& file)
@@ -368,31 +368,31 @@ u64 FifoDataFile::WriteMemoryUpdates(const std::vector<MemoryUpdate>& memUpdates
                                      File::IOFile& file)
 {
   // Add space for memory update list
-  u64 updateListOffset = file.Tell();
+  u64 update_list_offset = file.Tell();
   PadFile(memUpdates.size() * sizeof(FileMemoryUpdate), file);
 
   for (unsigned int i = 0; i < memUpdates.size(); ++i)
   {
-    const MemoryUpdate& srcUpdate = memUpdates[i];
+    const MemoryUpdate& src_update = memUpdates[i];
 
     // Write memory
     file.Seek(0, File::SeekOrigin::End);
-    u64 dataOffset = file.Tell();
-    file.WriteBytes(srcUpdate.data.data(), srcUpdate.data.size());
+    u64 data_offset = file.Tell();
+    file.WriteBytes(src_update.data.data(), src_update.data.size());
 
-    FileMemoryUpdate dstUpdate;
-    dstUpdate.address = srcUpdate.address;
-    dstUpdate.dataOffset = dataOffset;
-    dstUpdate.dataSize = static_cast<u32>(srcUpdate.data.size());
-    dstUpdate.fifoPosition = srcUpdate.fifoPosition;
-    dstUpdate.type = static_cast<u8>(srcUpdate.type);
+    FileMemoryUpdate dst_update;
+    dst_update.address = src_update.address;
+    dst_update.dataOffset = data_offset;
+    dst_update.dataSize = static_cast<u32>(src_update.data.size());
+    dst_update.fifoPosition = src_update.fifoPosition;
+    dst_update.type = static_cast<u8>(src_update.type);
 
-    u64 updateOffset = updateListOffset + (i * sizeof(FileMemoryUpdate));
-    file.Seek(updateOffset, File::SeekOrigin::Begin);
-    file.WriteBytes(&dstUpdate, sizeof(FileMemoryUpdate));
+    u64 update_offset = update_list_offset + (i * sizeof(FileMemoryUpdate));
+    file.Seek(update_offset, File::SeekOrigin::Begin);
+    file.WriteBytes(&dst_update, sizeof(FileMemoryUpdate));
   }
 
-  return updateListOffset;
+  return update_list_offset;
 }
 
 void FifoDataFile::ReadMemoryUpdates(u64 fileOffset, u32 numUpdates,
@@ -402,18 +402,18 @@ void FifoDataFile::ReadMemoryUpdates(u64 fileOffset, u32 numUpdates,
 
   for (u32 i = 0; i < numUpdates; ++i)
   {
-    u64 updateOffset = fileOffset + (i * sizeof(FileMemoryUpdate));
-    file.Seek(updateOffset, File::SeekOrigin::Begin);
-    FileMemoryUpdate srcUpdate;
-    file.ReadBytes(&srcUpdate, sizeof(FileMemoryUpdate));
+    u64 update_offset = fileOffset + (i * sizeof(FileMemoryUpdate));
+    file.Seek(update_offset, File::SeekOrigin::Begin);
+    FileMemoryUpdate src_update;
+    file.ReadBytes(&src_update, sizeof(FileMemoryUpdate));
 
-    MemoryUpdate& dstUpdate = memUpdates[i];
-    dstUpdate.address = srcUpdate.address;
-    dstUpdate.fifoPosition = srcUpdate.fifoPosition;
-    dstUpdate.data.resize(srcUpdate.dataSize);
-    dstUpdate.type = static_cast<MemoryUpdate::Type>(srcUpdate.type);
+    MemoryUpdate& dst_update = memUpdates[i];
+    dst_update.address = src_update.address;
+    dst_update.fifoPosition = src_update.fifoPosition;
+    dst_update.data.resize(src_update.dataSize);
+    dst_update.type = static_cast<MemoryUpdate::Type>(src_update.type);
 
-    file.Seek(srcUpdate.dataOffset, File::SeekOrigin::Begin);
-    file.ReadBytes(dstUpdate.data.data(), srcUpdate.dataSize);
+    file.Seek(src_update.dataOffset, File::SeekOrigin::Begin);
+    file.ReadBytes(dst_update.data.data(), src_update.dataSize);
   }
 }

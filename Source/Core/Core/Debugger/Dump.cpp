@@ -11,14 +11,14 @@
 
 CDump::CDump(const std::string& filename)
 {
-  File::IOFile pStream(filename, "rb");
-  if (pStream)
+  File::IOFile p_stream(filename, "rb");
+  if (p_stream)
   {
-    m_size = (size_t)pStream.GetSize();
+    m_size = (size_t)p_stream.GetSize();
 
     m_pData = new u8[m_size];
 
-    pStream.ReadArray(m_pData, m_size);
+    p_stream.ReadArray(m_pData, m_size);
   }
 }
 

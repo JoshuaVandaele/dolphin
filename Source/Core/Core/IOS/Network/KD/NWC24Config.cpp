@@ -50,9 +50,9 @@ void NWC24Config::WriteConfig() const
 
 void NWC24Config::WriteConfigToPath(const std::string& path) const
 {
-  constexpr FS::Modes public_modes{FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::ReadWrite};
-  m_fs->CreateFullPath(PID_KD, PID_KD, path, 0, public_modes);
-  const auto file = m_fs->CreateAndOpenFile(PID_KD, PID_KD, path, public_modes);
+  constexpr FS::Modes PUBLIC_MODES{FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::ReadWrite};
+  m_fs->CreateFullPath(PID_KD, PID_KD, path, 0, PUBLIC_MODES);
+  const auto file = m_fs->CreateAndOpenFile(PID_KD, PID_KD, path, PUBLIC_MODES);
   if (!file || !file->Write(&m_data, 1))
     ERROR_LOG_FMT(IOS_WC24, "Failed to open or write WC24 config file at {}", path);
 }
@@ -61,7 +61,7 @@ void NWC24Config::ResetConfig()
 {
   m_fs->Delete(PID_KD, PID_KD, CONFIG_PATH);
 
-  constexpr const char* urls[5] = {
+  constexpr const char* URLS[5] = {
       "https://amw.wc24.wii.com/cgi-bin/account.cgi", "http://rcw.wc24.wii.com/cgi-bin/check.cgi",
       "http://mtw.wc24.wii.com/cgi-bin/receive.cgi",  "http://mtw.wc24.wii.com/cgi-bin/delete.cgi",
       "http://mtw.wc24.wii.com/cgi-bin/send.cgi",
@@ -77,7 +77,7 @@ void NWC24Config::ResetConfig()
 
   for (int i = 0; i < URL_COUNT; ++i)
   {
-    strncpy(m_data.http_urls[i], urls[i], MAX_URL_LENGTH);
+    strncpy(m_data.http_urls[i], URLS[i], MAX_URL_LENGTH);
   }
 
   SetChecksum(CalculateNwc24ConfigChecksum());

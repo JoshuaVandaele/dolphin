@@ -40,33 +40,33 @@ void Jit64::lXXx(UGeckoInstruction inst)
   FALLBACK_IF(bJITLoadStorelwzOff && (inst.OPCD == 32));
 
   // Determine memory access size and sign extend
-  int accessSize = 0;
-  bool signExtend = false;
+  int access_size = 0;
+  bool sign_extend = false;
   bool byte_reversed = false;
   switch (inst.OPCD)
   {
   case 32:  // lwz
   case 33:  // lwzu
-    accessSize = 32;
-    signExtend = false;
+    access_size = 32;
+    sign_extend = false;
     break;
 
   case 34:  // lbz
   case 35:  // lbzu
-    accessSize = 8;
-    signExtend = false;
+    access_size = 8;
+    sign_extend = false;
     break;
 
   case 40:  // lhz
   case 41:  // lhzu
-    accessSize = 16;
-    signExtend = false;
+    access_size = 16;
+    sign_extend = false;
     break;
 
   case 42:  // lha
   case 43:  // lhau
-    accessSize = 16;
-    signExtend = true;
+    access_size = 16;
+    sign_extend = true;
     break;
 
   case 31:
@@ -77,28 +77,28 @@ void Jit64::lXXx(UGeckoInstruction inst)
       [[fallthrough]];
     case 23:  // lwzx
     case 55:  // lwzux
-      accessSize = 32;
-      signExtend = false;
+      access_size = 32;
+      sign_extend = false;
       break;
 
     case 87:   // lbzx
     case 119:  // lbzux
-      accessSize = 8;
-      signExtend = false;
+      access_size = 8;
+      sign_extend = false;
       break;
     case 790:  // lhbrx
       byte_reversed = true;
       [[fallthrough]];
     case 279:  // lhzx
     case 311:  // lhzux
-      accessSize = 16;
-      signExtend = false;
+      access_size = 16;
+      sign_extend = false;
       break;
 
     case 343:  // lhax
     case 375:  // lhaux
-      accessSize = 16;
-      signExtend = true;
+      access_size = 16;
+      sign_extend = true;
       break;
 
     default:
@@ -112,13 +112,13 @@ void Jit64::lXXx(UGeckoInstruction inst)
 
   // PowerPC has no 8-bit sign extended load, but x86 does, so merge extsb with the load if we find
   // it.
-  if (CanMergeNextInstructions(1) && accessSize == 8 && js.op[1].inst.OPCD == 31 &&
+  if (CanMergeNextInstructions(1) && access_size == 8 && js.op[1].inst.OPCD == 31 &&
       js.op[1].inst.SUBOP10 == 954 && js.op[1].inst.RS == inst.RD && js.op[1].inst.RA == inst.RD &&
       !js.op[1].inst.Rc)
   {
     js.downcountAmount++;
     js.skipInstructions = 1;
-    signExtend = true;
+    sign_extend = true;
   }
 
   // Determine whether this instruction updates inst.RA
@@ -131,23 +131,23 @@ void Jit64::lXXx(UGeckoInstruction inst)
   // Determine whether this instruction indexes with inst.RB
   const bool indexed = inst.OPCD == 31;
 
-  bool storeAddress = false;
-  s32 loadOffset = 0;
+  bool store_address = false;
+  s32 load_offset = 0;
 
   // Prepare result
-  RCX64Reg Rd = jo.memcheck ? gpr.RevertableBind(d, RCMode::Write) : gpr.Bind(d, RCMode::Write);
+  RCX64Reg rd = jo.memcheck ? gpr.RevertableBind(d, RCMode::Write) : gpr.Bind(d, RCMode::Write);
 
   // Prepare address operand
-  RCOpArg opAddress;
+  RCOpArg op_address;
   if (!update && !a)
   {
     if (indexed)
     {
-      opAddress = gpr.BindOrImm(b, RCMode::Read);
+      op_address = gpr.BindOrImm(b, RCMode::Read);
     }
     else
     {
-      opAddress = RCOpArg::Imm32((u32)(s32)inst.SIMM_16);
+      op_address = RCOpArg::Imm32((u32)(s32)inst.SIMM_16);
     }
   }
   else if (update && ((a == 0) || (d == a)))
@@ -159,14 +159,14 @@ void Jit64::lXXx(UGeckoInstruction inst)
     if (!indexed && gpr.IsImm(a) && !jo.memcheck)
     {
       u32 val = gpr.Imm32(a) + inst.SIMM_16;
-      opAddress = RCOpArg::Imm32(val);
+      op_address = RCOpArg::Imm32(val);
       if (update)
         gpr.SetImmediate32(a, val);
     }
     else if (indexed && gpr.IsImm(a) && gpr.IsImm(b) && !jo.memcheck)
     {
       u32 val = gpr.Imm32(a) + gpr.Imm32(b);
-      opAddress = RCOpArg::Imm32(val);
+      op_address = RCOpArg::Imm32(val);
       if (update)
         gpr.SetImmediate32(a, val);
     }
@@ -179,54 +179,54 @@ void Jit64::lXXx(UGeckoInstruction inst)
       if (use_constant_offset)
         offset = indexed ? gpr.SImm32(b) : (s32)inst.SIMM_16;
 
-      RCOpArg Rb = use_constant_offset ? RCOpArg{} : gpr.Use(b, RCMode::Read);
+      RCOpArg rb = use_constant_offset ? RCOpArg{} : gpr.Use(b, RCMode::Read);
 
       // Depending on whether we have an immediate and/or update, find the optimum way to calculate
       // the load address.
       if ((update || use_constant_offset) && !jo.memcheck)
       {
-        opAddress = gpr.Bind(a, update ? RCMode::ReadWrite : RCMode::Read);
-        RegCache::Realize(opAddress, Rb);
+        op_address = gpr.Bind(a, update ? RCMode::ReadWrite : RCMode::Read);
+        RegCache::Realize(op_address, rb);
 
         if (!use_constant_offset)
-          ADD(32, opAddress, Rb);
+          ADD(32, op_address, rb);
         else if (update)
-          ADD(32, opAddress, Imm32((u32)offset));
+          ADD(32, op_address, Imm32((u32)offset));
         else
-          loadOffset = offset;
+          load_offset = offset;
       }
       else
       {
-        storeAddress = true;
+        store_address = true;
         // In this case we need an extra temporary register.
-        opAddress = RCOpArg::R(RSCRATCH2);
-        RCOpArg Ra = gpr.Use(a, RCMode::Read);
-        RegCache::Realize(opAddress, Ra, Rb);
+        op_address = RCOpArg::R(RSCRATCH2);
+        RCOpArg ra = gpr.Use(a, RCMode::Read);
+        RegCache::Realize(op_address, ra, rb);
 
         if (use_constant_offset)
-          MOV_sum(32, RSCRATCH2, Ra, Imm32((u32)offset));
+          MOV_sum(32, RSCRATCH2, ra, Imm32((u32)offset));
         else
-          MOV_sum(32, RSCRATCH2, Ra, Rb);
+          MOV_sum(32, RSCRATCH2, ra, rb);
       }
     }
   }
 
-  RCX64Reg Ra = (update && storeAddress) ? gpr.Bind(a, RCMode::ReadWrite) : RCX64Reg{};
-  RegCache::Realize(opAddress, Ra, Rd);
+  RCX64Reg ra = (update && store_address) ? gpr.Bind(a, RCMode::ReadWrite) : RCX64Reg{};
+  RegCache::Realize(op_address, ra, rd);
 
-  BitSet32 registersInUse = CallerSavedRegistersInUse();
+  BitSet32 registers_in_use = CallerSavedRegistersInUse();
   // We need to save the (usually scratch) address register for the update.
-  if (update && storeAddress)
-    registersInUse[RSCRATCH2] = true;
+  if (update && store_address)
+    registers_in_use[RSCRATCH2] = true;
 
-  SafeLoadToReg(Rd, opAddress, accessSize, loadOffset, registersInUse, signExtend);
+  SafeLoadToReg(rd, op_address, access_size, load_offset, registers_in_use, sign_extend);
 
-  if (update && storeAddress)
-    MOV(32, Ra, opAddress);
+  if (update && store_address)
+    MOV(32, ra, op_address);
 
   // TODO: support no-swap in SafeLoadToReg instead
   if (byte_reversed)
-    BSWAP(accessSize, Rd);
+    BSWAP(access_size, rd);
 }
 
 void Jit64::dcbx(UGeckoInstruction inst)
@@ -245,9 +245,9 @@ void Jit64::dcbx(UGeckoInstruction inst)
                          js.op[1].inst.RA_6 == inst.RB && js.op[1].inst.RD_2 == inst.RB &&
                          js.op[2].inst.hex == 0x4200fff8;
 
-  RCOpArg Ra = inst.RA ? gpr.Use(inst.RA, RCMode::Read) : RCOpArg::Imm32(0);
-  RCX64Reg Rb = gpr.Bind(inst.RB, make_loop ? RCMode::ReadWrite : RCMode::Read);
-  RegCache::Realize(Ra, Rb);
+  RCOpArg ra = inst.RA ? gpr.Use(inst.RA, RCMode::Read) : RCOpArg::Imm32(0);
+  RCX64Reg rb = gpr.Bind(inst.RB, make_loop ? RCMode::ReadWrite : RCMode::Read);
+  RegCache::Realize(ra, rb);
 
   RCX64Reg loop_counter;
   if (make_loop)
@@ -338,14 +338,14 @@ void Jit64::dcbx(UGeckoInstruction inst)
   }
 
   X64Reg addr = RSCRATCH;
-  MOV_sum(32, addr, Ra, Rb);
+  MOV_sum(32, addr, ra, rb);
 
   if (make_loop)
   {
     // This is the best place to adjust Rb to what it should be since RSCRATCH2 still has the
     // adjusted loop count and we're done reading from Rb.
     SHL(32, R(RSCRATCH2), Imm8(5));
-    ADD(32, R(Rb), R(RSCRATCH2));  // Rb += (RSCRATCH2 * 32)
+    ADD(32, R(rb), R(RSCRATCH2));  // Rb += (RSCRATCH2 * 32)
   }
 
   X64Reg tmp = RSCRATCH2;
@@ -387,12 +387,12 @@ void Jit64::dcbx(UGeckoInstruction inst)
   if (m_ppc_state.feature_flags & FEATURE_FLAG_MSR_IR)
     SetJumpTarget(bat_lookup_failed);
 
-  BitSet32 registersInUse = CallerSavedRegistersInUse();
-  registersInUse[X64Reg(tmp)] = false;
-  registersInUse[X64Reg(effective_address)] = false;
+  BitSet32 registers_in_use = CallerSavedRegistersInUse();
+  registers_in_use[X64Reg(tmp)] = false;
+  registers_in_use[X64Reg(effective_address)] = false;
   if (make_loop)
-    registersInUse[X64Reg(loop_counter)] = false;
-  ABI_PushRegistersAndAdjustStack(registersInUse, 0);
+    registers_in_use[X64Reg(loop_counter)] = false;
+  ABI_PushRegistersAndAdjustStack(registers_in_use, 0);
   if (make_loop)
   {
     ABI_CallFunctionPRR(JitInterface::InvalidateICacheLinesFromJIT, &m_system.GetJitInterface(),
@@ -403,7 +403,7 @@ void Jit64::dcbx(UGeckoInstruction inst)
     ABI_CallFunctionPR(JitInterface::InvalidateICacheLineFromJIT, &m_system.GetJitInterface(),
                        effective_address);
   }
-  ABI_PopRegistersAndAdjustStack(registersInUse, 0);
+  ABI_PopRegistersAndAdjustStack(registers_in_use, 0);
   asm_routines.ResetStack(*this);
 
   FixupBranch done = J(Jump::Near);
@@ -440,11 +440,11 @@ void Jit64::dcbz(UGeckoInstruction inst)
   int b = inst.RB;
 
   {
-    RCOpArg Ra = a ? gpr.Use(a, RCMode::Read) : RCOpArg::Imm32(0);
-    RCOpArg Rb = gpr.Use(b, RCMode::Read);
-    RegCache::Realize(Ra, Rb);
+    RCOpArg ra = a ? gpr.Use(a, RCMode::Read) : RCOpArg::Imm32(0);
+    RCOpArg rb = gpr.Use(b, RCMode::Read);
+    RegCache::Realize(ra, rb);
 
-    MOV_sum(32, RSCRATCH, Ra, Rb);
+    MOV_sum(32, RSCRATCH, ra, rb);
     AND(32, R(RSCRATCH), Imm32(~31));
   }
 
@@ -478,10 +478,10 @@ void Jit64::dcbz(UGeckoInstruction inst)
     SetJumpTarget(slow);
   }
   MOV(32, PPCSTATE(pc), Imm32(js.compilerPC));
-  BitSet32 registersInUse = CallerSavedRegistersInUse();
-  ABI_PushRegistersAndAdjustStack(registersInUse, 0);
+  BitSet32 registers_in_use = CallerSavedRegistersInUse();
+  ABI_PushRegistersAndAdjustStack(registers_in_use, 0);
   ABI_CallFunctionPR(PowerPC::ClearDCacheLineFromJit, &m_mmu, RSCRATCH);
-  ABI_PopRegistersAndAdjustStack(registersInUse, 0);
+  ABI_PopRegistersAndAdjustStack(registers_in_use, 0);
 
   if (emit_fast_path)
   {
@@ -507,17 +507,17 @@ void Jit64::stX(UGeckoInstruction inst)
   if (!a && update)
     PanicAlertFmt("Invalid stX");
 
-  int accessSize;
+  int access_size;
   switch (inst.OPCD & ~1)
   {
   case 36:  // stw
-    accessSize = 32;
+    access_size = 32;
     break;
   case 44:  // sth
-    accessSize = 16;
+    access_size = 16;
     break;
   case 38:  // stb
-    accessSize = 8;
+    access_size = 8;
     break;
   default:
     ASSERT_MSG(DYNA_REC, 0, "stX: Invalid access size.");
@@ -529,9 +529,9 @@ void Jit64::stX(UGeckoInstruction inst)
   {
     const u32 addr = (a ? gpr.Imm32(a) : 0) + offset;
     const bool exception = [&] {
-      RCOpArg Rs = gpr.Use(s, RCMode::Read);
-      RegCache::Realize(Rs);
-      return WriteToConstAddress(accessSize, Rs, addr, CallerSavedRegistersInUse());
+      RCOpArg rs = gpr.Use(s, RCMode::Read);
+      RegCache::Realize(rs);
+      return WriteToConstAddress(access_size, rs, addr, CallerSavedRegistersInUse());
     }();
     if (update)
     {
@@ -541,34 +541,34 @@ void Jit64::stX(UGeckoInstruction inst)
       }
       else
       {
-        RCOpArg Ra = gpr.RevertableBind(a, RCMode::Write);
-        RegCache::Realize(Ra);
+        RCOpArg ra = gpr.RevertableBind(a, RCMode::Write);
+        RegCache::Realize(ra);
         MemoryExceptionCheck();
-        MOV(32, Ra, Imm32(addr));
+        MOV(32, ra, Imm32(addr));
       }
     }
   }
   else
   {
-    RCX64Reg Ra = gpr.Bind(a, update ? RCMode::ReadWrite : RCMode::Read);
+    RCX64Reg ra = gpr.Bind(a, update ? RCMode::ReadWrite : RCMode::Read);
     RCOpArg reg_value;
-    if (!gpr.IsImm(s) && WriteClobbersRegValue(accessSize, /* swap */ true))
+    if (!gpr.IsImm(s) && WriteClobbersRegValue(access_size, /* swap */ true))
     {
-      RCOpArg Rs = gpr.Use(s, RCMode::Read);
-      RegCache::Realize(Rs);
+      RCOpArg rs = gpr.Use(s, RCMode::Read);
+      RegCache::Realize(rs);
       reg_value = RCOpArg::R(RSCRATCH2);
-      MOV(32, reg_value, Rs);
+      MOV(32, reg_value, rs);
     }
     else
     {
       reg_value = gpr.BindOrImm(s, RCMode::Read);
     }
-    RegCache::Realize(Ra, reg_value);
-    SafeWriteRegToReg(reg_value, Ra, accessSize, offset, CallerSavedRegistersInUse(),
+    RegCache::Realize(ra, reg_value);
+    SafeWriteRegToReg(reg_value, ra, access_size, offset, CallerSavedRegistersInUse(),
                       SAFE_LOADSTORE_CLOBBER_RSCRATCH_INSTEAD_OF_ADDR);
 
     if (update)
-      ADD(32, Ra, Imm32((u32)offset));
+      ADD(32, ra, Imm32((u32)offset));
   }
 }
 
@@ -582,48 +582,48 @@ void Jit64::stXx(UGeckoInstruction inst)
   bool byte_reverse = !!(inst.SUBOP10 & 512);
   FALLBACK_IF(!a || (update && a == s) || (update && jo.memcheck && a == b));
 
-  int accessSize;
+  int access_size;
   switch (inst.SUBOP10 & ~32)
   {
   case 151:
   case 662:
-    accessSize = 32;
+    access_size = 32;
     break;
   case 407:
   case 918:
-    accessSize = 16;
+    access_size = 16;
     break;
   case 215:
-    accessSize = 8;
+    access_size = 8;
     break;
   default:
     PanicAlertFmt("stXx: invalid access size");
-    accessSize = 0;
+    access_size = 0;
     break;
   }
 
-  const bool does_clobber = WriteClobbersRegValue(accessSize, /* swap */ !byte_reverse);
+  const bool does_clobber = WriteClobbersRegValue(access_size, /* swap */ !byte_reverse);
 
-  RCOpArg Ra = update ? gpr.Bind(a, RCMode::ReadWrite) : gpr.Use(a, RCMode::Read);
-  RCOpArg Rb = gpr.Use(b, RCMode::Read);
-  RCOpArg Rs = does_clobber ? gpr.Use(s, RCMode::Read) : gpr.BindOrImm(s, RCMode::Read);
-  RegCache::Realize(Ra, Rb, Rs);
+  RCOpArg ra = update ? gpr.Bind(a, RCMode::ReadWrite) : gpr.Use(a, RCMode::Read);
+  RCOpArg rb = gpr.Use(b, RCMode::Read);
+  RCOpArg rs = does_clobber ? gpr.Use(s, RCMode::Read) : gpr.BindOrImm(s, RCMode::Read);
+  RegCache::Realize(ra, rb, rs);
 
-  MOV_sum(32, RSCRATCH2, Ra, Rb);
+  MOV_sum(32, RSCRATCH2, ra, rb);
 
-  if (!Rs.IsImm() && does_clobber)
+  if (!rs.IsImm() && does_clobber)
   {
-    MOV(32, R(RSCRATCH), Rs);
-    Rs = RCOpArg::R(RSCRATCH);
+    MOV(32, R(RSCRATCH), rs);
+    rs = RCOpArg::R(RSCRATCH);
   }
-  BitSet32 registersInUse = CallerSavedRegistersInUse();
+  BitSet32 registers_in_use = CallerSavedRegistersInUse();
   if (update)
-    registersInUse[RSCRATCH2] = true;
-  SafeWriteRegToReg(Rs, RSCRATCH2, accessSize, 0, registersInUse,
+    registers_in_use[RSCRATCH2] = true;
+  SafeWriteRegToReg(rs, RSCRATCH2, access_size, 0, registers_in_use,
                     byte_reverse ? SAFE_LOADSTORE_NO_SWAP : 0);
 
   if (update)
-    MOV(32, Ra, R(RSCRATCH2));
+    MOV(32, ra, R(RSCRATCH2));
 }
 
 // A few games use these heavily in video codecs.
@@ -636,17 +636,17 @@ void Jit64::lmw(UGeckoInstruction inst)
 
   // TODO: This doesn't handle rollback on DSI correctly
   {
-    RCOpArg Ra = a ? gpr.Use(a, RCMode::Read) : RCOpArg::Imm32(0);
-    RegCache::Realize(Ra);
-    MOV_sum(32, RSCRATCH2, Ra, Imm32((u32)(s32)inst.SIMM_16));
+    RCOpArg ra = a ? gpr.Use(a, RCMode::Read) : RCOpArg::Imm32(0);
+    RegCache::Realize(ra);
+    MOV_sum(32, RSCRATCH2, ra, Imm32((u32)(s32)inst.SIMM_16));
   }
   for (int i = d; i < 32; i++)
   {
     SafeLoadToReg(RSCRATCH, R(RSCRATCH2), 32, (i - d) * 4,
                   CallerSavedRegistersInUse() | BitSet32{RSCRATCH2}, false);
-    RCOpArg Ri = gpr.Bind(i, RCMode::Write);
-    RegCache::Realize(Ri);
-    MOV(32, Ri, R(RSCRATCH));
+    RCOpArg ri = gpr.Bind(i, RCMode::Write);
+    RegCache::Realize(ri);
+    MOV(32, ri, R(RSCRATCH));
   }
 }
 
@@ -660,20 +660,20 @@ void Jit64::stmw(UGeckoInstruction inst)
   // TODO: This doesn't handle rollback on DSI correctly
   for (int i = d; i < 32; i++)
   {
-    RCOpArg Ra = a ? gpr.Use(a, RCMode::Read) : RCOpArg::Imm32(0);
-    RCOpArg Ri = gpr.Use(i, RCMode::Read);
-    RegCache::Realize(Ra, Ri);
+    RCOpArg ra = a ? gpr.Use(a, RCMode::Read) : RCOpArg::Imm32(0);
+    RCOpArg ri = gpr.Use(i, RCMode::Read);
+    RegCache::Realize(ra, ri);
 
-    if (Ra.IsZero())
+    if (ra.IsZero())
       XOR(32, R(RSCRATCH), R(RSCRATCH));
     else
-      MOV(32, R(RSCRATCH), Ra);
-    if (!Ri.IsImm())
+      MOV(32, R(RSCRATCH), ra);
+    if (!ri.IsImm())
     {
-      MOV(32, R(RSCRATCH2), Ri);
-      Ri = RCOpArg::R(RSCRATCH2);
+      MOV(32, R(RSCRATCH2), ri);
+      ri = RCOpArg::R(RSCRATCH2);
     }
-    SafeWriteRegToReg(Ri, RSCRATCH, 32, (i - d) * 4 + (u32)(s32)inst.SIMM_16,
+    SafeWriteRegToReg(ri, RSCRATCH, 32, (i - d) * 4 + (u32)(s32)inst.SIMM_16,
                       CallerSavedRegistersInUse());
   }
 }

@@ -21,13 +21,13 @@ namespace WiimoteEmu
 {
 // Yamaha ADPCM decoder code based on The ffmpeg Project (Copyright (s) 2001-2003)
 
-static const s32 yamaha_difflookup[] = {1,  3,  5,  7,  9,  11,  13,  15,
+static const s32 YAMAHA_DIFFLOOKUP[] = {1,  3,  5,  7,  9,  11,  13,  15,
                                         -1, -3, -5, -7, -9, -11, -13, -15};
 
-static const s32 yamaha_indexscale[] = {230, 230, 230, 230, 307, 409, 512, 614,
+static const s32 YAMAHA_INDEXSCALE[] = {230, 230, 230, 230, 307, 409, 512, 614,
                                         230, 230, 230, 230, 307, 409, 512, 614};
 
-static s16 av_clip16(s32 a)
+static s16 AvClip16(s32 a)
 {
   if ((a + 32768) & ~65535)
     return (a >> 31) ^ 32767;
@@ -35,7 +35,7 @@ static s16 av_clip16(s32 a)
     return a;
 }
 
-static s32 av_clip(s32 a, s32 amin, s32 amax)
+static s32 AvClip(s32 a, s32 amin, s32 amax)
 {
   if (a < amin)
     return amin;
@@ -45,12 +45,12 @@ static s32 av_clip(s32 a, s32 amin, s32 amax)
     return a;
 }
 
-static s16 adpcm_yamaha_expand_nibble(ADPCMState& s, u8 nibble)
+static s16 AdpcmYamahaExpandNibble(ADPCMState& s, u8 nibble)
 {
-  s.predictor += (s.step * yamaha_difflookup[nibble]) / 8;
-  s.predictor = av_clip16(s.predictor);
-  s.step = (s.step * yamaha_indexscale[nibble]) >> 8;
-  s.step = av_clip(s.step, 127, 24576);
+  s.predictor += (s.step * YAMAHA_DIFFLOOKUP[nibble]) / 8;
+  s.predictor = AvClip16(s.predictor);
+  s.step = (s.step * YAMAHA_INDEXSCALE[nibble]) >> 8;
+  s.step = AvClip(s.step, 127, 24576);
   return s.predictor;
 }
 
@@ -90,8 +90,8 @@ void SpeakerLogic::SpeakerData(const u8* data, int length, float speaker_pan)
     // 4 bit Yamaha ADPCM (same as dreamcast)
     for (int i = 0; i < length; ++i)
     {
-      samples[i * 2] = adpcm_yamaha_expand_nibble(adpcm_state, (data[i] >> 4) & 0xf);
-      samples[i * 2 + 1] = adpcm_yamaha_expand_nibble(adpcm_state, data[i] & 0xf);
+      samples[i * 2] = AdpcmYamahaExpandNibble(adpcm_state, (data[i] >> 4) & 0xf);
+      samples[i * 2 + 1] = AdpcmYamahaExpandNibble(adpcm_state, data[i] & 0xf);
     }
 
     // Following details from http://wiibrew.org/wiki/Wiimote#Speaker

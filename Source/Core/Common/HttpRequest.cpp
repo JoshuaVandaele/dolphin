@@ -41,7 +41,7 @@ public:
   std::string EscapeComponent(const std::string& string);
 
 private:
-  static inline std::once_flag s_curl_was_initialized;
+  static inline std::once_flag m_s_curl_was_initialized;
   ProgressCallback m_callback;
   Headers m_response_headers;
   std::unique_ptr<CURL, decltype(&curl_easy_cleanup)> m_curl{nullptr, curl_easy_cleanup};
@@ -120,7 +120,7 @@ int HttpRequest::Impl::CurlProgressCallback(Impl* impl, curl_off_t dltotal, curl
 HttpRequest::Impl::Impl(std::chrono::milliseconds timeout_ms, ProgressCallback callback)
     : m_callback(std::move(callback))
 {
-  std::call_once(s_curl_was_initialized, [] { curl_global_init(CURL_GLOBAL_DEFAULT); });
+  std::call_once(m_s_curl_was_initialized, [] { curl_global_init(CURL_GLOBAL_DEFAULT); });
 
   m_curl.reset(curl_easy_init());
   if (!m_curl)
@@ -216,7 +216,7 @@ static size_t CurlWriteCallback(char* data, size_t size, size_t nmemb, void* use
   return actual_size;
 }
 
-static size_t header_callback(char* buffer, size_t size, size_t nitems, void* userdata)
+static size_t HeaderCallback(char* buffer, size_t size, size_t nitems, void* userdata)
 {
   auto* headers = static_cast<HttpRequest::Headers*>(userdata);
   std::string_view full_buffer = std::string_view{buffer, nitems};
@@ -273,7 +273,7 @@ HttpRequest::Response HttpRequest::Impl::Fetch(const std::string& url, Method me
   }
   curl_easy_setopt(m_curl.get(), CURLOPT_HTTPHEADER, list);
 
-  curl_easy_setopt(m_curl.get(), CURLOPT_HEADERFUNCTION, header_callback);
+  curl_easy_setopt(m_curl.get(), CURLOPT_HEADERFUNCTION, HeaderCallback);
   curl_easy_setopt(m_curl.get(), CURLOPT_HEADERDATA, static_cast<void*>(&m_response_headers));
 
   std::vector<u8> buffer;

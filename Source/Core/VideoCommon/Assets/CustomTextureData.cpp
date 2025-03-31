@@ -40,7 +40,7 @@ namespace
 
 const uint32_t DDS_MAGIC = 0x20534444;  // "DDS "
 
-struct DDS_PIXELFORMAT
+struct DdsPixelformat
 {
   uint32_t dwSize;
   uint32_t dwFlags;
@@ -89,14 +89,14 @@ struct DDS_PIXELFORMAT
 #define DDS_HEADER_FLAGS_LINEARSIZE 0x00080000  // DDSD_LINEARSIZE
 
 // Subset here matches D3D10_RESOURCE_DIMENSION and D3D11_RESOURCE_DIMENSION
-enum DDS_RESOURCE_DIMENSION
+enum DdsResourceDimension
 {
   DDS_DIMENSION_TEXTURE1D = 2,
   DDS_DIMENSION_TEXTURE2D = 3,
   DDS_DIMENSION_TEXTURE3D = 4,
 };
 
-struct DDS_HEADER
+struct DdsHeader
 {
   uint32_t dwSize;
   uint32_t dwFlags;
@@ -106,7 +106,7 @@ struct DDS_HEADER
   uint32_t dwDepth;  // only if DDS_HEADER_FLAGS_VOLUME is set in dwFlags
   uint32_t dwMipMapCount;
   uint32_t dwReserved1[11];
-  DDS_PIXELFORMAT ddspf;
+  DdsPixelformat ddspf;
   uint32_t dwCaps;
   uint32_t dwCaps2;
   uint32_t dwCaps3;
@@ -114,7 +114,7 @@ struct DDS_HEADER
   uint32_t dwReserved2;
 };
 
-struct DDS_HEADER_DXT10
+struct DdsHeaderDxT10
 {
   uint32_t dxgiFormat;
   uint32_t resourceDimension;
@@ -125,23 +125,23 @@ struct DDS_HEADER_DXT10
 
 #pragma pack(pop)
 
-static_assert(sizeof(DDS_HEADER) == 124, "DDS Header size mismatch");
-static_assert(sizeof(DDS_HEADER_DXT10) == 20, "DDS DX10 Extended Header size mismatch");
+static_assert(sizeof(DdsHeader) == 124, "DDS Header size mismatch");
+static_assert(sizeof(DdsHeaderDxT10) == 20, "DDS DX10 Extended Header size mismatch");
 
-constexpr DDS_PIXELFORMAT DDSPF_A8R8G8B8 = {
-    sizeof(DDS_PIXELFORMAT), DDS_RGBA, 0, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000};
-constexpr DDS_PIXELFORMAT DDSPF_X8R8G8B8 = {
-    sizeof(DDS_PIXELFORMAT), DDS_RGB, 0, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000};
-constexpr DDS_PIXELFORMAT DDSPF_A8B8G8R8 = {
-    sizeof(DDS_PIXELFORMAT), DDS_RGBA, 0, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000};
-constexpr DDS_PIXELFORMAT DDSPF_X8B8G8R8 = {
-    sizeof(DDS_PIXELFORMAT), DDS_RGB, 0, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0x00000000};
-constexpr DDS_PIXELFORMAT DDSPF_R8G8B8 = {
-    sizeof(DDS_PIXELFORMAT), DDS_RGB, 0, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000};
+constexpr DdsPixelformat DDSPF_A8R8G8B8 = {
+    sizeof(DdsPixelformat), DDS_RGBA, 0, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000};
+constexpr DdsPixelformat DDSPF_X8R8G8B8 = {
+    sizeof(DdsPixelformat), DDS_RGB, 0, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000};
+constexpr DdsPixelformat DDSPF_A8B8G8R8 = {
+    sizeof(DdsPixelformat), DDS_RGBA, 0, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000};
+constexpr DdsPixelformat DDSPF_X8B8G8R8 = {
+    sizeof(DdsPixelformat), DDS_RGB, 0, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0x00000000};
+constexpr DdsPixelformat DDSPF_R8G8B8 = {
+    sizeof(DdsPixelformat), DDS_RGB, 0, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000};
 
 // End of Microsoft code from DDS.h.
 
-static constexpr bool DDSPixelFormatMatches(const DDS_PIXELFORMAT& pf1, const DDS_PIXELFORMAT& pf2)
+static constexpr bool DDSPixelFormatMatches(const DdsPixelformat& pf1, const DdsPixelformat& pf2)
 {
   return std::tie(pf1.dwSize, pf1.dwFlags, pf1.dwFourCC, pf1.dwRGBBitCount, pf1.dwRBitMask,
                   pf1.dwGBitMask, pf1.dwGBitMask, pf1.dwBBitMask, pf1.dwABitMask) ==
@@ -185,7 +185,7 @@ static u32 CalculateMipCount(u32 width, u32 height)
   return mip_count;
 }
 
-static void ConvertTexture_X8B8G8R8(VideoCommon::CustomTextureData::ArraySlice::Level* level)
+static void ConvertTextureX8B8G8R8(VideoCommon::CustomTextureData::ArraySlice::Level* level)
 {
   u8* data_ptr = level->data.data();
   for (u32 row = 0; row < level->height; row++)
@@ -199,7 +199,7 @@ static void ConvertTexture_X8B8G8R8(VideoCommon::CustomTextureData::ArraySlice::
   }
 }
 
-static void ConvertTexture_A8R8G8B8(VideoCommon::CustomTextureData::ArraySlice::Level* level)
+static void ConvertTextureA8R8G8B8(VideoCommon::CustomTextureData::ArraySlice::Level* level)
 {
   u8* data_ptr = level->data.data();
   for (u32 row = 0; row < level->height; row++)
@@ -216,7 +216,7 @@ static void ConvertTexture_A8R8G8B8(VideoCommon::CustomTextureData::ArraySlice::
   }
 }
 
-static void ConvertTexture_X8R8G8B8(VideoCommon::CustomTextureData::ArraySlice::Level* level)
+static void ConvertTextureX8R8G8B8(VideoCommon::CustomTextureData::ArraySlice::Level* level)
 {
   u8* data_ptr = level->data.data();
   for (u32 row = 0; row < level->height; row++)
@@ -233,7 +233,7 @@ static void ConvertTexture_X8R8G8B8(VideoCommon::CustomTextureData::ArraySlice::
   }
 }
 
-static void ConvertTexture_R8G8B8(VideoCommon::CustomTextureData::ArraySlice::Level* level)
+static void ConvertTextureR8G8B8(VideoCommon::CustomTextureData::ArraySlice::Level* level)
 {
   std::vector<u8> new_data(level->row_length * level->height * sizeof(u32));
 
@@ -265,7 +265,7 @@ static bool ParseDDSHeader(File::IOFile& file, DDSLoadInfo* info)
   if (!file.ReadBytes(&magic, sizeof(magic)) || magic != DDS_MAGIC)
     return false;
 
-  DDS_HEADER header;
+  DdsHeader header;
   size_t header_size = sizeof(header);
   if (!file.ReadBytes(&header, header_size) || header.dwSize < header_size)
     return false;
@@ -307,7 +307,7 @@ static bool ParseDDSHeader(File::IOFile& file, DDSLoadInfo* info)
     u32 dxt10_format = 0;
     if (header.ddspf.dwFourCC == MAKEFOURCC('D', 'X', '1', '0'))
     {
-      DDS_HEADER_DXT10 dxt10_header;
+      DdsHeaderDxT10 dxt10_header;
       if (!file.ReadBytes(&dxt10_header, sizeof(dxt10_header)))
         return false;
 
@@ -373,19 +373,19 @@ static bool ParseDDSHeader(File::IOFile& file, DDSLoadInfo* info)
   {
     if (DDSPixelFormatMatches(header.ddspf, DDSPF_A8R8G8B8))
     {
-      info->conversion_function = ConvertTexture_A8R8G8B8;
+      info->conversion_function = ConvertTextureA8R8G8B8;
     }
     else if (DDSPixelFormatMatches(header.ddspf, DDSPF_X8R8G8B8))
     {
-      info->conversion_function = ConvertTexture_X8R8G8B8;
+      info->conversion_function = ConvertTextureX8R8G8B8;
     }
     else if (DDSPixelFormatMatches(header.ddspf, DDSPF_X8B8G8R8))
     {
-      info->conversion_function = ConvertTexture_X8B8G8R8;
+      info->conversion_function = ConvertTextureX8B8G8R8;
     }
     else if (DDSPixelFormatMatches(header.ddspf, DDSPF_R8G8B8))
     {
-      info->conversion_function = ConvertTexture_R8G8B8;
+      info->conversion_function = ConvertTextureR8G8B8;
     }
     else if (DDSPixelFormatMatches(header.ddspf, DDSPF_A8B8G8R8))
     {

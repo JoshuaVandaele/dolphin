@@ -72,8 +72,8 @@ float FogParams::GetC() const
 {
   if (IsNaNCase())
   {
-    constexpr float inf = std::numeric_limits<float>::infinity();
-    return !a.sign && !c_proj_fsel.c_sign ? -inf : inf;
+    constexpr float INF = std::numeric_limits<float>::infinity();
+    return !a.sign && !c_proj_fsel.c_sign ? -INF : INF;
   }
 
   return c_proj_fsel.FloatValue();

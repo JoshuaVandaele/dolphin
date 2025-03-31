@@ -369,9 +369,9 @@ void FifoPlayer::SetFrameRangeStart(u32 start)
 {
   if (m_File)
   {
-    const u32 lastFrame = m_File->GetFrameCount() - 1;
-    if (start > lastFrame)
-      start = lastFrame;
+    const u32 last_frame = m_File->GetFrameCount() - 1;
+    if (start > last_frame)
+      start = last_frame;
 
     m_FrameRangeStart = start;
     if (m_FrameRangeEnd < start)
@@ -386,9 +386,9 @@ void FifoPlayer::SetFrameRangeEnd(u32 end)
 {
   if (m_File)
   {
-    const u32 lastFrame = m_File->GetFrameCount() - 1;
-    if (end > lastFrame)
-      end = lastFrame;
+    const u32 last_frame = m_File->GetFrameCount() - 1;
+    if (end > last_frame)
+      end = last_frame;
 
     m_FrameRangeEnd = end;
     if (m_FrameRangeStart > end)
@@ -451,17 +451,17 @@ void FifoPlayer::WriteFramePart(const FramePart& part, u32* next_mem_update,
 
   while (*next_mem_update < frame.memoryUpdates.size() && data_start < data_end)
   {
-    const MemoryUpdate& memUpdate = frame.memoryUpdates[*next_mem_update];
+    const MemoryUpdate& mem_update = frame.memoryUpdates[*next_mem_update];
 
-    if (memUpdate.fifoPosition < data_end)
+    if (mem_update.fifoPosition < data_end)
     {
-      if (data_start < memUpdate.fifoPosition)
+      if (data_start < mem_update.fifoPosition)
       {
-        WriteFifo(data, data_start, memUpdate.fifoPosition);
-        data_start = memUpdate.fifoPosition;
+        WriteFifo(data, data_start, mem_update.fifoPosition);
+        data_start = mem_update.fifoPosition;
       }
 
-      WriteMemory(memUpdate);
+      WriteMemory(mem_update);
 
       ++*next_mem_update;
     }
@@ -480,9 +480,9 @@ void FifoPlayer::WriteAllMemoryUpdates()
 {
   ASSERT(m_File);
 
-  for (u32 frameNum = 0; frameNum < m_File->GetFrameCount(); ++frameNum)
+  for (u32 frame_num = 0; frame_num < m_File->GetFrameCount(); ++frame_num)
   {
-    const FifoFrameInfo& frame = m_File->GetFrame(frameNum);
+    const FifoFrameInfo& frame = m_File->GetFrame(frame_num);
     for (auto& update : frame.memoryUpdates)
     {
       WriteMemory(update);
@@ -506,7 +506,7 @@ void FifoPlayer::WriteMemory(const MemoryUpdate& memUpdate)
 void FifoPlayer::WriteFifo(const u8* data, u32 start, u32 end)
 {
   u32 written = start;
-  u32 lastBurstEnd = end - 1;
+  u32 last_burst_end = end - 1;
 
   auto& cpu = m_system.GetCPU();
   auto& core_timing = m_system.GetCoreTiming();
@@ -524,20 +524,20 @@ void FifoPlayer::WriteFifo(const u8* data, u32 start, u32 end)
       core_timing.Advance();
     }
 
-    u32 burstEnd = std::min(written + 255, lastBurstEnd);
+    u32 burst_end = std::min(written + 255, last_burst_end);
 
-    std::copy(data + written, data + burstEnd, ppc_state.gather_pipe_ptr);
-    ppc_state.gather_pipe_ptr += burstEnd - written;
-    written = burstEnd;
+    std::copy(data + written, data + burst_end, ppc_state.gather_pipe_ptr);
+    ppc_state.gather_pipe_ptr += burst_end - written;
+    written = burst_end;
 
     gpfifo.Write8(data[written++]);
 
     // Advance core timing
-    u32 elapsedCycles = u32(((u64)written * m_CyclesPerFrame) / m_FrameFifoSize);
-    u32 cyclesUsed = elapsedCycles - m_ElapsedCycles;
-    m_ElapsedCycles = elapsedCycles;
+    u32 elapsed_cycles = u32(((u64)written * m_CyclesPerFrame) / m_FrameFifoSize);
+    u32 cycles_used = elapsed_cycles - m_ElapsedCycles;
+    m_ElapsedCycles = elapsed_cycles;
 
-    ppc_state.downcount -= cyclesUsed;
+    ppc_state.downcount -= cycles_used;
     core_timing.Advance();
   }
 }
@@ -629,10 +629,10 @@ void FifoPlayer::LoadMemory()
 {
   auto& ppc_state = m_system.GetPPCState();
 
-  UReg_MSR newMSR;
-  newMSR.DR = 1;
-  newMSR.IR = 1;
-  ppc_state.msr.Hex = newMSR.Hex;
+  UReg_MSR new_msr;
+  new_msr.DR = 1;
+  new_msr.IR = 1;
+  ppc_state.msr.Hex = new_msr.Hex;
   ppc_state.spr[SPR_IBAT0U] = 0x80001fff;
   ppc_state.spr[SPR_IBAT0L] = 0x00000002;
   ppc_state.spr[SPR_DBAT0U] = 0x80001fff;

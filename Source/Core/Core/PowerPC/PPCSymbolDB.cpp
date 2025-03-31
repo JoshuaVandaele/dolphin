@@ -297,7 +297,7 @@ bool PPCSymbolDB::LoadMap(const Core::CPUThreadGuard& guard, const std::string& 
     // Column detection heuristic
     if (column_count == 0)
     {
-      constexpr auto is_hex_str = [](const std::string& s) {
+      constexpr auto IS_HEX_STR = [](const std::string& s) {
         return !s.empty() && s.find_first_not_of("0123456789abcdefABCDEF") == std::string::npos;
       };
       const std::string stripped_line(StripWhitespace(line));
@@ -307,7 +307,7 @@ bool PPCSymbolDB::LoadMap(const Core::CPUThreadGuard& guard, const std::string& 
 
       // Two columns format:
       // 80004000 zz_80004000_
-      if (!(iss >> word) || word.length() != 8 || !is_hex_str(word))
+      if (!(iss >> word) || word.length() != 8 || !IS_HEX_STR(word))
         continue;
       column_count = 2;
 
@@ -315,7 +315,7 @@ bool PPCSymbolDB::LoadMap(const Core::CPUThreadGuard& guard, const std::string& 
       //  Starting        Virtual
       //  address  Size   address
       //  -----------------------
-      if (iss && iss >> word && is_hex_str(word) && iss >> word && is_hex_str(word))
+      if (iss && iss >> word && IS_HEX_STR(word) && iss >> word && IS_HEX_STR(word))
         column_count = 3;
       else
         iss.str("");
@@ -324,7 +324,7 @@ bool PPCSymbolDB::LoadMap(const Core::CPUThreadGuard& guard, const std::string& 
       //  Starting        Virtual  File
       //  address  Size   address  offset
       //  ---------------------------------
-      if (iss && iss >> word && word.length() == 8 && is_hex_str(word))
+      if (iss && iss >> word && word.length() == 8 && IS_HEX_STR(word))
         column_count = 4;
     }
 

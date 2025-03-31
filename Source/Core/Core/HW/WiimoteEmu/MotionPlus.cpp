@@ -62,10 +62,10 @@ Common::Vec3 MotionPlus::DataFormat::Data::GetAngularVelocity(const CalibrationB
   const auto sign_fix = Common::Vec3(-1, +1, -1);
 
   // Adjust deg/s to rad/s.
-  constexpr auto scalar = float(MathUtil::TAU / 360);
+  constexpr auto SCALAR = float(MathUtil::TAU / 360);
 
   return gyro.GetNormalizedValue(calibration.value) * sign_fix * Common::Vec3(calibration.degrees) *
-         scalar;
+         SCALAR;
 }
 
 auto MotionPlus::CalibrationBlocks::GetRelevantCalibration(SlowType is_slow) const
@@ -103,8 +103,8 @@ void MotionPlus::Reset()
   constexpr u8 IS_INTEGRATED = 0x00;
 
   // FYI: This ID changes on activation/deactivation
-  constexpr std::array<u8, 6> initial_id = {IS_INTEGRATED, 0x00, 0xA6, 0x20, 0x00, 0x05};
-  m_reg_data.ext_identifier = initial_id;
+  constexpr std::array<u8, 6> INITIAL_ID = {IS_INTEGRATED, 0x00, 0xA6, 0x20, 0x00, 0x05};
+  m_reg_data.ext_identifier = INITIAL_ID;
 
   // Build calibration data.
 
@@ -468,13 +468,13 @@ void MotionPlus::Update(const DesiredExtensionState& target_state)
 
   // This is potentially any value that is less than cert_n and >= 2.
   // A real M+ uses random values each run.
-  constexpr u8 magic[] = "DOLPHIN DOES WHAT NINTENDON'T.";
+  constexpr u8 MAGIC[] = "DOLPHIN DOES WHAT NINTENDON'T.";
 
-  constexpr char cert_n[] =
+  constexpr char CERT_N[] =
       "67614561104116375676885818084175632651294951727285593632649596941616763967271774525888270484"
       "88546653264235848263182009106217734439508352645687684489830161";
 
-  constexpr char sqrt_v[] =
+  constexpr char SQRT_V[] =
       "22331959796794118515742337844101477131884013381589363004659408068948154670914705521646304758"
       "02483462872732436570235909421331424649287229820640697259759264";
 
@@ -483,10 +483,10 @@ void MotionPlus::Update(const DesiredExtensionState& target_state)
   case ChallengeState::PreparingX:
   {
     MPI param_x;
-    param_x.ReadBinary(magic);
+    param_x.ReadBinary(MAGIC);
 
     mbedtls_mpi_mul_mpi(&param_x, &param_x, &param_x);
-    mbedtls_mpi_mod_mpi(&param_x, &param_x, MPI(cert_n).Data());
+    mbedtls_mpi_mod_mpi(&param_x, &param_x, MPI(CERT_N).Data());
 
     // Big-int little endian parameter x.
     param_x.WriteLittleEndianBinary(&m_reg_data.challenge_data);
@@ -500,7 +500,7 @@ void MotionPlus::Update(const DesiredExtensionState& target_state)
     if (0 == m_reg_data.challenge_type)
     {
       MPI param_y0;
-      param_y0.ReadBinary(magic);
+      param_y0.ReadBinary(MAGIC);
 
       // Big-int little endian parameter y0.
       param_y0.WriteLittleEndianBinary(&m_reg_data.challenge_data);
@@ -508,10 +508,10 @@ void MotionPlus::Update(const DesiredExtensionState& target_state)
     else
     {
       MPI param_y1;
-      param_y1.ReadBinary(magic);
+      param_y1.ReadBinary(MAGIC);
 
-      mbedtls_mpi_mul_mpi(&param_y1, &param_y1, MPI(sqrt_v).Data());
-      mbedtls_mpi_mod_mpi(&param_y1, &param_y1, MPI(cert_n).Data());
+      mbedtls_mpi_mul_mpi(&param_y1, &param_y1, MPI(SQRT_V).Data());
+      mbedtls_mpi_mod_mpi(&param_y1, &param_y1, MPI(CERT_N).Data());
 
       // Big-int little endian parameter y1.
       param_y1.WriteLittleEndianBinary(&m_reg_data.challenge_data);

@@ -50,7 +50,7 @@ IPCReply ESDevice::Encrypt(u32 uid, const IOCtlVRequest& request)
 
   auto& system = GetSystem();
   auto& memory = system.GetMemory();
-  u32 keyIndex = memory.Read_U32(request.in_vectors[0].address);
+  u32 key_index = memory.Read_U32(request.in_vectors[0].address);
   u32 size = request.in_vectors[2].size;
   u8* source = memory.GetPointerForRange(request.in_vectors[2].address, size);
   u8* iv = memory.GetPointerForRange(request.io_vectors[0].address, 16);
@@ -59,7 +59,7 @@ IPCReply ESDevice::Encrypt(u32 uid, const IOCtlVRequest& request)
   // TODO: Check whether the active title is allowed to encrypt.
 
   const ReturnCode ret =
-      GetEmulationKernel().GetIOSC().Encrypt(keyIndex, iv, source, size, destination, PID_ES);
+      GetEmulationKernel().GetIOSC().Encrypt(key_index, iv, source, size, destination, PID_ES);
   return IPCReply(ret);
 }
 
@@ -70,7 +70,7 @@ IPCReply ESDevice::Decrypt(u32 uid, const IOCtlVRequest& request)
 
   auto& system = GetSystem();
   auto& memory = system.GetMemory();
-  u32 keyIndex = memory.Read_U32(request.in_vectors[0].address);
+  u32 key_index = memory.Read_U32(request.in_vectors[0].address);
   u32 size = request.in_vectors[2].size;
   u8* source = memory.GetPointerForRange(request.in_vectors[2].address, size);
   u8* iv = memory.GetPointerForRange(request.io_vectors[0].address, 16);
@@ -79,7 +79,7 @@ IPCReply ESDevice::Decrypt(u32 uid, const IOCtlVRequest& request)
   // TODO: Check whether the active title is allowed to decrypt.
 
   const ReturnCode ret =
-      GetEmulationKernel().GetIOSC().Decrypt(keyIndex, iv, source, size, destination, PID_ES);
+      GetEmulationKernel().GetIOSC().Decrypt(key_index, iv, source, size, destination, PID_ES);
   return IPCReply(ret);
 }
 

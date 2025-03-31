@@ -47,7 +47,7 @@ enum class HardwareModel : u8
 
 u8 GetAreaCode(std::string_view area)
 {
-  static constexpr std::array<std::pair<std::string_view, u8>, 13> regions{{
+  static constexpr std::array<std::pair<std::string_view, u8>, 13> REGIONS{{
       {"JPN", 0},
       {"USA", 1},
       {"EUR", 2},
@@ -63,8 +63,8 @@ u8 GetAreaCode(std::string_view area)
       {"CHN", 6},
   }};
 
-  const auto entry_pos = std::ranges::find(regions, area, Common::Projection::Key{});
-  if (entry_pos != regions.end())
+  const auto entry_pos = std::ranges::find(REGIONS, area, Common::Projection::Key{});
+  if (entry_pos != REGIONS.end())
     return entry_pos->second;
 
   return 7;  // Unknown
@@ -72,15 +72,15 @@ u8 GetAreaCode(std::string_view area)
 
 HardwareModel GetHardwareModel(std::string_view model)
 {
-  static constexpr std::array<std::pair<std::string_view, HardwareModel>, 4> models{{
+  static constexpr std::array<std::pair<std::string_view, HardwareModel>, 4> MODELS{{
       {"RVL", HardwareModel::RVL},
       {"RVT", HardwareModel::RVT},
       {"RVV", HardwareModel::RVV},
       {"RVD", HardwareModel::RVD},
   }};
 
-  const auto entry_pos = std::ranges::find(models, model, Common::Projection::Key{});
-  if (entry_pos != models.cend())
+  const auto entry_pos = std::ranges::find(MODELS, model, Common::Projection::Key{});
+  if (entry_pos != MODELS.cend())
     return entry_pos->second;
 
   return HardwareModel::Unknown;
@@ -89,16 +89,16 @@ HardwareModel GetHardwareModel(std::string_view model)
 s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, HardwareModel hardware_model,
                     u8 area_code)
 {
-  static constexpr std::array<u8, 8> table2{
+  static constexpr std::array<u8, 8> TABLE2{
       0x1, 0x5, 0x0, 0x4, 0x2, 0x3, 0x6, 0x7,
   };
-  static constexpr std::array<u8, 16> table1{
+  static constexpr std::array<u8, 16> TABLE1{
       0x4, 0xB, 0x7, 0x9, 0xF, 0x1, 0xD, 0x3, 0xC, 0x2, 0x6, 0xE, 0x8, 0x0, 0xA, 0x5,
   };
 
-  constexpr auto u64_get_byte = [](u64 value, u32 shift) -> u8 { return u8(value >> (shift * 8)); };
+  constexpr auto U64_GET_BYTE = [](u64 value, u32 shift) -> u8 { return u8(value >> (shift * 8)); };
 
-  constexpr auto u64_insert_byte = [](u64 value, u32 shift, u8 byte) -> u64 {
+  constexpr auto U64_INSERT_BYTE = [](u64 value, u32 shift, u8 byte) -> u64 {
     const u64 mask = 0x00000000000000FFULL << (shift * 8);
     const u64 inst = u64{byte} << (shift * 8);
     return (value & ~mask) | inst;
@@ -124,17 +124,17 @@ s32 NWC24MakeUserID(u64* nwc24_id, u32 hollywood_id, u16 id_ctr, HardwareModel h
 
   for (ctr = 0; ctr <= 5; ctr++)
   {
-    const u8 ret = u64_get_byte(mix_id, ctr);
-    const u8 foobar = u8((u32{table1[(ret >> 4) & 0xF]} << 4) | table1[ret & 0xF]);
-    mix_id = u64_insert_byte(mix_id, ctr, foobar & 0xff);
+    const u8 ret = U64_GET_BYTE(mix_id, ctr);
+    const u8 foobar = u8((u32{TABLE1[(ret >> 4) & 0xF]} << 4) | TABLE1[ret & 0xF]);
+    mix_id = U64_INSERT_BYTE(mix_id, ctr, foobar & 0xff);
   }
 
   const u64 mix_id_copy2 = mix_id;
 
   for (ctr = 0; ctr <= 5; ctr++)
   {
-    const u8 ret = u64_get_byte(mix_id_copy2, ctr);
-    mix_id = u64_insert_byte(mix_id, table2[ctr], ret);
+    const u8 ret = U64_GET_BYTE(mix_id_copy2, ctr);
+    mix_id = U64_INSERT_BYTE(mix_id, TABLE2[ctr], ret);
   }
 
   mix_id &= 0x001FFFFFFFFFFFFFULL;

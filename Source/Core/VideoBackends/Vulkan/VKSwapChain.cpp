@@ -163,10 +163,10 @@ bool SwapChain::SelectSurfaceFormat()
     return true;
   }
 
-  const VkSurfaceFormatKHR* surface_format_RGBA8 = nullptr;
-  const VkSurfaceFormatKHR* surface_format_BGRA8 = nullptr;
-  const VkSurfaceFormatKHR* surface_format_RGB10_A2 = nullptr;
-  const VkSurfaceFormatKHR* surface_format_RGBA16F_scRGB = nullptr;
+  const VkSurfaceFormatKHR* surface_format_rgb_a8 = nullptr;
+  const VkSurfaceFormatKHR* surface_format_bgr_a8 = nullptr;
+  const VkSurfaceFormatKHR* surface_format_rg_b10_a2 = nullptr;
+  const VkSurfaceFormatKHR* surface_format_rgb_a16_f_sc_rgb = nullptr;
 
   // Try to find all suitable formats.
   for (const VkSurfaceFormatKHR& surface_format : surface_formats)
@@ -180,16 +180,16 @@ bool SwapChain::SelectSurfaceFormat()
     if (surface_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
     {
       if (format == VK_FORMAT_R8G8B8A8_UNORM)
-        surface_format_RGBA8 = &surface_format;
+        surface_format_rgb_a8 = &surface_format;
       else if (format == VK_FORMAT_B8G8R8A8_UNORM)
-        surface_format_BGRA8 = &surface_format;
+        surface_format_bgr_a8 = &surface_format;
       else if (format == VK_FORMAT_A2B10G10R10_UNORM_PACK32)
-        surface_format_RGB10_A2 = &surface_format;
+        surface_format_rg_b10_a2 = &surface_format;
     }
     else if (format == VK_FORMAT_R16G16B16A16_SFLOAT &&
              surface_format.colorSpace == VK_COLOR_SPACE_EXTENDED_SRGB_LINEAR_EXT)
     {
-      surface_format_RGBA16F_scRGB = &surface_format;
+      surface_format_rgb_a16_f_sc_rgb = &surface_format;
     }
   }
 
@@ -197,14 +197,14 @@ bool SwapChain::SelectSurfaceFormat()
 
   // Pick the best format.
   // "g_ActiveConfig" might not have been been updated yet.
-  if (g_Config.bHDR && surface_format_RGBA16F_scRGB)
-    surface_format = surface_format_RGBA16F_scRGB;
-  else if (surface_format_RGB10_A2)
-    surface_format = surface_format_RGB10_A2;
-  else if (surface_format_RGBA8)
-    surface_format = surface_format_RGBA8;
-  else if (surface_format_BGRA8)
-    surface_format = surface_format_BGRA8;
+  if (g_Config.bHDR && surface_format_rgb_a16_f_sc_rgb)
+    surface_format = surface_format_rgb_a16_f_sc_rgb;
+  else if (surface_format_rg_b10_a2)
+    surface_format = surface_format_rg_b10_a2;
+  else if (surface_format_rgb_a8)
+    surface_format = surface_format_rgb_a8;
+  else if (surface_format_bgr_a8)
+    surface_format = surface_format_bgr_a8;
 
   if (surface_format)
   {

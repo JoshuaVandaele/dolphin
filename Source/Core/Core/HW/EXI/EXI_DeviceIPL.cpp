@@ -37,11 +37,11 @@ namespace ExpansionInterface
 // We should provide an option to choose from the above, or figure out the checksum (the algo in
 // yagcd seems wrong) so that people can change default language.
 
-static const char iplverPAL[0x100] = "(C) 1999-2001 Nintendo.  All rights reserved."
+static const char IPLVER_PAL[0x100] = "(C) 1999-2001 Nintendo.  All rights reserved."
                                      "(C) 1999 ArtX Inc.  All rights reserved."
                                      "PAL  Revision 1.0  ";
 
-static const char iplverNTSC[0x100] = "(C) 1999-2001 Nintendo.  All rights reserved."
+static const char IPLVER_NTSC[0x100] = "(C) 1999-2001 Nintendo.  All rights reserved."
                                       "(C) 1999 ArtX Inc.  All rights reserved.";
 
 Common::Flags<RTCFlag> g_rtc_flags;
@@ -122,9 +122,9 @@ CEXIIPL::CEXIIPL(Core::System& system) : IEXIDevice(system)
 
     // Copy header
     if (DiscIO::IsNTSC(SConfig::GetInstance().m_region))
-      memcpy(&m_rom[0], iplverNTSC, sizeof(iplverNTSC));
+      memcpy(&m_rom[0], IPLVER_NTSC, sizeof(IPLVER_NTSC));
     else
-      memcpy(&m_rom[0], iplverPAL, sizeof(iplverPAL));
+      memcpy(&m_rom[0], IPLVER_PAL, sizeof(IPLVER_PAL));
 
     // Load fonts
     LoadFontFile((File::GetSysDirectory() + GC_SYS_DIR + DIR_SEP + FONT_SHIFT_JIS), 0x1aff00);
@@ -296,7 +296,7 @@ void CEXIIPL::TransferByte(u8& data)
     DEBUG_LOG_FMT(EXPANSIONINTERFACE, "IPL-DEV data {} {:08x} {:02x}",
                   m_command.is_write() ? "write" : "read", address, data);
 
-    auto UartFifoAccess = [&]() {
+    auto uart_fifo_access = [&]() {
       if (m_command.is_write())
       {
         if (data != '\0')
@@ -361,7 +361,7 @@ void CEXIIPL::TransferByte(u8& data)
       {
       case 0:
         // Seems to be 16byte fifo
-        UartFifoAccess();
+        uart_fifo_access();
         break;
       case 0xc:
         // Seen being written to after reading 4 bytes from barnacle
@@ -388,7 +388,7 @@ void CEXIIPL::TransferByte(u8& data)
         // so we can leave the byte untouched.
         break;
       case 4:
-        UartFifoAccess();
+        uart_fifo_access();
         break;
       }
     }

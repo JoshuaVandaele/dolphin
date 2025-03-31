@@ -94,13 +94,13 @@ struct Slope
   }
 };
 
-static Slope ZSlope;
-static Slope WSlope;
-static Slope ColorSlopes[2][4];
-static Slope TexSlopes[8][3];
+static Slope z_slope;
+static Slope w_slope;
+static Slope color_slopes[2][4];
+static Slope tex_slopes[8][3];
 
 static Tev tev;
-static RasterBlock rasterBlock;
+static RasterBlock raster_block;
 
 static std::vector<BPFunctions::ScissorRect> scissors;
 
@@ -108,7 +108,7 @@ void Init()
 {
   // The other slopes are set each for each primitive drawn, but zfreeze means that the z slope
   // needs to be set to an (untested) default value.
-  ZSlope = Slope();
+  z_slope = Slope();
 }
 
 void ScissorChanged()
@@ -123,13 +123,13 @@ static s32 FixedLog2(float f)
   u32 x;
   std::memcpy(&x, &f, sizeof(u32));
 
-  s32 logInt = ((x & 0x7F800000) >> 19) - 2032;  // integer part
-  s32 logFract = (x & 0x007fffff) >> 19;         // approximate fractional part
+  s32 log_int = ((x & 0x7F800000) >> 19) - 2032;  // integer part
+  s32 log_fract = (x & 0x007fffff) >> 19;         // approximate fractional part
 
-  return logInt + logFract;
+  return log_int + log_fract;
 }
 
-static inline int iround(float x)
+static inline int Iround(float x)
 {
   int t = (int)x;
   if ((x - t) >= 0.5)
@@ -147,7 +147,7 @@ static void Draw(s32 x, s32 y, s32 xi, s32 yi)
 {
   INCSTAT(g_stats.this_frame.rasterized_pixels);
 
-  s32 z = (s32)std::clamp<float>(ZSlope.GetValue(x, y), 0.0f, 16777215.0f);
+  s32 z = (s32)std::clamp<float>(z_slope.GetValue(x, y), 0.0f, 16777215.0f);
 
   if (bpmem.GetEmulatedZ() == EmulatedZ::Early)
   {
@@ -162,7 +162,7 @@ static void Draw(s32 x, s32 y, s32 xi, s32 yi)
     EfbInterface::IncPerfCounterQuadCount(PQ_ZCOMP_OUTPUT_ZCOMPLOC);
   }
 
-  RasterBlockPixel& pixel = rasterBlock.Pixel[xi][yi];
+  RasterBlockPixel& pixel = raster_block.Pixel[xi][yi];
 
   tev.Position[0] = x;
   tev.Position[1] = y;
@@ -173,7 +173,7 @@ static void Draw(s32 x, s32 y, s32 xi, s32 yi)
   {
     for (int comp = 0; comp < 4; comp++)
     {
-      u16 color = (u16)ColorSlopes[i][comp].GetValue(x, y);
+      u16 color = (u16)color_slopes[i][comp].GetValue(x, y);
 
       // clamp color value to 0
       u16 mask = ~(color >> 8);
@@ -192,14 +192,14 @@ static void Draw(s32 x, s32 y, s32 xi, s32 yi)
 
   for (unsigned int i = 0; i < bpmem.genMode.numindstages; i++)
   {
-    tev.IndirectLod[i] = rasterBlock.IndirectLod[i];
-    tev.IndirectLinear[i] = rasterBlock.IndirectLinear[i];
+    tev.IndirectLod[i] = raster_block.IndirectLod[i];
+    tev.IndirectLinear[i] = raster_block.IndirectLinear[i];
   }
 
   for (unsigned int i = 0; i <= bpmem.genMode.numtevstages; i++)
   {
-    tev.TextureLod[i] = rasterBlock.TextureLod[i];
-    tev.TextureLinear[i] = rasterBlock.TextureLinear[i];
+    tev.TextureLod[i] = raster_block.TextureLod[i];
+    tev.TextureLinear[i] = raster_block.TextureLinear[i];
   }
 
   tev.Draw();
@@ -207,18 +207,18 @@ static void Draw(s32 x, s32 y, s32 xi, s32 yi)
 
 static inline void CalculateLOD(s32* lodp, bool* linear, u32 texmap, u32 texcoord)
 {
-  auto texUnit = bpmem.tex.GetUnit(texmap);
+  auto tex_unit = bpmem.tex.GetUnit(texmap);
 
   // LOD calculation requires data from the texture mode for bias, etc.
   // it does not seem to use the actual texture size
-  const TexMode0& tm0 = texUnit.texMode0;
-  const TexMode1& tm1 = texUnit.texMode1;
+  const TexMode0& tm0 = tex_unit.texMode0;
+  const TexMode1& tm1 = tex_unit.texMode1;
 
-  float sDelta, tDelta;
+  float s_delta, t_delta;
 
-  float* uv00 = rasterBlock.Pixel[0][0].Uv[texcoord];
-  float* uv10 = rasterBlock.Pixel[1][0].Uv[texcoord];
-  float* uv01 = rasterBlock.Pixel[0][1].Uv[texcoord];
+  float* uv00 = raster_block.Pixel[0][0].Uv[texcoord];
+  float* uv10 = raster_block.Pixel[1][0].Uv[texcoord];
+  float* uv01 = raster_block.Pixel[0][1].Uv[texcoord];
 
   float dudx = fabsf(uv00[0] - uv10[0]);
   float dvdx = fabsf(uv00[1] - uv10[1]);
@@ -227,17 +227,17 @@ static inline void CalculateLOD(s32* lodp, bool* linear, u32 texmap, u32 texcoor
 
   if (tm0.diag_lod == LODType::Diagonal)
   {
-    sDelta = dudx + dudy;
-    tDelta = dvdx + dvdy;
+    s_delta = dudx + dudy;
+    t_delta = dvdx + dvdy;
   }
   else
   {
-    sDelta = std::max(dudx, dudy);
-    tDelta = std::max(dvdx, dvdy);
+    s_delta = std::max(dudx, dudy);
+    t_delta = std::max(dvdx, dvdy);
   }
 
   // get LOD in s28.4
-  s32 lod = FixedLog2(std::max(sDelta, tDelta));
+  s32 lod = FixedLog2(std::max(s_delta, t_delta));
 
   // bias is s2.5
   int bias = tm0.lod_bias;
@@ -262,24 +262,24 @@ static void BuildBlock(s32 blockX, s32 blockY)
   {
     for (s32 xi = 0; xi < BLOCK_SIZE; xi++)
     {
-      RasterBlockPixel& pixel = rasterBlock.Pixel[xi][yi];
+      RasterBlockPixel& pixel = raster_block.Pixel[xi][yi];
 
       s32 x = xi + blockX;
       s32 y = yi + blockY;
 
-      float invW = 1.0f / WSlope.GetValue(x, y);
-      pixel.InvW = invW;
+      float inv_w = 1.0f / w_slope.GetValue(x, y);
+      pixel.InvW = inv_w;
 
       // tex coords
       for (unsigned int i = 0; i < bpmem.genMode.numtexgens; i++)
       {
-        float projection = invW;
-        float q = TexSlopes[i][2].GetValue(x, y) * invW;
+        float projection = inv_w;
+        float q = tex_slopes[i][2].GetValue(x, y) * inv_w;
         if (q != 0.0f)
-          projection = invW / q;
+          projection = inv_w / q;
 
-        pixel.Uv[i][0] = TexSlopes[i][0].GetValue(x, y) * projection;
-        pixel.Uv[i][1] = TexSlopes[i][1].GetValue(x, y) * projection;
+        pixel.Uv[i][0] = tex_slopes[i][0].GetValue(x, y) * projection;
+        pixel.Uv[i][1] = tex_slopes[i][1].GetValue(x, y) * projection;
       }
     }
   }
@@ -289,19 +289,19 @@ static void BuildBlock(s32 blockX, s32 blockY)
     u32 texmap = bpmem.tevindref.getTexMap(i);
     u32 texcoord = bpmem.tevindref.getTexCoord(i);
 
-    CalculateLOD(&rasterBlock.IndirectLod[i], &rasterBlock.IndirectLinear[i], texmap, texcoord);
+    CalculateLOD(&raster_block.IndirectLod[i], &raster_block.IndirectLinear[i], texmap, texcoord);
   }
 
   for (unsigned int i = 0; i <= bpmem.genMode.numtevstages; i++)
   {
-    int stageOdd = i & 1;
+    int stage_odd = i & 1;
     const TwoTevStageOrders& order = bpmem.tevorders[i >> 1];
-    if (order.getEnable(stageOdd))
+    if (order.getEnable(stage_odd))
     {
-      u32 texmap = order.getTexMap(stageOdd);
-      u32 texcoord = order.getTexCoord(stageOdd);
+      u32 texmap = order.getTexMap(stage_odd);
+      u32 texcoord = order.getTexCoord(stage_odd);
 
-      CalculateLOD(&rasterBlock.TextureLod[i], &rasterBlock.TextureLinear[i], texmap, texcoord);
+      CalculateLOD(&raster_block.TextureLod[i], &raster_block.TextureLinear[i], texmap, texcoord);
     }
   }
 }
@@ -311,10 +311,10 @@ void UpdateZSlope(const OutputVertexData* v0, const OutputVertexData* v1,
 {
   if (!bpmem.genMode.zfreeze)
   {
-    const s32 X1 = iround(16.0f * (v0->screenPosition.x - x_off)) - 9;
-    const s32 Y1 = iround(16.0f * (v0->screenPosition.y - y_off)) - 9;
-    const SlopeContext ctx(v0, v1, v2, (X1 + 0xF) >> 4, (Y1 + 0xF) >> 4, x_off, y_off);
-    ZSlope = Slope(v0->screenPosition.z, v1->screenPosition.z, v2->screenPosition.z, ctx);
+    const s32 x1 = Iround(16.0f * (v0->screenPosition.x - x_off)) - 9;
+    const s32 y1 = Iround(16.0f * (v0->screenPosition.y - y_off)) - 9;
+    const SlopeContext ctx(v0, v1, v2, (x1 + 0xF) >> 4, (y1 + 0xF) >> 4, x_off, y_off);
+    z_slope = Slope(v0->screenPosition.z, v1->screenPosition.z, v2->screenPosition.z, ctx);
   }
 }
 
@@ -330,37 +330,37 @@ static void DrawTriangleFrontFace(const OutputVertexData* v0, const OutputVertex
 
   // 28.4 fixed-point coordinates. rounded to nearest and adjusted to match hardware output
   // could also take floor and adjust -8
-  const s32 Y1 = iround(16.0f * (v0->screenPosition.y - scissor.y_off)) - 9;
-  const s32 Y2 = iround(16.0f * (v1->screenPosition.y - scissor.y_off)) - 9;
-  const s32 Y3 = iround(16.0f * (v2->screenPosition.y - scissor.y_off)) - 9;
+  const s32 y1 = Iround(16.0f * (v0->screenPosition.y - scissor.y_off)) - 9;
+  const s32 y2 = Iround(16.0f * (v1->screenPosition.y - scissor.y_off)) - 9;
+  const s32 y3 = Iround(16.0f * (v2->screenPosition.y - scissor.y_off)) - 9;
 
-  const s32 X1 = iround(16.0f * (v0->screenPosition.x - scissor.x_off)) - 9;
-  const s32 X2 = iround(16.0f * (v1->screenPosition.x - scissor.x_off)) - 9;
-  const s32 X3 = iround(16.0f * (v2->screenPosition.x - scissor.x_off)) - 9;
+  const s32 x1 = Iround(16.0f * (v0->screenPosition.x - scissor.x_off)) - 9;
+  const s32 x2 = Iround(16.0f * (v1->screenPosition.x - scissor.x_off)) - 9;
+  const s32 x3 = Iround(16.0f * (v2->screenPosition.x - scissor.x_off)) - 9;
 
   // Deltas
-  const s32 DX12 = X1 - X2;
-  const s32 DX23 = X2 - X3;
-  const s32 DX31 = X3 - X1;
+  const s32 d_x12 = x1 - x2;
+  const s32 d_x23 = x2 - x3;
+  const s32 d_x31 = x3 - x1;
 
-  const s32 DY12 = Y1 - Y2;
-  const s32 DY23 = Y2 - Y3;
-  const s32 DY31 = Y3 - Y1;
+  const s32 d_y12 = y1 - y2;
+  const s32 d_y23 = y2 - y3;
+  const s32 d_y31 = y3 - y1;
 
   // Fixed-point deltas
-  const s32 FDX12 = DX12 * 16;
-  const s32 FDX23 = DX23 * 16;
-  const s32 FDX31 = DX31 * 16;
+  const s32 fd_x12 = d_x12 * 16;
+  const s32 fd_x23 = d_x23 * 16;
+  const s32 fd_x31 = d_x31 * 16;
 
-  const s32 FDY12 = DY12 * 16;
-  const s32 FDY23 = DY23 * 16;
-  const s32 FDY31 = DY31 * 16;
+  const s32 fd_y12 = d_y12 * 16;
+  const s32 fd_y23 = d_y23 * 16;
+  const s32 fd_y31 = d_y31 * 16;
 
   // Bounding rectangle
-  s32 minx = (std::min(std::min(X1, X2), X3) + 0xF) >> 4;
-  s32 maxx = (std::max(std::max(X1, X2), X3) + 0xF) >> 4;
-  s32 miny = (std::min(std::min(Y1, Y2), Y3) + 0xF) >> 4;
-  s32 maxy = (std::max(std::max(Y1, Y2), Y3) + 0xF) >> 4;
+  s32 minx = (std::min(std::min(x1, x2), x3) + 0xF) >> 4;
+  s32 maxx = (std::max(std::max(x1, x2), x3) + 0xF) >> 4;
+  s32 miny = (std::min(std::min(y1, y2), y3) + 0xF) >> 4;
+  s32 maxy = (std::max(std::max(y1, y2), y3) + 0xF) >> 4;
 
   // scissor
   ASSERT(scissor.rect.left >= 0);
@@ -377,40 +377,41 @@ static void DrawTriangleFrontFace(const OutputVertexData* v0, const OutputVertex
     return;
 
   // Set up the remaining slopes
-  const SlopeContext ctx(v0, v1, v2, (X1 + 0xF) >> 4, (Y1 + 0xF) >> 4, scissor.x_off,
+  const SlopeContext ctx(v0, v1, v2, (x1 + 0xF) >> 4, (y1 + 0xF) >> 4, scissor.x_off,
                          scissor.y_off);
 
   float w[3] = {1.0f / v0->projectedPosition.w, 1.0f / v1->projectedPosition.w,
                 1.0f / v2->projectedPosition.w};
-  WSlope = Slope(w[0], w[1], w[2], ctx);
+  w_slope = Slope(w[0], w[1], w[2], ctx);
 
   for (unsigned int i = 0; i < bpmem.genMode.numcolchans; i++)
   {
     for (int comp = 0; comp < 4; comp++)
-      ColorSlopes[i][comp] = Slope(v0->color[i][comp], v1->color[i][comp], v2->color[i][comp], ctx);
+      color_slopes[i][comp] =
+          Slope(v0->color[i][comp], v1->color[i][comp], v2->color[i][comp], ctx);
   }
 
   for (unsigned int i = 0; i < bpmem.genMode.numtexgens; i++)
   {
     for (int comp = 0; comp < 3; comp++)
     {
-      TexSlopes[i][comp] = Slope(v0->texCoords[i][comp] * w[0], v1->texCoords[i][comp] * w[1],
-                                 v2->texCoords[i][comp] * w[2], ctx);
+      tex_slopes[i][comp] = Slope(v0->texCoords[i][comp] * w[0], v1->texCoords[i][comp] * w[1],
+                                  v2->texCoords[i][comp] * w[2], ctx);
     }
   }
 
   // Half-edge constants
-  s32 C1 = DY12 * X1 - DX12 * Y1;
-  s32 C2 = DY23 * X2 - DX23 * Y2;
-  s32 C3 = DY31 * X3 - DX31 * Y3;
+  s32 c1 = d_y12 * x1 - d_x12 * y1;
+  s32 c2 = d_y23 * x2 - d_x23 * y2;
+  s32 c3 = d_y31 * x3 - d_x31 * y3;
 
   // Correct for fill convention
-  if (DY12 < 0 || (DY12 == 0 && DX12 > 0))
-    C1++;
-  if (DY23 < 0 || (DY23 == 0 && DX23 > 0))
-    C2++;
-  if (DY31 < 0 || (DY31 == 0 && DX31 > 0))
-    C3++;
+  if (d_y12 < 0 || (d_y12 == 0 && d_x12 > 0))
+    c1++;
+  if (d_y23 < 0 || (d_y23 == 0 && d_x23 > 0))
+    c2++;
+  if (d_y31 < 0 || (d_y31 == 0 && d_x31 > 0))
+    c3++;
 
   // Start in corner of 2x2 block
   s32 block_minx = minx & ~(BLOCK_SIZE - 1);
@@ -421,32 +422,32 @@ static void DrawTriangleFrontFace(const OutputVertexData* v0, const OutputVertex
   {
     for (s32 x = block_minx; x < maxx; x += BLOCK_SIZE)
     {
-      s32 x1_ = (x + BLOCK_SIZE - 1);
-      s32 y1_ = (y + BLOCK_SIZE - 1);
+      s32 block_x1 = (x + BLOCK_SIZE - 1);
+      s32 block_y1 = (y + BLOCK_SIZE - 1);
 
       // Corners of block
-      s32 x0 = x << 4;
-      s32 x1 = x1_ << 4;
-      s32 y0 = y << 4;
-      s32 y1 = y1_ << 4;
+      s32 corner_x0 = x << 4;
+      s32 corner_x1 = block_x1 << 4;
+      s32 corner_y0 = y << 4;
+      s32 corner_y1 = block_y1 << 4;
 
       // Evaluate half-space functions
-      bool a00 = C1 + DX12 * y0 - DY12 * x0 > 0;
-      bool a10 = C1 + DX12 * y0 - DY12 * x1 > 0;
-      bool a01 = C1 + DX12 * y1 - DY12 * x0 > 0;
-      bool a11 = C1 + DX12 * y1 - DY12 * x1 > 0;
+      bool a00 = c1 + d_x12 * corner_y0 - d_y12 * corner_x0 > 0;
+      bool a10 = c1 + d_x12 * corner_y0 - d_y12 * corner_x1 > 0;
+      bool a01 = c1 + d_x12 * corner_y1 - d_y12 * corner_x0 > 0;
+      bool a11 = c1 + d_x12 * corner_y1 - d_y12 * corner_x1 > 0;
       int a = (a00 << 0) | (a10 << 1) | (a01 << 2) | (a11 << 3);
 
-      bool b00 = C2 + DX23 * y0 - DY23 * x0 > 0;
-      bool b10 = C2 + DX23 * y0 - DY23 * x1 > 0;
-      bool b01 = C2 + DX23 * y1 - DY23 * x0 > 0;
-      bool b11 = C2 + DX23 * y1 - DY23 * x1 > 0;
+      bool b00 = c2 + d_x23 * corner_y0 - d_y23 * corner_x0 > 0;
+      bool b10 = c2 + d_x23 * corner_y0 - d_y23 * corner_x1 > 0;
+      bool b01 = c2 + d_x23 * corner_y1 - d_y23 * corner_x0 > 0;
+      bool b11 = c2 + d_x23 * corner_y1 - d_y23 * corner_x1 > 0;
       int b = (b00 << 0) | (b10 << 1) | (b01 << 2) | (b11 << 3);
 
-      bool c00 = C3 + DX31 * y0 - DY31 * x0 > 0;
-      bool c10 = C3 + DX31 * y0 - DY31 * x1 > 0;
-      bool c01 = C3 + DX31 * y1 - DY31 * x0 > 0;
-      bool c11 = C3 + DX31 * y1 - DY31 * x1 > 0;
+      bool c00 = c3 + d_x31 * corner_y0 - d_y31 * corner_x0 > 0;
+      bool c10 = c3 + d_x31 * corner_y0 - d_y31 * corner_x1 > 0;
+      bool c01 = c3 + d_x31 * corner_y1 - d_y31 * corner_x0 > 0;
+      bool c11 = c3 + d_x31 * corner_y1 - d_y31 * corner_x1 > 0;
       int c = (c00 << 0) | (c10 << 1) | (c01 << 2) | (c11 << 3);
 
       // Skip block when outside an edge
@@ -457,7 +458,8 @@ static void DrawTriangleFrontFace(const OutputVertexData* v0, const OutputVertex
 
       // Accept whole block when totally covered
       // We still need to check min/max x/y because of the scissor
-      if (a == 0xF && b == 0xF && c == 0xF && x >= minx && x1_ < maxx && y >= miny && y1_ < maxy)
+      if (a == 0xF && b == 0xF && c == 0xF && x >= minx && corner_x1 < maxx && y >= miny &&
+          corner_y1 < maxy)
       {
         for (s32 iy = 0; iy < BLOCK_SIZE; iy++)
         {
@@ -469,19 +471,19 @@ static void DrawTriangleFrontFace(const OutputVertexData* v0, const OutputVertex
       }
       else  // Partially covered block
       {
-        s32 CY1 = C1 + DX12 * y0 - DY12 * x0;
-        s32 CY2 = C2 + DX23 * y0 - DY23 * x0;
-        s32 CY3 = C3 + DX31 * y0 - DY31 * x0;
+        s32 c_y1 = c1 + d_x12 * corner_y0 - d_y12 * corner_x0;
+        s32 c_y2 = c2 + d_x23 * corner_y0 - d_y23 * corner_x0;
+        s32 c_y3 = c3 + d_x31 * corner_y0 - d_y31 * corner_x0;
 
         for (s32 iy = 0; iy < BLOCK_SIZE; iy++)
         {
-          s32 CX1 = CY1;
-          s32 CX2 = CY2;
-          s32 CX3 = CY3;
+          s32 c_x1 = c_y1;
+          s32 c_x2 = c_y2;
+          s32 c_x3 = c_y3;
 
           for (s32 ix = 0; ix < BLOCK_SIZE; ix++)
           {
-            if (CX1 > 0 && CX2 > 0 && CX3 > 0)
+            if (c_x1 > 0 && c_x2 > 0 && c_x3 > 0)
             {
               // This check enforces the scissor rectangle, since it might not be aligned with the
               // blocks
@@ -489,14 +491,14 @@ static void DrawTriangleFrontFace(const OutputVertexData* v0, const OutputVertex
                 Draw(x + ix, y + iy, ix, iy);
             }
 
-            CX1 -= FDY12;
-            CX2 -= FDY23;
-            CX3 -= FDY31;
+            c_x1 -= fd_y12;
+            c_x2 -= fd_y23;
+            c_x3 -= fd_y31;
           }
 
-          CY1 += FDX12;
-          CY2 += FDX23;
-          CY3 += FDX31;
+          c_y1 += fd_x12;
+          c_y2 += fd_x23;
+          c_y3 += fd_x31;
         }
       }
     }

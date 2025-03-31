@@ -78,11 +78,11 @@ void SWVertexLoader::DrawCurrentBatch(u32 base_index, u32 num_indices, u32 base_
     ParseVertex(VertexLoaderManager::GetCurrentVertexFormat()->GetVertexDeclaration(), index);
 
     // transform this vertex so that it can be used for rasterization (outVertex)
-    OutputVertexData* outVertex = m_setup_unit.GetVertex();
-    TransformUnit::TransformPosition(&m_vertex, outVertex);
-    TransformUnit::TransformNormal(&m_vertex, outVertex);
-    TransformUnit::TransformColor(&m_vertex, outVertex);
-    TransformUnit::TransformTexCoord(&m_vertex, outVertex);
+    OutputVertexData* out_vertex = m_setup_unit.GetVertex();
+    TransformUnit::TransformPosition(&m_vertex, out_vertex);
+    TransformUnit::TransformNormal(&m_vertex, out_vertex);
+    TransformUnit::TransformColor(&m_vertex, out_vertex);
+    TransformUnit::TransformTexCoord(&m_vertex, out_vertex);
 
     // assemble and rasterize the primitive
     m_setup_unit.SetupVertex();

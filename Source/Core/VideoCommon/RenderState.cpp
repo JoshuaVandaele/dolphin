@@ -208,7 +208,7 @@ void BlendingState::ApproximateLogicOpWithBlending()
   // TODO: This previously had a warning about SRC and DST being aliased and not to mix them,
   // but INVSRCCLR and INVDSTCLR were also aliased and were mixed.
   // Thus, NOR, EQUIV, INVERT, COPY_INVERTED, and OR_INVERTED duplicate(d) other values.
-  static constexpr std::array<LogicOpApproximation, 16> approximations = {{
+  static constexpr std::array<LogicOpApproximation, 16> APPROXIMATIONS = {{
       // clang-format off
       {false, false, SrcBlendFactor::One,       DstBlendFactor::Zero},        // CLEAR (Shader outputs 0)
       {true,  false, SrcBlendFactor::DstClr,    DstBlendFactor::Zero},        // AND
@@ -231,7 +231,7 @@ void BlendingState::ApproximateLogicOpWithBlending()
 
   logicopenable = false;
   usedualsrc = false;
-  const LogicOpApproximation& approximation = approximations[static_cast<u32>(logicmode.Value())];
+  const LogicOpApproximation& approximation = APPROXIMATIONS[static_cast<u32>(logicmode.Value())];
   if (approximation.blendEnable)
   {
     blendenable = true;

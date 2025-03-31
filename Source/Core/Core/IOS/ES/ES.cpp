@@ -46,16 +46,16 @@ struct DirectoryToCreate
   FS::Gid gid = PID_KERNEL;
 };
 
-constexpr FS::Modes public_modes{FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::ReadWrite};
-constexpr std::array<DirectoryToCreate, 9> s_directories_to_create = {{
+constexpr FS::Modes PUBLIC_MODES{FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::ReadWrite};
+constexpr std::array<DirectoryToCreate, 9> S_DIRECTORIES_TO_CREATE = {{
     {"/sys", 0, {FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::None}},
     {"/ticket", 0, {FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::None}},
     {"/title", 0, {FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::Read}},
     {"/shared1", 0, {FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::None}},
-    {"/shared2", 0, public_modes},
-    {"/tmp", 0, public_modes},
+    {"/shared2", 0, PUBLIC_MODES},
+    {"/tmp", 0, PUBLIC_MODES},
     {"/import", 0, {FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::None}},
-    {"/meta", 0, public_modes, SYSMENU_UID, SYSMENU_GID},
+    {"/meta", 0, PUBLIC_MODES, SYSMENU_UID, SYSMENU_GID},
     {"/wfs", 0, {FS::Mode::ReadWrite, FS::Mode::None, FS::Mode::None}, PID_UNKNOWN, PID_UNKNOWN},
 }};
 
@@ -87,7 +87,7 @@ constexpr SystemTimers::TimeBaseTick GetESBootTicks(u32 ios_version)
 
 ESCore::ESCore(Kernel& ios) : m_ios(ios)
 {
-  for (const auto& directory : s_directories_to_create)
+  for (const auto& directory : S_DIRECTORIES_TO_CREATE)
   {
     // Note: ES sets its own UID and GID to 0/0 at boot, so all filesystem accesses in ES are done
     // as UID 0 even though its PID is 1.
@@ -802,9 +802,9 @@ static ReturnCode WriteTmdForDiVerify(FS::FileSystem* fs, const ES::TMDReader& t
 {
   const std::string temp_path = "/tmp/title.tmd";
   fs->Delete(PID_KERNEL, PID_KERNEL, temp_path);
-  constexpr FS::Modes internal_modes{FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::None};
+  constexpr FS::Modes INTERNAL_MODES{FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::None};
   {
-    const auto file = fs->CreateAndOpenFile(PID_KERNEL, PID_KERNEL, temp_path, internal_modes);
+    const auto file = fs->CreateAndOpenFile(PID_KERNEL, PID_KERNEL, temp_path, INTERNAL_MODES);
     if (!file)
       return FS::ConvertResult(file.Error());
     if (!file->Write(tmd.GetBytes().data(), tmd.GetBytes().size()))
@@ -813,12 +813,12 @@ static ReturnCode WriteTmdForDiVerify(FS::FileSystem* fs, const ES::TMDReader& t
 
   const std::string tmd_dir = Common::GetTitleContentPath(tmd.GetTitleId());
   const std::string tmd_path = Common::GetTMDFileName(tmd.GetTitleId());
-  constexpr FS::Modes parent_modes{FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::Read};
-  const auto result = fs->CreateFullPath(PID_KERNEL, PID_KERNEL, tmd_path, 0, parent_modes);
+  constexpr FS::Modes PARENT_MODES{FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::Read};
+  const auto result = fs->CreateFullPath(PID_KERNEL, PID_KERNEL, tmd_path, 0, PARENT_MODES);
   if (result != FS::ResultCode::Success)
     return FS::ConvertResult(result);
 
-  fs->SetMetadata(PID_KERNEL, tmd_dir, PID_KERNEL, PID_KERNEL, 0, internal_modes);
+  fs->SetMetadata(PID_KERNEL, tmd_dir, PID_KERNEL, PID_KERNEL, 0, INTERNAL_MODES);
   return FS::ConvertResult(fs->Rename(PID_KERNEL, PID_KERNEL, temp_path, tmd_path));
 }
 
@@ -856,10 +856,10 @@ ReturnCode ESDevice::DIVerify(const ES::TMDReader& tmd, const ES::TicketReader& 
 
   const std::string data_dir = Common::GetTitleDataPath(tmd.GetTitleId());
   // Might already exist, so we only need to check whether the second operation succeeded.
-  constexpr FS::Modes data_dir_modes{FS::Mode::ReadWrite, FS::Mode::None, FS::Mode::None};
-  fs->CreateDirectory(PID_KERNEL, PID_KERNEL, data_dir, 0, data_dir_modes);
+  constexpr FS::Modes DATA_DIR_MODES{FS::Mode::ReadWrite, FS::Mode::None, FS::Mode::None};
+  fs->CreateDirectory(PID_KERNEL, PID_KERNEL, data_dir, 0, DATA_DIR_MODES);
   return FS::ConvertResult(fs->SetMetadata(0, data_dir, GetEmulationKernel().GetUidForPPC(),
-                                           GetEmulationKernel().GetGidForPPC(), 0, data_dir_modes));
+                                           GetEmulationKernel().GetGidForPPC(), 0, DATA_DIR_MODES));
 }
 
 ReturnCode ESCore::CheckStreamKeyPermissions(const u32 uid, const u8* ticket_view,
@@ -869,9 +869,9 @@ ReturnCode ESCore::CheckStreamKeyPermissions(const u32 uid, const u8* ticket_vie
   // Only allow using this function with some titles (WFS titles).
   // The following is the exact check from IOS. Unfortunately, other than knowing that the
   // title type is what IOS checks, we don't know much about the constants used here.
-  constexpr u32 WFS_AND_0x4_FLAG = ES::TITLE_TYPE_0x4 | ES::TITLE_TYPE_WFS_MAYBE;
+  constexpr u32 WFS_AND_0X4_FLAG = ES::TITLE_TYPE_0x4 | ES::TITLE_TYPE_WFS_MAYBE;
   if ((!(title_flags & ES::TITLE_TYPE_0x4) && ~(title_flags >> 5) & 1) ||
-      (title_flags & WFS_AND_0x4_FLAG) == WFS_AND_0x4_FLAG)
+      (title_flags & WFS_AND_0X4_FLAG) == WFS_AND_0X4_FLAG)
   {
     return ES_EINVAL;
   }

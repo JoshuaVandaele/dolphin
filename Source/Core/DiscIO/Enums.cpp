@@ -490,7 +490,7 @@ std::string GetSysMenuVersionString(u16 title_version, bool is_vwii)
 
 const std::string& GetCompanyFromID(const std::string& company_id)
 {
-  static const std::map<std::string, std::string> companies = {
+  static const std::map<std::string, std::string> COMPANIES = {
       {"01", "Nintendo"},
       {"02", "Nintendo"},
       {"08", "Capcom"},
@@ -875,8 +875,8 @@ const std::string& GetCompanyFromID(const std::string& company_id)
       {"ZX", "TopWare Interactive"}};
 
   static const std::string EMPTY_STRING;
-  auto iterator = companies.find(company_id);
-  if (iterator != companies.end())
+  auto iterator = COMPANIES.find(company_id);
+  if (iterator != COMPANIES.end())
     return iterator->second;
   else
     return EMPTY_STRING;

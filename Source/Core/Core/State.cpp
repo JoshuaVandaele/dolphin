@@ -76,7 +76,7 @@ static std::mutex s_undo_load_buffer_mutex;
 
 static std::mutex s_load_or_save_in_progress_mutex;
 
-struct CompressAndDumpState_args
+struct CompressAndDumpStateArgs
 {
   std::vector<u8> buffer_vector;
   std::string filename;
@@ -88,7 +88,7 @@ struct CompressAndDumpState_args
 static std::mutex s_save_thread_mutex;
 
 // Queue for compressing and writing savestates to disk.
-static Common::WorkQueueThread<CompressAndDumpState_args> s_save_thread;
+static Common::WorkQueueThread<CompressAndDumpStateArgs> s_save_thread;
 
 // Keeps track of savestate writes that are currently happening, so we don't load a state while
 // another one is still saving. This is particularly important so if you save to a slot and then
@@ -112,7 +112,7 @@ constexpr u32 COOKIE_BASE = 0xBAADBABE;
 // Maps savestate versions to Dolphin versions.
 // Versions after 42 don't need to be added to this list,
 // because they save the exact Dolphin version to savestates.
-static const std::map<u32, std::pair<std::string, std::string>> s_old_versions = {
+static const std::map<u32, std::pair<std::string, std::string>> S_OLD_VERSIONS = {
     // The 16 -> 17 change modified the size of StateHeader,
     // so versions older than that can't even be decompressed anymore
     {17, {"3.5-1311", "3.5-1364"}}, {18, {"3.5-1366", "3.5-1371"}}, {19, {"3.5-1372", "3.5-1408"}},
@@ -378,7 +378,7 @@ static void WriteHeadersToFile(size_t uncompressed_size, File::IOFile& f)
   // If StateExtendedHeader is amended to include more than the base, add WriteBytes() calls here.
 }
 
-static void CompressAndDumpState(Core::System& system, CompressAndDumpState_args& save_args)
+static void CompressAndDumpState(Core::System& system, CompressAndDumpStateArgs& save_args)
 {
   const u8* const buffer_data = save_args.buffer_vector.data();
   const size_t buffer_size = save_args.buffer_vector.size();
@@ -474,7 +474,7 @@ void SaveAs(Core::System& system, const std::string& filename, bool wait)
       system,
       [&] {
         {
-          std::lock_guard lk_(s_state_writes_in_queue_mutex);
+          std::lock_guard lk(s_state_writes_in_queue_mutex);
           ++s_state_writes_in_queue;
         }
 
@@ -497,7 +497,7 @@ void SaveAs(Core::System& system, const std::string& filename, bool wait)
 
           std::shared_ptr<Common::Event> sync_event;
 
-          CompressAndDumpState_args save_args;
+          CompressAndDumpStateArgs save_args;
           save_args.buffer_vector = std::move(current_buffer);
           save_args.filename = filename;
           if (wait)
@@ -516,7 +516,7 @@ void SaveAs(Core::System& system, const std::string& filename, bool wait)
           // someone aborted the save by changing the mode?
           {
             // Note: The worker thread takes care of this in the other branch.
-            std::lock_guard lk_(s_state_writes_in_queue_mutex);
+            std::lock_guard lk(s_state_writes_in_queue_mutex);
             if (--s_state_writes_in_queue == 0)
               s_state_write_queue_is_empty.notify_all();
           }
@@ -736,12 +736,12 @@ static bool ValidateHeaders(const StateHeader& header)
   std::string loaded_str = header.version_string;
   const u32 loaded_version = header.version_header.version_cookie - COOKIE_BASE;
 
-  if (s_old_versions.contains(loaded_version))
+  if (S_OLD_VERSIONS.contains(loaded_version))
   {
     // This is a REALLY old version, before we started writing the version string to file
     success = false;
 
-    std::pair<std::string, std::string> version_range = s_old_versions.find(loaded_version)->second;
+    std::pair<std::string, std::string> version_range = S_OLD_VERSIONS.find(loaded_version)->second;
     std::string oldest_version = version_range.first;
     std::string newest_version = version_range.second;
 
@@ -884,7 +884,7 @@ void LoadAs(Core::System& system, const std::string& filename)
         }
 
         bool loaded = false;
-        bool loadedSuccessfully = false;
+        bool loaded_successfully = false;
 
         // brackets here are so buffer gets freed ASAP
         {
@@ -897,13 +897,13 @@ void LoadAs(Core::System& system, const std::string& filename)
             PointerWrap p(&ptr, buffer.size(), PointerWrap::Mode::Read);
             DoState(system, p);
             loaded = true;
-            loadedSuccessfully = p.IsReadMode();
+            loaded_successfully = p.IsReadMode();
           }
         }
 
         if (loaded)
         {
-          if (loadedSuccessfully)
+          if (loaded_successfully)
           {
             std::filesystem::path tempfilename(filename);
             Core::DisplayMessage(
@@ -936,7 +936,7 @@ void SetOnAfterLoadCallback(AfterLoadCallbackFunc callback)
 
 void Init(Core::System& system)
 {
-  s_save_thread.Reset("Savestate Worker", [&system](CompressAndDumpState_args args) {
+  s_save_thread.Reset("Savestate Worker", [&system](CompressAndDumpStateArgs args) {
     CompressAndDumpState(system, args);
 
     {

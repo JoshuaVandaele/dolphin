@@ -291,13 +291,13 @@ bool Interpreter::IsSRFlagSet(u16 flag) const
 
 bool Interpreter::CheckCondition(u8 condition) const
 {
-  const auto IsCarry = [this] { return IsSRFlagSet(SR_CARRY); };
-  const auto IsOverflow = [this] { return IsSRFlagSet(SR_OVERFLOW); };
-  const auto IsOverS32 = [this] { return IsSRFlagSet(SR_OVER_S32); };
-  const auto IsLess = [this] { return IsSRFlagSet(SR_OVERFLOW) != IsSRFlagSet(SR_SIGN); };
-  const auto IsZero = [this] { return IsSRFlagSet(SR_ARITH_ZERO); };
-  const auto IsLogicZero = [this] { return IsSRFlagSet(SR_LOGIC_ZERO); };
-  const auto IsConditionB = [this] {
+  const auto is_carry = [this] { return IsSRFlagSet(SR_CARRY); };
+  const auto is_overflow = [this] { return IsSRFlagSet(SR_OVERFLOW); };
+  const auto is_over_s32 = [this] { return IsSRFlagSet(SR_OVER_S32); };
+  const auto is_less = [this] { return IsSRFlagSet(SR_OVERFLOW) != IsSRFlagSet(SR_SIGN); };
+  const auto is_zero = [this] { return IsSRFlagSet(SR_ARITH_ZERO); };
+  const auto is_logic_zero = [this] { return IsSRFlagSet(SR_LOGIC_ZERO); };
+  const auto is_condition_b = [this] {
     return (!(IsSRFlagSet(SR_OVER_S32) || IsSRFlagSet(SR_TOP2BITS))) || IsSRFlagSet(SR_ARITH_ZERO);
   };
 
@@ -306,35 +306,35 @@ bool Interpreter::CheckCondition(u8 condition) const
   case 0xf:  // Always true.
     return true;
   case 0x0:  // GE - Greater Equal
-    return !IsLess();
+    return !is_less();
   case 0x1:  // L - Less
-    return IsLess();
+    return is_less();
   case 0x2:  // G - Greater
-    return !IsLess() && !IsZero();
+    return !is_less() && !is_zero();
   case 0x3:  // LE - Less Equal
-    return IsLess() || IsZero();
+    return is_less() || is_zero();
   case 0x4:  // NZ - Not Zero
-    return !IsZero();
+    return !is_zero();
   case 0x5:  // Z - Zero
-    return IsZero();
+    return is_zero();
   case 0x6:  // NC - Not carry
-    return !IsCarry();
+    return !is_carry();
   case 0x7:  // C - Carry
-    return IsCarry();
+    return is_carry();
   case 0x8:  // ? - Not over s32
-    return !IsOverS32();
+    return !is_over_s32();
   case 0x9:  // ? - Over s32
-    return IsOverS32();
+    return is_over_s32();
   case 0xa:  // ?
-    return !IsConditionB();
+    return !is_condition_b();
   case 0xb:  // ?
-    return IsConditionB();
+    return is_condition_b();
   case 0xc:  // LNZ  - Logic Not Zero
-    return !IsLogicZero();
+    return !is_logic_zero();
   case 0xd:  // LZ - Logic Zero
-    return IsLogicZero();
+    return is_logic_zero();
   case 0xe:  // O - Overflow
-    return IsOverflow();
+    return is_overflow();
   default:
     return true;
   }

@@ -19,7 +19,7 @@ struct JITOpInfo
 };
 
 // clang-format off
-const std::array<JITOpInfo, 125> s_opcodes =
+const std::array<JITOpInfo, 125> S_OPCODES =
 {{
   {0x0000, 0xfffc, &DSPEmitter::nop},
 
@@ -199,7 +199,7 @@ const std::array<JITOpInfo, 125> s_opcodes =
   {0xfe00, 0xfe00, &DSPEmitter::movpz},
 }};
 
-constexpr std::array<JITOpInfo, 25> s_opcodes_ext
+constexpr std::array<JITOpInfo, 25> S_OPCODES_EXT
 {{
   {0x0000, 0x00fc, &DSPEmitter::nop},
 
@@ -267,8 +267,8 @@ void InitInstructionTables()
   {
     s_ext_op_table[i] = nullptr;
 
-    const auto iter = FindByOpcode(static_cast<UDSPInstruction>(i), s_opcodes_ext);
-    if (iter == s_opcodes_ext.cend())
+    const auto iter = FindByOpcode(static_cast<UDSPInstruction>(i), S_OPCODES_EXT);
+    if (iter == S_OPCODES_EXT.cend())
       continue;
 
     s_ext_op_table[i] = iter->function;
@@ -279,8 +279,8 @@ void InitInstructionTables()
   {
     s_op_table[i] = nullptr;
 
-    const auto iter = FindByOpcode(static_cast<UDSPInstruction>(i), s_opcodes);
-    if (iter == s_opcodes.cend())
+    const auto iter = FindByOpcode(static_cast<UDSPInstruction>(i), S_OPCODES);
+    if (iter == S_OPCODES.cend())
       continue;
 
     s_op_table[i] = iter->function;

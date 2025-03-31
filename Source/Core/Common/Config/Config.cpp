@@ -149,7 +149,7 @@ void ClearCurrentRunLayer()
   s_layers.insert_or_assign(LayerType::CurrentRun, std::make_shared<Layer>(LayerType::CurrentRun));
 }
 
-static const std::map<System, std::string> system_to_name = {
+static const std::map<System, std::string> SYSTEM_TO_NAME = {
     {System::Main, "Dolphin"},
     {System::GCPad, "GCPad"},
     {System::WiiPad, "Wiimote"},
@@ -165,13 +165,13 @@ static const std::map<System, std::string> system_to_name = {
 
 const std::string& GetSystemName(System system)
 {
-  return system_to_name.at(system);
+  return SYSTEM_TO_NAME.at(system);
 }
 
 std::optional<System> GetSystemFromName(const std::string& name)
 {
-  const auto system = std::ranges::find(system_to_name, name, Common::Projection::Value{});
-  if (system != system_to_name.end())
+  const auto system = std::ranges::find(SYSTEM_TO_NAME, name, Common::Projection::Value{});
+  if (system != SYSTEM_TO_NAME.end())
     return system->first;
 
   return {};
@@ -179,7 +179,7 @@ std::optional<System> GetSystemFromName(const std::string& name)
 
 const std::string& GetLayerName(LayerType layer)
 {
-  static const std::map<LayerType, std::string> layer_to_name = {
+  static const std::map<LayerType, std::string> LAYER_TO_NAME = {
       {LayerType::Base, "Base"},
       {LayerType::GlobalGame, "Global GameINI"},
       {LayerType::LocalGame, "Local GameINI"},
@@ -188,7 +188,7 @@ const std::string& GetLayerName(LayerType layer)
       {LayerType::CommandLine, "Command Line"},
       {LayerType::CurrentRun, "Current Run"},
   };
-  return layer_to_name.at(layer);
+  return LAYER_TO_NAME.at(layer);
 }
 
 LayerType GetActiveLayerForConfig(const Location& config)

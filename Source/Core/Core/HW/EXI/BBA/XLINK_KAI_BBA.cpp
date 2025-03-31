@@ -212,10 +212,10 @@ void CEXIETHERNET::XLinkNetworkInterface::ReadThreadHandler(
         // Enable XLink chat messages in OSD if set
         if (self->m_chat_osd_enabled)
         {
-          constexpr std::string_view cmd = "setting;chat;true;";
-          const auto size = u32(cmd.length());
+          constexpr std::string_view CMD = "setting;chat;true;";
+          const auto size = u32(CMD.length());
           u8 buffer[255] = {};
-          memmove(buffer, cmd.data(), size);
+          memmove(buffer, CMD.data(), size);
 
           DEBUG_LOG_FMT(SP1, "SendCommandPayload {:x}\n{}", size,
                         ArrayToString(buffer, size, 0x10));

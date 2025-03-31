@@ -545,7 +545,7 @@ std::array<u32, 4> SDIOSlot0Device::GetCSDv1() const
 
   // 2048 bytes/sector
   // We could make this dynamic to support a wider range of file sizes
-  constexpr u32 read_bl_len = 11;
+  constexpr u32 READ_BL_LEN = 11;
 
   // size = (c_size + 1) * (1 << (2 + c_size_mult + read_bl_len))
   u32 c_size_mult = 0;
@@ -554,15 +554,15 @@ std::array<u32, 4> SDIOSlot0Device::GetCSDv1() const
   {
     invalid_size |= size & 1;
     size >>= 1;
-    if (++c_size_mult >= 8 + 2 + read_bl_len)
+    if (++c_size_mult >= 8 + 2 + READ_BL_LEN)
     {
       ERROR_LOG_FMT(IOS_SD, "SD Card is too big!");
       // Set max values
       size = 4096;
-      c_size_mult = 7 + 2 + read_bl_len;
+      c_size_mult = 7 + 2 + READ_BL_LEN;
     }
   }
-  c_size_mult -= 2 + read_bl_len;
+  c_size_mult -= 2 + READ_BL_LEN;
   --size;
   const u32 c_size(size);
 
@@ -612,14 +612,14 @@ std::array<u32, 4> SDIOSlot0Device::GetCSDv1() const
   // 0b1            reserved
 
   // TODO: CRC7 (but so far it looks like nobody is actually verifying this)
-  constexpr u32 crc = 0;
+  constexpr u32 CRC = 0;
 
   // Form the csd using the description above
   return {{
       0x007f003,
       0x5b5f8000 | (c_size >> 2),
       0x3ffc7f80 | (c_size << 30) | (c_size_mult << 15),
-      0x07c04001 | (crc << 1),
+      0x07c04001 | (CRC << 1),
   }};
 }
 
@@ -669,14 +669,14 @@ std::array<u32, 4> SDIOSlot0Device::GetCSDv2() const
   // 0b1                reserved
 
   // TODO: CRC7 (but so far it looks like nobody is actually verifying this)
-  constexpr u32 crc = 0;
+  constexpr u32 CRC = 0;
 
   // Form the csd using the description above
   return {{
       0x400e005a,
       0x5f590000 | (c_size >> 16),
       0x00007f80 | (c_size << 16),
-      0x0a400001 | (crc << 1),
+      0x0a400001 | (CRC << 1),
   }};
 }
 

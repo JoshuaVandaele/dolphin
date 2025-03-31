@@ -27,7 +27,7 @@ constexpr u32 RAM_VENDOR_MIOS = 0xCAFEBABE;
 // The writes are usually contained in a single function that
 // mostly writes raw literals to the relevant locations.
 // e.g. IOS9, version 1034, content id 0x00000006, function at 0xffff6884
-constexpr std::array<MemoryValues, 41> ios_memory_values = {
+constexpr std::array<MemoryValues, 41> IOS_MEMORY_VALUES = {
     {{
          4,          0x40003,     0x81006,          MEM1_SIZE,
          MEM1_SIZE,  MEM1_END,    MEM1_ARENA_BEGIN, MEM1_ARENA_END,
@@ -333,7 +333,7 @@ constexpr std::array<MemoryValues, 41> ios_memory_values = {
 
 const std::array<MemoryValues, 41>& GetMemoryValues()
 {
-  return ios_memory_values;
+  return IOS_MEMORY_VALUES;
 }
 
 Feature GetFeatures(u32 version)
@@ -380,7 +380,7 @@ bool IsEmulated(u32 major_version)
   if (major_version == static_cast<u32>(Titles::BC & 0xffffffff))
     return true;
 
-  return std::ranges::any_of(ios_memory_values, [major_version](const MemoryValues& values) {
+  return std::ranges::any_of(IOS_MEMORY_VALUES, [major_version](const MemoryValues& values) {
     return values.ios_number == major_version;
   });
 }

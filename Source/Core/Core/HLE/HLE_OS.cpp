@@ -53,7 +53,7 @@ void HLE_OSPanic(const Core::CPUThreadGuard& guard)
 }
 
 // Generalized function for printing formatted string.
-static void HLE_GeneralDebugPrint(const Core::CPUThreadGuard& guard, ParameterType parameter_type)
+static void HleGeneralDebugPrint(const Core::CPUThreadGuard& guard, ParameterType parameter_type)
 {
   auto& system = guard.GetSystem();
   const auto& ppc_state = system.GetPPCState();
@@ -99,13 +99,13 @@ static void HLE_GeneralDebugPrint(const Core::CPUThreadGuard& guard, ParameterTy
 // Generalized function for printing formatted string using parameter list.
 void HLE_GeneralDebugPrint(const Core::CPUThreadGuard& guard)
 {
-  HLE_GeneralDebugPrint(guard, ParameterType::ParameterList);
+  HleGeneralDebugPrint(guard, ParameterType::ParameterList);
 }
 
 // Generalized function for printing formatted string using va_list.
 void HLE_GeneralDebugVPrint(const Core::CPUThreadGuard& guard)
 {
-  HLE_GeneralDebugPrint(guard, ParameterType::VariableArgumentList);
+  HleGeneralDebugPrint(guard, ParameterType::VariableArgumentList);
 }
 
 // __write_console(int fd, const void* buffer, const u32* size)
@@ -137,7 +137,7 @@ void HLE_write_console(const Core::CPUThreadGuard& guard)
 }
 
 // Log (v)dprintf message if fd is 1 (stdout) or 2 (stderr)
-static void HLE_LogDPrint(const Core::CPUThreadGuard& guard, ParameterType parameter_type)
+static void HleLogDPrint(const Core::CPUThreadGuard& guard, ParameterType parameter_type)
 {
   auto& system = guard.GetSystem();
   const auto& ppc_state = system.GetPPCState();
@@ -155,18 +155,18 @@ static void HLE_LogDPrint(const Core::CPUThreadGuard& guard, ParameterType param
 //  -> int dprintf(int fd, const char* format, ...);
 void HLE_LogDPrint(const Core::CPUThreadGuard& guard)
 {
-  HLE_LogDPrint(guard, ParameterType::ParameterList);
+  HleLogDPrint(guard, ParameterType::ParameterList);
 }
 
 // Log vdprintf message
 //  -> int vdprintf(int fd, const char* format, va_list ap);
 void HLE_LogVDPrint(const Core::CPUThreadGuard& guard)
 {
-  HLE_LogDPrint(guard, ParameterType::VariableArgumentList);
+  HleLogDPrint(guard, ParameterType::VariableArgumentList);
 }
 
 // Log (v)fprintf message if FILE is stdout or stderr
-static void HLE_LogFPrint(const Core::CPUThreadGuard& guard, ParameterType parameter_type)
+static void HleLogFPrint(const Core::CPUThreadGuard& guard, ParameterType parameter_type)
 {
   auto& system = guard.GetSystem();
   const auto& ppc_state = system.GetPPCState();
@@ -198,14 +198,14 @@ static void HLE_LogFPrint(const Core::CPUThreadGuard& guard, ParameterType param
 //  -> int fprintf(FILE* stream, const char* format, ...);
 void HLE_LogFPrint(const Core::CPUThreadGuard& guard)
 {
-  HLE_LogFPrint(guard, ParameterType::ParameterList);
+  HleLogFPrint(guard, ParameterType::ParameterList);
 }
 
 // Log vfprintf message
 //  -> int vfprintf(FILE* stream, const char* format, va_list ap);
 void HLE_LogVFPrint(const Core::CPUThreadGuard& guard)
 {
-  HLE_LogFPrint(guard, ParameterType::VariableArgumentList);
+  HleLogFPrint(guard, ParameterType::VariableArgumentList);
 }
 
 namespace

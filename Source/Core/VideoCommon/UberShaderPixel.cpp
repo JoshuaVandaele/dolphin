@@ -67,7 +67,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
   const bool early_depth = uid_data->early_depth != 0;
   const bool per_pixel_depth = uid_data->per_pixel_depth != 0;
   const bool bounding_box = host_config.bounding_box;
-  const u32 numTexgen = uid_data->num_texgens;
+  const u32 num_texgen = uid_data->num_texgens;
   ShaderCode out;
 
   ASSERT_MSG(VIDEO, !(use_dual_source && use_framebuffer_fetch),
@@ -129,7 +129,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
   if (host_config.backend_geometry_shaders)
   {
     out.Write("VARYING_LOCATION(0) in VertexData {{\n");
-    GenerateVSOutputMembers(out, api_type, numTexgen, host_config,
+    GenerateVSOutputMembers(out, api_type, num_texgen, host_config,
                             GetInterpolationQualifier(msaa, ssaa, true, true), ShaderStage::Pixel);
 
     out.Write("}};\n\n");
@@ -144,7 +144,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
               GetInterpolationQualifier(msaa, ssaa));
     out.Write("VARYING_LOCATION({}) {} in float4 colors_1;\n", counter++,
               GetInterpolationQualifier(msaa, ssaa));
-    for (u32 i = 0; i < numTexgen; ++i)
+    for (u32 i = 0; i < num_texgen; ++i)
     {
       out.Write("VARYING_LOCATION({}) {} in float3 tex{};\n", counter++,
                 GetInterpolationQualifier(msaa, ssaa), i);
@@ -168,17 +168,17 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
   // not exist), then tex coord 0 is used (though sometimes glitchy effects happen on console).
   // This affects the Mario portrait in Luigi's Mansion, where the developers forgot to set
   // the number of tex gens to 2 (bug 11462).
-  if (numTexgen > 0)
+  if (num_texgen > 0)
   {
     out.Write("int2 selectTexCoord(uint index");
-    for (u32 i = 0; i < numTexgen; i++)
+    for (u32 i = 0; i < num_texgen; i++)
       out.Write(", int2 fixpoint_uv{}", i);
     out.Write(") {{\n");
 
     if (api_type == APIType::D3D)
     {
       out.Write("  switch (index) {{\n");
-      for (u32 i = 0; i < numTexgen; i++)
+      for (u32 i = 0; i < num_texgen; i++)
       {
         out.Write("  case {}u:\n"
                   "    return fixpoint_uv{};\n",
@@ -190,39 +190,39 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
     }
     else
     {
-      out.Write("  if (index >= {}u) {{\n", numTexgen);
+      out.Write("  if (index >= {}u) {{\n", num_texgen);
       out.Write("    return fixpoint_uv0;\n"
                 "  }}\n");
-      if (numTexgen > 4)
+      if (num_texgen > 4)
         out.Write("  if (index < 4u) {{\n");
-      if (numTexgen > 2)
+      if (num_texgen > 2)
         out.Write("    if (index < 2u) {{\n");
-      if (numTexgen > 1)
+      if (num_texgen > 1)
         out.Write("      return (index == 0u) ? fixpoint_uv0 : fixpoint_uv1;\n");
       else
         out.Write("      return fixpoint_uv0;\n");
-      if (numTexgen > 2)
+      if (num_texgen > 2)
       {
         out.Write("    }} else {{\n");  // >= 2 < min(4, numTexgen)
-        if (numTexgen > 3)
+        if (num_texgen > 3)
           out.Write("      return (index == 2u) ? fixpoint_uv2 : fixpoint_uv3;\n");
         else
           out.Write("      return fixpoint_uv2;\n");
         out.Write("    }}\n");
       }
-      if (numTexgen > 4)
+      if (num_texgen > 4)
       {
         out.Write("  }} else {{\n");  // >= 4 < min(8, numTexgen)
-        if (numTexgen > 6)
+        if (num_texgen > 6)
           out.Write("    if (index < 6u) {{\n");
-        if (numTexgen > 5)
+        if (num_texgen > 5)
           out.Write("      return (index == 4u) ? fixpoint_uv4 : fixpoint_uv5;\n");
         else
           out.Write("      return fixpoint_uv4;\n");
-        if (numTexgen > 6)
+        if (num_texgen > 6)
         {
           out.Write("    }} else {{\n");  // >= 6 < min(8, numTexgen)
-          if (numTexgen > 7)
+          if (num_texgen > 7)
             out.Write("      return (index == 6u) ? fixpoint_uv6 : fixpoint_uv7;\n");
           else
             out.Write("      return fixpoint_uv6;\n");
@@ -240,7 +240,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
     if (api_type == APIType::D3D)
     {
       out.Write("  switch (texmap) {{\n");
-      for (u32 i = 0; i < numTexgen; i++)
+      for (u32 i = 0; i < num_texgen; i++)
       {
         out.Write("  case {}u:\n"
                   "    return {}u;\n",
@@ -252,39 +252,39 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
     }
     else
     {
-      out.Write("  if (texmap >= {}u) {{\n", numTexgen);
+      out.Write("  if (texmap >= {}u) {{\n", num_texgen);
       out.Write("    return 0u;\n"
                 "  }}\n");
-      if (numTexgen > 4)
+      if (num_texgen > 4)
         out.Write("  if (texmap < 4u) {{\n");
-      if (numTexgen > 2)
+      if (num_texgen > 2)
         out.Write("    if (texmap < 2u) {{\n");
-      if (numTexgen > 1)
+      if (num_texgen > 1)
         out.Write("      return (texmap == 0u) ? 0u : 1u;\n");
       else
         out.Write("      return 0u;\n");
-      if (numTexgen > 2)
+      if (num_texgen > 2)
       {
         out.Write("    }} else {{\n");  // >= 2 < min(4, numTexgen)
-        if (numTexgen > 3)
+        if (num_texgen > 3)
           out.Write("      return (texmap == 2u) ? 2u : 3u;\n");
         else
           out.Write("      return 2u;\n");
         out.Write("    }}\n");
       }
-      if (numTexgen > 4)
+      if (num_texgen > 4)
       {
         out.Write("  }} else {{\n");  // >= 4 < min(8, numTexgen)
-        if (numTexgen > 6)
+        if (num_texgen > 6)
           out.Write("    if (texmap < 6u) {{\n");
-        if (numTexgen > 5)
+        if (num_texgen > 5)
           out.Write("      return (texmap == 4u) ? 4u : 5u;\n");
         else
           out.Write("      return 4u;\n");
-        if (numTexgen > 6)
+        if (num_texgen > 6)
         {
           out.Write("    }} else {{\n");  // >= 6 < min(8, numTexgen)
-          if (numTexgen > 7)
+          if (num_texgen > 7)
             out.Write("      return (texmap == 6u) ? 6u : 7u;\n");
           else
             out.Write("      return 6u;\n");
@@ -357,7 +357,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
   // ======================
   //    Indirect Lookup
   // ======================
-  const auto LookupIndirectTexture = [&out](std::string_view out_var_name,
+  const auto lookup_indirect_texture = [&out](std::string_view out_var_name,
                                             std::string_view in_index_name) {
     // in_index_name is the indirect stage, not the tev stage
     // bpmem_iref is packed differently from RAS1_IREF
@@ -382,7 +382,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
   // ======================
   //   TEV's Special Lerp
   // ======================
-  const auto WriteTevLerp = [&out](std::string_view components) {
+  const auto write_tev_lerp = [&out](std::string_view components) {
     out.Write("// TEV's Linear Interpolate, plus bias, add/subtract and scale\n"
               "int{0} tevLerp{0}(int{0} A, int{0} B, int{0} C, int{0} D, uint bias, bool op, "
               "uint scale) {{\n"
@@ -421,8 +421,8 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
               "}}\n\n",
               components);
   };
-  WriteTevLerp("");   // int
-  WriteTevLerp("3");  // int3
+  write_tev_lerp("");   // int
+  write_tev_lerp("3");  // int3
 
   // =======================
   //   TEV's Color Compare
@@ -475,7 +475,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
             "int4 getKonstColor(State s, StageState ss);\n"
             "\n");
 
-  static constexpr Common::EnumMap<std::string_view, CompareMode::Always> tev_alpha_funcs_table{
+  static constexpr Common::EnumMap<std::string_view, CompareMode::Always> TEV_ALPHA_FUNCS_TABLE{
       "return false;",   // CompareMode::Never
       "return a <  b;",  // CompareMode::Less
       "return a == b;",  // CompareMode::Equal
@@ -486,7 +486,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
       "return true;"     // CompareMode::Always
   };
 
-  static constexpr Common::EnumMap<std::string_view, TevColorArg::Zero> tev_c_input_table{
+  static constexpr Common::EnumMap<std::string_view, TevColorArg::Zero> TEV_C_INPUT_TABLE{
       "return s.Reg[0].rgb;",                                // CPREV,
       "return s.Reg[0].aaa;",                                // APREV,
       "return s.Reg[1].rgb;",                                // C0,
@@ -505,7 +505,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
       "return int3(0, 0, 0);",                               // ZERO
   };
 
-  static constexpr Common::EnumMap<std::string_view, TevAlphaArg::Zero> tev_a_input_table{
+  static constexpr Common::EnumMap<std::string_view, TevAlphaArg::Zero> TEV_A_INPUT_TABLE{
       "return s.Reg[0].a;",                                // APREV,
       "return s.Reg[1].a;",                                // A0,
       "return s.Reg[2].a;",                                // A1,
@@ -516,21 +516,21 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
       "return 0;",                                         // ZERO
   };
 
-  static constexpr Common::EnumMap<std::string_view, TevOutput::Color2> tev_regs_lookup_table{
+  static constexpr Common::EnumMap<std::string_view, TevOutput::Color2> TEV_REGS_LOOKUP_TABLE{
       "return s.Reg[0];",
       "return s.Reg[1];",
       "return s.Reg[2];",
       "return s.Reg[3];",
   };
 
-  static constexpr Common::EnumMap<std::string_view, TevOutput::Color2> tev_c_set_table{
+  static constexpr Common::EnumMap<std::string_view, TevOutput::Color2> TEV_C_SET_TABLE{
       "s.Reg[0].rgb = color;",
       "s.Reg[1].rgb = color;",
       "s.Reg[2].rgb = color;",
       "s.Reg[3].rgb = color;",
   };
 
-  static constexpr Common::EnumMap<std::string_view, TevOutput::Color2> tev_a_set_table{
+  static constexpr Common::EnumMap<std::string_view, TevOutput::Color2> TEV_A_SET_TABLE{
       "s.Reg[0].a = alpha;",
       "s.Reg[1].a = alpha;",
       "s.Reg[2].a = alpha;",
@@ -539,30 +539,30 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
 
   out.Write("// Helper function for Alpha Test\n"
             "bool alphaCompare(int a, int b, uint compare) {{\n");
-  WriteSwitch(out, api_type, "compare", tev_alpha_funcs_table, 2, false);
+  WriteSwitch(out, api_type, "compare", TEV_ALPHA_FUNCS_TABLE, 2, false);
   out.Write("}}\n"
             "\n"
             "int3 selectColorInput(State s, StageState ss, float4 colors_0, float4 colors_1, "
             "uint index) {{\n");
-  WriteSwitch(out, api_type, "index", tev_c_input_table, 2, false);
+  WriteSwitch(out, api_type, "index", TEV_C_INPUT_TABLE, 2, false);
   out.Write("}}\n"
             "\n"
             "int selectAlphaInput(State s, StageState ss, float4 colors_0, float4 colors_1, "
             "uint index) {{\n");
-  WriteSwitch(out, api_type, "index", tev_a_input_table, 2, false);
+  WriteSwitch(out, api_type, "index", TEV_A_INPUT_TABLE, 2, false);
   out.Write("}}\n"
             "\n"
             "int4 getTevReg(in State s, uint index) {{\n");
-  WriteSwitch(out, api_type, "index", tev_regs_lookup_table, 2, false);
+  WriteSwitch(out, api_type, "index", TEV_REGS_LOOKUP_TABLE, 2, false);
   out.Write("}}\n"
             "\n");
 
   // Since the fixed-point texture coodinate variables aren't global, we need to pass
   // them to the select function.  This applies to all backends.
-  if (numTexgen > 0)
+  if (num_texgen > 0)
   {
     out.Write("#define getTexCoord(index) selectTexCoord((index)");
-    for (u32 i = 0; i < numTexgen; i++)
+    for (u32 i = 0; i < num_texgen; i++)
       out.Write(", fixpoint_uv{}", i);
     out.Write(")\n\n");
   }
@@ -650,9 +650,9 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
                 TwoTevStageOrders().enable_tex_even.StartBit()));
 
   // Disable texturing when there are no texgens (for now)
-  if (numTexgen != 0)
+  if (num_texgen != 0)
   {
-    for (u32 i = 0; i < numTexgen; i++)
+    for (u32 i = 0; i < num_texgen; i++)
     {
       out.Write("    int2 fixpoint_uv{} = int2(", i);
       out.Write("(tex{}.z == 0.0 ? tex{}.xy : tex{}.xy / tex{}.z)", i, i, i, i);
@@ -692,7 +692,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
     // still apply in this case (and when the stage is disabled).
     out.Write("      if (bpmem_iref(bt) != 0u) {{\n");
     out.Write("        int3 indcoord;\n");
-    LookupIndirectTexture("indcoord", "bt");
+    lookup_indirect_texture("indcoord", "bt");
     out.Write("        if (bs != 0u)\n"
               "          s.AlphaBump = indcoord[bs - 1u];\n"
               "        switch(fmt)\n"
@@ -859,7 +859,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
       "        color = clamp(color, -1024, 1023);\n"
       "\n"
       "      // Write result to the correct input register of the next stage\n");
-  WriteSwitch(out, api_type, "color_dest", tev_c_set_table, 6, true);
+  WriteSwitch(out, api_type, "color_dest", TEV_C_SET_TABLE, 6, true);
   out.Write("\n");
 
   // Alpha combiner
@@ -926,7 +926,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
             "        alpha = clamp(alpha, -1024, 1023);\n"
             "\n"
             "      // Write result to the correct input register of the next stage\n");
-  WriteSwitch(out, api_type, "alpha_dest", tev_a_set_table, 6, true);
+  WriteSwitch(out, api_type, "alpha_dest", TEV_A_SET_TABLE, 6, true);
   out.Write("    }}\n");
   out.Write("    }} // Main TEV loop\n");
   out.Write("\n");
@@ -1126,7 +1126,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
 
   if (use_framebuffer_fetch)
   {
-    static constexpr std::array<const char*, 16> logic_op_mode{
+    static constexpr std::array<const char*, 16> LOGIC_OP_MODE{
         "int4(0, 0, 0, 0)",          // CLEAR
         "TevResult & fb_value",      // AND
         "TevResult & ~fb_value",     // AND_REVERSE
@@ -1149,9 +1149,9 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
               "  if (logic_op_enable) {{\n"
               "    int4 fb_value = iround(initial_ocol0 * 255.0);"
               "    switch (logic_op_mode) {{\n");
-    for (size_t i = 0; i < logic_op_mode.size(); i++)
+    for (size_t i = 0; i < LOGIC_OP_MODE.size(); i++)
     {
-      out.Write("      case {}u: TevResult = {}; break;\n", i, logic_op_mode[i]);
+      out.Write("      case {}u: TevResult = {}; break;\n", i, LOGIC_OP_MODE[i]);
     }
 
     out.Write("    }}\n"
@@ -1223,7 +1223,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
   {
     using Common::EnumMap;
 
-    static constexpr EnumMap<std::string_view, SrcBlendFactor::InvDstAlpha> blendSrcFactor{
+    static constexpr EnumMap<std::string_view, SrcBlendFactor::InvDstAlpha> BLEND_SRC_FACTOR{
         "blend_src.rgb = float3(0,0,0);",                      // ZERO
         "blend_src.rgb = float3(1,1,1);",                      // ONE
         "blend_src.rgb = initial_ocol0.rgb;",                  // DSTCLR
@@ -1233,7 +1233,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
         "blend_src.rgb = initial_ocol0.aaa;",                  // DSTALPHA
         "blend_src.rgb = float3(1,1,1) - initial_ocol0.aaa;",  // INVDSTALPHA
     };
-    static constexpr EnumMap<std::string_view, SrcBlendFactor::InvDstAlpha> blendSrcFactorAlpha{
+    static constexpr EnumMap<std::string_view, SrcBlendFactor::InvDstAlpha> BLEND_SRC_FACTOR_ALPHA{
         "blend_src.a = 0.0;",                    // ZERO
         "blend_src.a = 1.0;",                    // ONE
         "blend_src.a = initial_ocol0.a;",        // DSTCLR
@@ -1243,7 +1243,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
         "blend_src.a = initial_ocol0.a;",        // DSTALPHA
         "blend_src.a = 1.0 - initial_ocol0.a;",  // INVDSTALPHA
     };
-    static constexpr EnumMap<std::string_view, DstBlendFactor::InvDstAlpha> blendDstFactor{
+    static constexpr EnumMap<std::string_view, DstBlendFactor::InvDstAlpha> BLEND_DST_FACTOR{
         "blend_dst.rgb = float3(0,0,0);",                      // ZERO
         "blend_dst.rgb = float3(1,1,1);",                      // ONE
         "blend_dst.rgb = ocol0.rgb;",                          // SRCCLR
@@ -1253,7 +1253,7 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
         "blend_dst.rgb = initial_ocol0.aaa;",                  // DSTALPHA
         "blend_dst.rgb = float3(1,1,1) - initial_ocol0.aaa;",  // INVDSTALPHA
     };
-    static constexpr EnumMap<std::string_view, DstBlendFactor::InvDstAlpha> blendDstFactorAlpha{
+    static constexpr EnumMap<std::string_view, DstBlendFactor::InvDstAlpha> BLEND_DST_FACTOR_ALPHA{
         "blend_dst.a = 0.0;",                    // ZERO
         "blend_dst.a = 1.0;",                    // ONE
         "blend_dst.a = ocol0.a;",                // SRCCLR
@@ -1272,12 +1272,12 @@ ShaderCode GenPixelShader(APIType api_type, const ShaderHostConfig& host_config,
               "      src_color = ocol0;\n"
               "    }}"
               "    float4 blend_src;\n");
-    WriteSwitch(out, api_type, "blend_src_factor", blendSrcFactor, 4, true);
-    WriteSwitch(out, api_type, "blend_src_factor_alpha", blendSrcFactorAlpha, 4, true);
+    WriteSwitch(out, api_type, "blend_src_factor", BLEND_SRC_FACTOR, 4, true);
+    WriteSwitch(out, api_type, "blend_src_factor_alpha", BLEND_SRC_FACTOR_ALPHA, 4, true);
 
     out.Write("    float4 blend_dst;\n");
-    WriteSwitch(out, api_type, "blend_dst_factor", blendDstFactor, 4, true);
-    WriteSwitch(out, api_type, "blend_dst_factor_alpha", blendDstFactorAlpha, 4, true);
+    WriteSwitch(out, api_type, "blend_dst_factor", BLEND_DST_FACTOR, 4, true);
+    WriteSwitch(out, api_type, "blend_dst_factor_alpha", BLEND_DST_FACTOR_ALPHA, 4, true);
 
     out.Write("    float4 blend_result;\n"
               "    if (blend_subtract)\n"

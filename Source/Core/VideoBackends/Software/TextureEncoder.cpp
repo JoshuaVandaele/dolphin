@@ -19,24 +19,24 @@
 
 namespace TextureEncoder
 {
-static inline void RGBA_to_RGBA8(const u8* src, u8* r, u8* g, u8* b, u8* a)
+static inline void RgbaToRgbA8(const u8* src, u8* r, u8* g, u8* b, u8* a)
 {
-  u32 srcColor = *(u32*)src;
-  *a = Convert6To8(srcColor & 0x3f);
-  *b = Convert6To8((srcColor >> 6) & 0x3f);
-  *g = Convert6To8((srcColor >> 12) & 0x3f);
-  *r = Convert6To8((srcColor >> 18) & 0x3f);
+  u32 src_color = *(u32*)src;
+  *a = Convert6To8(src_color & 0x3f);
+  *b = Convert6To8((src_color >> 6) & 0x3f);
+  *g = Convert6To8((src_color >> 12) & 0x3f);
+  *r = Convert6To8((src_color >> 18) & 0x3f);
 }
 
-static inline void RGBA_to_RGB8(const u8* src, u8* r, u8* g, u8* b)
+static inline void RgbaToRgB8(const u8* src, u8* r, u8* g, u8* b)
 {
-  u32 srcColor = *(u32*)src;
-  *b = Convert6To8((srcColor >> 6) & 0x3f);
-  *g = Convert6To8((srcColor >> 12) & 0x3f);
-  *r = Convert6To8((srcColor >> 18) & 0x3f);
+  u32 src_color = *(u32*)src;
+  *b = Convert6To8((src_color >> 6) & 0x3f);
+  *g = Convert6To8((src_color >> 12) & 0x3f);
+  *r = Convert6To8((src_color >> 18) & 0x3f);
 }
 
-static inline u8 RGB8_to_I(u8 r, u8 g, u8 b)
+static inline u8 RgB8ToI(u8 r, u8 g, u8 b)
 {
   // values multiplied by 256 to keep math integer
   u16 val = 4096 + 66 * r + 129 * g + 25 * b;
@@ -46,7 +46,7 @@ static inline u8 RGB8_to_I(u8 r, u8 g, u8 b)
 // box filter sampling averages 4 samples with the source texel being the top left of the box
 // components are scaled to the range 0-255 after all samples are taken
 
-static inline void BoxfilterRGBA_to_RGBA8(const u8* src, u8* r, u8* g, u8* b, u8* a)
+static inline void BoxfilterRgbaToRgbA8(const u8* src, u8* r, u8* g, u8* b, u8* a)
 {
   u16 r16 = 0, g16 = 0, b16 = 0, a16 = 0;
 
@@ -54,12 +54,12 @@ static inline void BoxfilterRGBA_to_RGBA8(const u8* src, u8* r, u8* g, u8* b, u8
   {
     for (int x = 0; x < 2; x++)
     {
-      u32 srcColor = *(u32*)src;
+      u32 src_color = *(u32*)src;
 
-      a16 += srcColor & 0x3f;
-      b16 += (srcColor >> 6) & 0x3f;
-      g16 += (srcColor >> 12) & 0x3f;
-      r16 += (srcColor >> 18) & 0x3f;
+      a16 += src_color & 0x3f;
+      b16 += (src_color >> 6) & 0x3f;
+      g16 += (src_color >> 12) & 0x3f;
+      r16 += (src_color >> 18) & 0x3f;
 
       src += 3;  // move to next pixel
     }
@@ -72,7 +72,7 @@ static inline void BoxfilterRGBA_to_RGBA8(const u8* src, u8* r, u8* g, u8* b, u8
   *a = a16 + (a16 >> 6);
 }
 
-static inline void BoxfilterRGBA_to_RGB8(const u8* src, u8* r, u8* g, u8* b)
+static inline void BoxfilterRgbaToRgB8(const u8* src, u8* r, u8* g, u8* b)
 {
   u16 r16 = 0, g16 = 0, b16 = 0;
 
@@ -80,11 +80,11 @@ static inline void BoxfilterRGBA_to_RGB8(const u8* src, u8* r, u8* g, u8* b)
   {
     for (int x = 0; x < 2; x++)
     {
-      u32 srcColor = *(u32*)src;
+      u32 src_color = *(u32*)src;
 
-      b16 += (srcColor >> 6) & 0x3f;
-      g16 += (srcColor >> 12) & 0x3f;
-      r16 += (srcColor >> 18) & 0x3f;
+      b16 += (src_color >> 6) & 0x3f;
+      g16 += (src_color >> 12) & 0x3f;
+      r16 += (src_color >> 18) & 0x3f;
 
       src += 3;  // move to next pixel
     }
@@ -96,7 +96,7 @@ static inline void BoxfilterRGBA_to_RGB8(const u8* src, u8* r, u8* g, u8* b)
   *b = b16 + (b16 >> 6);
 }
 
-static inline void BoxfilterRGBA_to_x8(const u8* src, u8* x8, int shift)
+static inline void BoxfilterRgbaToX8(const u8* src, u8* x8, int shift)
 {
   u16 x16 = 0;
 
@@ -104,9 +104,9 @@ static inline void BoxfilterRGBA_to_x8(const u8* src, u8* x8, int shift)
   {
     for (int x = 0; x < 2; x++)
     {
-      u32 srcColor = *(u32*)src;
+      u32 src_color = *(u32*)src;
 
-      x16 += (srcColor >> shift) & 0x3f;
+      x16 += (src_color >> shift) & 0x3f;
 
       src += 3;  // move to next pixel
     }
@@ -116,7 +116,7 @@ static inline void BoxfilterRGBA_to_x8(const u8* src, u8* x8, int shift)
   *x8 = x16 + (x16 >> 6);
 }
 
-static inline void BoxfilterRGBA_to_xx8(const u8* src, u8* x1, u8* x2, int shift1, int shift2)
+static inline void BoxfilterRgbaToXx8(const u8* src, u8* x1, u8* x2, int shift1, int shift2)
 {
   u16 x16_1 = 0;
   u16 x16_2 = 0;
@@ -125,10 +125,10 @@ static inline void BoxfilterRGBA_to_xx8(const u8* src, u8* x1, u8* x2, int shift
   {
     for (int x = 0; x < 2; x++)
     {
-      u32 srcColor = *(u32*)src;
+      u32 src_color = *(u32*)src;
 
-      x16_1 += (srcColor >> shift1) & 0x3f;
-      x16_2 += (srcColor >> shift2) & 0x3f;
+      x16_1 += (src_color >> shift1) & 0x3f;
+      x16_2 += (src_color >> shift2) & 0x3f;
 
       src += 3;  // move to next pixel
     }
@@ -139,7 +139,7 @@ static inline void BoxfilterRGBA_to_xx8(const u8* src, u8* x1, u8* x2, int shift
   *x2 = x16_2 + (x16_2 >> 6);
 }
 
-static inline void BoxfilterRGB_to_RGB8(const u8* src, u8* r, u8* g, u8* b)
+static inline void BoxfilterRgbToRgB8(const u8* src, u8* r, u8* g, u8* b)
 {
   u16 r16 = 0, g16 = 0, b16 = 0;
 
@@ -161,7 +161,7 @@ static inline void BoxfilterRGB_to_RGB8(const u8* src, u8* r, u8* g, u8* b)
   *b = b16 >> 2;
 }
 
-static inline void BoxfilterRGB_to_x8(const u8* src, u8* x8, int comp)
+static inline void BoxfilterRgbToX8(const u8* src, u8* x8, int comp)
 {
   u16 x16 = 0;
 
@@ -179,7 +179,7 @@ static inline void BoxfilterRGB_to_x8(const u8* src, u8* x8, int comp)
   *x8 = x16 >> 2;
 }
 
-static inline void BoxfilterRGB_to_xx8(const u8* src, u8* x1, u8* x2, int comp1, int comp2)
+static inline void BoxfilterRgbToXx8(const u8* src, u8* x1, u8* x2, int comp1, int comp2)
 {
   u16 x16_1 = 0;
   u16 x16_2 = 0;
@@ -219,16 +219,16 @@ static void SetSpans(int sBlkSize, int tBlkSize, s32* tSpan, s32* sBlkSpan, s32*
 {
   // width is 1 less than the number of pixels of width
   u32 width = bpmem.copyTexSrcWH.x >> bpmem.triggerEFBCopy.half_scale;
-  u32 alignedWidth = Common::AlignUp(width + 1, sBlkSize);
+  u32 aligned_width = Common::AlignUp(width + 1, sBlkSize);
 
-  u32 readStride = 3 << bpmem.triggerEFBCopy.half_scale;
+  u32 read_stride = 3 << bpmem.triggerEFBCopy.half_scale;
 
   *tSpan = (640 - sBlkSize) *
-           readStride;  // bytes to advance src pointer after each row of texels in a block
+           read_stride;  // bytes to advance src pointer after each row of texels in a block
   *sBlkSpan =
-      ((-640 * tBlkSize) + sBlkSize) * readStride;  // bytes to advance src pointer after each block
-  *tBlkSpan = ((640 * tBlkSize) - alignedWidth) *
-              readStride;  // bytes to advance src pointer after each row of blocks
+      ((-640 * tBlkSize) + sBlkSize) * read_stride;  // bytes to advance src pointer after each block
+  *tBlkSpan = ((640 * tBlkSize) - aligned_width) *
+              read_stride;  // bytes to advance src pointer after each row of blocks
 
   *writeStride = bpmem.copyDestStride << 5;
 }
@@ -269,7 +269,7 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
   u16 sBlkCount, tBlkCount, sBlkSize, tBlkSize;
   s32 tSpan, sBlkSpan, tBlkSpan, writeStride;
   u8 r, g, b, a;
-  u32 readStride = 3;
+  u32 read_stride = 3;
   u8* dstBlockStart = dst;
 
   switch (format)
@@ -282,13 +282,13 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       ENCODE_LOOP_BLOCKS
       {
-        RGBA_to_RGB8(src, &r, &g, &b);
-        src += readStride;
-        *dst = RGB8_to_I(r, g, b) & 0xf0;
+        RgbaToRgB8(src, &r, &g, &b);
+        src += read_stride;
+        *dst = RgB8ToI(r, g, b) & 0xf0;
 
-        RGBA_to_RGB8(src, &r, &g, &b);
-        src += readStride;
-        *dst |= RGB8_to_I(r, g, b) >> 4;
+        RgbaToRgB8(src, &r, &g, &b);
+        src += read_stride;
+        *dst |= RgB8ToI(r, g, b) >> 4;
         dst++;
       }
       ENCODE_LOOP_SPANS
@@ -297,13 +297,13 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       ENCODE_LOOP_BLOCKS
       {
-        u32 srcColor = *(u32*)src;
-        src += readStride;
-        *dst = (srcColor >> 16) & 0xf0;
+        u32 src_color = *(u32*)src;
+        src += read_stride;
+        *dst = (src_color >> 16) & 0xf0;
 
-        srcColor = *(u32*)src;
-        src += readStride;
-        *dst |= (srcColor >> 20) & 0x0f;
+        src_color = *(u32*)src;
+        src += read_stride;
+        *dst |= (src_color >> 20) & 0x0f;
         dst++;
       }
       ENCODE_LOOP_SPANS
@@ -318,9 +318,9 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       ENCODE_LOOP_BLOCKS
       {
-        RGBA_to_RGB8(src, &r, &g, &b);
-        src += readStride;
-        *dst++ = RGB8_to_I(r, g, b);
+        RgbaToRgB8(src, &r, &g, &b);
+        src += read_stride;
+        *dst++ = RgB8ToI(r, g, b);
       }
       ENCODE_LOOP_SPANS
     }
@@ -328,9 +328,9 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       ENCODE_LOOP_BLOCKS
       {
-        u32 srcColor = *(u32*)src;
-        *dst++ = Convert6To8((srcColor >> 18) & 0x3f);
-        src += readStride;
+        u32 src_color = *(u32*)src;
+        *dst++ = Convert6To8((src_color >> 18) & 0x3f);
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -343,9 +343,9 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       ENCODE_LOOP_BLOCKS
       {
-        RGBA_to_RGBA8(src, &r, &g, &b, &a);
-        src += readStride;
-        *dst++ = (a & 0xf0) | (RGB8_to_I(r, g, b) >> 4);
+        RgbaToRgbA8(src, &r, &g, &b, &a);
+        src += read_stride;
+        *dst++ = (a & 0xf0) | (RgB8ToI(r, g, b) >> 4);
       }
       ENCODE_LOOP_SPANS
     }
@@ -353,9 +353,9 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       ENCODE_LOOP_BLOCKS
       {
-        u32 srcColor = *(u32*)src;
-        src += readStride;
-        *dst++ = ((srcColor << 2) & 0xf0) | ((srcColor >> 20) & 0x0f);
+        u32 src_color = *(u32*)src;
+        src += read_stride;
+        *dst++ = ((src_color << 2) & 0xf0) | ((src_color >> 20) & 0x0f);
       }
       ENCODE_LOOP_SPANS
     }
@@ -368,10 +368,10 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       ENCODE_LOOP_BLOCKS
       {
-        RGBA_to_RGBA8(src, &r, &g, &b, &a);
-        src += readStride;
+        RgbaToRgbA8(src, &r, &g, &b, &a);
+        src += read_stride;
         *dst++ = a;
-        *dst++ = RGB8_to_I(r, g, b);
+        *dst++ = RgB8ToI(r, g, b);
       }
       ENCODE_LOOP_SPANS
     }
@@ -379,10 +379,10 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       ENCODE_LOOP_BLOCKS
       {
-        u32 srcColor = *(u32*)src;
-        src += readStride;
-        *dst++ = Convert6To8(srcColor & 0x3f);
-        *dst++ = Convert6To8((srcColor >> 18) & 0x3f);
+        u32 src_color = *(u32*)src;
+        src += read_stride;
+        *dst++ = Convert6To8(src_color & 0x3f);
+        *dst++ = Convert6To8((src_color >> 18) & 0x3f);
       }
       ENCODE_LOOP_SPANS
     }
@@ -393,11 +393,11 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      u32 srcColor = *(u32*)src;
-      src += readStride;
+      u32 src_color = *(u32*)src;
+      src += read_stride;
 
       u16 val =
-          ((srcColor >> 8) & 0xf800) | ((srcColor >> 7) & 0x07e0) | ((srcColor >> 7) & 0x001f);
+          ((src_color >> 8) & 0xf800) | ((src_color >> 7) & 0x07e0) | ((src_color >> 7) & 0x001f);
       *(u16*)dst = Common::swap16(val);
       dst += 2;
     }
@@ -409,17 +409,17 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      u32 srcColor = *(u32*)src;
-      src += readStride;
+      u32 src_color = *(u32*)src;
+      src += read_stride;
 
-      u16 alpha = (srcColor << 9) & 0x7000;
+      u16 alpha = (src_color << 9) & 0x7000;
       u16 val;
       if (alpha == 0x7000)  // 555
-        val = 0x8000 | ((srcColor >> 9) & 0x7c00) | ((srcColor >> 8) & 0x03e0) |
-              ((srcColor >> 7) & 0x001f);
+        val = 0x8000 | ((src_color >> 9) & 0x7c00) | ((src_color >> 8) & 0x03e0) |
+              ((src_color >> 7) & 0x001f);
       else  // 4443
-        val = alpha | ((srcColor >> 12) & 0x0f00) | ((srcColor >> 10) & 0x00f0) |
-              ((srcColor >> 8) & 0x000f);
+        val = alpha | ((src_color >> 12) & 0x0f00) | ((src_color >> 10) & 0x00f0) |
+              ((src_color >> 8) & 0x000f);
 
       *(u16*)dst = Common::swap16(val);
       dst += 2;
@@ -432,8 +432,8 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      RGBA_to_RGBA8(src, &dst[1], &dst[32], &dst[33], &dst[0]);
-      src += readStride;
+      RgbaToRgbA8(src, &dst[1], &dst[32], &dst[33], &dst[0]);
+      src += read_stride;
       dst += 2;
     }
     ENCODE_LOOP_SPANS2
@@ -444,9 +444,9 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      u32 srcColor = *(u32*)src;
-      *dst++ = Convert6To8(srcColor & 0x3f);
-      src += readStride;
+      u32 src_color = *(u32*)src;
+      *dst++ = Convert6To8(src_color & 0x3f);
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -456,9 +456,9 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      u32 srcColor = *(u32*)src;
-      *dst++ = Convert6To8((srcColor >> 12) & 0x3f);
-      src += readStride;
+      u32 src_color = *(u32*)src;
+      *dst++ = Convert6To8((src_color >> 12) & 0x3f);
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -468,9 +468,9 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      u32 srcColor = *(u32*)src;
-      *dst++ = Convert6To8((srcColor >> 6) & 0x3f);
-      src += readStride;
+      u32 src_color = *(u32*)src;
+      *dst++ = Convert6To8((src_color >> 6) & 0x3f);
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -480,10 +480,10 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      u32 srcColor = *(u32*)src;
-      src += readStride;
-      *dst++ = Convert6To8((srcColor >> 12) & 0x3f);
-      *dst++ = Convert6To8((srcColor >> 18) & 0x3f);
+      u32 src_color = *(u32*)src;
+      src += read_stride;
+      *dst++ = Convert6To8((src_color >> 12) & 0x3f);
+      *dst++ = Convert6To8((src_color >> 18) & 0x3f);
     }
     ENCODE_LOOP_SPANS
     break;
@@ -493,10 +493,10 @@ static void EncodeRGBA6(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      u32 srcColor = *(u32*)src;
-      src += readStride;
-      *dst++ = Convert6To8((srcColor >> 6) & 0x3f);
-      *dst++ = Convert6To8((srcColor >> 12) & 0x3f);
+      u32 src_color = *(u32*)src;
+      src += read_stride;
+      *dst++ = Convert6To8((src_color >> 6) & 0x3f);
+      *dst++ = Convert6To8((src_color >> 12) & 0x3f);
     }
     ENCODE_LOOP_SPANS
     break;
@@ -512,7 +512,7 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
   u16 sBlkCount, tBlkCount, sBlkSize, tBlkSize;
   s32 tSpan, sBlkSpan, tBlkSpan, writeStride;
   u8 r, g, b, a;
-  u32 readStride = 6;
+  u32 read_stride = 6;
   u8* dstBlockStart = dst;
 
   switch (format)
@@ -525,13 +525,13 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGBA_to_RGB8(src, &r, &g, &b);
-        src += readStride;
-        *dst = RGB8_to_I(r, g, b) & 0xf0;
+        BoxfilterRgbaToRgB8(src, &r, &g, &b);
+        src += read_stride;
+        *dst = RgB8ToI(r, g, b) & 0xf0;
 
-        BoxfilterRGBA_to_RGB8(src, &r, &g, &b);
-        src += readStride;
-        *dst |= RGB8_to_I(r, g, b) >> 4;
+        BoxfilterRgbaToRgB8(src, &r, &g, &b);
+        src += read_stride;
+        *dst |= RgB8ToI(r, g, b) >> 4;
         dst++;
       }
       ENCODE_LOOP_SPANS
@@ -540,12 +540,12 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGBA_to_x8(src, &r, 18);
-        src += readStride;
+        BoxfilterRgbaToX8(src, &r, 18);
+        src += read_stride;
         *dst = r & 0xf0;
 
-        BoxfilterRGBA_to_x8(src, &r, 18);
-        src += readStride;
+        BoxfilterRgbaToX8(src, &r, 18);
+        src += read_stride;
         *dst |= r >> 4;
         dst++;
       }
@@ -561,9 +561,9 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGBA_to_RGB8(src, &r, &g, &b);
-        src += readStride;
-        *dst++ = RGB8_to_I(r, g, b);
+        BoxfilterRgbaToRgB8(src, &r, &g, &b);
+        src += read_stride;
+        *dst++ = RgB8ToI(r, g, b);
       }
       ENCODE_LOOP_SPANS
     }
@@ -571,9 +571,9 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGBA_to_x8(src, &r, 18);
+        BoxfilterRgbaToX8(src, &r, 18);
         *dst++ = r;
-        src += readStride;
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -586,9 +586,9 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGBA_to_RGBA8(src, &r, &g, &b, &a);
-        src += readStride;
-        *dst++ = (a & 0xf0) | (RGB8_to_I(r, g, b) >> 4);
+        BoxfilterRgbaToRgbA8(src, &r, &g, &b, &a);
+        src += read_stride;
+        *dst++ = (a & 0xf0) | (RgB8ToI(r, g, b) >> 4);
       }
       ENCODE_LOOP_SPANS
     }
@@ -596,8 +596,8 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGBA_to_xx8(src, &r, &a, 18, 0);
-        src += readStride;
+        BoxfilterRgbaToXx8(src, &r, &a, 18, 0);
+        src += read_stride;
         *dst++ = (a & 0xf0) | (r >> 4);
       }
       ENCODE_LOOP_SPANS
@@ -611,10 +611,10 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGBA_to_RGBA8(src, &r, &g, &b, &a);
-        src += readStride;
+        BoxfilterRgbaToRgbA8(src, &r, &g, &b, &a);
+        src += read_stride;
         *dst++ = a;
-        *dst++ = RGB8_to_I(r, g, b);
+        *dst++ = RgB8ToI(r, g, b);
       }
       ENCODE_LOOP_SPANS
     }
@@ -622,8 +622,8 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGBA_to_xx8(src, &r, &a, 18, 0);
-        src += readStride;
+        BoxfilterRgbaToXx8(src, &r, &a, 18, 0);
+        src += read_stride;
         *dst++ = a;
         *dst++ = r;
       }
@@ -636,8 +636,8 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGBA_to_RGB8(src, &r, &g, &b);
-      src += readStride;
+      BoxfilterRgbaToRgB8(src, &r, &g, &b);
+      src += read_stride;
 
       u16 val = ((r << 8) & 0xf800) | ((g << 3) & 0x07e0) | ((b >> 3) & 0x001f);
       *(u16*)dst = Common::swap16(val);
@@ -651,8 +651,8 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGBA_to_RGBA8(src, &r, &g, &b, &a);
-      src += readStride;
+      BoxfilterRgbaToRgbA8(src, &r, &g, &b, &a);
+      src += read_stride;
 
       u16 val;
       if (a >= 224)  // 5551
@@ -671,8 +671,8 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGBA_to_RGBA8(src, &dst[1], &dst[32], &dst[33], &dst[0]);
-      src += readStride;
+      BoxfilterRgbaToRgbA8(src, &dst[1], &dst[32], &dst[33], &dst[0]);
+      src += read_stride;
       dst += 2;
     }
     ENCODE_LOOP_SPANS2
@@ -683,9 +683,9 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGBA_to_x8(src, &a, 0);
+      BoxfilterRgbaToX8(src, &a, 0);
       *dst++ = a;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -695,9 +695,9 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGBA_to_x8(src, &g, 12);
+      BoxfilterRgbaToX8(src, &g, 12);
       *dst++ = g;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -707,9 +707,9 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGBA_to_x8(src, &b, 6);
+      BoxfilterRgbaToX8(src, &b, 6);
       *dst++ = b;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -719,8 +719,8 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGBA_to_xx8(src, &r, &g, 18, 12);
-      src += readStride;
+      BoxfilterRgbaToXx8(src, &r, &g, 18, 12);
+      src += read_stride;
       *dst++ = g;
       *dst++ = r;
     }
@@ -732,8 +732,8 @@ static void EncodeRGBA6halfscale(u8* dst, const u8* src, EFBCopyFormat format, b
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGBA_to_xx8(src, &g, &b, 12, 6);
-      src += readStride;
+      BoxfilterRgbaToXx8(src, &g, &b, 12, 6);
+      src += read_stride;
       *dst++ = b;
       *dst++ = g;
     }
@@ -750,7 +750,7 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
 {
   u16 sBlkCount, tBlkCount, sBlkSize, tBlkSize;
   s32 tSpan, sBlkSpan, tBlkSpan, writeStride;
-  u32 readStride = 3;
+  u32 read_stride = 3;
   u8* dstBlockStart = dst;
 
   switch (format)
@@ -763,11 +763,11 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       ENCODE_LOOP_BLOCKS
       {
-        *dst = RGB8_to_I(src[2], src[1], src[0]) & 0xf0;
-        src += readStride;
+        *dst = RgB8ToI(src[2], src[1], src[0]) & 0xf0;
+        src += read_stride;
 
-        *dst |= RGB8_to_I(src[2], src[1], src[0]) >> 4;
-        src += readStride;
+        *dst |= RgB8ToI(src[2], src[1], src[0]) >> 4;
+        src += read_stride;
         dst++;
       }
       ENCODE_LOOP_SPANS
@@ -777,10 +777,10 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
       ENCODE_LOOP_BLOCKS
       {
         *dst = src[2] & 0xf0;
-        src += readStride;
+        src += read_stride;
 
         *dst |= src[2] >> 4;
-        src += readStride;
+        src += read_stride;
 
         dst++;
       }
@@ -796,8 +796,8 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       ENCODE_LOOP_BLOCKS
       {
-        *dst++ = RGB8_to_I(src[2], src[1], src[0]);
-        src += readStride;
+        *dst++ = RgB8ToI(src[2], src[1], src[0]);
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -806,7 +806,7 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
       ENCODE_LOOP_BLOCKS
       {
         *dst++ = src[2];
-        src += readStride;
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -819,8 +819,8 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       ENCODE_LOOP_BLOCKS
       {
-        *dst++ = 0xf0 | (RGB8_to_I(src[2], src[1], src[0]) >> 4);
-        src += readStride;
+        *dst++ = 0xf0 | (RgB8ToI(src[2], src[1], src[0]) >> 4);
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -829,7 +829,7 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
       ENCODE_LOOP_BLOCKS
       {
         *dst++ = 0xf0 | (src[2] >> 4);
-        src += readStride;
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -843,9 +843,9 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
       ENCODE_LOOP_BLOCKS
       {
         *dst++ = 0xff;
-        *dst++ = RGB8_to_I(src[2], src[1], src[0]);
+        *dst++ = RgB8ToI(src[2], src[1], src[0]);
 
-        src += readStride;
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -855,7 +855,7 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
       {
         *dst++ = 0xff;
         *dst++ = src[2];
-        src += readStride;
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -868,7 +868,7 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       u16 val = ((src[2] << 8) & 0xf800) | ((src[1] << 3) & 0x07e0) | ((src[0] >> 3) & 0x001f);
       *(u16*)dst = Common::swap16(val);
-      src += readStride;
+      src += read_stride;
       dst += 2;
     }
     ENCODE_LOOP_SPANS
@@ -882,7 +882,7 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
       u16 val =
           0x8000 | ((src[2] << 7) & 0x7c00) | ((src[1] << 2) & 0x03e0) | ((src[0] >> 3) & 0x001f);
       *(u16*)dst = Common::swap16(val);
-      src += readStride;
+      src += read_stride;
       dst += 2;
     }
     ENCODE_LOOP_SPANS
@@ -897,7 +897,7 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
       dst[1] = src[2];
       dst[32] = src[1];
       dst[33] = src[0];
-      src += readStride;
+      src += read_stride;
       dst += 2;
     }
     ENCODE_LOOP_SPANS2
@@ -916,7 +916,7 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     ENCODE_LOOP_BLOCKS
     {
       *dst++ = src[1];
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -927,7 +927,7 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     ENCODE_LOOP_BLOCKS
     {
       *dst++ = src[0];
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -940,7 +940,7 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
       // FIXME: is this backwards?
       *dst++ = src[1];
       *dst++ = src[2];
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -952,7 +952,7 @@ static void EncodeRGB8(u8* dst, const u8* src, EFBCopyFormat format, bool yuv)
     {
       *dst++ = src[0];
       *dst++ = src[1];
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -968,7 +968,7 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
   u16 sBlkCount, tBlkCount, sBlkSize, tBlkSize;
   s32 tSpan, sBlkSpan, tBlkSpan, writeStride;
   u8 r, g, b;
-  u32 readStride = 6;
+  u32 read_stride = 6;
   u8* dstBlockStart = dst;
 
   switch (format)
@@ -981,13 +981,13 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGB_to_RGB8(src, &r, &g, &b);
-        *dst = RGB8_to_I(r, g, b) & 0xf0;
-        src += readStride;
+        BoxfilterRgbToRgB8(src, &r, &g, &b);
+        *dst = RgB8ToI(r, g, b) & 0xf0;
+        src += read_stride;
 
-        BoxfilterRGB_to_RGB8(src, &r, &g, &b);
-        *dst |= RGB8_to_I(r, g, b) >> 4;
-        src += readStride;
+        BoxfilterRgbToRgB8(src, &r, &g, &b);
+        *dst |= RgB8ToI(r, g, b) >> 4;
+        src += read_stride;
         dst++;
       }
       ENCODE_LOOP_SPANS
@@ -996,13 +996,13 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGB_to_x8(src, &r, 2);
+        BoxfilterRgbToX8(src, &r, 2);
         *dst = r & 0xf0;
-        src += readStride;
+        src += read_stride;
 
-        BoxfilterRGB_to_x8(src, &r, 2);
+        BoxfilterRgbToX8(src, &r, 2);
         *dst |= r >> 4;
-        src += readStride;
+        src += read_stride;
 
         dst++;
       }
@@ -1018,9 +1018,9 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGB_to_RGB8(src, &r, &g, &b);
-        *dst++ = RGB8_to_I(r, g, b);
-        src += readStride;
+        BoxfilterRgbToRgB8(src, &r, &g, &b);
+        *dst++ = RgB8ToI(r, g, b);
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -1028,9 +1028,9 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGB_to_x8(src, &r, 2);
+        BoxfilterRgbToX8(src, &r, 2);
         *dst++ = r;
-        src += readStride;
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -1043,9 +1043,9 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGB_to_RGB8(src, &r, &g, &b);
-        *dst++ = 0xf0 | (RGB8_to_I(r, g, b) >> 4);
-        src += readStride;
+        BoxfilterRgbToRgB8(src, &r, &g, &b);
+        *dst++ = 0xf0 | (RgB8ToI(r, g, b) >> 4);
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -1053,9 +1053,9 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGB_to_x8(src, &r, 2);
+        BoxfilterRgbToX8(src, &r, 2);
         *dst++ = 0xf0 | (r >> 4);
-        src += readStride;
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -1068,10 +1068,10 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGB_to_RGB8(src, &r, &g, &b);
+        BoxfilterRgbToRgB8(src, &r, &g, &b);
         *dst++ = 0xff;
-        *dst++ = RGB8_to_I(r, g, b);
-        src += readStride;
+        *dst++ = RgB8ToI(r, g, b);
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -1079,10 +1079,10 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     {
       ENCODE_LOOP_BLOCKS
       {
-        BoxfilterRGB_to_x8(src, &r, 2);
+        BoxfilterRgbToX8(src, &r, 2);
         *dst++ = 0xff;
         *dst++ = r;
-        src += readStride;
+        src += read_stride;
       }
       ENCODE_LOOP_SPANS
     }
@@ -1093,10 +1093,10 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_RGB8(src, &r, &g, &b);
+      BoxfilterRgbToRgB8(src, &r, &g, &b);
       u16 val = ((r << 8) & 0xf800) | ((g << 3) & 0x07e0) | ((b >> 3) & 0x001f);
       *(u16*)dst = Common::swap16(val);
-      src += readStride;
+      src += read_stride;
       dst += 2;
     }
     ENCODE_LOOP_SPANS
@@ -1107,10 +1107,10 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_RGB8(src, &r, &g, &b);
+      BoxfilterRgbToRgB8(src, &r, &g, &b);
       u16 val = 0x8000 | ((r << 7) & 0x7c00) | ((g << 2) & 0x03e0) | ((b >> 3) & 0x001f);
       *(u16*)dst = Common::swap16(val);
-      src += readStride;
+      src += read_stride;
       dst += 2;
     }
     ENCODE_LOOP_SPANS
@@ -1121,12 +1121,12 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_RGB8(src, &r, &g, &b);
+      BoxfilterRgbToRgB8(src, &r, &g, &b);
       dst[0] = 0xff;
       dst[1] = r;
       dst[32] = g;
       dst[33] = b;
-      src += readStride;
+      src += read_stride;
       dst += 2;
     }
     ENCODE_LOOP_SPANS2
@@ -1144,9 +1144,9 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_x8(src, &g, 1);
+      BoxfilterRgbToX8(src, &g, 1);
       *dst++ = g;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1156,9 +1156,9 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_x8(src, &b, 0);
+      BoxfilterRgbToX8(src, &b, 0);
       *dst++ = b;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1168,10 +1168,10 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_xx8(src, &r, &g, 2, 1);
+      BoxfilterRgbToXx8(src, &r, &g, 2, 1);
       *dst++ = g;
       *dst++ = r;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1181,10 +1181,10 @@ static void EncodeRGB8halfscale(u8* dst, const u8* src, EFBCopyFormat format, bo
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_xx8(src, &g, &b, 1, 0);
+      BoxfilterRgbToXx8(src, &g, &b, 1, 0);
       *dst++ = b;
       *dst++ = g;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1199,7 +1199,7 @@ static void EncodeZ24(u8* dst, const u8* src, EFBCopyFormat format)
 {
   u16 sBlkCount, tBlkCount, sBlkSize, tBlkSize;
   s32 tSpan, sBlkSpan, tBlkSpan, writeStride;
-  u32 readStride = 3;
+  u32 read_stride = 3;
   u8* dstBlockStart = dst;
 
   switch (format)
@@ -1211,7 +1211,7 @@ static void EncodeZ24(u8* dst, const u8* src, EFBCopyFormat format)
     ENCODE_LOOP_BLOCKS
     {
       *dst++ = src[2];
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1227,7 +1227,7 @@ static void EncodeZ24(u8* dst, const u8* src, EFBCopyFormat format)
       dst[1] = src[2];
       dst[32] = src[1];
       dst[33] = src[0];
-      src += readStride;
+      src += read_stride;
       dst += 2;
     }
     ENCODE_LOOP_SPANS2
@@ -1240,10 +1240,10 @@ static void EncodeZ24(u8* dst, const u8* src, EFBCopyFormat format)
     ENCODE_LOOP_BLOCKS
     {
       *dst = src[2] & 0xf0;
-      src += readStride;
+      src += read_stride;
 
       *dst |= src[2] >> 4;
-      src += readStride;
+      src += read_stride;
 
       dst++;
     }
@@ -1256,7 +1256,7 @@ static void EncodeZ24(u8* dst, const u8* src, EFBCopyFormat format)
     ENCODE_LOOP_BLOCKS
     {
       *dst++ = src[1];
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1267,7 +1267,7 @@ static void EncodeZ24(u8* dst, const u8* src, EFBCopyFormat format)
     ENCODE_LOOP_BLOCKS
     {
       *dst++ = src[0];
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1280,7 +1280,7 @@ static void EncodeZ24(u8* dst, const u8* src, EFBCopyFormat format)
       // FIXME: should these be reversed?
       *dst++ = src[1];
       *dst++ = src[2];
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1292,7 +1292,7 @@ static void EncodeZ24(u8* dst, const u8* src, EFBCopyFormat format)
     {
       *dst++ = src[0];
       *dst++ = src[1];
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1307,7 +1307,7 @@ static void EncodeZ24halfscale(u8* dst, const u8* src, EFBCopyFormat format)
 {
   u16 sBlkCount, tBlkCount, sBlkSize, tBlkSize;
   s32 tSpan, sBlkSpan, tBlkSpan, writeStride;
-  u32 readStride = 6;
+  u32 read_stride = 6;
   u8 r, g, b;
   u8* dstBlockStart = dst;
 
@@ -1319,9 +1319,9 @@ static void EncodeZ24halfscale(u8* dst, const u8* src, EFBCopyFormat format)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_x8(src, &b, 2);
+      BoxfilterRgbToX8(src, &b, 2);
       *dst++ = b;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1333,9 +1333,9 @@ static void EncodeZ24halfscale(u8* dst, const u8* src, EFBCopyFormat format)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_RGB8(src, &dst[33], &dst[32], &dst[1]);
+      BoxfilterRgbToRgB8(src, &dst[33], &dst[32], &dst[1]);
       dst[0] = 255;
-      src += readStride;
+      src += read_stride;
       dst += 2;
     }
     ENCODE_LOOP_SPANS2
@@ -1347,13 +1347,13 @@ static void EncodeZ24halfscale(u8* dst, const u8* src, EFBCopyFormat format)
     sBlkSize /= 2;
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_x8(src, &b, 2);
+      BoxfilterRgbToX8(src, &b, 2);
       *dst = b & 0xf0;
-      src += readStride;
+      src += read_stride;
 
-      BoxfilterRGB_to_x8(src, &b, 2);
+      BoxfilterRgbToX8(src, &b, 2);
       *dst |= b >> 4;
-      src += readStride;
+      src += read_stride;
 
       dst++;
     }
@@ -1365,9 +1365,9 @@ static void EncodeZ24halfscale(u8* dst, const u8* src, EFBCopyFormat format)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_x8(src, &g, 1);
+      BoxfilterRgbToX8(src, &g, 1);
       *dst++ = g;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1377,9 +1377,9 @@ static void EncodeZ24halfscale(u8* dst, const u8* src, EFBCopyFormat format)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_x8(src, &r, 0);
+      BoxfilterRgbToX8(src, &r, 0);
       *dst++ = r;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1389,10 +1389,10 @@ static void EncodeZ24halfscale(u8* dst, const u8* src, EFBCopyFormat format)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_xx8(src, &r, &g, 0, 1);
+      BoxfilterRgbToXx8(src, &r, &g, 0, 1);
       *dst++ = g;
       *dst++ = r;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;
@@ -1402,11 +1402,11 @@ static void EncodeZ24halfscale(u8* dst, const u8* src, EFBCopyFormat format)
     SetSpans(sBlkSize, tBlkSize, &tSpan, &sBlkSpan, &tBlkSpan, &writeStride);
     ENCODE_LOOP_BLOCKS
     {
-      BoxfilterRGB_to_xx8(src, &g, &b, 1, 2);
+      BoxfilterRgbToXx8(src, &g, &b, 1, 2);
       // FIXME: is this backwards?
       *dst++ = b;
       *dst++ = g;
-      src += readStride;
+      src += read_stride;
     }
     ENCODE_LOOP_SPANS
     break;

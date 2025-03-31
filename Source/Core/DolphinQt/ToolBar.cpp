@@ -16,14 +16,14 @@
 #include "DolphinQt/Resources.h"
 #include "DolphinQt/Settings.h"
 
-static QSize ICON_SIZE(32, 32);
+static QSize icon_size(32, 32);
 
 ToolBar::ToolBar(QWidget* parent) : QToolBar(parent)
 {
   setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
   setMovable(!Settings::Instance().AreWidgetsLocked());
   setFloatable(false);
-  setIconSize(ICON_SIZE);
+  setIconSize(icon_size);
   setVisible(Settings::Instance().IsToolBarVisible());
 
   setWindowTitle(tr("Toolbar"));

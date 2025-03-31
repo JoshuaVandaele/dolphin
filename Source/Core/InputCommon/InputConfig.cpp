@@ -31,8 +31,8 @@ InputConfig::~InputConfig() = default;
 bool InputConfig::LoadConfig()
 {
   Common::IniFile inifile;
-  bool useProfile[MAX_BBMOTES] = {false, false, false, false, false};
-  static constexpr std::array<std::string_view, MAX_BBMOTES> num = {"1", "2", "3", "4", "BB"};
+  bool use_profile[MAX_BBMOTES] = {false, false, false, false, false};
+  static constexpr std::array<std::string_view, MAX_BBMOTES> NUM = {"1", "2", "3", "4", "BB"};
   std::string profile[MAX_BBMOTES];
 
   if (SConfig::GetInstance().GetGameID() != "00000000")
@@ -44,7 +44,7 @@ bool InputConfig::LoadConfig()
 
     for (int i = 0; i < 4; i++)
     {
-      const auto profile_name = fmt::format("{}Profile{}", GetProfileKey(), num[i]);
+      const auto profile_name = fmt::format("{}Profile{}", GetProfileKey(), NUM[i]);
 
       if (control_section->Exists(profile_name))
       {
@@ -62,7 +62,7 @@ bool InputConfig::LoadConfig()
 
           // Use the first profile by default
           profile[i] = profiles[0];
-          useProfile[i] = true;
+          use_profile[i] = true;
         }
       }
     }
@@ -78,7 +78,7 @@ bool InputConfig::LoadConfig()
     {
       Common::IniFile::Section config;
       // Load settings from ini
-      if (useProfile[n])
+      if (use_profile[n])
       {
         std::string base;
         SplitPath(profile[n], nullptr, &base, nullptr);

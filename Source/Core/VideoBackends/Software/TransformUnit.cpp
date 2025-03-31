@@ -163,18 +163,18 @@ static void TransformTexCoordRegular(const TexMtxInfo& texinfo, int coordNum,
 
   if (xfmem.dualTexTrans.enabled)
   {
-    Vec3 tempCoord;
+    Vec3 temp_coord;
 
     // normalize
-    const PostMtxInfo& postInfo = xfmem.postMtxInfo[coordNum];
-    const float* postMat = &xfmem.postMatrices[postInfo.index * 4];
+    const PostMtxInfo& post_info = xfmem.postMtxInfo[coordNum];
+    const float* post_mat = &xfmem.postMatrices[post_info.index * 4];
 
-    if (postInfo.normalize)
-      tempCoord = dst->Normalized();
+    if (post_info.normalize)
+      temp_coord = dst->Normalized();
     else
-      tempCoord = *dst;
+      temp_coord = *dst;
 
-    MultiplyVec3Mat34(tempCoord, postMat, *dst);
+    MultiplyVec3Mat34(temp_coord, post_mat, *dst);
   }
 
   // When q is 0, the GameCube appears to have a special case
@@ -229,13 +229,13 @@ static float CalculateLightAttn(const LightPointer* light, Vec3* _ldir, const Ve
   {
     ldir = ldir.Normalized();
     attn = (ldir * normal) >= 0.0 ? std::max(0.0f, light->dir * normal) : 0;
-    Vec3 attLen = Vec3(1.0, attn, attn * attn);
-    Vec3 cosAttn = light->cosatt;
-    Vec3 distAttn = light->distatt;
+    Vec3 att_len = Vec3(1.0, attn, attn * attn);
+    Vec3 cos_attn = light->cosatt;
+    Vec3 dist_attn = light->distatt;
     if (chan.diffusefunc != DiffuseFunc::None)
-      distAttn = distAttn.Normalized();
+      dist_attn = dist_attn.Normalized();
 
-    attn = SafeDivide(std::max(0.0f, attLen * cosAttn), attLen * distAttn);
+    attn = SafeDivide(std::max(0.0f, att_len * cos_attn), att_len * dist_attn);
     break;
   }
   case AttenuationFunc::Spot:
@@ -245,9 +245,9 @@ static float CalculateLightAttn(const LightPointer* light, Vec3* _ldir, const Ve
     ldir = ldir / dist;
     attn = std::max(0.0f, ldir * light->dir);
 
-    float cosAtt = light->cosatt.x + (light->cosatt.y * attn) + (light->cosatt.z * attn * attn);
-    float distAtt = light->distatt.x + (light->distatt.y * dist) + (light->distatt.z * dist2);
-    attn = SafeDivide(std::max(0.0f, cosAtt), distAtt);
+    float cos_att = light->cosatt.x + (light->cosatt.y * attn) + (light->cosatt.z * attn * attn);
+    float dist_att = light->distatt.x + (light->distatt.y * dist) + (light->distatt.z * dist2);
+    attn = SafeDivide(std::max(0.0f, cos_att), dist_att);
     break;
   }
   default:
@@ -265,18 +265,18 @@ static void LightColor(const Vec3& pos, const Vec3& normal, u8 lightNum, const L
   Vec3 ldir = light->pos - pos;
   float attn = CalculateLightAttn(light, &ldir, normal, chan);
 
-  float difAttn = ldir * normal;
+  float dif_attn = ldir * normal;
   switch (chan.diffusefunc)
   {
   case DiffuseFunc::None:
     AddScaledIntegerColor(light->color, attn, lightCol);
     break;
   case DiffuseFunc::Sign:
-    AddScaledIntegerColor(light->color, attn * difAttn, lightCol);
+    AddScaledIntegerColor(light->color, attn * dif_attn, lightCol);
     break;
   case DiffuseFunc::Clamp:
-    difAttn = std::max(0.0f, difAttn);
-    AddScaledIntegerColor(light->color, attn * difAttn, lightCol);
+    dif_attn = std::max(0.0f, dif_attn);
+    AddScaledIntegerColor(light->color, attn * dif_attn, lightCol);
     break;
   default:
     PanicAlertFmt("Invalid diffusefunc: {}", chan.attnfunc);
@@ -291,18 +291,18 @@ static void LightAlpha(const Vec3& pos, const Vec3& normal, u8 lightNum, const L
   Vec3 ldir = light->pos - pos;
   float attn = CalculateLightAttn(light, &ldir, normal, chan);
 
-  float difAttn = ldir * normal;
+  float dif_attn = ldir * normal;
   switch (chan.diffusefunc)
   {
   case DiffuseFunc::None:
     lightCol += light->color[0] * attn;
     break;
   case DiffuseFunc::Sign:
-    lightCol += light->color[0] * attn * difAttn;
+    lightCol += light->color[0] * attn * dif_attn;
     break;
   case DiffuseFunc::Clamp:
-    difAttn = std::max(0.0f, difAttn);
-    lightCol += light->color[0] * attn * difAttn;
+    dif_attn = std::max(0.0f, dif_attn);
+    lightCol += light->color[0] * attn * dif_attn;
     break;
   default:
     PanicAlertFmt("Invalid diffusefunc: {}", chan.attnfunc);
@@ -326,31 +326,31 @@ void TransformColor(const InputVertexData* src, OutputVertexData* dst)
 
     if (colorchan.enablelighting)
     {
-      Vec3 lightCol;
+      Vec3 light_col;
       if (colorchan.ambsource == AmbSource::Vertex)
       {
-        lightCol.x = src->color[chan][1];
-        lightCol.y = src->color[chan][2];
-        lightCol.z = src->color[chan][3];
+        light_col.x = src->color[chan][1];
+        light_col.y = src->color[chan][2];
+        light_col.z = src->color[chan][3];
       }
       else
       {
-        const u8* ambColor = reinterpret_cast<u8*>(&xfmem.ambColor[chan]);
-        lightCol.x = ambColor[1];
-        lightCol.y = ambColor[2];
-        lightCol.z = ambColor[3];
+        const u8* amb_color = reinterpret_cast<u8*>(&xfmem.ambColor[chan]);
+        light_col.x = amb_color[1];
+        light_col.y = amb_color[2];
+        light_col.z = amb_color[3];
       }
 
       u8 mask = colorchan.GetFullLightMask();
       for (int i = 0; i < 8; ++i)
       {
         if (mask & (1 << i))
-          LightColor(dst->mvPosition, dst->normal[0], i, colorchan, lightCol);
+          LightColor(dst->mvPosition, dst->normal[0], i, colorchan, light_col);
       }
 
-      int light_x = std::clamp(static_cast<int>(lightCol.x), 0, 255);
-      int light_y = std::clamp(static_cast<int>(lightCol.y), 0, 255);
-      int light_z = std::clamp(static_cast<int>(lightCol.z), 0, 255);
+      int light_x = std::clamp(static_cast<int>(light_col.x), 0, 255);
+      int light_y = std::clamp(static_cast<int>(light_col.y), 0, 255);
+      int light_z = std::clamp(static_cast<int>(light_col.z), 0, 255);
       chancolor[1] = (matcolor[1] * (light_x + (light_x >> 7))) >> 8;
       chancolor[2] = (matcolor[2] * (light_y + (light_y >> 7))) >> 8;
       chancolor[3] = (matcolor[3] * (light_z + (light_z >> 7))) >> 8;
@@ -369,20 +369,20 @@ void TransformColor(const InputVertexData* src, OutputVertexData* dst)
 
     if (xfmem.alpha[chan].enablelighting)
     {
-      float lightCol;
+      float light_col;
       if (alphachan.ambsource == AmbSource::Vertex)
-        lightCol = src->color[chan][0];
+        light_col = src->color[chan][0];
       else
-        lightCol = static_cast<float>(xfmem.ambColor[chan] & 0xff);
+        light_col = static_cast<float>(xfmem.ambColor[chan] & 0xff);
 
       u8 mask = alphachan.GetFullLightMask();
       for (int i = 0; i < 8; ++i)
       {
         if (mask & (1 << i))
-          LightAlpha(dst->mvPosition, dst->normal[0], i, alphachan, lightCol);
+          LightAlpha(dst->mvPosition, dst->normal[0], i, alphachan, light_col);
       }
 
-      int light_a = std::clamp(static_cast<int>(lightCol), 0, 255);
+      int light_a = std::clamp(static_cast<int>(light_col), 0, 255);
       chancolor[0] = (matcolor[0] * (light_a + (light_a >> 7))) >> 8;
     }
     else
@@ -398,14 +398,14 @@ void TransformColor(const InputVertexData* src, OutputVertexData* dst)
 
 void TransformTexCoord(const InputVertexData* src, OutputVertexData* dst)
 {
-  for (u32 coordNum = 0; coordNum < xfmem.numTexGen.numTexGens; coordNum++)
+  for (u32 coord_num = 0; coord_num < xfmem.numTexGen.numTexGens; coord_num++)
   {
-    const TexMtxInfo& texinfo = xfmem.texMtxInfo[coordNum];
+    const TexMtxInfo& texinfo = xfmem.texMtxInfo[coord_num];
 
     switch (texinfo.texgentype)
     {
     case TexGenType::Regular:
-      TransformTexCoordRegular(texinfo, coordNum, src, dst);
+      TransformTexCoordRegular(texinfo, coord_num, src, dst);
       break;
     case TexGenType::EmbossMap:
     {
@@ -415,22 +415,22 @@ void TransformTexCoord(const InputVertexData* src, OutputVertexData* dst)
       float d1 = ldir * dst->normal[1];
       float d2 = ldir * dst->normal[2];
 
-      dst->texCoords[coordNum].x = dst->texCoords[texinfo.embosssourceshift].x + d1;
-      dst->texCoords[coordNum].y = dst->texCoords[texinfo.embosssourceshift].y + d2;
-      dst->texCoords[coordNum].z = dst->texCoords[texinfo.embosssourceshift].z;
+      dst->texCoords[coord_num].x = dst->texCoords[texinfo.embosssourceshift].x + d1;
+      dst->texCoords[coord_num].y = dst->texCoords[texinfo.embosssourceshift].y + d2;
+      dst->texCoords[coord_num].z = dst->texCoords[texinfo.embosssourceshift].z;
     }
     break;
     case TexGenType::Color0:
       ASSERT(texinfo.inputform == TexInputForm::AB11);
-      dst->texCoords[coordNum].x = (float)dst->color[0][0] / 255.0f;
-      dst->texCoords[coordNum].y = (float)dst->color[0][1] / 255.0f;
-      dst->texCoords[coordNum].z = 1.0f;
+      dst->texCoords[coord_num].x = (float)dst->color[0][0] / 255.0f;
+      dst->texCoords[coord_num].y = (float)dst->color[0][1] / 255.0f;
+      dst->texCoords[coord_num].z = 1.0f;
       break;
     case TexGenType::Color1:
       ASSERT(texinfo.inputform == TexInputForm::AB11);
-      dst->texCoords[coordNum].x = (float)dst->color[1][0] / 255.0f;
-      dst->texCoords[coordNum].y = (float)dst->color[1][1] / 255.0f;
-      dst->texCoords[coordNum].z = 1.0f;
+      dst->texCoords[coord_num].x = (float)dst->color[1][0] / 255.0f;
+      dst->texCoords[coord_num].y = (float)dst->color[1][1] / 255.0f;
+      dst->texCoords[coord_num].z = 1.0f;
       break;
     default:
       ERROR_LOG_FMT(VIDEO, "Bad tex gen type {}", texinfo.texgentype);
@@ -438,10 +438,10 @@ void TransformTexCoord(const InputVertexData* src, OutputVertexData* dst)
     }
   }
 
-  for (u32 coordNum = 0; coordNum < xfmem.numTexGen.numTexGens; coordNum++)
+  for (u32 coord_num = 0; coord_num < xfmem.numTexGen.numTexGens; coord_num++)
   {
-    dst->texCoords[coordNum][0] *= (bpmem.texcoords[coordNum].s.scale_minus_1 + 1);
-    dst->texCoords[coordNum][1] *= (bpmem.texcoords[coordNum].t.scale_minus_1 + 1);
+    dst->texCoords[coord_num][0] *= (bpmem.texcoords[coord_num].s.scale_minus_1 + 1);
+    dst->texCoords[coord_num][1] *= (bpmem.texcoords[coord_num].t.scale_minus_1 + 1);
   }
 }
 }  // namespace TransformUnit

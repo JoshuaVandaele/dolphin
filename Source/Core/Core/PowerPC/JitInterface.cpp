@@ -109,10 +109,10 @@ void JitInterface::UpdateMembase()
 static std::string_view GetDescription(const CPUEmuFeatureFlags flags)
 {
   static constexpr std::array<std::string_view, (FEATURE_FLAG_END_OF_ENUMERATION - 1) << 1>
-      descriptions = {
+      DESCRIPTIONS = {
           "", "DR", "IR", "DR|IR", "PERFMON", "DR|PERFMON", "IR|PERFMON", "DR|IR|PERFMON",
       };
-  return descriptions[flags];
+  return DESCRIPTIONS[flags];
 }
 
 void JitInterface::JitBlockLogDump(const Core::CPUThreadGuard& guard, std::FILE* file) const

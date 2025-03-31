@@ -77,10 +77,10 @@ void DSPEmitter::andcf(const UDSPInstruction opc)
     const OpArg sr_reg = m_gpr.GetReg(DSP_REG_SR);
     AND(16, R(val), Imm16(imm));
     CMP(16, R(val), Imm16(imm));
-    FixupBranch notLogicZero = J_CC(CC_NE);
+    FixupBranch not_logic_zero = J_CC(CC_NE);
     OR(16, sr_reg, Imm16(SR_LOGIC_ZERO));
     FixupBranch exit = J();
-    SetJumpTarget(notLogicZero);
+    SetJumpTarget(not_logic_zero);
     AND(16, sr_reg, Imm16(~SR_LOGIC_ZERO));
     SetJumpTarget(exit);
     m_gpr.PutReg(DSP_REG_SR);
@@ -112,10 +112,10 @@ void DSPEmitter::andf(const UDSPInstruction opc)
     //   g_dsp.r.sr &= ~SR_LOGIC_ZERO;
     const OpArg sr_reg = m_gpr.GetReg(DSP_REG_SR);
     TEST(16, R(val), Imm16(imm));
-    FixupBranch notLogicZero = J_CC(CC_NE);
+    FixupBranch not_logic_zero = J_CC(CC_NE);
     OR(16, sr_reg, Imm16(SR_LOGIC_ZERO));
     FixupBranch exit = J();
-    SetJumpTarget(notLogicZero);
+    SetJumpTarget(not_logic_zero);
     AND(16, sr_reg, Imm16(~SR_LOGIC_ZERO));
     SetJumpTarget(exit);
     m_gpr.PutReg(DSP_REG_SR);
@@ -1066,10 +1066,10 @@ void DSPEmitter::abs(const UDSPInstruction opc)
   get_long_acc(dreg);
   //	if (acc < 0) acc = 0 - acc;
   TEST(64, R(RAX), R(RAX));
-  FixupBranch GreaterThanOrEqual = J_CC(CC_GE);
+  FixupBranch greater_than_or_equal = J_CC(CC_GE);
   NEG(64, R(RAX));
   set_long_acc(dreg);
-  SetJumpTarget(GreaterThanOrEqual);
+  SetJumpTarget(greater_than_or_equal);
   //	Update_SR_Register64(dsp_get_long_acc(dreg));
   if (FlagsNeeded())
   {
@@ -1362,20 +1362,20 @@ void DSPEmitter::lsrn(const UDSPInstruction opc)
   TEST(64, R(RDX), R(RDX));  // is this actually worth the branch cost?
   FixupBranch zero = J_CC(CC_E);
   TEST(16, R(RAX), Imm16(0x3f));  // is this actually worth the branch cost?
-  FixupBranch noShift = J_CC(CC_Z);
+  FixupBranch no_shift = J_CC(CC_Z);
   // CL gets automatically masked with 0x3f on IA32/AMD64
   // MOVZX(64, 16, RCX, R(RAX));
   MOV(64, R(RCX), R(RAX));
   // AND(16, R(RCX), Imm16(0x3f));
   TEST(16, R(RAX), Imm16(0x40));
-  FixupBranch shiftLeft = J_CC(CC_Z);
+  FixupBranch shift_left = J_CC(CC_Z);
   NEG(16, R(RCX));
   // ADD(16, R(RCX), Imm16(0x40));
   SHL(64, R(RDX), R(RCX));
   FixupBranch exit = J();
-  SetJumpTarget(shiftLeft);
+  SetJumpTarget(shift_left);
   SHR(64, R(RDX), R(RCX));
-  SetJumpTarget(noShift);
+  SetJumpTarget(no_shift);
   SetJumpTarget(exit);
 
   //	dsp_set_long_acc(0, (s64)acc);
@@ -1421,18 +1421,18 @@ void DSPEmitter::asrn(const UDSPInstruction opc)
   TEST(64, R(RDX), R(RDX));
   FixupBranch zero = J_CC(CC_E);
   TEST(16, R(RAX), Imm16(0x3f));
-  FixupBranch noShift = J_CC(CC_Z);
+  FixupBranch no_shift = J_CC(CC_Z);
   MOVZX(64, 16, RCX, R(RAX));
   AND(16, R(RCX), Imm16(0x3f));
   TEST(16, R(RAX), Imm16(0x40));
-  FixupBranch shiftLeft = J_CC(CC_Z);
+  FixupBranch shift_left = J_CC(CC_Z);
   NEG(16, R(RCX));
   ADD(16, R(RCX), Imm16(0x40));
   SHL(64, R(RDX), R(RCX));
   FixupBranch exit = J();
-  SetJumpTarget(shiftLeft);
+  SetJumpTarget(shift_left);
   SAR(64, R(RDX), R(RCX));
-  SetJumpTarget(noShift);
+  SetJumpTarget(no_shift);
   SetJumpTarget(exit);
 
   //	dsp_set_long_acc(0, acc);
@@ -1484,18 +1484,18 @@ void DSPEmitter::lsrnrx(const UDSPInstruction opc)
   TEST(64, R(RDX), R(RDX));
   FixupBranch zero = J_CC(CC_E);
   TEST(16, R(RAX), Imm16(0x3f));
-  FixupBranch noShift = J_CC(CC_Z);
+  FixupBranch no_shift = J_CC(CC_Z);
   MOVZX(64, 16, RCX, R(RAX));
   AND(16, R(RCX), Imm16(0x3f));
   TEST(16, R(RAX), Imm16(0x40));
-  FixupBranch shiftLeft = J_CC(CC_Z);
+  FixupBranch shift_left = J_CC(CC_Z);
   NEG(16, R(RCX));
   ADD(16, R(RCX), Imm16(0x40));
   SHR(64, R(RDX), R(RCX));
   FixupBranch exit = J();
-  SetJumpTarget(shiftLeft);
+  SetJumpTarget(shift_left);
   SHL(64, R(RDX), R(RCX));
-  SetJumpTarget(noShift);
+  SetJumpTarget(no_shift);
   SetJumpTarget(exit);
 
   //	dsp_set_long_acc(dreg, (s64)acc);
@@ -1541,18 +1541,18 @@ void DSPEmitter::asrnrx(const UDSPInstruction opc)
   TEST(64, R(RDX), R(RDX));
   FixupBranch zero = J_CC(CC_E);
   TEST(16, R(RAX), Imm16(0x3f));
-  FixupBranch noShift = J_CC(CC_Z);
+  FixupBranch no_shift = J_CC(CC_Z);
   MOVZX(64, 16, RCX, R(RAX));
   AND(16, R(RCX), Imm16(0x3f));
   TEST(16, R(RAX), Imm16(0x40));
-  FixupBranch shiftLeft = J_CC(CC_Z);
+  FixupBranch shift_left = J_CC(CC_Z);
   NEG(16, R(RCX));
   ADD(16, R(RCX), Imm16(0x40));
   SAR(64, R(RDX), R(RCX));
   FixupBranch exit = J();
-  SetJumpTarget(shiftLeft);
+  SetJumpTarget(shift_left);
   SHL(64, R(RDX), R(RCX));
-  SetJumpTarget(noShift);
+  SetJumpTarget(no_shift);
   SetJumpTarget(exit);
 
   //	dsp_set_long_acc(dreg, acc);
@@ -1599,18 +1599,18 @@ void DSPEmitter::lsrnr(const UDSPInstruction opc)
   TEST(64, R(RDX), R(RDX));
   FixupBranch zero = J_CC(CC_E);
   TEST(16, R(RAX), Imm16(0x3f));
-  FixupBranch noShift = J_CC(CC_Z);
+  FixupBranch no_shift = J_CC(CC_Z);
   MOVZX(64, 16, RCX, R(RAX));
   AND(16, R(RCX), Imm16(0x3f));
   TEST(16, R(RAX), Imm16(0x40));
-  FixupBranch shiftLeft = J_CC(CC_Z);
+  FixupBranch shift_left = J_CC(CC_Z);
   NEG(16, R(RCX));
   ADD(16, R(RCX), Imm16(0x40));
   SHR(64, R(RDX), R(RCX));
   FixupBranch exit = J();
-  SetJumpTarget(shiftLeft);
+  SetJumpTarget(shift_left);
   SHL(64, R(RDX), R(RCX));
-  SetJumpTarget(noShift);
+  SetJumpTarget(no_shift);
   SetJumpTarget(exit);
 
   //	dsp_set_long_acc(dreg, (s64)acc);
@@ -1654,18 +1654,18 @@ void DSPEmitter::asrnr(const UDSPInstruction opc)
   TEST(64, R(RDX), R(RDX));
   FixupBranch zero = J_CC(CC_E);
   TEST(16, R(RAX), Imm16(0x3f));
-  FixupBranch noShift = J_CC(CC_Z);
+  FixupBranch no_shift = J_CC(CC_Z);
   MOVZX(64, 16, RCX, R(RAX));
   AND(16, R(RCX), Imm16(0x3f));
   TEST(16, R(RAX), Imm16(0x40));
-  FixupBranch shiftLeft = J_CC(CC_Z);
+  FixupBranch shift_left = J_CC(CC_Z);
   NEG(16, R(RCX));
   ADD(16, R(RCX), Imm16(0x40));
   SAR(64, R(RDX), R(RCX));
   FixupBranch exit = J();
-  SetJumpTarget(shiftLeft);
+  SetJumpTarget(shift_left);
   SHL(64, R(RDX), R(RCX));
-  SetJumpTarget(noShift);
+  SetJumpTarget(no_shift);
   SetJumpTarget(exit);
 
   //	dsp_set_long_acc(dreg, acc);

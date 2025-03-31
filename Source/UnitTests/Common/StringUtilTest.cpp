@@ -74,10 +74,10 @@ TEST(StringUtil, ToString_TryParse_Roundtrip)
 
 TEST(StringUtil, GetEscapedHtml)
 {
-  static constexpr auto no_escape_needed =
+  static constexpr auto NO_ESCAPE_NEEDED =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
       "!@#$%^*()-_=+,./?;:[]{}| \\\t\n";
-  EXPECT_EQ(Common::GetEscapedHtml(no_escape_needed), no_escape_needed);
+  EXPECT_EQ(Common::GetEscapedHtml(NO_ESCAPE_NEEDED), NO_ESCAPE_NEEDED);
   EXPECT_EQ(Common::GetEscapedHtml("&<>'\""), "&amp;&lt;&gt;&apos;&quot;");
   EXPECT_EQ(Common::GetEscapedHtml("&&&"), "&amp;&amp;&amp;");
 }

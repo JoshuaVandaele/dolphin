@@ -33,7 +33,7 @@ static bool VerifyRoms(const SDSP& dsp)
     u32 hash_drom;  // dsp_coef.bin
   };
 
-  static const std::array<DspRomHashes, 7> known_roms = {{
+  static const std::array<DspRomHashes, 7> KNOWN_ROMS = {{
       // Official Nintendo ROM
       {0x66f334fe, 0xf3b93527},
 
@@ -63,9 +63,9 @@ static bool VerifyRoms(const SDSP& dsp)
       Common::HashAdler32(reinterpret_cast<const u8*>(dsp.coef), DSP_COEF_BYTE_SIZE);
   int rom_idx = -1;
 
-  for (size_t i = 0; i < known_roms.size(); ++i)
+  for (size_t i = 0; i < KNOWN_ROMS.size(); ++i)
   {
-    const DspRomHashes& rom = known_roms[i];
+    const DspRomHashes& rom = KNOWN_ROMS[i];
     if (hash_irom == rom.hash_irom && hash_drom == rom.hash_drom)
       rom_idx = static_cast<int>(i);
   }

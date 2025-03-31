@@ -125,9 +125,9 @@ std::array<u8, 11> ComputeToyCode(u64 code)
 {
   if (code == 0)
   {
-    static constexpr std::array<u8, 11> invalid_code_result{
+    static constexpr std::array<u8, 11> INVALID_CODE_RESULT{
         static_cast<u8>('N'), static_cast<u8>('/'), static_cast<u8>('A')};
-    return invalid_code_result;
+    return INVALID_CODE_RESULT;
   }
 
   std::array<u8, 10> code_bytes;
@@ -137,11 +137,11 @@ std::array<u8, 11> ComputeToyCode(u64 code)
     code /= 29;
   }
 
-  static constexpr char lookup_table[] = "23456789BCDFGHJKLMNPQRSTVWXYZ";
+  static constexpr char LOOKUP_TABLE[] = "23456789BCDFGHJKLMNPQRSTVWXYZ";
   std::array<u8, 10> code_chars;
   for (size_t i = 0; i < code_bytes.size(); ++i)
   {
-    code_chars[i] = static_cast<u8>(lookup_table[code_bytes[9 - i]]);
+    code_chars[i] = static_cast<u8>(LOOKUP_TABLE[code_bytes[9 - i]]);
   }
 
   std::array<u8, 11> result;

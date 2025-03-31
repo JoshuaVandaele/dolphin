@@ -681,7 +681,7 @@ struct SDLMotionAxis
 using SDLMotionAxisList = std::array<SDLMotionAxis, 6>;
 
 // clang-format off
-static constexpr std::array<const char*, 21> s_sdl_button_names = {
+static constexpr std::array<const char*, 21> S_SDL_BUTTON_NAMES = {
     "Button S",    // SDL_CONTROLLER_BUTTON_A
     "Button E",    // SDL_CONTROLLER_BUTTON_B
     "Button W",    // SDL_CONTROLLER_BUTTON_X
@@ -704,7 +704,7 @@ static constexpr std::array<const char*, 21> s_sdl_button_names = {
     "Paddle 4",     // SDL_CONTROLLER_BUTTON_PADDLE4
     "Touchpad",    // SDL_CONTROLLER_BUTTON_TOUCHPAD
 };
-static constexpr std::array<const char*, 6> s_sdl_axis_names = {
+static constexpr std::array<const char*, 6> S_SDL_AXIS_NAMES = {
     "Left X",     // SDL_CONTROLLER_AXIS_LEFTX
     "Left Y",     // SDL_CONTROLLER_AXIS_LEFTY
     "Right X",    // SDL_CONTROLLER_AXIS_RIGHTX
@@ -764,7 +764,7 @@ GameController::GameController(SDL_GameController* const gamecontroller,
     // Inputs
 
     // Buttons
-    for (u8 i = 0; i != size(s_sdl_button_names); ++i)
+    for (u8 i = 0; i != size(S_SDL_BUTTON_NAMES); ++i)
     {
       SDL_GameControllerButton button = static_cast<SDL_GameControllerButton>(i);
       if (SDL_GameControllerHasButton(m_gamecontroller, button))
@@ -776,7 +776,7 @@ GameController::GameController(SDL_GameController* const gamecontroller,
     }
 
     // Axes
-    for (u8 i = 0; i != size(s_sdl_axis_names); ++i)
+    for (u8 i = 0; i != size(S_SDL_AXIS_NAMES); ++i)
     {
       SDL_GameControllerAxis axis = static_cast<SDL_GameControllerAxis>(i);
       if (SDL_GameControllerHasAxis(m_gamecontroller, axis))
@@ -986,13 +986,13 @@ int GameController::GetSDLInstanceID() const
 
 std::string GameController::Button::GetName() const
 {
-  return s_sdl_button_names[m_button];
+  return S_SDL_BUTTON_NAMES[m_button];
 }
 
 std::string GameController::Axis::GetName() const
 {
   if (IsTriggerAxis(m_axis))
-    return std::string(s_sdl_axis_names[m_axis]);
+    return std::string(S_SDL_AXIS_NAMES[m_axis]);
 
   bool negative = m_range < 0;
 
@@ -1000,7 +1000,7 @@ std::string GameController::Axis::GetName() const
   if (m_axis % 2 == 1)
     negative = !negative;
 
-  return std::string(s_sdl_axis_names[m_axis]) + (negative ? '-' : '+');
+  return std::string(S_SDL_AXIS_NAMES[m_axis]) + (negative ? '-' : '+');
 }
 
 ControlState GameController::Button::GetState() const

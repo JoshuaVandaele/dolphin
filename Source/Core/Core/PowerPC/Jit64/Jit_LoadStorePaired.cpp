@@ -36,36 +36,36 @@ void Jit64::psq_stXX(UGeckoInstruction inst)
   FALLBACK_IF(!a);
 
   RCX64Reg scratch_guard = gpr.Scratch(RSCRATCH_EXTRA);
-  RCOpArg Ra = update ? gpr.Bind(a, RCMode::ReadWrite) : gpr.Use(a, RCMode::Read);
-  RCOpArg Rb = indexed ? gpr.Use(b, RCMode::Read) : RCOpArg::Imm32((u32)offset);
-  RCOpArg Rs = fpr.Use(s, RCMode::Read);
-  RegCache::Realize(scratch_guard, Ra, Rb, Rs);
+  RCOpArg ra = update ? gpr.Bind(a, RCMode::ReadWrite) : gpr.Use(a, RCMode::Read);
+  RCOpArg rb = indexed ? gpr.Use(b, RCMode::Read) : RCOpArg::Imm32((u32)offset);
+  RCOpArg rs = fpr.Use(s, RCMode::Read);
+  RegCache::Realize(scratch_guard, ra, rb, rs);
 
-  MOV_sum(32, RSCRATCH_EXTRA, Ra, Rb);
+  MOV_sum(32, RSCRATCH_EXTRA, ra, rb);
 
   // In memcheck mode, don't update the address until the exception check
   if (update && !jo.memcheck)
-    MOV(32, Ra, R(RSCRATCH_EXTRA));
+    MOV(32, ra, R(RSCRATCH_EXTRA));
 
   if (w)
-    CVTSD2SS(XMM0, Rs);  // one
+    CVTSD2SS(XMM0, rs);  // one
   else
-    CVTPD2PS(XMM0, Rs);  // pair
+    CVTPD2PS(XMM0, rs);  // pair
 
-  const bool gqrIsConstant = js.constantGqrValid[i];
-  if (gqrIsConstant)
+  const bool gqr_is_constant = js.constantGqrValid[i];
+  if (gqr_is_constant)
   {
-    const u32 gqrValue = js.constantGqr[i] & 0xffff;
-    int type = gqrValue & 0x7;
+    const u32 gqr_value = js.constantGqr[i] & 0xffff;
+    int type = gqr_value & 0x7;
 
     // Paired stores (other than w/type zero) don't yield any real change in
     // performance right now, but if we can improve fastmem support this might change
-    if (gqrValue == 0)
+    if (gqr_value == 0)
     {
       if (w)
-        GenQuantizedStore(true, static_cast<EQuantizeType>(type), (gqrValue & 0x3F00) >> 8);
+        GenQuantizedStore(true, static_cast<EQuantizeType>(type), (gqr_value & 0x3F00) >> 8);
       else
-        GenQuantizedStore(false, static_cast<EQuantizeType>(type), (gqrValue & 0x3F00) >> 8);
+        GenQuantizedStore(false, static_cast<EQuantizeType>(type), (gqr_value & 0x3F00) >> 8);
     }
     else
     {
@@ -73,7 +73,7 @@ void Jit64::psq_stXX(UGeckoInstruction inst)
       MOV(32, PPCSTATE(pc), Imm32(js.compilerPC));
       // We know what GQR is here, so we can load RSCRATCH2 and call into the store method directly
       // with just the scale bits.
-      MOV(32, R(RSCRATCH2), Imm32(gqrValue & 0x3F00));
+      MOV(32, R(RSCRATCH2), Imm32(gqr_value & 0x3F00));
 
       if (w)
         CALL(asm_routines.single_store_quantized[type]);
@@ -102,7 +102,7 @@ void Jit64::psq_stXX(UGeckoInstruction inst)
 
   if (update && jo.memcheck)
   {
-    ADD(32, Ra, Rb);
+    ADD(32, ra, rb);
   }
 }
 
@@ -125,22 +125,22 @@ void Jit64::psq_lXX(UGeckoInstruction inst)
   FALLBACK_IF(!a);
 
   RCX64Reg scratch_guard = gpr.Scratch(RSCRATCH_EXTRA);
-  RCX64Reg Ra = gpr.Bind(a, update ? RCMode::ReadWrite : RCMode::Read);
-  RCOpArg Rb = indexed ? gpr.Use(b, RCMode::Read) : RCOpArg::Imm32((u32)offset);
-  RCX64Reg Rs = fpr.Bind(s, RCMode::Write);
-  RegCache::Realize(scratch_guard, Ra, Rb, Rs);
+  RCX64Reg ra = gpr.Bind(a, update ? RCMode::ReadWrite : RCMode::Read);
+  RCOpArg rb = indexed ? gpr.Use(b, RCMode::Read) : RCOpArg::Imm32((u32)offset);
+  RCX64Reg rs = fpr.Bind(s, RCMode::Write);
+  RegCache::Realize(scratch_guard, ra, rb, rs);
 
-  MOV_sum(32, RSCRATCH_EXTRA, Ra, Rb);
+  MOV_sum(32, RSCRATCH_EXTRA, ra, rb);
 
   // In memcheck mode, don't update the address until the exception check
   if (update && !jo.memcheck)
-    MOV(32, Ra, R(RSCRATCH_EXTRA));
+    MOV(32, ra, R(RSCRATCH_EXTRA));
 
-  const bool gqrIsConstant = js.constantGqrValid[i];
-  if (gqrIsConstant)
+  const bool gqr_is_constant = js.constantGqrValid[i];
+  if (gqr_is_constant)
   {
-    const u32 gqrValue = js.constantGqr[i] >> 16;
-    GenQuantizedLoad(w == 1, static_cast<EQuantizeType>(gqrValue & 0x7), (gqrValue & 0x3F00) >> 8);
+    const u32 gqr_value = js.constantGqr[i] >> 16;
+    GenQuantizedLoad(w == 1, static_cast<EQuantizeType>(gqr_value & 0x7), (gqr_value & 0x3F00) >> 8);
   }
   else
   {
@@ -160,9 +160,9 @@ void Jit64::psq_lXX(UGeckoInstruction inst)
     CALLptr(MatR(RSCRATCH));
   }
 
-  CVTPS2PD(Rs, R(XMM0));
+  CVTPS2PD(rs, R(XMM0));
   if (update && jo.memcheck)
   {
-    ADD(32, Ra, Rb);
+    ADD(32, ra, rb);
   }
 }

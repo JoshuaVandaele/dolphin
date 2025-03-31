@@ -77,9 +77,9 @@ bool NWC24Dl::IsDisabled() const
 void NWC24Dl::WriteDlList() const
 {
   ASSERT(!IsDisabled());
-  constexpr FS::Modes public_modes{FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::ReadWrite};
-  m_fs->CreateFullPath(PID_KD, PID_KD, DL_LIST_PATH, 0, public_modes);
-  const auto file = m_fs->CreateAndOpenFile(PID_KD, PID_KD, DL_LIST_PATH, public_modes);
+  constexpr FS::Modes PUBLIC_MODES{FS::Mode::ReadWrite, FS::Mode::ReadWrite, FS::Mode::ReadWrite};
+  m_fs->CreateFullPath(PID_KD, PID_KD, DL_LIST_PATH, 0, PUBLIC_MODES);
+  const auto file = m_fs->CreateAndOpenFile(PID_KD, PID_KD, DL_LIST_PATH, PUBLIC_MODES);
 
   if (!file || !file->Write(&m_data, 1))
     ERROR_LOG_FMT(IOS_WC24, "Failed to open or write WC24 DL list file");

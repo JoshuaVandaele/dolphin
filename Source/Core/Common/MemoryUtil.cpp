@@ -283,9 +283,9 @@ size_t MemPhysical()
   get_system_info(&sysinfo);
   return static_cast<size_t>(sysinfo.max_pages * B_PAGE_SIZE);
 #else
-  struct sysinfo memInfo;
-  sysinfo(&memInfo);
-  return (size_t)memInfo.totalram * memInfo.mem_unit;
+  struct sysinfo mem_info;
+  sysinfo(&mem_info);
+  return (size_t)mem_info.totalram * mem_info.mem_unit;
 #endif
 }
 

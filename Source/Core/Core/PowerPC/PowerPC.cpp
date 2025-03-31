@@ -219,7 +219,7 @@ void PowerPCManager::InitializeCPUCore(CPUCore cpu_core)
 
 std::span<const CPUCore> AvailableCPUCores()
 {
-  static constexpr auto cpu_cores = {
+  static constexpr auto CPU_CORES = {
 #ifdef _M_X86_64
       CPUCore::JIT64,
 #elif defined(_M_ARM_64)
@@ -229,7 +229,7 @@ std::span<const CPUCore> AvailableCPUCores()
       CPUCore::Interpreter,
   };
 
-  return cpu_cores;
+  return CPU_CORES;
 }
 
 CPUCore DefaultCPUCore()

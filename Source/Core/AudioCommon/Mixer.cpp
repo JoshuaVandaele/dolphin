@@ -60,7 +60,7 @@ void Mixer::DoState(PointerWrap& p)
 // Executed from sound stream thread
 void Mixer::MixerFifo::Mix(s16* samples, std::size_t num_samples)
 {
-  constexpr u32 half = 0x80000000;
+  constexpr u32 HALF = 0x80000000;
 
   const u64 out_sample_rate = m_mixer->m_output_sample_rate;
   u64 in_sample_rate = FIXED_SAMPLE_RATE_DIVIDEND / m_input_sample_rate_divisor;
@@ -89,12 +89,12 @@ void Mixer::MixerFifo::Mix(s16* samples, std::size_t num_samples)
     samples += 2;
 
     m_current_index += index_jump;
-    if (m_current_index < half)
+    if (m_current_index < HALF)
     {
       m_front = m_back;
       Dequeue(&m_back);
 
-      m_current_index += half;
+      m_current_index += HALF;
     }
   }
 }
@@ -125,12 +125,12 @@ std::size_t Mixer::MixSurround(float* samples, std::size_t num_samples)
 
   std::size_t needed_frames = m_surround_decoder.QueryFramesNeededForSurroundOutput(num_samples);
 
-  constexpr std::size_t max_samples = 0x8000;
-  ASSERT_MSG(AUDIO, needed_frames <= max_samples,
+  constexpr std::size_t MAX_SAMPLES = 0x8000;
+  ASSERT_MSG(AUDIO, needed_frames <= MAX_SAMPLES,
              "needed_frames would overflow m_scratch_buffer: {} -> {} > {}", num_samples,
-             needed_frames, max_samples);
+             needed_frames, MAX_SAMPLES);
 
-  std::array<s16, max_samples> buffer;
+  std::array<s16, MAX_SAMPLES> buffer;
   std::size_t available_frames = Mix(buffer.data(), static_cast<std::size_t>(needed_frames));
   if (available_frames != needed_frames)
   {

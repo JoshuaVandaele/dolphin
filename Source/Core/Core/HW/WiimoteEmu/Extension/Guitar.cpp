@@ -22,7 +22,7 @@
 
 namespace WiimoteEmu
 {
-static const std::map<const ControlState, const u8> s_slider_bar_control_codes{
+static const std::map<const ControlState, const u8> S_SLIDER_BAR_CONTROL_CODES{
     // values determined using a PS3 Guitar Hero 5 controller, which maps the touchbar to Zr on
     // Windows
     {0.0, 0x0F},        // not touching
@@ -33,9 +33,9 @@ static const std::map<const ControlState, const u8> s_slider_bar_control_codes{
     {1.0, 0x1F}         // bottom fret
 };
 
-constexpr std::array<u8, 6> guitar_id{{0x00, 0x00, 0xa4, 0x20, 0x01, 0x03}};
+constexpr std::array<u8, 6> GUITAR_ID{{0x00, 0x00, 0xa4, 0x20, 0x01, 0x03}};
 
-constexpr std::array<u16, 5> guitar_fret_bitmasks{{
+constexpr std::array<u16, 5> GUITAR_FRET_BITMASKS{{
     Guitar::FRET_GREEN,
     Guitar::FRET_RED,
     Guitar::FRET_YELLOW,
@@ -43,7 +43,7 @@ constexpr std::array<u16, 5> guitar_fret_bitmasks{{
     Guitar::FRET_ORANGE,
 }};
 
-constexpr std::array<const char*, 5> guitar_fret_names{{
+constexpr std::array<const char*, 5> GUITAR_FRET_NAMES{{
     _trans("Green"),
     _trans("Red"),
     _trans("Yellow"),
@@ -51,12 +51,12 @@ constexpr std::array<const char*, 5> guitar_fret_names{{
     _trans("Orange"),
 }};
 
-constexpr std::array<u16, 2> guitar_button_bitmasks{{
+constexpr std::array<u16, 2> GUITAR_BUTTON_BITMASKS{{
     Guitar::BUTTON_MINUS,
     Guitar::BUTTON_PLUS,
 }};
 
-constexpr std::array<u16, 2> guitar_strum_bitmasks{{
+constexpr std::array<u16, 2> GUITAR_STRUM_BITMASKS{{
     Guitar::BAR_UP,
     Guitar::BAR_DOWN,
 }};
@@ -67,7 +67,7 @@ Guitar::Guitar() : Extension1stParty(_trans("Guitar"))
 
   // frets
   groups.emplace_back(m_frets = new ControllerEmu::Buttons(_trans("Frets")));
-  for (auto& guitar_fret_name : guitar_fret_names)
+  for (auto& guitar_fret_name : GUITAR_FRET_NAMES)
   {
     m_frets->AddInput(Translatability::Translate, guitar_fret_name);
   }
@@ -83,9 +83,9 @@ Guitar::Guitar() : Extension1stParty(_trans("Guitar"))
   m_buttons->AddInput(Translatability::DoNotTranslate, "+");
 
   // stick
-  constexpr auto gate_radius = ControlState(STICK_GATE_RADIUS) / STICK_RADIUS;
+  constexpr auto GATE_RADIUS = ControlState(STICK_GATE_RADIUS) / STICK_RADIUS;
   groups.emplace_back(m_stick =
-                          new ControllerEmu::OctagonAnalogStick(_trans("Stick"), gate_radius));
+                          new ControllerEmu::OctagonAnalogStick(_trans("Stick"), GATE_RADIUS));
 
   // whammy
   groups.emplace_back(m_whammy = new ControllerEmu::Triggers(_trans("Whammy")));
@@ -117,7 +117,7 @@ void Guitar::BuildDesiredExtensionState(DesiredExtensionState* target_state)
     const ControllerEmu::Slider::StateData slider_data =
         m_slider_bar->GetState(m_input_override_function);
 
-    guitar_data.sb = s_slider_bar_control_codes.lower_bound(slider_data.value)->second;
+    guitar_data.sb = S_SLIDER_BAR_CONTROL_CODES.lower_bound(slider_data.value)->second;
   }
   else
   {
@@ -131,13 +131,13 @@ void Guitar::BuildDesiredExtensionState(DesiredExtensionState* target_state)
   guitar_data.whammy = MapFloat<u8>(whammy_state.data[0], 0, 0, 0x1F);
 
   // buttons
-  m_buttons->GetState(&guitar_data.bt, guitar_button_bitmasks.data(), m_input_override_function);
+  m_buttons->GetState(&guitar_data.bt, GUITAR_BUTTON_BITMASKS.data(), m_input_override_function);
 
   // frets
-  m_frets->GetState(&guitar_data.bt, guitar_fret_bitmasks.data(), m_input_override_function);
+  m_frets->GetState(&guitar_data.bt, GUITAR_FRET_BITMASKS.data(), m_input_override_function);
 
   // strum
-  m_strum->GetState(&guitar_data.bt, guitar_strum_bitmasks.data(), m_input_override_function);
+  m_strum->GetState(&guitar_data.bt, GUITAR_STRUM_BITMASKS.data(), m_input_override_function);
 
   // flip button bits
   guitar_data.bt ^= 0xFFFF;
@@ -154,7 +154,7 @@ void Guitar::Reset()
 {
   EncryptedExtension::Reset();
 
-  m_reg.identifier = guitar_id;
+  m_reg.identifier = GUITAR_ID;
 
   // TODO: Is there calibration data?
 }

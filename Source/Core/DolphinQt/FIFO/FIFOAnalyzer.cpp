@@ -687,7 +687,7 @@ public:
                         vtx_attr.g0.NormalIndex3 ? normal_elements : 1);
       for (u32 c = 0; c < vtx_desc.low.Color.Size(); c++)
       {
-        static constexpr Common::EnumMap<u32, ColorFormat::RGBA8888> component_sizes = {
+        static constexpr Common::EnumMap<u32, ColorFormat::RGBA8888> COMPONENT_SIZES = {
             2,  // RGB565
             3,  // RGB888
             4,  // RGB888x
@@ -704,7 +704,7 @@ public:
           process_simple_component(2);
           break;
         case VertexComponentFormat::Direct:
-          process_simple_component(component_sizes[vtx_attr.GetColorFormat(c)]);
+          process_simple_component(COMPONENT_SIZES[vtx_attr.GetColorFormat(c)]);
           break;
         case VertexComponentFormat::NotPresent:
           break;

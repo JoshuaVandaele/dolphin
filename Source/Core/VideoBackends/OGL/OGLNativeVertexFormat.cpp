@@ -26,11 +26,11 @@ OGLGfx::CreateNativeVertexFormat(const PortableVertexDeclaration& vtx_decl)
 
 static inline GLuint VarToGL(ComponentFormat t)
 {
-  static constexpr Common::EnumMap<GLuint, ComponentFormat::InvalidFloat7> lookup = {
+  static constexpr Common::EnumMap<GLuint, ComponentFormat::InvalidFloat7> LOOKUP = {
       GL_UNSIGNED_BYTE, GL_BYTE,  GL_UNSIGNED_SHORT, GL_SHORT,
       GL_FLOAT,         GL_FLOAT, GL_FLOAT,          GL_FLOAT,
   };
-  return lookup[t];
+  return LOOKUP[t];
 }
 
 static void SetPointer(ShaderAttrib attrib, u32 stride, const AttributeFormat& format)

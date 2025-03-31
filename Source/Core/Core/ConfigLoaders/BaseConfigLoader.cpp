@@ -74,7 +74,7 @@ void SaveToSYSCONF(Config::LayerType layer, std::function<bool(const Config::Loc
   sysconf.Save();
 }
 
-const std::map<Config::System, int> system_to_ini = {
+const std::map<Config::System, int> SYSTEM_TO_INI = {
     {Config::System::Main, F_DOLPHINCONFIG_IDX},
     {Config::System::GCPad, F_GCPADCONFIG_IDX},
     {Config::System::WiiPad, F_WIIPADCONFIG_IDX},
@@ -95,12 +95,12 @@ public:
   void Load(Config::Layer* layer) override
   {
     // List of settings that under no circumstances should be loaded from the global config INI.
-    static const auto s_setting_disallowed = {
+    static const auto S_SETTING_DISALLOWED = {
         &Config::MAIN_MEMORY_CARD_SIZE.GetLocation(),
     };
 
     LoadFromSYSCONF(layer);
-    for (const auto& system : system_to_ini)
+    for (const auto& system : SYSTEM_TO_INI)
     {
       Common::IniFile ini;
       ini.Load(File::GetUserPath(system.second));
@@ -115,7 +115,7 @@ public:
         {
           const Config::Location location{system.first, section_name, value.first};
           const bool load_disallowed = std::ranges::any_of(
-              s_setting_disallowed, [&location](const auto* l) { return *l == location; });
+              S_SETTING_DISALLOWED, [&location](const auto* l) { return *l == location; });
           if (load_disallowed)
             continue;
 
@@ -131,7 +131,7 @@ public:
 
     std::map<Config::System, Common::IniFile> inis;
 
-    for (const auto& system : system_to_ini)
+    for (const auto& system : SYSTEM_TO_INI)
     {
       inis[system.first].Load(File::GetUserPath(system.second));
     }
@@ -173,7 +173,7 @@ public:
       }
     }
 
-    for (const auto& system : system_to_ini)
+    for (const auto& system : SYSTEM_TO_INI)
     {
       inis[system.first].Save(File::GetUserPath(system.second));
     }

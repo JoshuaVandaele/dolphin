@@ -112,7 +112,7 @@ static std::atomic<State> s_state = State::Uninitialized;
 static std::unique_ptr<MemoryWatcher> s_memory_watcher;
 #endif
 
-void Callback_FramePresented(const PresentInfo& present_info);
+void CallbackFramePresented(const PresentInfo& present_info);
 
 struct HostJob
 {
@@ -131,7 +131,7 @@ static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot
                       WindowSystemInfo wsi);
 
 static Common::EventHook s_frame_presented =
-    AfterPresentEvent::Register(&Core::Callback_FramePresented, "Core Frame Presented");
+    AfterPresentEvent::Register(&Core::CallbackFramePresented, "Core Frame Presented");
 
 bool GetIsThrottlerTempDisabled()
 {
@@ -589,12 +589,12 @@ static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot
   system.GetPowerPC().SetMode(PowerPC::CoreMode::Interpreter);
 
   // Determine the CPU thread function
-  void (*cpuThreadFunc)(Core::System & system, const std::optional<std::string>& savestate_path,
+  void (*cpu_thread_func)(Core::System & system, const std::optional<std::string>& savestate_path,
                         bool delete_savestate);
   if (std::holds_alternative<BootParameters::DFF>(boot->parameters))
-    cpuThreadFunc = FifoPlayerThread;
+    cpu_thread_func = FifoPlayerThread;
   else
-    cpuThreadFunc = CpuThread;
+    cpu_thread_func = CpuThread;
 
   std::optional<DiscIO::Riivolution::SavegameRedirect> savegame_redirect = std::nullopt;
   if (system.IsWii())
@@ -645,7 +645,7 @@ static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot
 
     // Spawn the CPU thread. The CPU thread will signal the event that boot is complete.
     s_cpu_thread =
-        std::thread(cpuThreadFunc, std::ref(system), std::ref(savestate_path), delete_savestate);
+        std::thread(cpu_thread_func, std::ref(system), std::ref(savestate_path), delete_savestate);
 
     // become the GPU thread
     system.GetFifo().RunGpuLoop();
@@ -664,7 +664,7 @@ static void EmuThread(Core::System& system, std::unique_ptr<BootParameters> boot
   else  // SingleCore mode
   {
     // Become the CPU thread
-    cpuThreadFunc(system, savestate_path, delete_savestate);
+    cpu_thread_func(system, savestate_path, delete_savestate);
   }
 
   INFO_LOG_FMT(CONSOLE, "{}", StopMessage(true, "Stopping GDB ..."));
@@ -725,8 +725,8 @@ State GetState(Core::System& system)
 
 static std::string GenerateScreenshotFolderPath()
 {
-  const std::string& gameId = SConfig::GetInstance().GetGameID();
-  std::string path = File::GetUserPath(D_SCREENSHOTS_IDX) + gameId + DIR_SEP_CHR;
+  const std::string& game_id = SConfig::GetInstance().GetGameID();
+  std::string path = File::GetUserPath(D_SCREENSHOTS_IDX) + game_id + DIR_SEP_CHR;
 
   if (!File::CreateFullPath(path))
   {
@@ -851,7 +851,7 @@ void RunOnCPUThread(Core::System& system, std::function<void()> function, bool w
 // --- Callbacks for backends / engine ---
 
 // Called from Renderer::Swap (GPU thread) when a frame is presented to the host screen.
-void Callback_FramePresented(const PresentInfo& present_info)
+void CallbackFramePresented(const PresentInfo& present_info)
 {
   g_perf_metrics.CountFrame();
 
@@ -887,11 +887,11 @@ void Callback_NewField(Core::System& system)
 void UpdateTitle(Core::System& system)
 {
   // Settings are shown the same for both extended and summary info
-  const std::string SSettings = fmt::format(
+  const std::string s_settings = fmt::format(
       "{} {} | {} | {}", system.GetPowerPC().GetCPUName(), system.IsDualCoreMode() ? "DC" : "SC",
       g_video_backend->GetDisplayName(), Config::Get(Config::MAIN_DSP_HLE) ? "HLE" : "LLE");
 
-  std::string message = fmt::format("{} | {}", Common::GetScmRevStr(), SSettings);
+  std::string message = fmt::format("{} | {}", Common::GetScmRevStr(), s_settings);
   if (Config::Get(Config::MAIN_SHOW_ACTIVE_TITLE))
   {
     const std::string& title = SConfig::GetInstance().GetTitleDescription();

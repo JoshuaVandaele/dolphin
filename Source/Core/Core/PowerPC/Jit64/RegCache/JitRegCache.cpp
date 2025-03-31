@@ -545,7 +545,7 @@ void RegCache::StoreFromRegister(preg_t i, FlushMode mode)
   // When a transaction is in progress, allowing the store would overwrite the old value.
   ASSERT_MSG(DYNA_REC, !m_regs[i].IsRevertable(), "Register transaction on {} is in progress!", i);
 
-  bool doStore = false;
+  bool do_store = false;
 
   switch (m_regs[i].GetLocationType())
   {
@@ -556,17 +556,17 @@ void RegCache::StoreFromRegister(preg_t i, FlushMode mode)
   case PPCCachedReg::LocationType::Bound:
   {
     X64Reg xr = RX(i);
-    doStore = m_xregs[xr].IsDirty();
+    do_store = m_xregs[xr].IsDirty();
     if (mode == FlushMode::Full)
       m_xregs[xr].Unbind();
     break;
   }
   case PPCCachedReg::LocationType::Immediate:
-    doStore = true;
+    do_store = true;
     break;
   }
 
-  if (doStore)
+  if (do_store)
     StoreRegister(i, GetDefaultLocation(i));
   if (mode == FlushMode::Full)
     m_regs[i].SetFlushed();

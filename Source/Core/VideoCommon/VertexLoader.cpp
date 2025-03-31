@@ -18,7 +18,7 @@
 const u8* g_video_buffer_read_ptr;
 u8* g_vertex_manager_write_ptr;
 
-static void PosMtx_ReadDirect_UByte(VertexLoader* loader)
+static void PosMtxReadDirectUByte(VertexLoader* loader)
 {
   u32 posmtx = DataRead<u8>() & 0x3f;
   if (loader->m_remaining < 3)
@@ -27,7 +27,7 @@ static void PosMtx_ReadDirect_UByte(VertexLoader* loader)
   PRIM_LOG("posmtx: {}, ", posmtx);
 }
 
-static void TexMtx_ReadDirect_UByte(VertexLoader* loader)
+static void TexMtxReadDirectUByte(VertexLoader* loader)
 {
   loader->m_curtexmtx[loader->m_texmtxread] = DataRead<u8>() & 0x3f;
 
@@ -35,18 +35,18 @@ static void TexMtx_ReadDirect_UByte(VertexLoader* loader)
   loader->m_texmtxread++;
 }
 
-static void TexMtx_Write_Float(VertexLoader* loader)
+static void TexMtxWriteFloat(VertexLoader* loader)
 {
   DataWrite(float(loader->m_curtexmtx[loader->m_texmtxwrite++]));
 }
 
-static void TexMtx_Write_Float2(VertexLoader* loader)
+static void TexMtxWriteFloat2(VertexLoader* loader)
 {
   DataWrite(0.f);
   DataWrite(float(loader->m_curtexmtx[loader->m_texmtxwrite++]));
 }
 
-static void TexMtx_Write_Float3(VertexLoader* loader)
+static void TexMtxWriteFloat3(VertexLoader* loader)
 {
   DataWrite(0.f);
   DataWrite(0.f);
@@ -83,7 +83,7 @@ void VertexLoader::CompileVertexTranslator()
   // Position Matrix Index
   if (m_VtxDesc.low.PosMatIdx)
   {
-    WriteCall(PosMtx_ReadDirect_UByte);
+    WriteCall(PosMtxReadDirectUByte);
     m_native_vtx_decl.posmtx.components = 4;
     m_native_vtx_decl.posmtx.enable = true;
     m_native_vtx_decl.posmtx.offset = nat_offset;
@@ -95,7 +95,7 @@ void VertexLoader::CompileVertexTranslator()
   for (auto texmtxidx : m_VtxDesc.low.TexMatIdx)
   {
     if (texmtxidx)
-      WriteCall(TexMtx_ReadDirect_UByte);
+      WriteCall(TexMtxReadDirectUByte);
   }
 
   // Write vertex position loader
@@ -113,17 +113,17 @@ void VertexLoader::CompileVertexTranslator()
   // Normals
   if (m_VtxDesc.low.Normal != VertexComponentFormat::NotPresent)
   {
-    TPipelineFunction pFunc =
+    TPipelineFunction p_func =
         VertexLoader_Normal::GetFunction(m_VtxDesc.low.Normal, m_VtxAttr.g0.NormalFormat,
                                          m_VtxAttr.g0.NormalElements, m_VtxAttr.g0.NormalIndex3);
 
-    if (pFunc == nullptr)
+    if (p_func == nullptr)
     {
       PanicAlertFmt("VertexLoader_Normal::GetFunction({} {} {} {}) returned zero!",
                     m_VtxDesc.low.Normal, m_VtxAttr.g0.NormalFormat, m_VtxAttr.g0.NormalElements,
                     m_VtxAttr.g0.NormalIndex3);
     }
-    WriteCall(pFunc);
+    WriteCall(p_func);
 
     for (int i = 0; i < (m_VtxAttr.g0.NormalElements == NormalComponentCount::NTB ? 3 : 1); i++)
     {
@@ -142,12 +142,12 @@ void VertexLoader::CompileVertexTranslator()
     m_native_vtx_decl.colors[i].type = ComponentFormat::UByte;
     m_native_vtx_decl.colors[i].integer = false;
 
-    TPipelineFunction pFunc =
+    TPipelineFunction p_func =
         VertexLoader_Color::GetFunction(m_VtxDesc.low.Color[i], m_VtxAttr.GetColorFormat(i));
 
-    if (pFunc != nullptr)
+    if (p_func != nullptr)
     {
-      WriteCall(pFunc);
+      WriteCall(p_func);
     }
     else
     {
@@ -196,11 +196,11 @@ void VertexLoader::CompileVertexTranslator()
       if (tc != VertexComponentFormat::NotPresent)
       {
         // if texmtx is included, texcoord will always be 3 floats, z will be the texmtx index
-        WriteCall(elements == TexComponentCount::ST ? TexMtx_Write_Float : TexMtx_Write_Float2);
+        WriteCall(elements == TexComponentCount::ST ? TexMtxWriteFloat : TexMtxWriteFloat2);
       }
       else
       {
-        WriteCall(TexMtx_Write_Float3);
+        WriteCall(TexMtxWriteFloat3);
       }
     }
     else

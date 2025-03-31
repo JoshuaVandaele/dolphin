@@ -115,15 +115,15 @@ bool TraversalClient::TestPacket(u8* data, size_t size, ENetAddress* from)
 //--Temporary until more of the old netplay branch is moved over
 void TraversalClient::Update()
 {
-  ENetEvent netEvent;
-  if (enet_host_service(m_NetHost, &netEvent, 4) > 0)
+  ENetEvent net_event;
+  if (enet_host_service(m_NetHost, &net_event, 4) > 0)
   {
-    switch (netEvent.type)
+    switch (net_event.type)
     {
     case ENET_EVENT_TYPE_RECEIVE:
-      TestPacket(netEvent.packet->data, netEvent.packet->dataLength, &netEvent.peer->address);
+      TestPacket(net_event.packet->data, net_event.packet->dataLength, &net_event.peer->address);
 
-      enet_packet_destroy(netEvent.packet);
+      enet_packet_destroy(net_event.packet);
       break;
     default:
       break;
@@ -246,14 +246,14 @@ void TraversalClient::OnFailure(FailureReason reason)
 
 void TraversalClient::ResendPacket(OutgoingTraversalPacketInfo* info)
 {
-  bool testPacket =
+  bool test_packet =
       m_TestSocket != ENET_SOCKET_NULL && info->packet.type == TraversalPacketType::TestPlease;
   info->sendTime = enet_time_get();
   info->tries++;
   ENetBuffer buf;
   buf.data = &info->packet;
   buf.dataLength = sizeof(info->packet);
-  if (enet_socket_send(testPacket ? m_TestSocket : m_NetHost->socket, &m_ServerAddress, &buf, 1) ==
+  if (enet_socket_send(test_packet ? m_TestSocket : m_NetHost->socket, &m_ServerAddress, &buf, 1) ==
       -1)
     OnFailure(FailureReason::SocketSendError);
 }
@@ -321,13 +321,13 @@ void TraversalClient::NewTraversalTest()
   buf.data = &packet;
   buf.dataLength = sizeof(packet);
   // send to alt port
-  ENetAddress altAddress = m_ServerAddress;
-  altAddress.port = m_portAlt;
+  ENetAddress alt_address = m_ServerAddress;
+  alt_address.port = m_portAlt;
   // set up ttl and send
   int oldttl;
   enet_socket_get_option(m_TestSocket, ENET_SOCKOPT_TTL, &oldttl);
   enet_socket_set_option(m_TestSocket, ENET_SOCKOPT_TTL, m_ttl);
-  if (enet_socket_send(m_TestSocket, &altAddress, &buf, 1) == -1)
+  if (enet_socket_send(m_TestSocket, &alt_address, &buf, 1) == -1)
   {
     // error, abort
     enet_socket_destroy(m_TestSocket);
@@ -346,19 +346,19 @@ void TraversalClient::HandleTraversalTest()
   {
     // check for packet on test socket (with timeout)
     u32 deadline = enet_time_get() + 50;
-    u32 waitCondition;
+    u32 wait_condition;
     do
     {
-      waitCondition = ENET_SOCKET_WAIT_RECEIVE | ENET_SOCKET_WAIT_INTERRUPT;
-      u32 currentTime = enet_time_get();
-      if (currentTime > deadline ||
-          enet_socket_wait(m_TestSocket, &waitCondition, deadline - currentTime) != 0)
+      wait_condition = ENET_SOCKET_WAIT_RECEIVE | ENET_SOCKET_WAIT_INTERRUPT;
+      u32 current_time = enet_time_get();
+      if (current_time > deadline ||
+          enet_socket_wait(m_TestSocket, &wait_condition, deadline - current_time) != 0)
       {
         // error or timeout, exit the loop and assume test failure
-        waitCondition = 0;
+        wait_condition = 0;
         break;
       }
-      else if (waitCondition & ENET_SOCKET_WAIT_RECEIVE)
+      else if (wait_condition & ENET_SOCKET_WAIT_RECEIVE)
       {
         // try reading the packet and see if it's relevant
         ENetAddress raddr;
@@ -370,7 +370,7 @@ void TraversalClient::HandleTraversalTest()
         if (rv < 0)
         {
           // error, exit the loop and assume test failure
-          waitCondition = 0;
+          wait_condition = 0;
           break;
         }
         else if (rv < int(sizeof(packet)) || raddr.host != m_ServerAddress.host ||
@@ -380,11 +380,11 @@ void TraversalClient::HandleTraversalTest()
           continue;
         }
       }
-    } while (waitCondition & ENET_SOCKET_WAIT_INTERRUPT);
+    } while (wait_condition & ENET_SOCKET_WAIT_INTERRUPT);
     // regardless of what happens next, we can throw out the socket
     enet_socket_destroy(m_TestSocket);
     m_TestSocket = ENET_SOCKET_NULL;
-    if (waitCondition & ENET_SOCKET_WAIT_RECEIVE)
+    if (wait_condition & ENET_SOCKET_WAIT_RECEIVE)
     {
       // success, we can stop now
       m_ttlReady = true;
@@ -418,8 +418,8 @@ void TraversalClient::Reset()
 
 int ENET_CALLBACK TraversalClient::InterceptCallback(ENetHost* host, ENetEvent* event)
 {
-  auto traversalClient = g_TraversalClient.get();
-  if (traversalClient->TestPacket(host->receivedData, host->receivedDataLength,
+  auto traversal_client = g_TraversalClient.get();
+  if (traversal_client->TestPacket(host->receivedData, host->receivedDataLength,
                                   &host->receivedAddress) ||
       (host->receivedDataLength == 1 && host->receivedData[0] == 0))
   {
@@ -435,22 +435,22 @@ ENet::ENetHostPtr g_MainNetHost;
 // The settings at the previous TraversalClient reset - notably, we
 // need to know not just what port it's on, but whether it was
 // explicitly requested.
-static std::string g_OldServer;
-static u16 g_OldServerPort;
-static u16 g_OldServerPortAlt;
-static u16 g_OldListenPort;
+static std::string g_old_server;
+static u16 g_old_server_port;
+static u16 g_old_server_port_alt;
+static u16 g_old_listen_port;
 
 bool EnsureTraversalClient(const std::string& server, u16 server_port, u16 server_port_alt,
                            u16 listen_port)
 {
-  if (!g_MainNetHost || !g_TraversalClient || server != g_OldServer ||
-      server_port != g_OldServerPort || server_port_alt != g_OldServerPortAlt ||
-      listen_port != g_OldListenPort)
+  if (!g_MainNetHost || !g_TraversalClient || server != g_old_server ||
+      server_port != g_old_server_port || server_port_alt != g_old_server_port_alt ||
+      listen_port != g_old_listen_port)
   {
-    g_OldServer = server;
-    g_OldServerPort = server_port;
-    g_OldServerPortAlt = server_port_alt;
-    g_OldListenPort = listen_port;
+    g_old_server = server;
+    g_old_server_port = server_port;
+    g_old_server_port_alt = server_port_alt;
+    g_old_listen_port = listen_port;
 
     ENetAddress addr = {ENET_HOST_ANY, listen_port};
     auto host = Common::ENet::ENetHostPtr{enet_host_create(&addr,                   // address

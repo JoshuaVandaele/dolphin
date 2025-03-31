@@ -145,17 +145,17 @@ Device::Device(std::unique_ptr<WiimoteReal::Wiimote> wiimote) : m_wiimote(std::m
   using EmuWiimote = WiimoteEmu::Wiimote;
 
   // Buttons.
-  static constexpr std::pair<u16, const char*> button_masks[] = {
+  static constexpr std::pair<u16, const char*> BUTTON_MASKS[] = {
       {EmuWiimote::BUTTON_A, "A"},       {EmuWiimote::BUTTON_B, "B"},
       {EmuWiimote::BUTTON_ONE, "1"},     {EmuWiimote::BUTTON_TWO, "2"},
       {EmuWiimote::BUTTON_MINUS, "-"},   {EmuWiimote::BUTTON_PLUS, "+"},
       {EmuWiimote::BUTTON_HOME, "HOME"},
   };
 
-  for (auto& button : button_masks)
+  for (auto& button : BUTTON_MASKS)
     AddInput(new Button<u16>(&m_core_data.hex, button.first, button.second));
 
-  static constexpr u16 dpad_masks[] = {
+  static constexpr u16 DPAD_MASKS[] = {
       EmuWiimote::PAD_UP,
       EmuWiimote::PAD_DOWN,
       EmuWiimote::PAD_LEFT,
@@ -163,19 +163,19 @@ Device::Device(std::unique_ptr<WiimoteReal::Wiimote> wiimote) : m_wiimote(std::m
   };
 
   // Friendly orientation inputs.
-  static constexpr const char* const rotation_names[] = {"Pitch", "Roll", "Yaw"};
-  for (std::size_t i = 0; i != std::size(rotation_names); ++i)
+  static constexpr const char* const ROTATION_NAMES[] = {"Pitch", "Roll", "Yaw"};
+  for (std::size_t i = 0; i != std::size(ROTATION_NAMES); ++i)
   {
     AddInput(
-        new UndetectableSignedAnalogInput(&m_rotation_inputs.data[i], rotation_names[i], -1.f));
-    AddInput(new UndetectableSignedAnalogInput(&m_rotation_inputs.data[i], rotation_names[i], 1.f));
+        new UndetectableSignedAnalogInput(&m_rotation_inputs.data[i], ROTATION_NAMES[i], -1.f));
+    AddInput(new UndetectableSignedAnalogInput(&m_rotation_inputs.data[i], ROTATION_NAMES[i], 1.f));
   }
 
   // Raw accelerometer.
-  for (std::size_t i = 0; i != std::size(dpad_masks); ++i)
-    AddInput(new Button<u16>(&m_core_data.hex, dpad_masks[i], named_directions[i]));
+  for (std::size_t i = 0; i != std::size(DPAD_MASKS); ++i)
+    AddInput(new Button<u16>(&m_core_data.hex, DPAD_MASKS[i], named_directions[i]));
 
-  static constexpr std::array<std::array<const char*, 2>, 3> accel_names = {{
+  static constexpr std::array<std::array<const char*, 2>, 3> ACCEL_NAMES = {{
       {"Accel Left", "Accel Right"},
       {"Accel Backward", "Accel Forward"},
       {"Accel Up", "Accel Down"},
@@ -183,18 +183,18 @@ Device::Device(std::unique_ptr<WiimoteReal::Wiimote> wiimote) : m_wiimote(std::m
 
   for (std::size_t i = 0; i != m_accel_data.data.size(); ++i)
   {
-    AddInput(new UndetectableAnalogInput<float>(&m_accel_data.data[i], accel_names[i][0], 1));
-    AddInput(new UndetectableAnalogInput<float>(&m_accel_data.data[i], accel_names[i][1], -1));
+    AddInput(new UndetectableAnalogInput<float>(&m_accel_data.data[i], ACCEL_NAMES[i][0], 1));
+    AddInput(new UndetectableAnalogInput<float>(&m_accel_data.data[i], ACCEL_NAMES[i][1], -1));
   }
 
   // IR data.
-  static constexpr const char* const ir_names[] = {"IR Center X", "IR Center Y"};
-  for (std::size_t i = 0; i != std::size(ir_names); ++i)
+  static constexpr const char* const IR_NAMES[] = {"IR Center X", "IR Center Y"};
+  for (std::size_t i = 0; i != std::size(IR_NAMES); ++i)
   {
     AddInput(
-        new UndetectableSignedAnalogInput(&m_ir_state.center_position.data[i], ir_names[i], -1.f));
+        new UndetectableSignedAnalogInput(&m_ir_state.center_position.data[i], IR_NAMES[i], -1.f));
     AddInput(
-        new UndetectableSignedAnalogInput(&m_ir_state.center_position.data[i], ir_names[i], 1.f));
+        new UndetectableSignedAnalogInput(&m_ir_state.center_position.data[i], IR_NAMES[i], 1.f));
   }
 
   AddInput(new UndetectableAnalogInput<bool>(&m_ir_state.is_hidden, "IR Hidden", 1));
@@ -213,7 +213,7 @@ Device::Device(std::unique_ptr<WiimoteReal::Wiimote> wiimote) : m_wiimote(std::m
   }
 
   // Raw gyroscope.
-  static constexpr std::array<std::array<const char*, 2>, 3> gyro_names = {{
+  static constexpr std::array<std::array<const char*, 2>, 3> GYRO_NAMES = {{
       {"Gyro Pitch Down", "Gyro Pitch Up"},
       {"Gyro Roll Left", "Gyro Roll Right"},
       {"Gyro Yaw Left", "Gyro Yaw Right"},
@@ -222,9 +222,9 @@ Device::Device(std::unique_ptr<WiimoteReal::Wiimote> wiimote) : m_wiimote(std::m
   for (std::size_t i = 0; i != m_accel_data.data.size(); ++i)
   {
     AddInput(
-        new UndetectableAnalogInput<float>(&m_mplus_state.gyro_data.data[i], gyro_names[i][0], 1));
+        new UndetectableAnalogInput<float>(&m_mplus_state.gyro_data.data[i], GYRO_NAMES[i][0], 1));
     AddInput(
-        new UndetectableAnalogInput<float>(&m_mplus_state.gyro_data.data[i], gyro_names[i][1], -1));
+        new UndetectableAnalogInput<float>(&m_mplus_state.gyro_data.data[i], GYRO_NAMES[i][1], -1));
   }
 
   using WiimoteEmu::Nunchuk;
@@ -235,55 +235,55 @@ Device::Device(std::unique_ptr<WiimoteReal::Wiimote> wiimote) : m_wiimote(std::m
   AddInput(new Button<u8>(&m_nunchuk_state.buttons, Nunchuk::BUTTON_Z, nunchuk_prefix + "Z"));
 
   // Stick.
-  static constexpr const char* const nunchuk_stick_names[] = {"X", "Y"};
-  for (std::size_t i = 0; i != std::size(nunchuk_stick_names); ++i)
+  static constexpr const char* const NUNCHUK_STICK_NAMES[] = {"X", "Y"};
+  for (std::size_t i = 0; i != std::size(NUNCHUK_STICK_NAMES); ++i)
   {
     AddInput(new SignedAnalogInput(&m_nunchuk_state.stick.data[i],
-                                   nunchuk_prefix + nunchuk_stick_names[i], -1.f));
+                                   nunchuk_prefix + NUNCHUK_STICK_NAMES[i], -1.f));
     AddInput(new SignedAnalogInput(&m_nunchuk_state.stick.data[i],
-                                   nunchuk_prefix + nunchuk_stick_names[i], 1.f));
+                                   nunchuk_prefix + NUNCHUK_STICK_NAMES[i], 1.f));
   }
 
   // Raw accelerometer.
   for (std::size_t i = 0; i != m_accel_data.data.size(); ++i)
   {
     AddInput(new UndetectableAnalogInput<float>(&m_nunchuk_state.accel.data[i],
-                                                nunchuk_prefix + accel_names[i][0], 1));
+                                                nunchuk_prefix + ACCEL_NAMES[i][0], 1));
     AddInput(new UndetectableAnalogInput<float>(&m_nunchuk_state.accel.data[i],
-                                                nunchuk_prefix + accel_names[i][1], -1));
+                                                nunchuk_prefix + ACCEL_NAMES[i][1], -1));
   }
 
   using WiimoteEmu::Classic;
   const std::string classic_prefix = "Classic ";
 
   // Buttons.
-  static constexpr u16 classic_dpad_masks[] = {
+  static constexpr u16 CLASSIC_DPAD_MASKS[] = {
       Classic::PAD_UP,
       Classic::PAD_DOWN,
       Classic::PAD_LEFT,
       Classic::PAD_RIGHT,
   };
 
-  for (std::size_t i = 0; i != std::size(classic_dpad_masks); ++i)
-    AddInput(new Button<u16>(&m_classic_state.buttons, classic_dpad_masks[i],
+  for (std::size_t i = 0; i != std::size(CLASSIC_DPAD_MASKS); ++i)
+    AddInput(new Button<u16>(&m_classic_state.buttons, CLASSIC_DPAD_MASKS[i],
                              classic_prefix + named_directions[i]));
 
-  static constexpr u16 classic_button_masks[] = {
+  static constexpr u16 CLASSIC_BUTTON_MASKS[] = {
       Classic::BUTTON_A,     Classic::BUTTON_B,    Classic::BUTTON_X,    Classic::BUTTON_Y,
       Classic::TRIGGER_L,    Classic::TRIGGER_R,   Classic::BUTTON_ZL,   Classic::BUTTON_ZR,
       Classic::BUTTON_MINUS, Classic::BUTTON_PLUS, Classic::BUTTON_HOME,
   };
 
-  static constexpr const char* const classic_button_names[] = {
+  static constexpr const char* const CLASSIC_BUTTON_NAMES[] = {
       "A", "B", "X", "Y", "L", "R", "ZL", "ZR", "-", "+", "HOME",
   };
 
-  for (std::size_t i = 0; i != std::size(classic_button_masks); ++i)
-    AddInput(new Button<u16>(&m_classic_state.buttons, classic_button_masks[i],
-                             classic_prefix + classic_button_names[i]));
+  for (std::size_t i = 0; i != std::size(CLASSIC_BUTTON_MASKS); ++i)
+    AddInput(new Button<u16>(&m_classic_state.buttons, CLASSIC_BUTTON_MASKS[i],
+                             classic_prefix + CLASSIC_BUTTON_NAMES[i]));
 
   // Sticks.
-  static constexpr const char* const classic_stick_names[][2] = {{"Left X", "Left Y"},
+  static constexpr const char* const CLASSIC_STICK_NAMES[][2] = {{"Left X", "Left Y"},
                                                                  {"Right X", "Right Y"}};
 
   for (std::size_t s = 0; s != std::size(m_classic_state.sticks); ++s)
@@ -291,9 +291,9 @@ Device::Device(std::unique_ptr<WiimoteReal::Wiimote> wiimote) : m_wiimote(std::m
     for (std::size_t i = 0; i != std::size(m_classic_state.sticks[0].data); ++i)
     {
       AddInput(new SignedAnalogInput(&m_classic_state.sticks[s].data[i],
-                                     classic_prefix + classic_stick_names[s][i], -1.f));
+                                     classic_prefix + CLASSIC_STICK_NAMES[s][i], -1.f));
       AddInput(new SignedAnalogInput(&m_classic_state.sticks[s].data[i],
-                                     classic_prefix + classic_stick_names[s][i], 1.f));
+                                     classic_prefix + CLASSIC_STICK_NAMES[s][i], 1.f));
     }
   }
 
@@ -379,12 +379,12 @@ void Device::RunTasks()
   }
 
   // Set reporting mode to one that supports every component.
-  static constexpr auto desired_reporting_mode = InputReportID::ReportCoreAccelIR10Ext6;
-  if (m_reporting_mode != desired_reporting_mode)
+  static constexpr auto DESIRED_REPORTING_MODE = InputReportID::ReportCoreAccelIR10Ext6;
+  if (m_reporting_mode != DESIRED_REPORTING_MODE)
   {
     OutputReportMode mode = {};
     mode.ack = 1;
-    mode.mode = desired_reporting_mode;
+    mode.mode = DESIRED_REPORTING_MODE;
     QueueReport(mode, [this](ErrorCode error) {
       if (error != ErrorCode::Success)
       {
@@ -392,7 +392,7 @@ void Device::RunTasks()
         return;
       }
 
-      m_reporting_mode = desired_reporting_mode;
+      m_reporting_mode = DESIRED_REPORTING_MODE;
 
       DEBUG_LOG_FMT(WIIMOTE, "WiiRemote: Set reporting mode.");
     });
@@ -904,7 +904,7 @@ void Device::SetIRSensitivity(u32 level)
   };
 
   // Data for Wii levels 1 to 5.
-  static constexpr std::array<IRSensitivityConfig, IR_SENSITIVITY_LEVEL_COUNT> sensitivity_configs =
+  static constexpr std::array<IRSensitivityConfig, IR_SENSITIVITY_LEVEL_COUNT> SENSITIVITY_CONFIGS =
       {{
           {{0x02, 0x00, 0x00, 0x71, 0x01, 0x00, 0x64, 0x00, 0xfe}, {0xfd, 0x05}},
           {{0x02, 0x00, 0x00, 0x71, 0x01, 0x00, 0x96, 0x00, 0xb4}, {0xb3, 0x04}},
@@ -918,7 +918,7 @@ void Device::SetIRSensitivity(u32 level)
 
   DEBUG_LOG_FMT(WIIMOTE, "WiiRemote: Setting IR sensitivity: {}.", level + 1);
 
-  const auto& sensitivity_config = sensitivity_configs[level];
+  const auto& sensitivity_config = SENSITIVITY_CONFIGS[level];
 
   WriteData(AddressSpace::I2CBus, WiimoteEmu::CameraLogic::I2C_ADDR, BLOCK1_ADDR,
             sensitivity_config.block1, [&sensitivity_config, level, this](ErrorCode block_result) {
@@ -1420,11 +1420,11 @@ void Device::ProcessNormalExtensionData(const u8* ext_data, u32 ext_size)
 
 void Device::UpdateRumble()
 {
-  static constexpr auto rumble_period = std::chrono::milliseconds(100);
+  static constexpr auto RUMBLE_PERIOD = std::chrono::milliseconds(100);
 
   const auto on_time =
-      std::chrono::duration_cast<Clock::duration>(rumble_period * m_rumble_level.load());
-  const auto off_time = rumble_period - on_time;
+      std::chrono::duration_cast<Clock::duration>(RUMBLE_PERIOD * m_rumble_level.load());
+  const auto off_time = RUMBLE_PERIOD - on_time;
 
   const auto now = Clock::now();
 

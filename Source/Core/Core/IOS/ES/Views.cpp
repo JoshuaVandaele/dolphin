@@ -44,23 +44,23 @@ IPCReply ESDevice::GetTicketViewCount(const IOCtlVRequest& request)
   auto& system = GetSystem();
   auto& memory = system.GetMemory();
 
-  const u64 TitleID = memory.Read_U64(request.in_vectors[0].address);
+  const u64 title_id = memory.Read_U64(request.in_vectors[0].address);
 
-  const ES::TicketReader ticket = m_core.FindSignedTicket(TitleID);
+  const ES::TicketReader ticket = m_core.FindSignedTicket(title_id);
   u32 view_count = ticket.IsValid() ? static_cast<u32>(ticket.GetNumberOfTickets()) : 0;
 
-  if (!IsEmulated(TitleID))
+  if (!IsEmulated(title_id))
   {
     view_count = 0;
-    ERROR_LOG_FMT(IOS_ES, "GetViewCount: Dolphin doesn't emulate IOS title {:016x}", TitleID);
+    ERROR_LOG_FMT(IOS_ES, "GetViewCount: Dolphin doesn't emulate IOS title {:016x}", title_id);
   }
-  else if (ShouldReturnFakeViewsForIOSes(TitleID, m_core.m_title_context))
+  else if (ShouldReturnFakeViewsForIOSes(title_id, m_core.m_title_context))
   {
     view_count = 1;
-    WARN_LOG_FMT(IOS_ES, "GetViewCount: Faking IOS title {:016x} being present", TitleID);
+    WARN_LOG_FMT(IOS_ES, "GetViewCount: Faking IOS title {:016x} being present", title_id);
   }
 
-  INFO_LOG_FMT(IOS_ES, "IOCTL_ES_GETVIEWCNT for titleID: {:016x} (View Count = {})", TitleID,
+  INFO_LOG_FMT(IOS_ES, "IOCTL_ES_GETVIEWCNT for titleID: {:016x} (View Count = {})", title_id,
                view_count);
 
   memory.Write_U32(view_count, request.io_vectors[0].address);
@@ -75,18 +75,18 @@ IPCReply ESDevice::GetTicketViews(const IOCtlVRequest& request)
   auto& system = GetSystem();
   auto& memory = system.GetMemory();
 
-  const u64 TitleID = memory.Read_U64(request.in_vectors[0].address);
-  const u32 maxViews = memory.Read_U32(request.in_vectors[1].address);
+  const u64 title_id = memory.Read_U64(request.in_vectors[0].address);
+  const u32 max_views = memory.Read_U32(request.in_vectors[1].address);
 
-  const ES::TicketReader ticket = m_core.FindSignedTicket(TitleID);
+  const ES::TicketReader ticket = m_core.FindSignedTicket(title_id);
 
-  if (!IsEmulated(TitleID))
+  if (!IsEmulated(title_id))
   {
-    ERROR_LOG_FMT(IOS_ES, "GetViews: Dolphin doesn't emulate IOS title {:016x}", TitleID);
+    ERROR_LOG_FMT(IOS_ES, "GetViews: Dolphin doesn't emulate IOS title {:016x}", title_id);
   }
   else if (ticket.IsValid())
   {
-    u32 number_of_views = std::min(maxViews, static_cast<u32>(ticket.GetNumberOfTickets()));
+    u32 number_of_views = std::min(max_views, static_cast<u32>(ticket.GetNumberOfTickets()));
     for (u32 view = 0; view < number_of_views; ++view)
     {
       const std::vector<u8> ticket_view = ticket.GetRawTicketView(view);
@@ -94,13 +94,13 @@ IPCReply ESDevice::GetTicketViews(const IOCtlVRequest& request)
                        ticket_view.data(), ticket_view.size());
     }
   }
-  else if (ShouldReturnFakeViewsForIOSes(TitleID, m_core.m_title_context))
+  else if (ShouldReturnFakeViewsForIOSes(title_id, m_core.m_title_context))
   {
     memory.Memset(request.io_vectors[0].address, 0, sizeof(ES::TicketView));
-    WARN_LOG_FMT(IOS_ES, "GetViews: Faking IOS title {:016x} being present", TitleID);
+    WARN_LOG_FMT(IOS_ES, "GetViews: Faking IOS title {:016x} being present", title_id);
   }
 
-  INFO_LOG_FMT(IOS_ES, "IOCTL_ES_GETVIEWS for titleID: {:016x} (MaxViews = {})", TitleID, maxViews);
+  INFO_LOG_FMT(IOS_ES, "IOCTL_ES_GETVIEWS for titleID: {:016x} (MaxViews = {})", title_id, max_views);
 
   return IPCReply(IPC_SUCCESS);
 }
@@ -216,8 +216,8 @@ IPCReply ESDevice::GetTMDViewSize(const IOCtlVRequest& request)
   auto& system = GetSystem();
   auto& memory = system.GetMemory();
 
-  const u64 TitleID = memory.Read_U64(request.in_vectors[0].address);
-  const ES::TMDReader tmd = m_core.FindInstalledTMD(TitleID);
+  const u64 title_id = memory.Read_U64(request.in_vectors[0].address);
+  const ES::TMDReader tmd = m_core.FindInstalledTMD(title_id);
 
   if (!tmd.IsValid())
     return IPCReply(FS_ENOENT);
@@ -225,7 +225,7 @@ IPCReply ESDevice::GetTMDViewSize(const IOCtlVRequest& request)
   const u32 view_size = static_cast<u32>(tmd.GetRawView().size());
   memory.Write_U32(view_size, request.io_vectors[0].address);
 
-  INFO_LOG_FMT(IOS_ES, "GetTMDViewSize: {} bytes for title {:016x}", view_size, TitleID);
+  INFO_LOG_FMT(IOS_ES, "GetTMDViewSize: {} bytes for title {:016x}", view_size, title_id);
   return IPCReply(IPC_SUCCESS);
 }
 

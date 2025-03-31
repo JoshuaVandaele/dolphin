@@ -57,7 +57,7 @@ enum
 };
 
 // Indicates which pins are accessible by broadway.  Writable by starlet only.
-static constexpr Common::Flags<GPIO> gpio_owner = {GPIO::SLOT_LED, GPIO::SLOT_IN, GPIO::SENSOR_BAR,
+static constexpr Common::Flags<GPIO> GPIO_OWNER = {GPIO::SLOT_LED, GPIO::SLOT_IN, GPIO::SENSOR_BAR,
                                                    GPIO::DO_EJECT, GPIO::AVE_SCL, GPIO::AVE_SDA};
 
 WiiIPC::WiiIPC(Core::System& system) : m_system(system)
@@ -173,7 +173,7 @@ void WiiIPC::RegisterMMIO(MMIO::Mapping* mmio, u32 base)
                  MMIO::ComplexWrite<u32>([](Core::System& system, u32, u32 val) {
                    auto& wii_ipc = system.GetWiiIPC();
                    wii_ipc.m_gpio_out.m_hex =
-                       (val & gpio_owner.m_hex) | (wii_ipc.m_gpio_out.m_hex & ~gpio_owner.m_hex);
+                       (val & GPIO_OWNER.m_hex) | (wii_ipc.m_gpio_out.m_hex & ~GPIO_OWNER.m_hex);
                    if (wii_ipc.m_gpio_out[GPIO::DO_EJECT])
                    {
                      INFO_LOG_FMT(WII_IPC, "Ejecting disc due to GPIO write");
@@ -187,7 +187,7 @@ void WiiIPC::RegisterMMIO(MMIO::Mapping* mmio, u32 base)
                  MMIO::ComplexWrite<u32>([](Core::System& system, u32, u32 val) {
                    auto& wii_ipc = system.GetWiiIPC();
                    wii_ipc.m_gpio_dir.m_hex =
-                       (val & gpio_owner.m_hex) | (wii_ipc.m_gpio_dir.m_hex & ~gpio_owner.m_hex);
+                       (val & GPIO_OWNER.m_hex) | (wii_ipc.m_gpio_dir.m_hex & ~GPIO_OWNER.m_hex);
                  }));
   mmio->Register(base | GPIOB_IN, MMIO::ComplexRead<u32>([](Core::System& system, u32) {
                    Common::Flags<GPIO> gpio_in;
@@ -210,7 +210,7 @@ void WiiIPC::RegisterMMIO(MMIO::Mapping* mmio, u32 base)
                  MMIO::ComplexWrite<u32>([](Core::System& system, u32, u32 val) {
                    auto& wii_ipc = system.GetWiiIPC();
                    wii_ipc.m_gpio_out.m_hex =
-                       (wii_ipc.m_gpio_out.m_hex & gpio_owner.m_hex) | (val & ~gpio_owner.m_hex);
+                       (wii_ipc.m_gpio_out.m_hex & GPIO_OWNER.m_hex) | (val & ~GPIO_OWNER.m_hex);
                    if (wii_ipc.m_gpio_out[GPIO::DO_EJECT])
                    {
                      INFO_LOG_FMT(WII_IPC, "Ejecting disc due to GPIO write");
@@ -224,7 +224,7 @@ void WiiIPC::RegisterMMIO(MMIO::Mapping* mmio, u32 base)
                  MMIO::ComplexWrite<u32>([](Core::System& system, u32, u32 val) {
                    auto& wii_ipc = system.GetWiiIPC();
                    wii_ipc.m_gpio_dir.m_hex =
-                       (wii_ipc.m_gpio_dir.m_hex & gpio_owner.m_hex) | (val & ~gpio_owner.m_hex);
+                       (wii_ipc.m_gpio_dir.m_hex & GPIO_OWNER.m_hex) | (val & ~GPIO_OWNER.m_hex);
                  }));
   mmio->Register(base | GPIO_IN, MMIO::ComplexRead<u32>([](Core::System& system, u32) {
                    Common::Flags<GPIO> gpio_in;

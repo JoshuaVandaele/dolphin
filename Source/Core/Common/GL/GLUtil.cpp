@@ -14,85 +14,85 @@ namespace GLUtil
 GLuint CompileProgram(const std::string& vertexShader, const std::string& fragmentShader)
 {
   // generate objects
-  GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-  GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-  GLuint programID = glCreateProgram();
+  GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
+  GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
+  GLuint program_id = glCreateProgram();
 
   // compile vertex shader
   const char* shader = vertexShader.c_str();
-  glShaderSource(vertexShaderID, 1, &shader, nullptr);
-  glCompileShader(vertexShaderID);
+  glShaderSource(vertex_shader_id, 1, &shader, nullptr);
+  glCompileShader(vertex_shader_id);
 #if defined(_DEBUG) || defined(DEBUGFAST)
-  GLint Result = GL_FALSE;
-  char stringBuffer[1024];
-  GLsizei stringBufferUsage = 0;
-  glGetShaderiv(vertexShaderID, GL_COMPILE_STATUS, &Result);
-  glGetShaderInfoLog(vertexShaderID, 1024, &stringBufferUsage, stringBuffer);
+  GLint result = GL_FALSE;
+  char string_buffer[1024];
+  GLsizei string_buffer_usage = 0;
+  glGetShaderiv(vertex_shader_id, GL_COMPILE_STATUS, &result);
+  glGetShaderInfoLog(vertex_shader_id, 1024, &string_buffer_usage, string_buffer);
 
-  if (Result && stringBufferUsage)
+  if (result && string_buffer_usage)
   {
-    ERROR_LOG_FMT(VIDEO, "GLSL vertex shader warnings:\n{}{}", stringBuffer, vertexShader);
+    ERROR_LOG_FMT(VIDEO, "GLSL vertex shader warnings:\n{}{}", string_buffer, vertexShader);
   }
-  else if (!Result)
+  else if (!result)
   {
-    ERROR_LOG_FMT(VIDEO, "GLSL vertex shader error:\n{}{}", stringBuffer, vertexShader);
+    ERROR_LOG_FMT(VIDEO, "GLSL vertex shader error:\n{}{}", string_buffer, vertexShader);
   }
   else
   {
     INFO_LOG_FMT(VIDEO, "GLSL vertex shader compiled:\n{}", vertexShader);
   }
 
-  bool shader_errors = !Result;
+  bool shader_errors = !result;
 #endif
 
   // compile fragment shader
   shader = fragmentShader.c_str();
-  glShaderSource(fragmentShaderID, 1, &shader, nullptr);
-  glCompileShader(fragmentShaderID);
+  glShaderSource(fragment_shader_id, 1, &shader, nullptr);
+  glCompileShader(fragment_shader_id);
 #if defined(_DEBUG) || defined(DEBUGFAST)
-  glGetShaderiv(fragmentShaderID, GL_COMPILE_STATUS, &Result);
-  glGetShaderInfoLog(fragmentShaderID, 1024, &stringBufferUsage, stringBuffer);
+  glGetShaderiv(fragment_shader_id, GL_COMPILE_STATUS, &result);
+  glGetShaderInfoLog(fragment_shader_id, 1024, &string_buffer_usage, string_buffer);
 
-  if (Result && stringBufferUsage)
+  if (result && string_buffer_usage)
   {
-    ERROR_LOG_FMT(VIDEO, "GLSL fragment shader warnings:\n{}{}", stringBuffer, fragmentShader);
+    ERROR_LOG_FMT(VIDEO, "GLSL fragment shader warnings:\n{}{}", string_buffer, fragmentShader);
   }
-  else if (!Result)
+  else if (!result)
   {
-    ERROR_LOG_FMT(VIDEO, "GLSL fragment shader error:\n{}{}", stringBuffer, fragmentShader);
+    ERROR_LOG_FMT(VIDEO, "GLSL fragment shader error:\n{}{}", string_buffer, fragmentShader);
   }
   else
   {
     INFO_LOG_FMT(VIDEO, "GLSL fragment shader compiled:\n{}", fragmentShader);
   }
 
-  shader_errors |= !Result;
+  shader_errors |= !result;
 #endif
 
   // link them
-  glAttachShader(programID, vertexShaderID);
-  glAttachShader(programID, fragmentShaderID);
-  glLinkProgram(programID);
+  glAttachShader(program_id, vertex_shader_id);
+  glAttachShader(program_id, fragment_shader_id);
+  glLinkProgram(program_id);
 #if defined(_DEBUG) || defined(DEBUGFAST)
-  glGetProgramiv(programID, GL_LINK_STATUS, &Result);
-  glGetProgramInfoLog(programID, 1024, &stringBufferUsage, stringBuffer);
+  glGetProgramiv(program_id, GL_LINK_STATUS, &result);
+  glGetProgramInfoLog(program_id, 1024, &string_buffer_usage, string_buffer);
 
-  if (Result && stringBufferUsage)
+  if (result && string_buffer_usage)
   {
-    ERROR_LOG_FMT(VIDEO, "GLSL linker warnings:\n{}{}{}", stringBuffer, vertexShader,
+    ERROR_LOG_FMT(VIDEO, "GLSL linker warnings:\n{}{}{}", string_buffer, vertexShader,
                   fragmentShader);
   }
-  else if (!Result && !shader_errors)
+  else if (!result && !shader_errors)
   {
-    ERROR_LOG_FMT(VIDEO, "GLSL linker error:\n{}{}{}", stringBuffer, vertexShader, fragmentShader);
+    ERROR_LOG_FMT(VIDEO, "GLSL linker error:\n{}{}{}", string_buffer, vertexShader, fragmentShader);
   }
 #endif
 
   // cleanup
-  glDeleteShader(vertexShaderID);
-  glDeleteShader(fragmentShaderID);
+  glDeleteShader(vertex_shader_id);
+  glDeleteShader(fragment_shader_id);
 
-  return programID;
+  return program_id;
 }
 
 void EnablePrimitiveRestart(const GLContext* context)

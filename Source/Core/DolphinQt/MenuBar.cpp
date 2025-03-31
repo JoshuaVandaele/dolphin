@@ -687,7 +687,7 @@ void MenuBar::AddGameListTypeSection(QMenu* view_menu)
 
 void MenuBar::AddListColumnsMenu(QMenu* view_menu)
 {
-  static const QMap<QString, const Config::Info<bool>*> columns{
+  static const QMap<QString, const Config::Info<bool>*> COLUMNS{
       {tr("Platform"), &Config::MAIN_GAMELIST_COLUMN_PLATFORM},
       {tr("Banner"), &Config::MAIN_GAMELIST_COLUMN_BANNER},
       {tr("Title"), &Config::MAIN_GAMELIST_COLUMN_TITLE},
@@ -708,9 +708,9 @@ void MenuBar::AddListColumnsMenu(QMenu* view_menu)
   m_cols_menu = view_menu->addMenu(tr("List Columns"));
   column_group->setExclusive(false);
 
-  for (const auto& key : columns.keys())
+  for (const auto& key : COLUMNS.keys())
   {
-    const Config::Info<bool>* const config = columns[key];
+    const Config::Info<bool>* const config = COLUMNS[key];
     QAction* action = column_group->addAction(m_cols_menu->addAction(key));
     action->setCheckable(true);
     action->setChecked(Config::Get(*config));
@@ -723,7 +723,7 @@ void MenuBar::AddListColumnsMenu(QMenu* view_menu)
 
 void MenuBar::AddShowPlatformsMenu(QMenu* view_menu)
 {
-  static const QMap<QString, const Config::Info<bool>*> platform_map{
+  static const QMap<QString, const Config::Info<bool>*> PLATFORM_MAP{
       {tr("Show Wii"), &Config::MAIN_GAMELIST_LIST_WII},
       {tr("Show GameCube"), &Config::MAIN_GAMELIST_LIST_GC},
       {tr("Show WAD"), &Config::MAIN_GAMELIST_LIST_WAD},
@@ -733,9 +733,9 @@ void MenuBar::AddShowPlatformsMenu(QMenu* view_menu)
   QMenu* plat_menu = view_menu->addMenu(tr("Show Platforms"));
   platform_group->setExclusive(false);
 
-  for (const auto& key : platform_map.keys())
+  for (const auto& key : PLATFORM_MAP.keys())
   {
-    const Config::Info<bool>* const config = platform_map[key];
+    const Config::Info<bool>* const config = PLATFORM_MAP[key];
     QAction* action = platform_group->addAction(plat_menu->addAction(key));
     action->setCheckable(true);
     action->setChecked(Config::Get(*config));
@@ -748,7 +748,7 @@ void MenuBar::AddShowPlatformsMenu(QMenu* view_menu)
 
 void MenuBar::AddShowRegionsMenu(QMenu* view_menu)
 {
-  static const QMap<QString, const Config::Info<bool>*> region_map{
+  static const QMap<QString, const Config::Info<bool>*> REGION_MAP{
       {tr("Show JPN"), &Config::MAIN_GAMELIST_LIST_JPN},
       {tr("Show PAL"), &Config::MAIN_GAMELIST_LIST_PAL},
       {tr("Show USA"), &Config::MAIN_GAMELIST_LIST_USA},
@@ -769,9 +769,9 @@ void MenuBar::AddShowRegionsMenu(QMenu* view_menu)
   const QAction* const hide_all_regions = region_menu->addAction(tr("Hide All"));
   region_menu->addSeparator();
 
-  for (const auto& key : region_map.keys())
+  for (const auto& key : REGION_MAP.keys())
   {
-    const Config::Info<bool>* const config = region_map[key];
+    const Config::Info<bool>* const config = REGION_MAP[key];
     QAction* const menu_item = region_menu->addAction(key);
     menu_item->setCheckable(true);
     menu_item->setChecked(Config::Get(*config));
@@ -1466,7 +1466,7 @@ RSOVector MenuBar::DetectRSOModules(ParallelProgressDialog& progress)
 {
   Core::CPUThreadGuard guard(Core::System::GetInstance());
 
-  constexpr std::array<std::string_view, 2> search_for = {".elf", ".plf"};
+  constexpr std::array<std::string_view, 2> SEARCH_FOR = {".elf", ".plf"};
 
   const AddressSpace::Accessors* accessors =
       AddressSpace::GetAccessors(AddressSpace::Type::Effective);
@@ -1474,7 +1474,7 @@ RSOVector MenuBar::DetectRSOModules(ParallelProgressDialog& progress)
   RSOVector matches;
 
   // Find filepath to elf/plf commonly used by RSO modules
-  for (const auto& str : search_for)
+  for (const auto& str : SEARCH_FOR)
   {
     u32 next = 0;
     while (true)
@@ -1776,31 +1776,31 @@ void MenuBar::ApplySignatureFile()
 
 void MenuBar::CombineSignatureFiles()
 {
-  const QString priorityFile = DolphinFileDialog::getOpenFileName(
+  const QString priority_file = DolphinFileDialog::getOpenFileName(
       this, tr("Choose Priority Input File"), QDir::homePath(), GetSignatureSelector());
-  if (priorityFile.isEmpty())
+  if (priority_file.isEmpty())
     return;
 
-  const QString secondaryFile = DolphinFileDialog::getOpenFileName(
+  const QString secondary_file = DolphinFileDialog::getOpenFileName(
       this, tr("Choose Secondary Input File"), QDir::homePath(), GetSignatureSelector());
-  if (secondaryFile.isEmpty())
+  if (secondary_file.isEmpty())
     return;
 
-  const QString saveFile = DolphinFileDialog::getSaveFileName(
+  const QString save_file = DolphinFileDialog::getSaveFileName(
       this, tr("Save Combined Output File As"), QDir::homePath(), GetSignatureSelector());
-  if (saveFile.isEmpty())
+  if (save_file.isEmpty())
     return;
 
-  const std::string load_pathPriorityFile = priorityFile.toStdString();
-  const std::string load_pathSecondaryFile = secondaryFile.toStdString();
-  const std::string save_path = saveFile.toStdString();
-  SignatureDB db(load_pathPriorityFile);
-  db.Load(load_pathPriorityFile);
-  db.Load(load_pathSecondaryFile);
+  const std::string load_path_priority_file = priority_file.toStdString();
+  const std::string load_path_secondary_file = secondary_file.toStdString();
+  const std::string save_path = save_file.toStdString();
+  SignatureDB db(load_path_priority_file);
+  db.Load(load_path_priority_file);
+  db.Load(load_path_secondary_file);
   if (!db.Save(save_path))
   {
     ModalMessageBox::warning(this, tr("Error"),
-                             tr("Failed to save to signature file '%1'").arg(saveFile));
+                             tr("Failed to save to signature file '%1'").arg(save_file));
     return;
   }
 

@@ -166,8 +166,8 @@ void EmuCodeBlock::UnsafeWriteRegToReg(Gen::X64Reg reg_value, Gen::X64Reg reg_ad
 bool EmuCodeBlock::UnsafeLoadToReg(X64Reg reg_value, OpArg opAddress, int accessSize, s32 offset,
                                    bool signExtend, MovInfo* info)
 {
-  bool offsetAddedToAddress = false;
-  OpArg memOperand;
+  bool offset_added_to_address = false;
+  OpArg mem_operand;
   if (opAddress.IsSimpleReg())
   {
     // Deal with potential wraparound.  (This is just a heuristic, and it would
@@ -181,27 +181,27 @@ bool EmuCodeBlock::UnsafeLoadToReg(X64Reg reg_value, OpArg opAddress, int access
       // This method can potentially clobber the address if it shares a register
       // with the load target. In this case we can just subtract offset from the
       // register (see Jit64 for this implementation).
-      offsetAddedToAddress = (reg_value == opAddress.GetSimpleReg());
+      offset_added_to_address = (reg_value == opAddress.GetSimpleReg());
 
       LEA(32, reg_value, MDisp(opAddress.GetSimpleReg(), offset));
       opAddress = R(reg_value);
       offset = 0;
     }
-    memOperand = MComplex(RMEM, opAddress.GetSimpleReg(), SCALE_1, offset);
+    mem_operand = MComplex(RMEM, opAddress.GetSimpleReg(), SCALE_1, offset);
   }
   else if (opAddress.IsImm())
   {
     MOV(32, R(reg_value), Imm32((u32)(opAddress.Imm32() + offset)));
-    memOperand = MRegSum(RMEM, reg_value);
+    mem_operand = MRegSum(RMEM, reg_value);
   }
   else
   {
     MOV(32, R(reg_value), opAddress);
-    memOperand = MComplex(RMEM, reg_value, SCALE_1, offset);
+    mem_operand = MComplex(RMEM, reg_value, SCALE_1, offset);
   }
 
-  LoadAndSwap(accessSize, reg_value, memOperand, signExtend, info);
-  return offsetAddedToAddress;
+  LoadAndSwap(accessSize, reg_value, mem_operand, signExtend, info);
+  return offset_added_to_address;
 }
 
 // Visitor that generates code to read a MMIO value.
@@ -326,24 +326,24 @@ void EmuCodeBlock::SafeLoadToReg(X64Reg reg_value, const Gen::OpArg& opAddress, 
   if (m_jit.jo.fastmem && !(flags & (SAFE_LOADSTORE_NO_FASTMEM | SAFE_LOADSTORE_NO_UPDATE_PC)) &&
       !force_slow_access)
   {
-    u8* backpatchStart = GetWritableCodePtr();
+    u8* backpatch_start = GetWritableCodePtr();
     MovInfo mov;
-    bool offsetAddedToAddress =
+    bool offset_added_to_address =
         UnsafeLoadToReg(reg_value, opAddress, accessSize, offset, signExtend, &mov);
     TrampolineInfo& info = m_back_patch_info[mov.address];
     info.pc = js.compilerPC;
     info.nonAtomicSwapStoreSrc = mov.nonAtomicSwapStore ? mov.nonAtomicSwapStoreSrc : INVALID_REG;
-    info.start = backpatchStart;
+    info.start = backpatch_start;
     info.read = true;
     info.op_reg = reg_value;
     info.op_arg = opAddress;
-    info.offsetAddedToAddress = offsetAddedToAddress;
+    info.offsetAddedToAddress = offset_added_to_address;
     info.accessSize = accessSize >> 3;
     info.offset = offset;
     info.registersInUse = registersInUse;
     info.flags = flags;
     info.signExtend = signExtend;
-    ptrdiff_t padding = BACKPATCH_SIZE - (GetCodePtr() - backpatchStart);
+    ptrdiff_t padding = BACKPATCH_SIZE - (GetCodePtr() - backpatch_start);
     if (padding > 0)
     {
       NOP(padding);
@@ -448,11 +448,11 @@ void EmuCodeBlock::SafeLoadToRegImmediate(X64Reg reg_value, u32 address, int acc
   }
 
   // If the address maps to an MMIO register, inline MMIO read code.
-  u32 mmioAddress = m_jit.m_mmu.IsOptimizableMMIOAccess(address, accessSize);
-  if (accessSize != 64 && mmioAddress)
+  u32 mmio_address = m_jit.m_mmu.IsOptimizableMMIOAccess(address, accessSize);
+  if (accessSize != 64 && mmio_address)
   {
     auto& memory = m_jit.m_system.GetMemory();
-    MMIOLoadToReg(memory.GetMMIOMapping(), reg_value, registersInUse, mmioAddress, accessSize,
+    MMIOLoadToReg(memory.GetMMIOMapping(), reg_value, registersInUse, mmio_address, accessSize,
                   signExtend);
     return;
   }
@@ -504,13 +504,13 @@ void EmuCodeBlock::SafeWriteRegToReg(OpArg reg_value, X64Reg reg_addr, int acces
   if (m_jit.jo.fastmem && !(flags & (SAFE_LOADSTORE_NO_FASTMEM | SAFE_LOADSTORE_NO_UPDATE_PC)) &&
       !force_slow_access)
   {
-    u8* backpatchStart = GetWritableCodePtr();
+    u8* backpatch_start = GetWritableCodePtr();
     MovInfo mov;
     UnsafeWriteRegToReg(reg_value, reg_addr, accessSize, offset, swap, &mov);
     TrampolineInfo& info = m_back_patch_info[mov.address];
     info.pc = js.compilerPC;
     info.nonAtomicSwapStoreSrc = mov.nonAtomicSwapStore ? mov.nonAtomicSwapStoreSrc : INVALID_REG;
-    info.start = backpatchStart;
+    info.start = backpatch_start;
     info.read = false;
     info.op_arg = reg_value;
     info.op_reg = reg_addr;
@@ -519,7 +519,7 @@ void EmuCodeBlock::SafeWriteRegToReg(OpArg reg_value, X64Reg reg_addr, int acces
     info.offset = offset;
     info.registersInUse = registersInUse;
     info.flags = flags;
-    ptrdiff_t padding = BACKPATCH_SIZE - (GetCodePtr() - backpatchStart);
+    ptrdiff_t padding = BACKPATCH_SIZE - (GetCodePtr() - backpatch_start);
     if (padding > 0)
     {
       NOP(padding);
@@ -740,9 +740,9 @@ void EmuCodeBlock::JitClearCA()
 }
 
 // Abstract between AVX and SSE: automatically handle 3-operand instructions
-void EmuCodeBlock::avx_op(void (XEmitter::*avxOp)(X64Reg, X64Reg, const OpArg&),
-                          void (XEmitter::*sseOp)(X64Reg, const OpArg&), X64Reg regOp,
-                          const OpArg& arg1, const OpArg& arg2, bool packed, bool reversible)
+void EmuCodeBlock::AVXOP(void (XEmitter::*avxOp)(X64Reg, X64Reg, const OpArg&),
+                         void (XEmitter::*sseOp)(X64Reg, const OpArg&), X64Reg regOp,
+                         const OpArg& arg1, const OpArg& arg2, bool packed, bool reversible)
 {
   if (arg1.IsSimpleReg(regOp))
   {
@@ -797,9 +797,9 @@ void EmuCodeBlock::avx_op(void (XEmitter::*avxOp)(X64Reg, X64Reg, const OpArg&),
 }
 
 // Abstract between AVX and SSE: automatically handle 3-operand instructions
-void EmuCodeBlock::avx_op(void (XEmitter::*avxOp)(X64Reg, X64Reg, const OpArg&, u8),
-                          void (XEmitter::*sseOp)(X64Reg, const OpArg&, u8), X64Reg regOp,
-                          const OpArg& arg1, const OpArg& arg2, u8 imm)
+void EmuCodeBlock::AVXOP(void (XEmitter::*avxOp)(X64Reg, X64Reg, const OpArg&, u8),
+                         void (XEmitter::*sseOp)(X64Reg, const OpArg&, u8), X64Reg regOp,
+                         const OpArg& arg1, const OpArg& arg2, u8 imm)
 {
   if (arg1.IsSimpleReg(regOp))
   {
@@ -832,8 +832,9 @@ void EmuCodeBlock::avx_op(void (XEmitter::*avxOp)(X64Reg, X64Reg, const OpArg&, 
   }
 }
 
-alignas(16) static const u64 psMantissaTruncate[2] = {0xFFFFFFFFF8000000ULL, 0xFFFFFFFFF8000000ULL};
-alignas(16) static const u64 psRoundBit[2] = {0x8000000, 0x8000000};
+alignas(16) static const u64 PS_MANTISSA_TRUNCATE[2] = {0xFFFFFFFFF8000000ULL,
+                                                        0xFFFFFFFFF8000000ULL};
+alignas(16) static const u64 PS_ROUND_BIT[2] = {0x8000000, 0x8000000};
 
 // Emulate the odd truncation/rounding that the PowerPC does on the RHS operand before
 // a single precision multiply. To be precise, it drops the low 28 bits of the mantissa,
@@ -846,16 +847,16 @@ void EmuCodeBlock::Force25BitPrecision(X64Reg output, const OpArg& input, X64Reg
     // mantissa = (mantissa & ~0xFFFFFFF) + ((mantissa & (1ULL << 27)) << 1);
     if (input.IsSimpleReg() && cpu_info.bAVX)
     {
-      VPAND(tmp, input.GetSimpleReg(), MConst(psRoundBit));
-      VPAND(output, input.GetSimpleReg(), MConst(psMantissaTruncate));
+      VPAND(tmp, input.GetSimpleReg(), MConst(PS_ROUND_BIT));
+      VPAND(output, input.GetSimpleReg(), MConst(PS_MANTISSA_TRUNCATE));
       PADDQ(output, R(tmp));
     }
     else
     {
       if (!input.IsSimpleReg(output))
         MOVAPD(output, input);
-      avx_op(&XEmitter::VPAND, &XEmitter::PAND, tmp, R(output), MConst(psRoundBit), true, true);
-      PAND(output, MConst(psMantissaTruncate));
+      AVXOP(&XEmitter::VPAND, &XEmitter::PAND, tmp, R(output), MConst(PS_ROUND_BIT), true, true);
+      PAND(output, MConst(PS_MANTISSA_TRUNCATE));
       PADDQ(output, R(tmp));
     }
   }
@@ -865,7 +866,7 @@ void EmuCodeBlock::Force25BitPrecision(X64Reg output, const OpArg& input, X64Reg
   }
 }
 
-alignas(16) static const __m128i double_qnan_bit = _mm_set_epi64x(0xffffffffffffffff,
+alignas(16) static const __m128i DOUBLE_QNAN_BIT = _mm_set_epi64x(0xffffffffffffffff,
                                                                   0xfff7ffffffffffff);
 
 // Converting single->double is a bit easier because all single denormals are double normals.
@@ -885,13 +886,13 @@ void EmuCodeBlock::ConvertSingleToDouble(X64Reg dst, X64Reg src, bool src_is_gpr
 
   UCOMISS(dst, R(dst));
   CVTSS2SD(dst, R(dst));
-  FixupBranch nanConversion = J_CC(CC_P, Jump::Near);
+  FixupBranch nan_conversion = J_CC(CC_P, Jump::Near);
 
   SwitchToFarCode();
-  SetJumpTarget(nanConversion);
+  SetJumpTarget(nan_conversion);
   TEST(32, R(gprsrc), Imm32(0x00400000));
   FixupBranch continue1 = J_CC(CC_NZ, Jump::Near);
-  ANDPD(dst, MConst(double_qnan_bit));
+  ANDPD(dst, MConst(DOUBLE_QNAN_BIT));
   FixupBranch continue2 = J(Jump::Near);
   SwitchToNearCode();
 
@@ -900,13 +901,13 @@ void EmuCodeBlock::ConvertSingleToDouble(X64Reg dst, X64Reg src, bool src_is_gpr
   MOVDDUP(dst, R(dst));
 }
 
-alignas(16) static const u64 psDoubleExp[2] = {Common::DOUBLE_EXP, 0};
-alignas(16) static const u64 psDoubleFrac[2] = {Common::DOUBLE_FRAC, 0};
-alignas(16) static const u64 psDoubleNoSign[2] = {~Common::DOUBLE_SIGN, 0};
+alignas(16) static const u64 PS_DOUBLE_EXP[2] = {Common::DOUBLE_EXP, 0};
+alignas(16) static const u64 PS_DOUBLE_FRAC[2] = {Common::DOUBLE_FRAC, 0};
+alignas(16) static const u64 PS_DOUBLE_NO_SIGN[2] = {~Common::DOUBLE_SIGN, 0};
 
-alignas(16) static const u32 psFloatExp[4] = {Common::FLOAT_EXP, 0, 0, 0};
-alignas(16) static const u32 psFloatFrac[4] = {Common::FLOAT_FRAC, 0, 0, 0};
-alignas(16) static const u32 psFloatNoSign[4] = {~Common::FLOAT_SIGN, 0, 0, 0};
+alignas(16) static const u32 PS_FLOAT_EXP[4] = {Common::FLOAT_EXP, 0, 0, 0};
+alignas(16) static const u32 PS_FLOAT_FRAC[4] = {Common::FLOAT_FRAC, 0, 0, 0};
+alignas(16) static const u32 PS_FLOAT_NO_SIGN[4] = {~Common::FLOAT_SIGN, 0, 0, 0};
 
 // TODO: it might be faster to handle FPRF in the same way as CR is currently handled for integer,
 // storing the result of each floating point op and calculating it when needed. This is trickier
@@ -926,40 +927,40 @@ void EmuCodeBlock::SetFPRF(Gen::X64Reg xmm, bool single)
     // Get the sign bit; almost all the branches need it.
     SHR(input_size, R(RSCRATCH), Imm8(input_size - 1));
     if (single)
-      PTEST(xmm, MConst(psFloatExp));
+      PTEST(xmm, MConst(PS_FLOAT_EXP));
     else
-      PTEST(xmm, MConst(psDoubleExp));
-    FixupBranch maxExponent = J_CC(CC_C);
-    FixupBranch zeroExponent = J_CC(CC_Z);
+      PTEST(xmm, MConst(PS_DOUBLE_EXP));
+    FixupBranch max_exponent = J_CC(CC_C);
+    FixupBranch zero_exponent = J_CC(CC_Z);
 
     // Nice normalized number: sign ? PPC_FPCLASS_NN : PPC_FPCLASS_PN;
     LEA(32, RSCRATCH,
         MScaled(RSCRATCH, Common::PPC_FPCLASS_NN - Common::PPC_FPCLASS_PN, Common::PPC_FPCLASS_PN));
     continue1 = J();
 
-    SetJumpTarget(maxExponent);
+    SetJumpTarget(max_exponent);
     if (single)
-      PTEST(xmm, MConst(psFloatFrac));
+      PTEST(xmm, MConst(PS_FLOAT_FRAC));
     else
-      PTEST(xmm, MConst(psDoubleFrac));
-    FixupBranch notNAN = J_CC(CC_Z);
+      PTEST(xmm, MConst(PS_DOUBLE_FRAC));
+    FixupBranch not_nan = J_CC(CC_Z);
 
     // Max exponent + mantissa: PPC_FPCLASS_QNAN
     MOV(32, R(RSCRATCH), Imm32(Common::PPC_FPCLASS_QNAN));
     continue2 = J();
 
     // Max exponent + no mantissa: sign ? PPC_FPCLASS_NINF : PPC_FPCLASS_PINF;
-    SetJumpTarget(notNAN);
+    SetJumpTarget(not_nan);
     LEA(32, RSCRATCH,
         MScaled(RSCRATCH, Common::PPC_FPCLASS_NINF - Common::PPC_FPCLASS_PINF,
                 Common::PPC_FPCLASS_PINF));
     continue3 = J();
 
-    SetJumpTarget(zeroExponent);
+    SetJumpTarget(zero_exponent);
     if (single)
-      PTEST(xmm, MConst(psFloatNoSign));
+      PTEST(xmm, MConst(PS_FLOAT_NO_SIGN));
     else
-      PTEST(xmm, MConst(psDoubleNoSign));
+      PTEST(xmm, MConst(PS_DOUBLE_NO_SIGN));
     FixupBranch zero = J_CC(CC_Z);
 
     // No exponent + mantissa: sign ? PPC_FPCLASS_ND : PPC_FPCLASS_PD;
@@ -978,8 +979,8 @@ void EmuCodeBlock::SetFPRF(Gen::X64Reg xmm, bool single)
     if (single)
       TEST(32, R(RSCRATCH), Imm32(Common::FLOAT_EXP));
     else
-      TEST(64, R(RSCRATCH), MConst(psDoubleExp));
-    FixupBranch zeroExponent = J_CC(CC_Z);
+      TEST(64, R(RSCRATCH), MConst(PS_DOUBLE_EXP));
+    FixupBranch zero_exponent = J_CC(CC_Z);
 
     if (single)
     {
@@ -988,8 +989,8 @@ void EmuCodeBlock::SetFPRF(Gen::X64Reg xmm, bool single)
     }
     else
     {
-      AND(64, R(RSCRATCH), MConst(psDoubleNoSign));
-      CMP(64, R(RSCRATCH), MConst(psDoubleExp));
+      AND(64, R(RSCRATCH), MConst(PS_DOUBLE_NO_SIGN));
+      CMP(64, R(RSCRATCH), MConst(PS_DOUBLE_EXP));
     }
     FixupBranch nan =
         J_CC(CC_G);  // This works because if the sign bit is set, RSCRATCH is negative
@@ -1013,11 +1014,11 @@ void EmuCodeBlock::SetFPRF(Gen::X64Reg xmm, bool single)
                 Common::PPC_FPCLASS_PINF));
     continue3 = J();
 
-    SetJumpTarget(zeroExponent);
+    SetJumpTarget(zero_exponent);
     if (single)
       TEST(input_size, R(RSCRATCH), Imm32(~Common::FLOAT_SIGN));
     else
-      TEST(input_size, R(RSCRATCH), MConst(psDoubleNoSign));
+      TEST(input_size, R(RSCRATCH), MConst(PS_DOUBLE_NO_SIGN));
     FixupBranch zero = J_CC(CC_Z);
 
     SHR(input_size, R(RSCRATCH), Imm8(input_size - 1));

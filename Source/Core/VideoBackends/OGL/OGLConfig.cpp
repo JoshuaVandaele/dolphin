@@ -89,8 +89,8 @@ void InitDriverInfo()
   case DriverDetails::VENDOR_QUALCOMM:
   {
     driver = DriverDetails::DRIVER_QUALCOMM;
-    double glVersion;
-    sscanf(g_ogl_config.gl_version, "OpenGL ES %lg V@%lg", &glVersion, &version);
+    double gl_version;
+    sscanf(g_ogl_config.gl_version, "OpenGL ES %lg V@%lg", &gl_version, &version);
   }
   break;
   case DriverDetails::VENDOR_ARM:
@@ -196,17 +196,17 @@ void InitDriverInfo()
     driver = DriverDetails::DRIVER_IMGTEC;
     double gl_version;
     int major, minor, change;
-    constexpr double change_scale = 10000000;
+    constexpr double CHANGE_SCALE = 10000000;
     sscanf(g_ogl_config.gl_version, "OpenGL ES %lg build %d.%d@%d", &gl_version, &major, &minor,
            &change);
     version = 100 * major + minor;
-    if (change >= change_scale)
+    if (change >= CHANGE_SCALE)
     {
-      ERROR_LOG_FMT(VIDEO, "Version changeID overflow - change:{} scale:{}", change, change_scale);
+      ERROR_LOG_FMT(VIDEO, "Version changeID overflow - change:{} scale:{}", change, CHANGE_SCALE);
     }
     else
     {
-      version += static_cast<double>(change) / change_scale;
+      version += static_cast<double>(change) / CHANGE_SCALE;
     }
   }
   break;
@@ -220,7 +220,7 @@ void InitDriverInfo()
 
 bool PopulateConfig(GLContext* m_main_gl_context)
 {
-  bool bSuccess = true;
+  bool b_success = true;
   bool supports_glsl_cache = false;
 
   g_ogl_config.gl_vendor = (const char*)glGetString(GL_VENDOR);
@@ -235,7 +235,7 @@ bool PopulateConfig(GLContext* m_main_gl_context)
       // It's also compatible with the gles3 one.
       PanicAlertFmtT("GPU: ERROR: Need GL_ARB_framebuffer_object for multiple render targets.\n"
                      "GPU: Does your video card support OpenGL 3.0?");
-      bSuccess = false;
+      b_success = false;
     }
 
     if (!GLExtensions::Supports("GL_ARB_vertex_array_object"))
@@ -244,7 +244,7 @@ bool PopulateConfig(GLContext* m_main_gl_context)
       // Also gles3 requires to use it.
       PanicAlertFmtT("GPU: OGL ERROR: Need GL_ARB_vertex_array_object.\n"
                      "GPU: Does your video card support OpenGL 3.0?");
-      bSuccess = false;
+      b_success = false;
     }
 
     if (!GLExtensions::Supports("GL_ARB_map_buffer_range"))
@@ -253,7 +253,7 @@ bool PopulateConfig(GLContext* m_main_gl_context)
       // The ogl2 one also isn't in gles3.
       PanicAlertFmtT("GPU: OGL ERROR: Need GL_ARB_map_buffer_range.\n"
                      "GPU: Does your video card support OpenGL 3.0?");
-      bSuccess = false;
+      b_success = false;
     }
 
     if (!GLExtensions::Supports("GL_ARB_uniform_buffer_object"))
@@ -262,14 +262,14 @@ bool PopulateConfig(GLContext* m_main_gl_context)
       // we also can stream them much nicer and pack into it whatever we want to
       PanicAlertFmtT("GPU: OGL ERROR: Need GL_ARB_uniform_buffer_object.\n"
                      "GPU: Does your video card support OpenGL 3.1?");
-      bSuccess = false;
+      b_success = false;
     }
     else if (DriverDetails::HasBug(DriverDetails::BUG_BROKEN_UBO))
     {
       PanicAlertFmtT(
           "Buggy GPU driver detected.\n"
           "Please either install the closed-source GPU driver or update your Mesa 3D version.");
-      bSuccess = false;
+      b_success = false;
     }
 
     if (!GLExtensions::Supports("GL_ARB_sampler_objects"))
@@ -278,7 +278,7 @@ bool PopulateConfig(GLContext* m_main_gl_context)
       // highest requirement, but it seems that no driver lacks support for it.
       PanicAlertFmtT("GPU: OGL ERROR: Need GL_ARB_sampler_objects.\n"
                      "GPU: Does your video card support OpenGL 3.3?");
-      bSuccess = false;
+      b_success = false;
     }
   }
 
@@ -467,7 +467,7 @@ bool PopulateConfig(GLContext* m_main_gl_context)
                      "GPU: Does your video card support OpenGL 3.0?\n"
                      "GPU: Your driver supports GLSL {0}",
                      reinterpret_cast<const char*>(glGetString(GL_SHADING_LANGUAGE_VERSION)));
-      bSuccess = false;
+      b_success = false;
     }
     else if (GLExtensions::Version() == 300)
     {
@@ -554,19 +554,19 @@ bool PopulateConfig(GLContext* m_main_gl_context)
   g_backend_info.AAModes.clear();
   if (g_ogl_config.bSupportsMSAA)
   {
-    bool supportsGetInternalFormat =
+    bool supports_get_internal_format =
         GLExtensions::Supports("VERSION_4_2") || GLExtensions::Supports("VERSION_GLES_3");
-    if (supportsGetInternalFormat)
+    if (supports_get_internal_format)
     {
       // Note: GL_TEXTURE_2D_MULTISAMPLE_ARRAY_OES should technically be used for
       // GL_OES_texture_storage_multisample_2d_array, but both are 0x9102 so it does not matter.
 
       std::vector<int> color_aa_modes;
       {
-        GLenum colorInternalFormat = OGLTexture::GetGLInternalFormatForTextureFormat(
+        GLenum color_internal_format = OGLTexture::GetGLInternalFormatForTextureFormat(
             FramebufferManager::GetEFBColorFormat(), true);
         GLint num_color_sample_counts = 0;
-        glGetInternalformativ(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, colorInternalFormat,
+        glGetInternalformativ(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, color_internal_format,
                               GL_NUM_SAMPLE_COUNTS, 1, &num_color_sample_counts);
 
         ASSERT_MSG(VIDEO, num_color_sample_counts >= 0,
@@ -578,7 +578,7 @@ bool PopulateConfig(GLContext* m_main_gl_context)
           color_aa_modes.resize(num_color_sample_counts);
 
           static_assert(sizeof(GLint) == sizeof(u32));
-          glGetInternalformativ(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, colorInternalFormat, GL_SAMPLES,
+          glGetInternalformativ(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, color_internal_format, GL_SAMPLES,
                                 num_color_sample_counts,
                                 reinterpret_cast<GLint*>(color_aa_modes.data()));
           ASSERT_MSG(VIDEO, std::ranges::is_sorted(color_aa_modes | std::views::reverse),
@@ -592,10 +592,10 @@ bool PopulateConfig(GLContext* m_main_gl_context)
 
       std::vector<int> depth_aa_modes;
       {
-        GLenum depthInternalFormat = OGLTexture::GetGLInternalFormatForTextureFormat(
+        GLenum depth_internal_format = OGLTexture::GetGLInternalFormatForTextureFormat(
             FramebufferManager::GetEFBColorFormat(), true);
         GLint num_depth_sample_counts = 0;
-        glGetInternalformativ(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, depthInternalFormat,
+        glGetInternalformativ(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, depth_internal_format,
                               GL_NUM_SAMPLE_COUNTS, 1, &num_depth_sample_counts);
 
         ASSERT_MSG(VIDEO, num_depth_sample_counts >= 0,
@@ -607,7 +607,7 @@ bool PopulateConfig(GLContext* m_main_gl_context)
           depth_aa_modes.resize(num_depth_sample_counts);
 
           static_assert(sizeof(GLint) == sizeof(u32));
-          glGetInternalformativ(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, depthInternalFormat, GL_SAMPLES,
+          glGetInternalformativ(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, depth_internal_format, GL_SAMPLES,
                                 num_depth_sample_counts,
                                 reinterpret_cast<GLint*>(depth_aa_modes.data()));
           ASSERT_MSG(VIDEO, std::ranges::is_sorted(depth_aa_modes | std::views::reverse),
@@ -664,11 +664,11 @@ bool PopulateConfig(GLContext* m_main_gl_context)
     g_backend_info.AAModes = {1};
   }
 
-  const bool bSupportsIsHelperInvocation = g_ogl_config.bIsES ?
+  const bool b_supports_is_helper_invocation = g_ogl_config.bIsES ?
                                                g_ogl_config.eSupportedGLSLVersion >= GlslEs320 :
                                                g_ogl_config.eSupportedGLSLVersion >= Glsl450;
   g_ogl_config.bSupportsKHRShaderSubgroup =
-      GLExtensions::Supports("GL_KHR_shader_subgroup") && bSupportsIsHelperInvocation;
+      GLExtensions::Supports("GL_KHR_shader_subgroup") && b_supports_is_helper_invocation;
   if (g_ogl_config.bSupportsKHRShaderSubgroup)
   {
     // Check for the features: basic + arithmetic + ballot
@@ -715,10 +715,10 @@ bool PopulateConfig(GLContext* m_main_gl_context)
         "turn this off in the graphics driver's settings in order for Dolphin to work.\n\n"
         "(MSAA with {0} samples found on default framebuffer)",
         samples);
-    bSuccess = false;
+    b_success = false;
   }
 
-  if (!bSuccess)
+  if (!b_success)
     return false;
 
   g_Config.VerifyValidity();

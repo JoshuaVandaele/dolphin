@@ -31,7 +31,7 @@ constexpr u32 m_os = OS_ALL | OS_ANDROID;
 #elif __APPLE__
 constexpr u32 m_os = OS_ALL | OS_OSX;
 #elif __linux__
-constexpr u32 m_os = OS_ALL | OS_LINUX;
+constexpr u32 M_OS = OS_ALL | OS_LINUX;
 #elif __FreeBSD__
 constexpr u32 m_os = OS_ALL | OS_FREEBSD;
 #elif __OpenBSD__
@@ -51,7 +51,7 @@ static std::string m_name;
 
 // This is a list of all known bugs for each vendor
 // We use this to check if the device and driver has a issue
-constexpr BugInfo m_known_bugs[] = {
+constexpr BugInfo M_KNOWN_BUGS[] = {
     {API_OPENGL, OS_ALL, VENDOR_QUALCOMM, DRIVER_QUALCOMM, Family::UNKNOWN,
      BUG_BROKEN_BUFFER_STREAM, -1.0, -1.0, true},
     {API_OPENGL, OS_ALL, VENDOR_QUALCOMM, DRIVER_QUALCOMM, Family::UNKNOWN,
@@ -200,9 +200,9 @@ void Init(API api, Vendor vendor, Driver driver, const double version, const Fam
   // Clear bug list, as the API may have changed
   m_bugs.clear();
 
-  for (const auto& bug : m_known_bugs)
+  for (const auto& bug : M_KNOWN_BUGS)
   {
-    if ((bug.m_api & api) && (bug.m_os & m_os) &&
+    if ((bug.m_api & api) && (bug.m_os & M_OS) &&
         (bug.m_vendor == m_vendor || bug.m_vendor == VENDOR_ALL) &&
         (bug.m_driver == m_driver || bug.m_driver == DRIVER_ALL) &&
         (bug.m_family == m_family || bug.m_family == Family::UNKNOWN) &&
@@ -230,7 +230,7 @@ bool HasBug(Bug bug)
 
 // clang-format off
 
-static const char* to_string(API api)
+static const char* ToString(API api)
 {
   switch (api)
   {
@@ -241,7 +241,7 @@ static const char* to_string(API api)
   return "Unknown";
 }
 
-static const char* to_string(Driver driver)
+static const char* ToString(Driver driver)
 {
   switch (driver)
   {
@@ -265,7 +265,7 @@ static const char* to_string(Driver driver)
   return "Unknown";
 }
 
-static const char* to_string(Bug bug)
+static const char* ToString(Bug bug)
 {
   switch (bug)
   {
@@ -306,17 +306,17 @@ static const char* to_string(Bug bug)
 void OverrideBug(Bug bug, bool new_value)
 {
   const auto [it, added] = m_bugs.try_emplace(
-      bug, BugInfo{m_api, m_os, m_vendor, m_driver, m_family, bug, -1, -1, false});
+      bug, BugInfo{m_api, M_OS, m_vendor, m_driver, m_family, bug, -1, -1, false});
   if (it->second.m_hasbug != new_value)
   {
     DolphinAnalytics& analytics = DolphinAnalytics::Instance();
     Common::AnalyticsReportBuilder builder(analytics.BaseBuilder());
     builder.AddData("type", "gpu-bug-override");
-    builder.AddData("bug", to_string(bug));
+    builder.AddData("bug", ToString(bug));
     builder.AddData("value", new_value);
     builder.AddData("gpu", m_name);
-    builder.AddData("api", to_string(m_api));
-    builder.AddData("driver", to_string(m_driver));
+    builder.AddData("api", ToString(m_api));
+    builder.AddData("driver", ToString(m_driver));
     builder.AddData("version", std::to_string(m_version));
     analytics.Send(builder);
 

@@ -1195,9 +1195,9 @@ void AchievementManager::Request(const rc_api_request_t* request,
         }
         else
         {
-          static constexpr char error_message[] = "Failed HTTP request.";
-          server_response.body = error_message;
-          server_response.body_length = sizeof(error_message);
+          static constexpr char ERROR_MESSAGE[] = "Failed HTTP request.";
+          server_response.body = ERROR_MESSAGE;
+          server_response.body_length = sizeof(ERROR_MESSAGE);
           server_response.http_status_code = RC_API_SERVER_RESPONSE_RETRYABLE_CLIENT_ERROR;
         }
 

@@ -110,7 +110,7 @@ bool ObjectCache::CreateDescriptorSetLayouts()
 {
   // The geometry shader buffer must be last in this binding set, as we don't include it
   // if geometry shaders are not supported by the device. See the decrement below.
-  static const std::array<VkDescriptorSetLayoutBinding, 4> standard_ubo_bindings{{
+  static const std::array<VkDescriptorSetLayoutBinding, 4> STANDARD_UBO_BINDINGS{{
       {UBO_DESCRIPTOR_SET_BINDING_PS, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1,
        VK_SHADER_STAGE_FRAGMENT_BIT},
       {UBO_DESCRIPTOR_SET_BINDING_VS, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1,
@@ -127,7 +127,7 @@ bool ObjectCache::CreateDescriptorSetLayouts()
   static_assert(VideoCommon::MAX_PIXEL_SHADER_SAMPLERS == 16, "Update descriptor sampler bindings");
 
   static const std::array<VkDescriptorSetLayoutBinding, TOTAL_PIXEL_SAMPLER_BINDINGS>
-      standard_sampler_bindings{{
+      STANDARD_SAMPLER_BINDINGS{{
           {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, MAX_PIXEL_SAMPLER_ARRAY_SIZE,
            VK_SHADER_STAGE_FRAGMENT_BIT},
           {8, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT},
@@ -141,18 +141,18 @@ bool ObjectCache::CreateDescriptorSetLayouts()
       }};
 
   // The dynamic veretex loader's vertex buffer must be last here, for similar reasons
-  static const std::array<VkDescriptorSetLayoutBinding, 2> standard_ssbo_bindings{{
+  static const std::array<VkDescriptorSetLayoutBinding, 2> STANDARD_SSBO_BINDINGS{{
       {0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT},
       {1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT},
   }};
 
-  static const std::array<VkDescriptorSetLayoutBinding, 1> utility_ubo_bindings{{
+  static const std::array<VkDescriptorSetLayoutBinding, 1> UTILITY_UBO_BINDINGS{{
       {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1,
        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_GEOMETRY_BIT | VK_SHADER_STAGE_FRAGMENT_BIT},
   }};
 
   // Utility samplers aren't dynamically indexed.
-  static const std::array<VkDescriptorSetLayoutBinding, 9> utility_sampler_bindings{{
+  static const std::array<VkDescriptorSetLayoutBinding, 9> UTILITY_SAMPLER_BINDINGS{{
       {0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT},
       {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT},
       {2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT},
@@ -164,7 +164,7 @@ bool ObjectCache::CreateDescriptorSetLayouts()
       {8, VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT},
   }};
 
-  static const std::array<VkDescriptorSetLayoutBinding, 19> compute_set_bindings{{
+  static const std::array<VkDescriptorSetLayoutBinding, 19> COMPUTE_SET_BINDINGS{{
       {0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1, VK_SHADER_STAGE_COMPUTE_BIT},
       {1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT},
       {2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_COMPUTE_BIT},
@@ -186,21 +186,21 @@ bool ObjectCache::CreateDescriptorSetLayouts()
       {18, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, VK_SHADER_STAGE_COMPUTE_BIT},
   }};
 
-  std::array<VkDescriptorSetLayoutBinding, 4> ubo_bindings = standard_ubo_bindings;
+  std::array<VkDescriptorSetLayoutBinding, 4> ubo_bindings = STANDARD_UBO_BINDINGS;
 
   std::array<VkDescriptorSetLayoutCreateInfo, NUM_DESCRIPTOR_SET_LAYOUTS> create_infos{{
       {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, nullptr, 0,
        static_cast<u32>(ubo_bindings.size()), ubo_bindings.data()},
       {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, nullptr, 0,
-       static_cast<u32>(standard_sampler_bindings.size()), standard_sampler_bindings.data()},
+       static_cast<u32>(STANDARD_SAMPLER_BINDINGS.size()), STANDARD_SAMPLER_BINDINGS.data()},
       {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, nullptr, 0,
-       static_cast<u32>(standard_ssbo_bindings.size()), standard_ssbo_bindings.data()},
+       static_cast<u32>(STANDARD_SSBO_BINDINGS.size()), STANDARD_SSBO_BINDINGS.data()},
       {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, nullptr, 0,
-       static_cast<u32>(utility_ubo_bindings.size()), utility_ubo_bindings.data()},
+       static_cast<u32>(UTILITY_UBO_BINDINGS.size()), UTILITY_UBO_BINDINGS.data()},
       {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, nullptr, 0,
-       static_cast<u32>(utility_sampler_bindings.size()), utility_sampler_bindings.data()},
+       static_cast<u32>(UTILITY_SAMPLER_BINDINGS.size()), UTILITY_SAMPLER_BINDINGS.data()},
       {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, nullptr, 0,
-       static_cast<u32>(compute_set_bindings.size()), compute_set_bindings.data()},
+       static_cast<u32>(COMPUTE_SET_BINDINGS.size()), COMPUTE_SET_BINDINGS.data()},
   }};
 
   // Don't set the GS bit if geometry shaders aren't available.
@@ -369,10 +369,10 @@ VkSampler ObjectCache::GetSampler(const SamplerState& info)
   if (iter != m_sampler_cache.end())
     return iter->second;
 
-  static constexpr std::array<VkFilter, 4> filters = {{VK_FILTER_NEAREST, VK_FILTER_LINEAR}};
-  static constexpr std::array<VkSamplerMipmapMode, 2> mipmap_modes = {
+  static constexpr std::array<VkFilter, 4> FILTERS = {{VK_FILTER_NEAREST, VK_FILTER_LINEAR}};
+  static constexpr std::array<VkSamplerMipmapMode, 2> MIPMAP_MODES = {
       {VK_SAMPLER_MIPMAP_MODE_NEAREST, VK_SAMPLER_MIPMAP_MODE_LINEAR}};
-  static constexpr std::array<VkSamplerAddressMode, 4> address_modes = {
+  static constexpr std::array<VkSamplerAddressMode, 4> ADDRESS_MODES = {
       {VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE, VK_SAMPLER_ADDRESS_MODE_REPEAT,
        VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT}};
 
@@ -380,11 +380,11 @@ VkSampler ObjectCache::GetSampler(const SamplerState& info)
       VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,              // VkStructureType         sType
       nullptr,                                            // const void*             pNext
       0,                                                  // VkSamplerCreateFlags    flags
-      filters[u32(info.tm0.mag_filter.Value())],          // VkFilter                magFilter
-      filters[u32(info.tm0.min_filter.Value())],          // VkFilter                minFilter
-      mipmap_modes[u32(info.tm0.mipmap_filter.Value())],  // VkSamplerMipmapMode mipmapMode
-      address_modes[u32(info.tm0.wrap_u.Value())],        // VkSamplerAddressMode    addressModeU
-      address_modes[u32(info.tm0.wrap_v.Value())],        // VkSamplerAddressMode    addressModeV
+      FILTERS[u32(info.tm0.mag_filter.Value())],          // VkFilter                magFilter
+      FILTERS[u32(info.tm0.min_filter.Value())],          // VkFilter                minFilter
+      MIPMAP_MODES[u32(info.tm0.mipmap_filter.Value())],  // VkSamplerMipmapMode mipmapMode
+      ADDRESS_MODES[u32(info.tm0.wrap_u.Value())],        // VkSamplerAddressMode    addressModeU
+      ADDRESS_MODES[u32(info.tm0.wrap_v.Value())],        // VkSamplerAddressMode    addressModeV
       VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,              // VkSamplerAddressMode    addressModeW
       info.tm0.lod_bias / 256.0f,                         // float                   mipLodBias
       VK_FALSE,                                 // VkBool32                anisotropyEnable
@@ -593,7 +593,7 @@ bool ObjectCache::LoadPipelineCache()
 // Table 9.1. Layout for pipeline cache header version VK_PIPELINE_CACHE_HEADER_VERSION_ONE
 // NOTE: This data is assumed to be in little-endian format.
 #pragma pack(push, 4)
-struct VK_PIPELINE_CACHE_HEADER
+struct VkPipelineCacheHeader
 {
   u32 header_length;
   u32 header_version;
@@ -602,20 +602,20 @@ struct VK_PIPELINE_CACHE_HEADER
   u8 uuid[VK_UUID_SIZE];
 };
 #pragma pack(pop)
-static_assert(std::is_trivially_copyable<VK_PIPELINE_CACHE_HEADER>::value,
+static_assert(std::is_trivially_copyable<VkPipelineCacheHeader>::value,
               "VK_PIPELINE_CACHE_HEADER must be trivially copyable");
 
 bool ObjectCache::ValidatePipelineCache(const u8* data, size_t data_length)
 {
-  if (data_length < sizeof(VK_PIPELINE_CACHE_HEADER))
+  if (data_length < sizeof(VkPipelineCacheHeader))
   {
     ERROR_LOG_FMT(VIDEO, "Pipeline cache failed validation: Invalid header");
     return false;
   }
 
-  VK_PIPELINE_CACHE_HEADER header;
+  VkPipelineCacheHeader header;
   std::memcpy(&header, data, sizeof(header));
-  if (header.header_length < sizeof(VK_PIPELINE_CACHE_HEADER))
+  if (header.header_length < sizeof(VkPipelineCacheHeader))
   {
     ERROR_LOG_FMT(VIDEO, "Pipeline cache failed validation: Invalid header length");
     return false;

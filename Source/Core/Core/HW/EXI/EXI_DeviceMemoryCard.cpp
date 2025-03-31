@@ -503,10 +503,10 @@ void CEXIMemoryCard::DoState(PointerWrap& p)
   // otherwise, we'll assume the user wants to keep their memcards and saves separate,
   // unless we're loading (in which case we let the savestate contents decide, in order to stay
   // aligned with them).
-  bool storeContents = m_system.GetMovie().IsMovieActive();
-  p.Do(storeContents);
+  bool store_contents = m_system.GetMovie().IsMovieActive();
+  p.Do(store_contents);
 
-  if (storeContents)
+  if (store_contents)
   {
     p.Do(m_interrupt_switch);
     p.Do(m_interrupt_set);

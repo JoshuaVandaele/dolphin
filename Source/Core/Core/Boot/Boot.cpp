@@ -74,12 +74,12 @@ static std::vector<std::string> ReadM3UFile(const std::string& m3u_path,
   while (std::getline(s, line))
   {
     // This is the UTF-8 representation of U+FEFF.
-    constexpr std::string_view utf8_bom = "\xEF\xBB\xBF";
+    constexpr std::string_view UTF8_BOM = "\xEF\xBB\xBF";
 
-    if (line.starts_with(utf8_bom))
+    if (line.starts_with(UTF8_BOM))
     {
       WARN_LOG_FMT(BOOT, "UTF-8 BOM in file: {}", m3u_path);
-      line.erase(0, utf8_bom.length());
+      line.erase(0, UTF8_BOM.length());
     }
 
     if (!line.empty() && line.front() != '#')  // Comments start with #
@@ -235,9 +235,9 @@ std::unique_ptr<BootParameters> BootParameters::GenerateFromFile(std::vector<std
   }
 #endif
 
-  static const std::unordered_set<std::string> disc_image_extensions = {
+  static const std::unordered_set<std::string> DISC_IMAGE_EXTENSIONS = {
       {".gcm", ".iso", ".tgc", ".wbfs", ".ciso", ".gcz", ".wia", ".rvz", ".nfs", ".dol", ".elf"}};
-  if (disc_image_extensions.contains(extension))
+  if (DISC_IMAGE_EXTENSIONS.contains(extension))
   {
     std::unique_ptr<DiscIO::VolumeDisc> disc = DiscIO::CreateDisc(path);
     if (disc)
@@ -375,9 +375,9 @@ bool CBoot::FindMapFile(std::string* existing_map_file, std::string* writable_ma
 
 bool CBoot::LoadMapFromFilename(const Core::CPUThreadGuard& guard, PPCSymbolDB& ppc_symbol_db)
 {
-  std::string strMapFilename;
-  bool found = FindMapFile(&strMapFilename, nullptr);
-  if (found && ppc_symbol_db.LoadMap(guard, strMapFilename))
+  std::string str_map_filename;
+  bool found = FindMapFile(&str_map_filename, nullptr);
+  if (found && ppc_symbol_db.LoadMap(guard, str_map_filename))
   {
     Host_PPCSymbolsChanged();
     return true;
@@ -393,29 +393,29 @@ bool CBoot::Load_BS2(Core::System& system, const std::string& boot_rom_filename)
 {
   // CRC32 hashes of the IPL file, obtained from Redump
   // DOL-001(USA) / DOL-001(JPN) / DOT-001 / SL-GC10 (NTSC Revision 1.0)
-  constexpr u32 NTSC_v1_0 = 0x6DAC1F2A;
+  constexpr u32 NTSC_V1_0 = 0x6DAC1F2A;
   // DOL-001(USA) / DOL-001(JPN) / DOT-001 (NTSC Revision 1.1)
-  constexpr u32 NTSC_v1_1 = 0xD5E6FEEA;
+  constexpr u32 NTSC_V1_1 = 0xD5E6FEEA;
   // DOL-001(USA) / DOL-001(JPN) (NTSC Revision 1.2)
-  constexpr u32 NTSC_v1_2_001 = 0xD235E3F9;
+  constexpr u32 NTSC_V1_2_001 = 0xD235E3F9;
   // DOL-101(USA) / DOL-101(JPN) (NTSC Revision 1.2)
-  constexpr u32 NTSC_v1_2_101 = 0x86573808;
+  constexpr u32 NTSC_V1_2_101 = 0x86573808;
   // DOL-002(BRA) (MPAL Revision 1.1)
-  constexpr u32 MPAL_v1_1 = 0x667D0B64;
+  constexpr u32 MPAL_V1_1 = 0x667D0B64;
   // DOL-001(EUR) / DOT-001P (PAL Revision 1.0)
-  constexpr u32 PAL_v1_0 = 0x4F319F43;
+  constexpr u32 PAL_V1_0 = 0x4F319F43;
   // DOL-101(EUR) (PAL Revision 1.2)
-  constexpr u32 PAL_v1_2 = 0xAD1B7F16;
+  constexpr u32 PAL_V1_2 = 0xAD1B7F16;
 
   // Load the IPL ROM dump, limited to 2MiB which is the size of the official IPLs.
-  constexpr size_t max_ipl_size = 2 * 1024 * 1024;
+  constexpr size_t MAX_IPL_SIZE = 2 * 1024 * 1024;
   std::vector<u8> data;
   {
     File::IOFile file(boot_rom_filename, "rb");
     if (!file)
       return false;
 
-    data.resize(static_cast<size_t>(std::min<u64>(file.GetSize(), max_ipl_size)));
+    data.resize(static_cast<size_t>(std::min<u64>(file.GetSize(), MAX_IPL_SIZE)));
     if (!file.ReadArray(data.data(), data.size()))
       return false;
   }
@@ -425,15 +425,15 @@ bool CBoot::Load_BS2(Core::System& system, const std::string& boot_rom_filename)
   bool pal_ipl = false;
   switch (ipl_hash)
   {
-  case NTSC_v1_0:
-  case NTSC_v1_1:
-  case NTSC_v1_2_001:
-  case NTSC_v1_2_101:
-  case MPAL_v1_1:
+  case NTSC_V1_0:
+  case NTSC_V1_1:
+  case NTSC_V1_2_001:
+  case NTSC_V1_2_101:
+  case MPAL_V1_1:
     known_ipl = true;
     break;
-  case PAL_v1_0:
-  case PAL_v1_2:
+  case PAL_V1_0:
+  case PAL_V1_2:
     pal_ipl = true;
     known_ipl = true;
     break;
@@ -702,10 +702,10 @@ BootExecutableReader::~BootExecutableReader() = default;
 
 void StateFlags::UpdateChecksum()
 {
-  constexpr size_t length_in_bytes = sizeof(StateFlags) - 4;
-  constexpr size_t num_elements = length_in_bytes / sizeof(u32);
-  std::array<u32, num_elements> flag_data;
-  std::memcpy(flag_data.data(), &flags, length_in_bytes);
+  constexpr size_t LENGTH_IN_BYTES = sizeof(StateFlags) - 4;
+  constexpr size_t NUM_ELEMENTS = LENGTH_IN_BYTES / sizeof(u32);
+  std::array<u32, NUM_ELEMENTS> flag_data;
+  std::memcpy(flag_data.data(), &flags, LENGTH_IN_BYTES);
   checksum = std::accumulate(flag_data.cbegin(), flag_data.cend(), 0U);
 }
 
@@ -714,9 +714,9 @@ void UpdateStateFlags(std::function<void(StateFlags*)> update_function)
   CreateSystemMenuTitleDirs();
   const std::string file_path = Common::GetTitleDataPath(Titles::SYSTEM_MENU) + "/" WII_STATE;
   const auto fs = Core::System::GetInstance().GetIOS()->GetFS();
-  constexpr IOS::HLE::FS::Mode rw_mode = IOS::HLE::FS::Mode::ReadWrite;
+  constexpr IOS::HLE::FS::Mode RW_MODE = IOS::HLE::FS::Mode::ReadWrite;
   const auto file = fs->CreateAndOpenFile(IOS::SYSMENU_UID, IOS::SYSMENU_GID, file_path,
-                                          {rw_mode, rw_mode, rw_mode});
+                                          {RW_MODE, RW_MODE, RW_MODE});
   if (!file)
     return;
 

@@ -72,7 +72,7 @@ static constexpr u64 GibibytesToBytes(u64 gibibytes)
 {
   return MebibytesToBytes(gibibytes * 1024u);
 }
-constexpr std::array sd_size_combo_entries{
+constexpr std::array SD_SIZE_COMBO_ENTRIES{
     SDSizeComboEntry{0, _trans("Auto")},
     SDSizeComboEntry{MebibytesToBytes(64), _trans("64 MiB")},
     SDSizeComboEntry{MebibytesToBytes(128), _trans("128 MiB")},
@@ -259,8 +259,8 @@ void WiiPane::CreateSDCard()
   }
 
   m_sd_card_size_combo = new QComboBox();
-  for (size_t i = 0; i < sd_size_combo_entries.size(); ++i)
-    m_sd_card_size_combo->addItem(tr(sd_size_combo_entries[i].name));
+  for (size_t i = 0; i < SD_SIZE_COMBO_ENTRIES.size(); ++i)
+    m_sd_card_size_combo->addItem(tr(SD_SIZE_COMBO_ENTRIES[i].name));
   sd_settings_group_layout->addWidget(new QLabel(tr("SD Card File Size:")), row, 0);
   sd_settings_group_layout->addWidget(m_sd_card_size_combo, row, 1);
   ++row;
@@ -411,9 +411,9 @@ void WiiPane::LoadConfig()
   m_sync_sd_folder_checkbox->setChecked(Config::Get(Config::MAIN_WII_SD_CARD_ENABLE_FOLDER_SYNC));
 
   const u64 sd_card_size = Config::Get(Config::MAIN_WII_SD_CARD_FILESIZE);
-  for (size_t i = 0; i < sd_size_combo_entries.size(); ++i)
+  for (size_t i = 0; i < SD_SIZE_COMBO_ENTRIES.size(); ++i)
   {
-    if (sd_size_combo_entries[i].size == sd_card_size)
+    if (SD_SIZE_COMBO_ENTRIES[i].size == sd_card_size)
       m_sd_card_size_combo->setCurrentIndex(static_cast<int>(i));
   }
 
@@ -451,10 +451,10 @@ void WiiPane::OnSaveConfig()
 
   const int sd_card_size_index = m_sd_card_size_combo->currentIndex();
   if (sd_card_size_index >= 0 &&
-      static_cast<size_t>(sd_card_size_index) < sd_size_combo_entries.size())
+      static_cast<size_t>(sd_card_size_index) < SD_SIZE_COMBO_ENTRIES.size())
   {
     Config::SetBase(Config::MAIN_WII_SD_CARD_FILESIZE,
-                    sd_size_combo_entries[sd_card_size_index].size);
+                    SD_SIZE_COMBO_ENTRIES[sd_card_size_index].size);
   }
 }
 

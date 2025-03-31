@@ -14,7 +14,7 @@
 
 namespace
 {
-constexpr u16 s_primitive_restart = UINT16_MAX;
+constexpr u16 S_PRIMITIVE_RESTART = UINT16_MAX;
 
 template <bool pr>
 u16* WriteTriangle(u16* index_ptr, u32 index1, u32 index2, u32 index3)
@@ -23,7 +23,7 @@ u16* WriteTriangle(u16* index_ptr, u32 index1, u32 index2, u32 index3)
   *index_ptr++ = index2;
   *index_ptr++ = index3;
   if constexpr (pr)
-    *index_ptr++ = s_primitive_restart;
+    *index_ptr++ = S_PRIMITIVE_RESTART;
   return index_ptr;
 }
 
@@ -46,7 +46,7 @@ u16* AddStrip(u16* index_ptr, u32 num_verts, u32 index)
     {
       *index_ptr++ = index + i;
     }
-    *index_ptr++ = s_primitive_restart;
+    *index_ptr++ = S_PRIMITIVE_RESTART;
   }
   else
   {
@@ -94,7 +94,7 @@ u16* AddFan(u16* index_ptr, u32 num_verts, u32 index)
       *index_ptr++ = index;
       *index_ptr++ = index + i + 1;
       *index_ptr++ = index + i + 2;
-      *index_ptr++ = s_primitive_restart;
+      *index_ptr++ = S_PRIMITIVE_RESTART;
     }
 
     for (; i + 2 <= num_verts; i += 2)
@@ -103,7 +103,7 @@ u16* AddFan(u16* index_ptr, u32 num_verts, u32 index)
       *index_ptr++ = index + i + 0;
       *index_ptr++ = index;
       *index_ptr++ = index + i + 1;
-      *index_ptr++ = s_primitive_restart;
+      *index_ptr++ = S_PRIMITIVE_RESTART;
     }
   }
 
@@ -143,7 +143,7 @@ u16* AddQuads(u16* index_ptr, u32 num_verts, u32 index)
       *index_ptr++ = index + i - 1;
       *index_ptr++ = index + i - 3;
       *index_ptr++ = index + i - 0;
-      *index_ptr++ = s_primitive_restart;
+      *index_ptr++ = S_PRIMITIVE_RESTART;
     }
     else
     {
@@ -162,7 +162,7 @@ u16* AddQuads(u16* index_ptr, u32 num_verts, u32 index)
 }
 
 template <bool pr>
-u16* AddQuads_nonstandard(u16* index_ptr, u32 num_verts, u32 index)
+u16* AddQuadsNonstandard(u16* index_ptr, u32 num_verts, u32 index)
 {
   WARN_LOG_FMT(VIDEO, "Non-standard primitive drawing command GL_DRAW_QUADS_2");
   return AddQuads<pr>(index_ptr, num_verts, index);
@@ -191,14 +191,14 @@ u16* AddLineStrip(u16* index_ptr, u32 num_verts, u32 index)
 }
 
 template <bool pr, bool linestrip>
-u16* AddLines_VSExpand(u16* index_ptr, u32 num_verts, u32 index)
+u16* AddLinesVsExpand(u16* index_ptr, u32 num_verts, u32 index)
 {
   // VS Expand uses (index >> 2) as the base vertex
   // Bit 0 indicates which side of the line (left/right for a vertical line)
   // Bit 1 indicates which point of the line (top/bottom for a vertical line)
   // VS Expand assumes the two points will be adjacent vertices
-  constexpr u32 advance = linestrip ? 1 : 2;
-  for (u32 i = 1; i < num_verts; i += advance)
+  constexpr u32 ADVANCE = linestrip ? 1 : 2;
+  for (u32 i = 1; i < num_verts; i += ADVANCE)
   {
     u32 p0 = (index + i - 1) << 2;
     u32 p1 = (index + i - 0) << 2;
@@ -208,7 +208,7 @@ u16* AddLines_VSExpand(u16* index_ptr, u32 num_verts, u32 index)
       *index_ptr++ = p0 + 1;
       *index_ptr++ = p1 + 2;
       *index_ptr++ = p1 + 3;
-      *index_ptr++ = s_primitive_restart;
+      *index_ptr++ = S_PRIMITIVE_RESTART;
     }
     else
     {
@@ -233,7 +233,7 @@ u16* AddPoints(u16* index_ptr, u32 num_verts, u32 index)
 }
 
 template <bool pr>
-u16* AddPoints_VSExpand(u16* index_ptr, u32 num_verts, u32 index)
+u16* AddPointsVsExpand(u16* index_ptr, u32 num_verts, u32 index)
 {
   // VS Expand uses (index >> 2) as the base vertex
   // Bottom two bits indicate which of (TL, TR, BL, BR) this is
@@ -246,7 +246,7 @@ u16* AddPoints_VSExpand(u16* index_ptr, u32 num_verts, u32 index)
       *index_ptr++ = base + 1;
       *index_ptr++ = base + 2;
       *index_ptr++ = base + 3;
-      *index_ptr++ = s_primitive_restart;
+      *index_ptr++ = S_PRIMITIVE_RESTART;
     }
     else
     {
@@ -269,7 +269,7 @@ void IndexGenerator::Init()
   if (g_backend_info.bSupportsPrimitiveRestart)
   {
     m_primitive_table[Primitive::GX_DRAW_QUADS] = AddQuads<true>;
-    m_primitive_table[Primitive::GX_DRAW_QUADS_2] = AddQuads_nonstandard<true>;
+    m_primitive_table[Primitive::GX_DRAW_QUADS_2] = AddQuadsNonstandard<true>;
     m_primitive_table[Primitive::GX_DRAW_TRIANGLES] = AddList<true>;
     m_primitive_table[Primitive::GX_DRAW_TRIANGLE_STRIP] = AddStrip<true>;
     m_primitive_table[Primitive::GX_DRAW_TRIANGLE_FAN] = AddFan<true>;
@@ -277,7 +277,7 @@ void IndexGenerator::Init()
   else
   {
     m_primitive_table[Primitive::GX_DRAW_QUADS] = AddQuads<false>;
-    m_primitive_table[Primitive::GX_DRAW_QUADS_2] = AddQuads_nonstandard<false>;
+    m_primitive_table[Primitive::GX_DRAW_QUADS_2] = AddQuadsNonstandard<false>;
     m_primitive_table[Primitive::GX_DRAW_TRIANGLES] = AddList<false>;
     m_primitive_table[Primitive::GX_DRAW_TRIANGLE_STRIP] = AddStrip<false>;
     m_primitive_table[Primitive::GX_DRAW_TRIANGLE_FAN] = AddFan<false>;
@@ -286,15 +286,15 @@ void IndexGenerator::Init()
   {
     if (g_backend_info.bSupportsPrimitiveRestart)
     {
-      m_primitive_table[Primitive::GX_DRAW_LINES] = AddLines_VSExpand<true, false>;
-      m_primitive_table[Primitive::GX_DRAW_LINE_STRIP] = AddLines_VSExpand<true, true>;
-      m_primitive_table[Primitive::GX_DRAW_POINTS] = AddPoints_VSExpand<true>;
+      m_primitive_table[Primitive::GX_DRAW_LINES] = AddLinesVsExpand<true, false>;
+      m_primitive_table[Primitive::GX_DRAW_LINE_STRIP] = AddLinesVsExpand<true, true>;
+      m_primitive_table[Primitive::GX_DRAW_POINTS] = AddPointsVsExpand<true>;
     }
     else
     {
-      m_primitive_table[Primitive::GX_DRAW_LINES] = AddLines_VSExpand<false, false>;
-      m_primitive_table[Primitive::GX_DRAW_LINE_STRIP] = AddLines_VSExpand<false, true>;
-      m_primitive_table[Primitive::GX_DRAW_POINTS] = AddPoints_VSExpand<false>;
+      m_primitive_table[Primitive::GX_DRAW_LINES] = AddLinesVsExpand<false, false>;
+      m_primitive_table[Primitive::GX_DRAW_LINE_STRIP] = AddLinesVsExpand<false, true>;
+      m_primitive_table[Primitive::GX_DRAW_POINTS] = AddPointsVsExpand<false>;
     }
   }
   else

@@ -241,8 +241,8 @@ void GameFile::DownloadDefaultCover()
       SConfig::GetInstance().GetGameTDBImageRegionCode(DiscIO::IsWii(GetPlatform()), m_region);
 
   Common::HttpRequest request;
-  static constexpr char cover_url[] = "https://art.gametdb.com/wii/cover/{}/{}.png";
-  const auto response = request.Get(fmt::format(cover_url, region_code, m_gametdb_id));
+  static constexpr char COVER_URL[] = "https://art.gametdb.com/wii/cover/{}/{}.png";
+  const auto response = request.Get(fmt::format(COVER_URL, region_code, m_gametdb_id));
 
   if (!response)
     return;
@@ -555,7 +555,7 @@ bool GameFile::CheckIfTwoDiscGame(const std::string& game_id) const
   if (game_id.size() < GAME_ID_PREFIX_SIZE)
     return false;
 
-  static constexpr std::array<std::string_view, 30> two_disc_game_id_prefixes = {
+  static constexpr std::array<std::string_view, 30> TWO_DISC_GAME_ID_PREFIXES = {
       // Resident Evil
       "DBJ",
       // The Lord of the Rings: The Third Age
@@ -613,10 +613,10 @@ bool GameFile::CheckIfTwoDiscGame(const std::string& game_id) const
       "S6T",
       "SDQ",
   };
-  static_assert(std::ranges::is_sorted(two_disc_game_id_prefixes));
+  static_assert(std::ranges::is_sorted(TWO_DISC_GAME_ID_PREFIXES));
 
   std::string_view game_id_prefix(game_id.data(), GAME_ID_PREFIX_SIZE);
-  return std::ranges::binary_search(two_disc_game_id_prefixes, game_id_prefix);
+  return std::ranges::binary_search(TWO_DISC_GAME_ID_PREFIXES, game_id_prefix);
 }
 
 std::string GameFile::GetNetPlayName(const Core::TitleDatabase& title_database) const

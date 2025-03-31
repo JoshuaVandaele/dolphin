@@ -19,14 +19,14 @@ namespace PowerPC
 {
 namespace
 {
-constexpr std::array<u32, 8> s_plru_mask{
+constexpr std::array<u32, 8> S_PLRU_MASK{
     11, 11, 19, 19, 37, 37, 69, 69,
 };
-constexpr std::array<u32, 8> s_plru_value{
+constexpr std::array<u32, 8> S_PLRU_VALUE{
     11, 3, 17, 1, 36, 4, 64, 0,
 };
 
-constexpr std::array<u32, 255> s_way_from_valid = [] {
+constexpr std::array<u32, 255> S_WAY_FROM_VALID = [] {
   std::array<u32, 255> data{};
   for (size_t m = 0; m < data.size(); m++)
   {
@@ -38,7 +38,7 @@ constexpr std::array<u32, 255> s_way_from_valid = [] {
   return data;
 }();
 
-constexpr std::array<u32, 128> s_way_from_plru = [] {
+constexpr std::array<u32, 128> S_WAY_FROM_PLRU = [] {
   std::array<u32, 128> data{};
 
   for (size_t m = 0; m < data.size(); m++)
@@ -230,9 +230,9 @@ std::pair<u32, u32> Cache::GetCache(Memory::MemoryManager& memory, u32 addr, boo
   {
     // select a way
     if (valid[set] != 0xff)
-      way = s_way_from_valid[valid[set]];
+      way = S_WAY_FROM_VALID[valid[set]];
     else
-      way = s_way_from_plru[plru[set]];
+      way = S_WAY_FROM_PLRU[plru[set]];
 
     if (valid[set] & (1 << way))
     {
@@ -265,7 +265,7 @@ std::pair<u32, u32> Cache::GetCache(Memory::MemoryManager& memory, u32 addr, boo
 
   // update plru
   if (way != 0xff)
-    plru[set] = (plru[set] & ~s_plru_mask[way]) | s_plru_value[way];
+    plru[set] = (plru[set] & ~S_PLRU_MASK[way]) | S_PLRU_VALUE[way];
 
   return {set, way};
 }

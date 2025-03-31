@@ -189,58 +189,58 @@ GekkoSyntaxHighlight::GekkoSyntaxHighlight(QTextDocument* document, QTextCharFor
 void GekkoSyntaxHighlight::HighlightSubstr(int start, int len, HighlightFormat format)
 {
   QTextCharFormat hl_format = m_base_format;
-  const QColor DIRECTIVE_COLOR[2] = {QColor(0x9d, 0x00, 0x06),
+  const QColor directive_color[2] = {QColor(0x9d, 0x00, 0x06),
                                      QColor(0xfb, 0x49, 0x34)};  // Gruvbox darkred
-  const QColor MNEMONIC_COLOR[2] = {QColor(0x79, 0x74, 0x0e),
+  const QColor mnemonic_color[2] = {QColor(0x79, 0x74, 0x0e),
                                     QColor(0xb8, 0xbb, 0x26)};  // Gruvbox darkgreen
-  const QColor IMM_COLOR[2] = {QColor(0xb5, 0x76, 0x14),
+  const QColor imm_color[2] = {QColor(0xb5, 0x76, 0x14),
                                QColor(0xfa, 0xbd, 0x2f)};  // Gruvbox darkyellow
-  const QColor BUILTIN_COLOR[2] = {QColor(0x07, 0x66, 0x78),
+  const QColor builtin_color[2] = {QColor(0x07, 0x66, 0x78),
                                    QColor(0x83, 0xa5, 0x98)};  // Gruvbox darkblue
-  const QColor HA_LA_COLOR[2] = {QColor(0xaf, 0x3a, 0x03),
+  const QColor ha_la_color[2] = {QColor(0xaf, 0x3a, 0x03),
                                  QColor(0xfe, 0x80, 0x19)};  // Gruvbox darkorange
-  const QColor HOVER_BG_COLOR[2] = {QColor(0xd5, 0xc4, 0xa1),
+  const QColor hover_bg_color[2] = {QColor(0xd5, 0xc4, 0xa1),
                                     QColor(0x50, 0x49, 0x45)};  // Gruvbox bg2
-  const QColor STRING_COLOR[2] = {QColor(0x98, 0x97, 0x1a),
+  const QColor string_color[2] = {QColor(0x98, 0x97, 0x1a),
                                   QColor(0x98, 0x97, 0x1a)};  // Gruvbox green
-  const QColor COMMENT_COLOR[2] = {QColor(0x68, 0x9d, 0x6a),
+  const QColor comment_color[2] = {QColor(0x68, 0x9d, 0x6a),
                                    QColor(0x68, 0x9d, 0x6a)};  // Gruvbox aqua
 
   switch (format)
   {
   case HighlightFormat::Directive:
-    hl_format.setForeground(DIRECTIVE_COLOR[m_theme_idx]);
+    hl_format.setForeground(directive_color[m_theme_idx]);
     break;
   case HighlightFormat::Mnemonic:
-    hl_format.setForeground(MNEMONIC_COLOR[m_theme_idx]);
+    hl_format.setForeground(mnemonic_color[m_theme_idx]);
     break;
   case HighlightFormat::Symbol:
     break;
   case HighlightFormat::Immediate:
-    hl_format.setForeground(IMM_COLOR[m_theme_idx]);
+    hl_format.setForeground(imm_color[m_theme_idx]);
     break;
   case HighlightFormat::GPR:
   case HighlightFormat::FPR:
   case HighlightFormat::SPR:
   case HighlightFormat::CRField:
   case HighlightFormat::CRFlag:
-    hl_format.setForeground(BUILTIN_COLOR[m_theme_idx]);
+    hl_format.setForeground(builtin_color[m_theme_idx]);
     break;
   case HighlightFormat::Str:
-    hl_format.setForeground(STRING_COLOR[m_theme_idx]);
+    hl_format.setForeground(string_color[m_theme_idx]);
     break;
   case HighlightFormat::HaLa:
-    hl_format.setForeground(HA_LA_COLOR[m_theme_idx]);
+    hl_format.setForeground(ha_la_color[m_theme_idx]);
     break;
   case HighlightFormat::Paren:
-    hl_format.setBackground(HOVER_BG_COLOR[m_theme_idx]);
+    hl_format.setBackground(hover_bg_color[m_theme_idx]);
     break;
   case HighlightFormat::Default:
     hl_format.clearForeground();
     hl_format.clearBackground();
     break;
   case HighlightFormat::Comment:
-    hl_format.setForeground(COMMENT_COLOR[m_theme_idx]);
+    hl_format.setForeground(comment_color[m_theme_idx]);
     break;
   case HighlightFormat::Error:
     hl_format.setUnderlineColor(Qt::red);

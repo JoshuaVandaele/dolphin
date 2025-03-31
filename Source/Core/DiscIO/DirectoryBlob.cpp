@@ -273,12 +273,12 @@ static bool IsValidDirectoryBlob(const std::string& dol_path, std::string* parti
 #ifdef _WIN32
   constexpr const char* dir_separator = "/\\";
 #else
-  constexpr char dir_separator = '/';
+  constexpr char DIR_SEPARATOR = '/';
 #endif
   if (true_root)
   {
     *true_root =
-        dol_path.substr(0, dol_path.find_last_of(dir_separator, partition_root->size() - 2) + 1);
+        dol_path.substr(0, dol_path.find_last_of(DIR_SEPARATOR, partition_root->size() - 2) + 1);
   }
 
   return true;
@@ -1246,11 +1246,11 @@ static void PadToAddress(u64 start_address, u64* address, u64* length, u8** buff
 {
   if (start_address > *address && *length > 0)
   {
-    u64 padBytes = std::min(start_address - *address, *length);
-    memset(*buffer, 0, (size_t)padBytes);
-    *length -= padBytes;
-    *buffer += padBytes;
-    *address += padBytes;
+    u64 pad_bytes = std::min(start_address - *address, *length);
+    memset(*buffer, 0, (size_t)pad_bytes);
+    *length -= pad_bytes;
+    *buffer += pad_bytes;
+    *address += pad_bytes;
   }
 }
 

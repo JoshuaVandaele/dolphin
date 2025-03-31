@@ -30,9 +30,9 @@ static inline u32 GetColorOffset(u16 x, u16 y)
 
 static inline u32 GetDepthOffset(u16 x, u16 y)
 {
-  constexpr u32 depth_buffer_start = EFB_WIDTH * EFB_HEIGHT * 3;
+  constexpr u32 DEPTH_BUFFER_START = EFB_WIDTH * EFB_HEIGHT * 3;
 
-  return (x + y * EFB_WIDTH) * 3 + depth_buffer_start;
+  return (x + y * EFB_WIDTH) * 3 + DEPTH_BUFFER_START;
 }
 
 static void SetPixelAlphaOnly(u32 offset, u8 a)
@@ -309,23 +309,23 @@ static u32 GetDestinationFactor(u8* srcClr, u8* dstClr, DstBlendFactor mode)
 
 static void BlendColor(u8* srcClr, u8* dstClr)
 {
-  u32 srcFactor = GetSourceFactor(srcClr, dstClr, bpmem.blendmode.srcfactor);
-  u32 dstFactor = GetDestinationFactor(srcClr, dstClr, bpmem.blendmode.dstfactor);
+  u32 src_factor = GetSourceFactor(srcClr, dstClr, bpmem.blendmode.srcfactor);
+  u32 dst_factor = GetDestinationFactor(srcClr, dstClr, bpmem.blendmode.dstfactor);
 
   for (int i = 0; i < 4; i++)
   {
     // add MSB of factors to make their range 0 -> 256
-    u32 sf = (srcFactor & 0xff);
+    u32 sf = (src_factor & 0xff);
     sf += sf >> 7;
 
-    u32 df = (dstFactor & 0xff);
+    u32 df = (dst_factor & 0xff);
     df += df >> 7;
 
     u32 color = (srcClr[i] * sf + dstClr[i] * df) >> 8;
     dstClr[i] = (color > 255) ? 255 : color;
 
-    dstFactor >>= 8;
-    srcFactor >>= 8;
+    dst_factor >>= 8;
+    src_factor >>= 8;
   }
 }
 
@@ -400,50 +400,50 @@ static void Dither(u16 x, u16 y, u8* color)
     return;
 
   // Flipper uses a standard 2x2 Bayer Matrix for 6 bit dithering
-  static const u8 dither[2][2] = {{0, 2}, {3, 1}};
+  static const u8 DITHER[2][2] = {{0, 2}, {3, 1}};
 
   // Only the color channels are dithered?
   for (int i = BLU_C; i <= RED_C; i++)
-    color[i] = ((color[i] - (color[i] >> 6)) + dither[y & 1][x & 1]) & 0xfc;
+    color[i] = ((color[i] - (color[i] >> 6)) + DITHER[y & 1][x & 1]) & 0xfc;
 }
 
 void BlendTev(u16 x, u16 y, u8* color)
 {
   const u32 offset = GetColorOffset(x, y);
-  u32 dstClr = GetPixelColor(offset);
+  u32 dst_clr = GetPixelColor(offset);
 
-  u8* dstClrPtr = (u8*)&dstClr;
+  u8* dst_clr_ptr = (u8*)&dst_clr;
 
   if (bpmem.blendmode.blendenable)
   {
     if (bpmem.blendmode.subtract)
-      SubtractBlend(color, dstClrPtr);
+      SubtractBlend(color, dst_clr_ptr);
     else
-      BlendColor(color, dstClrPtr);
+      BlendColor(color, dst_clr_ptr);
   }
   else if (bpmem.blendmode.logicopenable)
   {
-    LogicBlend(*((u32*)color), &dstClr, bpmem.blendmode.logicmode);
+    LogicBlend(*((u32*)color), &dst_clr, bpmem.blendmode.logicmode);
   }
   else
   {
-    dstClrPtr = color;
+    dst_clr_ptr = color;
   }
 
   if (bpmem.dstalpha.enable)
-    dstClrPtr[ALP_C] = bpmem.dstalpha.alpha;
+    dst_clr_ptr[ALP_C] = bpmem.dstalpha.alpha;
 
   if (bpmem.blendmode.colorupdate)
   {
-    Dither(x, y, dstClrPtr);
+    Dither(x, y, dst_clr_ptr);
     if (bpmem.blendmode.alphaupdate)
-      SetPixelAlphaColor(offset, dstClrPtr);
+      SetPixelAlphaColor(offset, dst_clr_ptr);
     else
-      SetPixelColorOnly(offset, dstClrPtr);
+      SetPixelColorOnly(offset, dst_clr_ptr);
   }
   else if (bpmem.blendmode.alphaupdate)
   {
-    SetPixelAlphaOnly(offset, dstClrPtr[ALP_C]);
+    SetPixelAlphaOnly(offset, dst_clr_ptr[ALP_C]);
   }
 }
 

@@ -327,14 +327,14 @@ void FifoManager::RunGpuLoop()
             if (m_config_sync_gpu && m_sync_ticks.load() < m_config_sync_gpu_min_distance)
               break;
 
-            u32 cyclesExecuted = 0;
-            u32 readPtr = fifo.CPReadPointer.load(std::memory_order_relaxed);
-            ReadDataFromFifo(readPtr);
+            u32 cycles_executed = 0;
+            u32 read_ptr = fifo.CPReadPointer.load(std::memory_order_relaxed);
+            ReadDataFromFifo(read_ptr);
 
-            if (readPtr == fifo.CPEnd.load(std::memory_order_relaxed))
-              readPtr = fifo.CPBase.load(std::memory_order_relaxed);
+            if (read_ptr == fifo.CPEnd.load(std::memory_order_relaxed))
+              read_ptr = fifo.CPBase.load(std::memory_order_relaxed);
             else
-              readPtr += GPFifo::GATHER_PIPE_SIZE;
+              read_ptr += GPFifo::GATHER_PIPE_SIZE;
 
             const s32 distance =
                 static_cast<s32>(fifo.CPReadWriteDistance.load(std::memory_order_relaxed)) -
@@ -346,9 +346,9 @@ void FifoManager::RunGpuLoop()
 
             u8* write_ptr = m_video_buffer_write_ptr;
             m_video_buffer_read_ptr = OpcodeDecoder::RunFifo(
-                DataReader(m_video_buffer_read_ptr, write_ptr), &cyclesExecuted);
+                DataReader(m_video_buffer_read_ptr, write_ptr), &cycles_executed);
 
-            fifo.CPReadPointer.store(readPtr, std::memory_order_relaxed);
+            fifo.CPReadPointer.store(read_ptr, std::memory_order_relaxed);
             fifo.CPReadWriteDistance.fetch_sub(GPFifo::GATHER_PIPE_SIZE, std::memory_order_seq_cst);
             if ((write_ptr - m_video_buffer_read_ptr) == 0)
             {
@@ -360,10 +360,10 @@ void FifoManager::RunGpuLoop()
 
             if (m_config_sync_gpu)
             {
-              cyclesExecuted = (int)(cyclesExecuted / m_config_sync_gpu_overclock);
-              int old = m_sync_ticks.fetch_sub(cyclesExecuted);
+              cycles_executed = (int)(cycles_executed / m_config_sync_gpu_overclock);
+              int old = m_sync_ticks.fetch_sub(cycles_executed);
               if (old >= m_config_sync_gpu_max_distance &&
-                  old - (int)cyclesExecuted < m_config_sync_gpu_max_distance)
+                  old - (int)cycles_executed < m_config_sync_gpu_max_distance)
               {
                 m_sync_wakeup_event.Set();
               }

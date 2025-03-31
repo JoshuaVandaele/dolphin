@@ -10,7 +10,7 @@
 
 using namespace Common::GekkoAssembler;
 
-constexpr char instructions[] = "add r3, r4, r5\n"
+constexpr char INSTRUCTIONS[] = "add r3, r4, r5\n"
                                 "add. r3, r4, r5\n"
                                 "addo r3, r4, r5\n"
                                 "addo. r3, r4, r5\n"
@@ -353,7 +353,7 @@ constexpr char instructions[] = "add r3, r4, r5\n"
                                 "bclr 12, 2\n"
                                 "bclrl 12, 2\n";
 
-constexpr u8 expected_instructions[] = {
+constexpr u8 EXPECTED_INSTRUCTIONS[] = {
     0x7c, 0x64, 0x2a, 0x14, 0x7c, 0x64, 0x2a, 0x15, 0x7c, 0x64, 0x2e, 0x14, 0x7c, 0x64, 0x2e, 0x15,
     0x7c, 0x64, 0x28, 0x14, 0x7c, 0x64, 0x28, 0x15, 0x7c, 0x64, 0x2c, 0x14, 0x7c, 0x64, 0x2c, 0x15,
     0x7c, 0x64, 0x29, 0x14, 0x7c, 0x64, 0x29, 0x15, 0x7c, 0x64, 0x2d, 0x14, 0x7c, 0x64, 0x2d, 0x15,
@@ -444,19 +444,19 @@ constexpr u8 expected_instructions[] = {
 
 TEST(Assembler, AllInstructions)
 {
-  auto res = Assemble(instructions, 0);
+  auto res = Assemble(INSTRUCTIONS, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 1);
-  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(expected_instructions));
+  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(EXPECTED_INSTRUCTIONS));
 
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], expected_instructions[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], EXPECTED_INSTRUCTIONS[i]) << " -> i=" << i;
   }
 }
 
-constexpr char extended_instructions[] = "subi 0, 4, 8\n"
+constexpr char EXTENDED_INSTRUCTIONS[] = "subi 0, 4, 8\n"
                                          "subis 0, 4, 8\n"
                                          "subic 0, 4, 8\n"
                                          "subic. 0, 4, 8\n"
@@ -1316,7 +1316,7 @@ constexpr char extended_instructions[] = "subi 0, 4, 8\n"
                                          "bnuctrl+\n"
                                          "bnuctrl+ 0\n";
 
-constexpr u8 extended_expect[] = {
+constexpr u8 EXTENDED_EXPECT[] = {
     0x38, 0x04, 0xff, 0xf8, 0x3c, 0x04, 0xff, 0xf8, 0x30, 0x04, 0xff, 0xf8, 0x34, 0x04, 0xff, 0xf8,
     0x2c, 0x00, 0x00, 0x04, 0x2c, 0x04, 0x00, 0x08, 0x7c, 0x00, 0x20, 0x00, 0x7c, 0x04, 0x40, 0x00,
     0x28, 0x00, 0x00, 0x04, 0x28, 0x04, 0x00, 0x08, 0x7c, 0x00, 0x20, 0x40, 0x7c, 0x04, 0x40, 0x40,
@@ -1536,21 +1536,21 @@ constexpr u8 extended_expect[] = {
 
 TEST(Assembler, AllExtendedInstructions)
 {
-  auto res = Assemble(extended_instructions, 0);
+  auto res = Assemble(EXTENDED_INSTRUCTIONS, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 1);
-  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(extended_expect));
+  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(EXTENDED_EXPECT));
 
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], extended_expect[i]) << "->i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], EXTENDED_EXPECT[i]) << "->i=" << i;
   }
 }
 
 TEST(Assembler, ByteDirectivesSimple)
 {
-  constexpr char assembly[] = ".byte 0\n"
+  constexpr char ASSEMBLY[] = ".byte 0\n"
                               ".Byte 0xff\n"
                               ".bYte 0x100\n"
                               ".2bYTe 0\n"
@@ -1574,7 +1574,7 @@ TEST(Assembler, ByteDirectivesSimple)
                               ".8byte 0x100000000\n"
                               ".8byte 0xffffffffffffffff\n"
                               ".8byte 0x10000000000000000\n";
-  constexpr u8 expect[] = {
+  constexpr u8 EXPECT[] = {
       0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0x01, 0x00, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00,
       0x01, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1585,71 +1585,71 @@ TEST(Assembler, ByteDirectivesSimple)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   };
 
-  auto res = Assemble(assembly, 0);
+  auto res = Assemble(ASSEMBLY, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 1);
-  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(expect));
+  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(EXPECT));
 
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], expect[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], EXPECT[i]) << " -> i=" << i;
   }
 }
 
 TEST(Assembler, MultiOperandDirectives)
 {
-  constexpr char assembly[] = ".byte 0, 1, 2\n"
+  constexpr char ASSEMBLY[] = ".byte 0, 1, 2\n"
                               ".2byte 3, 4, 5\n"
                               ".4byte 6, 7, 8\n"
                               ".8byte 9, 10, 11\n";
-  constexpr u8 expect[] = {
+  constexpr u8 EXPECT[] = {
       0, 1, 2, 0, 3, 0, 4, 0, 5, 0, 0, 0, 6, 0,  0, 0, 7, 0, 0, 0, 8, 0,  0,
       0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 11,
   };
-  auto res = Assemble(assembly, 0);
+  auto res = Assemble(ASSEMBLY, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 1);
-  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(expect));
+  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(EXPECT));
 
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], expect[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], EXPECT[i]) << " -> i=" << i;
   }
 }
 
 TEST(Assembler, OperandExpressionDirectives)
 {
-  constexpr char assembly[] = ".byte 0 + 1, 1 * 4, 2 * 8\n"
+  constexpr char ASSEMBLY[] = ".byte 0 + 1, 1 * 4, 2 * 8\n"
                               ".2byte 3*6*9, 5*5*12, 81/9\n"
                               ".4byte 1<<12, 5>>3, 8^8\n"
                               ".8byte 0b1010 & 0b1101, 0b1010 | 0b0101, 0x12 + 010\n";
-  constexpr u8 expect[] = {
+  constexpr u8 EXPECT[] = {
       1, 4, 16, 0, 162, 1, 44, 0, 9, 0, 0, 16, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0,          0,
       0, 0, 0,  0, 0,   8, 0,  0, 0, 0, 0, 0,  0, 15, 0, 0, 0, 0, 0, 0, 0, 0x12 + 010,
   };
-  auto res = Assemble(assembly, 0);
+  auto res = Assemble(ASSEMBLY, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 1);
-  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(expect));
+  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(EXPECT));
 
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], expect[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], EXPECT[i]) << " -> i=" << i;
   }
 }
 
 TEST(Assembler, FloatDirectives)
 {
-  constexpr char assembly[] = ".float 0\n"
+  constexpr char ASSEMBLY[] = ".float 0\n"
                               ".float 1, 2, 3.0\n"
                               ".float 1.25, 1.5e6, -2e-5\n"
                               ".double 0\n"
                               ".double 1, 2, 3.0\n"
                               ".double 1.0000001, 0.0000025, .000006e9\n";
-  constexpr u8 expect[] = {
+  constexpr u8 EXPECT[] = {
       0,    0,    0,    0,    0x3f, 0x80, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x40, 0x40,
       0x00, 0x00, 0x3f, 0xa0, 0x00, 0x00, 0x49, 0xb7, 0x1b, 0x00, 0xb7, 0xa7, 0xc5, 0xac,
       0,    0,    0,    0,    0,    0,    0,    0,    0x3f, 0xf0, 0x00, 0x00, 0x00, 0x00,
@@ -1657,65 +1657,65 @@ TEST(Assembler, FloatDirectives)
       0x00, 0x00, 0x00, 0x00, 0x3f, 0xf0, 0x00, 0x00, 0x1a, 0xd7, 0xf2, 0x9b, 0x3e, 0xc4,
       0xf8, 0xb5, 0x88, 0xe3, 0x68, 0xf1, 0x40, 0xb7, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00,
   };
-  auto res = Assemble(assembly, 0);
+  auto res = Assemble(ASSEMBLY, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 1);
-  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(expect));
+  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(EXPECT));
 
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], expect[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], EXPECT[i]) << " -> i=" << i;
   }
 }
 
 TEST(Assembler, ZeroDirectives)
 {
-  constexpr char assembly[] = ".zeros 0\n"
+  constexpr char ASSEMBLY[] = ".zeros 0\n"
                               ".zeros 1\n"
                               ".zeros 5 + 5\n";
-  constexpr u8 expect[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  auto res = Assemble(assembly, 0);
+  constexpr u8 EXPECT[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  auto res = Assemble(ASSEMBLY, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 1);
-  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(expect));
+  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(EXPECT));
 
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], expect[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], EXPECT[i]) << " -> i=" << i;
   }
 }
 
 TEST(Assembler, StringDirectives)
 {
-  constexpr char assembly[] = ".ascii \"test string\"\n"
+  constexpr char ASSEMBLY[] = ".ascii \"test string\"\n"
                               ".ascii \"string with \\n escapes \\r\"\n"
                               ".ascii \"string with octals \\123 \\0\"\n"
                               ".ascii \"string with hex \\x12\\x45\\x9912\"\n"
                               ".asciz \"null terminator\"\n";
-  constexpr u8 expect[] = {
+  constexpr u8 EXPECT[] = {
       't', 'e',  's', 't', ' ', 's',    't', 'r',  'i',    'n',    'g',    's', 't', 'r', 'i', 'n',
       'g', ' ',  'w', 'i', 't', 'h',    ' ', '\n', ' ',    'e',    's',    'c', 'a', 'p', 'e', 's',
       ' ', '\r', 's', 't', 'r', 'i',    'n', 'g',  ' ',    'w',    'i',    't', 'h', ' ', 'o', 'c',
       't', 'a',  'l', 's', ' ', '\123', ' ', '\0', 's',    't',    'r',    'i', 'n', 'g', ' ', 'w',
       'i', 't',  'h', ' ', 'h', 'e',    'x', ' ',  '\x12', '\x45', '\x12', 'n', 'u', 'l', 'l', ' ',
       't', 'e',  'r', 'm', 'i', 'n',    'a', 't',  'o',    'r',    '\0'};
-  auto res = Assemble(assembly, 0);
+  auto res = Assemble(ASSEMBLY, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 1);
-  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(expect));
+  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(EXPECT));
 
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], expect[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], EXPECT[i]) << " -> i=" << i;
   }
 }
 
 TEST(Assembler, RelocateDirective)
 {
-  constexpr char assembly[] = ".zeros 5\n"
+  constexpr char ASSEMBLY[] = ".zeros 5\n"
                               ".locate 100\n"
                               ".zeros 9\n"
                               ".locate 110\n"
@@ -1724,23 +1724,23 @@ TEST(Assembler, RelocateDirective)
                               ".zeros 29\n"
                               ".locate 120 + 5*5+4 + 1\n"
                               ".zeros 1\n";
-  constexpr u32 expect_addr[] = {0, 100, 110, 120, 150};
-  constexpr size_t expect_size[] = {5, 9, 10, 29, 1};
+  constexpr u32 EXPECT_ADDR[] = {0, 100, 110, 120, 150};
+  constexpr size_t EXPECT_SIZE[] = {5, 9, 10, 29, 1};
 
-  auto res = Assemble(assembly, 0);
+  auto res = Assemble(ASSEMBLY, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
-  ASSERT_EQ(code_blocks.size(), sizeof(expect_size) / sizeof(expect_size[0]));
+  ASSERT_EQ(code_blocks.size(), sizeof(EXPECT_SIZE) / sizeof(EXPECT_SIZE[0]));
   for (size_t i = 0; i < code_blocks.size(); i++)
   {
-    EXPECT_EQ(code_blocks[i].instructions.size(), expect_size[i]) << " -> i=" << i;
-    EXPECT_EQ(code_blocks[i].block_address, expect_addr[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[i].instructions.size(), EXPECT_SIZE[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[i].block_address, EXPECT_ADDR[i]) << " -> i=" << i;
   }
 }
 
 TEST(Assembler, AlignmentDirectives)
 {
-  constexpr char assembly_align[] = ".zeros 1\n"
+  constexpr char ASSEMBLY_ALIGN[] = ".zeros 1\n"
                                     ".align 0\n"
                                     ".zeros 1\n"
                                     ".align 1\n"
@@ -1764,15 +1764,15 @@ TEST(Assembler, AlignmentDirectives)
                                     ".padalign 4\n"
                                     ".byte 1\n"
                                     ".padalign 10\n";
-  constexpr u32 expect_addr[] = {0, 4, 16, 32, 1024};
+  constexpr u32 EXPECT_ADDR[] = {0, 4, 16, 32, 1024};
 
-  auto res = Assemble(assembly_align, 0);
+  auto res = Assemble(ASSEMBLY_ALIGN, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
-  ASSERT_EQ(code_blocks.size(), sizeof(expect_addr) / sizeof(expect_addr[0]));
+  ASSERT_EQ(code_blocks.size(), sizeof(EXPECT_ADDR) / sizeof(EXPECT_ADDR[0]));
   for (size_t i = 0; i < code_blocks.size(); i++)
   {
-    EXPECT_EQ(code_blocks[i].block_address, expect_addr[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[i].block_address, EXPECT_ADDR[i]) << " -> i=" << i;
   }
 
   auto&& last_block = code_blocks.back().instructions;
@@ -1801,37 +1801,37 @@ TEST(Assembler, AlignmentDirectives)
 
 TEST(Assembler, SkipDirective)
 {
-  constexpr char assembly_align[] = ".byte 5\n"
+  constexpr char ASSEMBLY_ALIGN[] = ".byte 5\n"
                                     ".skip 0\n"
                                     ".byte 6\n"
                                     ".skip 1\n"
                                     ".byte 7\n"
                                     ".skip 10 * 10\n"
                                     ".byte 8\n";
-  constexpr u32 expect_addr[] = {0, 3, 104};
+  constexpr u32 EXPECT_ADDR[] = {0, 3, 104};
 
-  auto res = Assemble(assembly_align, 0);
+  auto res = Assemble(ASSEMBLY_ALIGN, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
-  ASSERT_EQ(code_blocks.size(), sizeof(expect_addr) / sizeof(expect_addr[0]));
+  ASSERT_EQ(code_blocks.size(), sizeof(EXPECT_ADDR) / sizeof(EXPECT_ADDR[0]));
 
-  EXPECT_EQ(code_blocks[0].block_address, expect_addr[0]) << " -> i=0";
+  EXPECT_EQ(code_blocks[0].block_address, EXPECT_ADDR[0]) << " -> i=0";
   ASSERT_EQ(code_blocks[0].instructions.size(), 2);
   EXPECT_EQ(code_blocks[0].instructions[0], 5) << " -> i=0";
   EXPECT_EQ(code_blocks[0].instructions[1], 6) << " -> i=0";
 
-  EXPECT_EQ(code_blocks[1].block_address, expect_addr[1]) << " -> i=1";
+  EXPECT_EQ(code_blocks[1].block_address, EXPECT_ADDR[1]) << " -> i=1";
   ASSERT_EQ(code_blocks[1].instructions.size(), 1);
   EXPECT_EQ(code_blocks[1].instructions[0], 7) << " -> i=1";
 
-  EXPECT_EQ(code_blocks[2].block_address, expect_addr[2]) << " -> i=2";
+  EXPECT_EQ(code_blocks[2].block_address, EXPECT_ADDR[2]) << " -> i=2";
   ASSERT_EQ(code_blocks[2].instructions.size(), 1);
   EXPECT_EQ(code_blocks[2].instructions[0], 8) << " -> i=2";
 }
 
 TEST(Assembler, DefvarDirective)
 {
-  constexpr char assembly[] = ".defvar NewVar, 0\n"
+  constexpr char ASSEMBLY[] = ".defvar NewVar, 0\n"
                               ".defvar NewVar2, 123\n"
                               ".defvar __Name, 1*2+3+4\n"
                               ".defvar AB_cd00, 5*5+__Name\n"
@@ -1840,23 +1840,23 @@ TEST(Assembler, DefvarDirective)
                               ".4byte __Name\n"
                               ".4byte AB_cd00\n"
                               ".4byte AB_cd00 + NewVar2\n";
-  constexpr u8 expect[] = {
+  constexpr u8 EXPECT[] = {
       0, 0, 0, 123, 0, 0, 0, 9, 0, 0, 0, 34, 0, 0, 0, 157,
   };
 
-  auto res = Assemble(assembly, 0);
+  auto res = Assemble(ASSEMBLY, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 1);
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], expect[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], EXPECT[i]) << " -> i=" << i;
   }
 }
 
 TEST(Assembler, VariousOperandExpressions)
 {
-  constexpr char assembly[] = ".locate 0x400\n"
+  constexpr char ASSEMBLY[] = ".locate 0x400\n"
                               "b .\n"
                               "b .\n"
                               ".locate 0x800\n"
@@ -1872,36 +1872,36 @@ TEST(Assembler, VariousOperandExpressions)
                               "li r0, TestValue\n"
                               ".locate 0x80001234\n"
                               "post_locate_2:\n";
-  constexpr u8 expect_0[] = {
+  constexpr u8 EXPECT_0[] = {
       0x48, 0x00, 0x04, 0x00, 0x48, 0x00, 0x04, 0x04,
   };
-  constexpr u8 expect_1[] = {
+  constexpr u8 EXPECT_1[] = {
       0x48, 0x00, 0x01, 0x00, 0x4b, 0xff, 0xff, 0xfc, 0x48, 0x00, 0x00,
       0x10, 0x4b, 0xff, 0xff, 0xf4, 0x3c, 0x00, 0x80, 0x00, 0x60, 0x00,
       0x12, 0x34, 0x38, 0x00, 0x04, 0xd2, 0x38, 0x00, 0x04, 0xd2,
   };
 
-  auto res = Assemble(assembly, 0);
+  auto res = Assemble(ASSEMBLY, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 2);
 
-  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(expect_0));
+  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(EXPECT_0));
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], expect_0[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], EXPECT_0[i]) << " -> i=" << i;
   }
 
-  ASSERT_EQ(code_blocks[1].instructions.size(), sizeof(expect_1));
+  ASSERT_EQ(code_blocks[1].instructions.size(), sizeof(EXPECT_1));
   for (size_t i = 0; i < code_blocks[1].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[1].instructions[i], expect_1[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[1].instructions[i], EXPECT_1[i]) << " -> i=" << i;
   }
 }
 
 TEST(Assembler, AbsRel)
 {
-  constexpr char assembly[] = ".locate 0x80001234\n"
+  constexpr char ASSEMBLY[] = ".locate 0x80001234\n"
                               "lbl0:\n"
                               ".defvar abs_loc, lbl0\n"
                               ".4byte lbl0\n"
@@ -1910,155 +1910,155 @@ TEST(Assembler, AbsRel)
                               ".4byte .\n"
                               "b lbl0\n"
                               "b `abs_loc`\n";
-  constexpr u8 expect[] = {
+  constexpr u8 EXPECT[] = {
       0x80, 0x00, 0x12, 0x34, 0x80, 0x00, 0x12, 0x34, 0x80, 0x00,
       0x12, 0x3c, 0x4b, 0xff, 0xff, 0xf4, 0x4b, 0xff, 0xff, 0xf0,
   };
 
-  auto res = Assemble(assembly, 0);
+  auto res = Assemble(ASSEMBLY, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 1);
 
-  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(expect));
+  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(EXPECT));
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], expect[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], EXPECT[i]) << " -> i=" << i;
   }
 }
 
 TEST(Assembler, BadTokens)
 {
-  constexpr char unterminated_str[] = ".ascii \"no terminator";
-  constexpr char bad_hex_in_str[] = ".ascii \"\\xnot hex\"";
-  constexpr char newline_in_str[] = ".ascii \"abc\nd\"";
-  constexpr char bad_float_0[] = ".float";
-  constexpr char bad_float_1[] = ".float 1.";
-  constexpr char bad_float_2[] = ".float .";
-  constexpr char bad_float_3[] = ".float -.5e";
-  constexpr char bad_float_4[] = ".float -.6e+";
+  constexpr char UNTERMINATED_STR[] = ".ascii \"no terminator";
+  constexpr char BAD_HEX_IN_STR[] = ".ascii \"\\xnot hex\"";
+  constexpr char NEWLINE_IN_STR[] = ".ascii \"abc\nd\"";
+  constexpr char BAD_FLOAT_0[] = ".float";
+  constexpr char BAD_FLOAT_1[] = ".float 1.";
+  constexpr char BAD_FLOAT_2[] = ".float .";
+  constexpr char BAD_FLOAT_3[] = ".float -.5e";
+  constexpr char BAD_FLOAT_4[] = ".float -.6e+";
 
-  EXPECT_TRUE(IsFailure(Assemble(unterminated_str, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(bad_hex_in_str, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(newline_in_str, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(bad_float_0, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(bad_float_1, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(bad_float_2, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(bad_float_3, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(bad_float_4, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(UNTERMINATED_STR, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(BAD_HEX_IN_STR, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(NEWLINE_IN_STR, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(BAD_FLOAT_0, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(BAD_FLOAT_1, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(BAD_FLOAT_2, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(BAD_FLOAT_3, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(BAD_FLOAT_4, 0)));
 }
 
 TEST(Assembler, RangeTest)
 {
-  constexpr char gpr_range_0[] = "mr r3, -1";
-  constexpr char gpr_range_1[] = "mr r3, 0";
-  constexpr char gpr_range_2[] = "mr r3, 32";
-  constexpr char gpr_range_3[] = "mr r3, 31";
-  constexpr char crf_range_0[] = "cmpw -1, 0, 0";
-  constexpr char crf_range_1[] = "cmpw 0, 0, 0";
-  constexpr char crf_range_2[] = "cmpw 8, 0, 0";
-  constexpr char crf_range_3[] = "cmpw 7, 0, 0";
-  constexpr char bc_range_0[] = "beq 1 << 15";
-  constexpr char bc_range_1[] = "beq (1 << 15) - 4";
-  constexpr char bc_range_2[] = "beq -(1 << 15) - 4";
-  constexpr char bc_range_3[] = "beq -(1 << 15)";
-  constexpr char b_range_0[] = "b 1 << 25";
-  constexpr char b_range_1[] = "b (1 << 25) - 4";
-  constexpr char b_range_2[] = "b -(1 << 25) - 4";
-  constexpr char b_range_3[] = "b -(1 << 25)";
-  constexpr char crb_range_0[] = "cror -1, -1, -1";
-  constexpr char crb_range_1[] = "cror 0, 0, 0";
-  constexpr char crb_range_2[] = "cror 32, 32, 32";
-  constexpr char crb_range_3[] = "cror 31, 31, 31";
-  constexpr char off_range_0[] = "lwz r0, 1 << 15(r3)";
-  constexpr char off_range_1[] = "lwz r0, (1 << 15) - 1(r3)";
-  constexpr char off_range_2[] = "lwz r0, -(1 << 15) - 1(r3)";
-  constexpr char off_range_3[] = "lwz r0, -(1 << 15)(r3)";
-  constexpr char psoff_range_0[] = "psq_l f0, 1 << 11(r3), 0, 0";
-  constexpr char psoff_range_1[] = "psq_l f0, (1 << 11) - 1(r3), 0, 0";
-  constexpr char psoff_range_2[] = "psq_l f0, -(1 << 11) - 1(r3), 0, 0";
-  constexpr char psoff_range_3[] = "psq_l f0, -(1 << 11)(r3), 0, 0";
-  constexpr char simm_range_0[] = "addi r0, r1, 0x8000";
-  constexpr char simm_range_1[] = "addi r0, r1, 0x7fff";
-  constexpr char simm_range_2[] = "addi r0, r1, -0x8001";
-  constexpr char simm_range_3[] = "addi r0, r1, -0x8000";
-  constexpr char uimm_range_0[] = "andi. r0, r1, 0x10000";
-  constexpr char uimm_range_1[] = "andi. r0, r1, 0xffff";
-  constexpr char uimm_range_2[] = "andi. r0, r1, -1";
-  constexpr char uimm_range_3[] = "andi. r0, r1, 0";
+  constexpr char GPR_RANGE_0[] = "mr r3, -1";
+  constexpr char GPR_RANGE_1[] = "mr r3, 0";
+  constexpr char GPR_RANGE_2[] = "mr r3, 32";
+  constexpr char GPR_RANGE_3[] = "mr r3, 31";
+  constexpr char CRF_RANGE_0[] = "cmpw -1, 0, 0";
+  constexpr char CRF_RANGE_1[] = "cmpw 0, 0, 0";
+  constexpr char CRF_RANGE_2[] = "cmpw 8, 0, 0";
+  constexpr char CRF_RANGE_3[] = "cmpw 7, 0, 0";
+  constexpr char BC_RANGE_0[] = "beq 1 << 15";
+  constexpr char BC_RANGE_1[] = "beq (1 << 15) - 4";
+  constexpr char BC_RANGE_2[] = "beq -(1 << 15) - 4";
+  constexpr char BC_RANGE_3[] = "beq -(1 << 15)";
+  constexpr char B_RANGE_0[] = "b 1 << 25";
+  constexpr char B_RANGE_1[] = "b (1 << 25) - 4";
+  constexpr char B_RANGE_2[] = "b -(1 << 25) - 4";
+  constexpr char B_RANGE_3[] = "b -(1 << 25)";
+  constexpr char CRB_RANGE_0[] = "cror -1, -1, -1";
+  constexpr char CRB_RANGE_1[] = "cror 0, 0, 0";
+  constexpr char CRB_RANGE_2[] = "cror 32, 32, 32";
+  constexpr char CRB_RANGE_3[] = "cror 31, 31, 31";
+  constexpr char OFF_RANGE_0[] = "lwz r0, 1 << 15(r3)";
+  constexpr char OFF_RANGE_1[] = "lwz r0, (1 << 15) - 1(r3)";
+  constexpr char OFF_RANGE_2[] = "lwz r0, -(1 << 15) - 1(r3)";
+  constexpr char OFF_RANGE_3[] = "lwz r0, -(1 << 15)(r3)";
+  constexpr char PSOFF_RANGE_0[] = "psq_l f0, 1 << 11(r3), 0, 0";
+  constexpr char PSOFF_RANGE_1[] = "psq_l f0, (1 << 11) - 1(r3), 0, 0";
+  constexpr char PSOFF_RANGE_2[] = "psq_l f0, -(1 << 11) - 1(r3), 0, 0";
+  constexpr char PSOFF_RANGE_3[] = "psq_l f0, -(1 << 11)(r3), 0, 0";
+  constexpr char SIMM_RANGE_0[] = "addi r0, r1, 0x8000";
+  constexpr char SIMM_RANGE_1[] = "addi r0, r1, 0x7fff";
+  constexpr char SIMM_RANGE_2[] = "addi r0, r1, -0x8001";
+  constexpr char SIMM_RANGE_3[] = "addi r0, r1, -0x8000";
+  constexpr char UIMM_RANGE_0[] = "andi. r0, r1, 0x10000";
+  constexpr char UIMM_RANGE_1[] = "andi. r0, r1, 0xffff";
+  constexpr char UIMM_RANGE_2[] = "andi. r0, r1, -1";
+  constexpr char UIMM_RANGE_3[] = "andi. r0, r1, 0";
 
-  EXPECT_TRUE(IsFailure(Assemble(gpr_range_0, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(gpr_range_1, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(gpr_range_2, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(gpr_range_3, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(crf_range_0, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(crf_range_1, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(crf_range_2, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(crf_range_3, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(bc_range_0, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(bc_range_1, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(bc_range_2, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(bc_range_3, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(b_range_0, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(b_range_1, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(b_range_2, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(b_range_3, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(crb_range_0, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(crb_range_1, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(crb_range_2, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(crb_range_3, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(off_range_0, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(off_range_1, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(off_range_2, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(off_range_3, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(psoff_range_0, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(psoff_range_1, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(psoff_range_2, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(psoff_range_3, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(psoff_range_0, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(psoff_range_1, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(psoff_range_2, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(psoff_range_3, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(simm_range_0, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(simm_range_1, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(simm_range_2, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(simm_range_3, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(uimm_range_0, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(uimm_range_1, 0)));
-  EXPECT_TRUE(IsFailure(Assemble(uimm_range_2, 0)));
-  EXPECT_TRUE(!IsFailure(Assemble(uimm_range_3, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(GPR_RANGE_0, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(GPR_RANGE_1, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(GPR_RANGE_2, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(GPR_RANGE_3, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(CRF_RANGE_0, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(CRF_RANGE_1, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(CRF_RANGE_2, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(CRF_RANGE_3, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(BC_RANGE_0, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(BC_RANGE_1, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(BC_RANGE_2, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(BC_RANGE_3, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(B_RANGE_0, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(B_RANGE_1, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(B_RANGE_2, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(B_RANGE_3, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(CRB_RANGE_0, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(CRB_RANGE_1, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(CRB_RANGE_2, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(CRB_RANGE_3, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(OFF_RANGE_0, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(OFF_RANGE_1, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(OFF_RANGE_2, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(OFF_RANGE_3, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(PSOFF_RANGE_0, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(PSOFF_RANGE_1, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(PSOFF_RANGE_2, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(PSOFF_RANGE_3, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(PSOFF_RANGE_0, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(PSOFF_RANGE_1, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(PSOFF_RANGE_2, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(PSOFF_RANGE_3, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(SIMM_RANGE_0, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(SIMM_RANGE_1, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(SIMM_RANGE_2, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(SIMM_RANGE_3, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(UIMM_RANGE_0, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(UIMM_RANGE_1, 0)));
+  EXPECT_TRUE(IsFailure(Assemble(UIMM_RANGE_2, 0)));
+  EXPECT_TRUE(!IsFailure(Assemble(UIMM_RANGE_3, 0)));
 }
 
 TEST(Assembly, MalformedExpressions)
 {
-  constexpr char missing_arg[] = "add 0, 1";
-  constexpr char missing_paren_0[] = ".4byte (1 + 2), ((3 * 6) + 7";
-  constexpr char missing_paren_1[] = ".4byte (1 + 2), `(3 * 6) + 7";
-  constexpr char mismatched_paren[] = ".4byte (1 + 2), (`3 * 6) + 7`";
-  constexpr char wrong_arg_format[] = "lwz r3, 100, r4";
-  constexpr char no_operator[] = "b . .";
-  constexpr char no_operand[] = "b 4 + +";
+  constexpr char MISSING_ARG[] = "add 0, 1";
+  constexpr char MISSING_PAREN_0[] = ".4byte (1 + 2), ((3 * 6) + 7";
+  constexpr char MISSING_PAREN_1[] = ".4byte (1 + 2), `(3 * 6) + 7";
+  constexpr char MISMATCHED_PAREN[] = ".4byte (1 + 2), (`3 * 6) + 7`";
+  constexpr char WRONG_ARG_FORMAT[] = "lwz r3, 100, r4";
+  constexpr char NO_OPERATOR[] = "b . .";
+  constexpr char NO_OPERAND[] = "b 4 + +";
 
-  auto res = Assemble(missing_arg, 0);
+  auto res = Assemble(MISSING_ARG, 0);
   EXPECT_TRUE(IsFailure(res) && GetFailure(res).message == "Expected ',' but found '<EOF>'")
       << GetFailure(res).message;
-  res = Assemble(missing_paren_0, 0);
+  res = Assemble(MISSING_PAREN_0, 0);
   EXPECT_TRUE(IsFailure(res) && GetFailure(res).message == "Expected ')' but found '<EOF>'")
       << GetFailure(res).message;
-  res = Assemble(missing_paren_1, 0);
+  res = Assemble(MISSING_PAREN_1, 0);
   EXPECT_TRUE(IsFailure(res) && GetFailure(res).message == "Expected '`' but found '<EOF>'")
       << GetFailure(res).message;
-  res = Assemble(mismatched_paren, 0);
+  res = Assemble(MISMATCHED_PAREN, 0);
   EXPECT_TRUE(IsFailure(res) && GetFailure(res).message == "Expected '`' but found ')'")
       << GetFailure(res).message;
-  res = Assemble(wrong_arg_format, 0);
+  res = Assemble(WRONG_ARG_FORMAT, 0);
   EXPECT_TRUE(IsFailure(res) && GetFailure(res).message == "Expected '(' but found ','")
       << GetFailure(res).message;
-  res = Assemble(no_operator, 0);
+  res = Assemble(NO_OPERATOR, 0);
   EXPECT_TRUE(IsFailure(res) &&
               GetFailure(res).message == "Unexpected token '.' where line should have ended")
       << GetFailure(res).message;
-  res = Assemble(no_operand, 0);
+  res = Assemble(NO_OPERAND, 0);
   EXPECT_TRUE(IsFailure(res) && GetFailure(res).message == "Unexpected token '+' in expression")
       << GetFailure(res).message;
 }
@@ -2067,7 +2067,7 @@ TEST(Assembly, MalformedExpressions)
 // Expect bytes are based on disc contents
 TEST(Assembly, RealAssembly)
 {
-  constexpr char real_assembly[] = ".locate 0x8046A690\n"
+  constexpr char REAL_ASSEMBLY[] = ".locate 0x8046A690\n"
                                    ".defvar back_chain, -0x30\n"
                                    ".defvar var_28, -0x28\n"
                                    ".defvar pre_back_chain,  0\n"
@@ -2182,7 +2182,7 @@ TEST(Assembly, RealAssembly)
                                    "blr\n"
                                    "loc_8046A804:\n";
 
-  constexpr u8 real_expect[] = {
+  constexpr u8 REAL_EXPECT[] = {
       0x94, 0x21, 0xff, 0xd0, 0x7c, 0x08, 0x02, 0xa6, 0x90, 0x01, 0x00, 0x34, 0x39, 0x61, 0x00,
       0x30, 0x4b, 0xe5, 0x23, 0xe5, 0x38, 0x00, 0x00, 0x00, 0x7c, 0xfc, 0x3b, 0x78, 0x90, 0x08,
       0x00, 0x00, 0x7c, 0x78, 0x1b, 0x78, 0x7c, 0x99, 0x23, 0x78, 0x7c, 0xba, 0x2b, 0x78, 0x7c,
@@ -2211,15 +2211,15 @@ TEST(Assembly, RealAssembly)
       0x20,
   };
 
-  auto res = Assemble(real_assembly, 0);
+  auto res = Assemble(REAL_ASSEMBLY, 0);
   ASSERT_TRUE(!IsFailure(res));
   auto&& code_blocks = GetT(res);
   ASSERT_EQ(code_blocks.size(), 1);
-  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(real_expect));
+  ASSERT_EQ(code_blocks[0].instructions.size(), sizeof(REAL_EXPECT));
 
   EXPECT_EQ(code_blocks[0].block_address, 0x8046a690);
   for (size_t i = 0; i < code_blocks[0].instructions.size(); i++)
   {
-    EXPECT_EQ(code_blocks[0].instructions[i], real_expect[i]) << " -> i=" << i;
+    EXPECT_EQ(code_blocks[0].instructions[i], REAL_EXPECT[i]) << " -> i=" << i;
   }
 }

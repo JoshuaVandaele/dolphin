@@ -261,18 +261,18 @@ void LoadIndexedXF(CPArray array, u32 index, u16 address, u8 size)
   // load stuff from array to address in xf mem
 
   const u32 buf_size = size * sizeof(u32);
-  u32* currData = reinterpret_cast<u32*>(&xfmem) + address;
-  u32* newData;
+  u32* curr_data = reinterpret_cast<u32*>(&xfmem) + address;
+  u32* new_data;
   auto& system = Core::System::GetInstance();
   auto& fifo = system.GetFifo();
   if (fifo.UseDeterministicGPUThread())
   {
-    newData = static_cast<u32*>(fifo.PopFifoAuxBuffer(buf_size));
+    new_data = static_cast<u32*>(fifo.PopFifoAuxBuffer(buf_size));
   }
   else
   {
     auto& memory = system.GetMemory();
-    newData = reinterpret_cast<u32*>(memory.GetPointerForRange(
+    new_data = reinterpret_cast<u32*>(memory.GetPointerForRange(
         g_main_cp_state.array_bases[array] + g_main_cp_state.array_strides[array] * index,
         buf_size));
   }
@@ -281,7 +281,7 @@ void LoadIndexedXF(CPArray array, u32 index, u16 address, u8 size)
   bool changed = false;
   for (u32 i = 0; i < size; ++i)
   {
-    if (currData[i] != Common::swap32(newData[i]))
+    if (curr_data[i] != Common::swap32(new_data[i]))
     {
       changed = true;
       XFMemWritten(xf_state_manager, size, address);
@@ -291,7 +291,7 @@ void LoadIndexedXF(CPArray array, u32 index, u16 address, u8 size)
   if (changed)
   {
     for (u32 i = 0; i < size; ++i)
-      currData[i] = Common::swap32(newData[i]);
+      curr_data[i] = Common::swap32(new_data[i]);
   }
 }
 

@@ -50,9 +50,9 @@ std::optional<double> GetRayLineIntersection(Common::DVec2 ray, Common::DVec2 po
 
 double GetNearestNotch(double angle, double virtual_notch_angle)
 {
-  constexpr auto sides = 8;
-  constexpr auto rounding = MathUtil::TAU / sides;
-  const auto closest_notch = std::round(angle / rounding) * rounding;
+  constexpr auto SIDES = 8;
+  constexpr auto ROUNDING = MathUtil::TAU / SIDES;
+  const auto closest_notch = std::round(angle / ROUNDING) * ROUNDING;
   const auto angle_diff =
       std::fmod(angle - closest_notch + MathUtil::PI, MathUtil::TAU) - MathUtil::PI;
   return std::abs(angle_diff) < virtual_notch_angle / 2 ? closest_notch : angle;
@@ -79,13 +79,13 @@ OctagonStickGate::OctagonStickGate(ControlState radius) : m_radius(radius)
 
 ControlState OctagonStickGate::GetRadiusAtAngle(double angle) const
 {
-  constexpr int sides = 8;
-  constexpr double sum_int_angles = (sides - 2) * MathUtil::PI;
-  constexpr double half_int_angle = sum_int_angles / sides / 2;
+  constexpr int SIDES = 8;
+  constexpr double SUM_INT_ANGLES = (SIDES - 2) * MathUtil::PI;
+  constexpr double HALF_INT_ANGLE = SUM_INT_ANGLES / SIDES / 2;
 
-  angle = std::fmod(angle, MathUtil::TAU / sides);
+  angle = std::fmod(angle, MathUtil::TAU / SIDES);
   // Solve ASA triangle using The Law of Sines:
-  return m_radius / std::sin(MathUtil::PI - angle - half_int_angle) * std::sin(half_int_angle);
+  return m_radius / std::sin(MathUtil::PI - angle - HALF_INT_ANGLE) * std::sin(HALF_INT_ANGLE);
 }
 
 std::optional<u32> OctagonStickGate::GetIdealCalibrationSampleCount() const
@@ -114,9 +114,9 @@ SquareStickGate::SquareStickGate(ControlState half_width) : m_half_width(half_wi
 
 ControlState SquareStickGate::GetRadiusAtAngle(double angle) const
 {
-  constexpr double section_angle = MathUtil::TAU / 4;
+  constexpr double SECTION_ANGLE = MathUtil::TAU / 4;
   return m_half_width /
-         std::cos(std::fmod(angle + section_angle / 2, section_angle) - section_angle / 2);
+         std::cos(std::fmod(angle + SECTION_ANGLE / 2, SECTION_ANGLE) - SECTION_ANGLE / 2);
 }
 
 std::optional<u32> SquareStickGate::GetIdealCalibrationSampleCount() const
@@ -288,10 +288,10 @@ void ReshapableInput::SaveConfig(Common::IniFile::Section* section, const std::s
                fmt::format("{:.2f}", fmt::join(scaled_calibration, " ")), "");
 
   // Save center value.
-  static constexpr char center_format[] = "{:.2f} {:.2f}";
-  const auto center_data = fmt::format(center_format, m_center.x * CENTER_CONFIG_SCALE,
+  static constexpr char CENTER_FORMAT[] = "{:.2f} {:.2f}";
+  const auto center_data = fmt::format(CENTER_FORMAT, m_center.x * CENTER_CONFIG_SCALE,
                                        m_center.y * CENTER_CONFIG_SCALE);
-  section->Set(group + CENTER_CONFIG_NAME, center_data, fmt::format(center_format, 0.0, 0.0));
+  section->Set(group + CENTER_CONFIG_NAME, center_data, fmt::format(CENTER_FORMAT, 0.0, 0.0));
 }
 
 ReshapableInput::ReshapeData ReshapableInput::Reshape(ControlState x, ControlState y,

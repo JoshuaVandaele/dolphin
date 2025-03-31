@@ -126,12 +126,12 @@ void DSPEmitter::WriteBlockLink(u16 dest)
       MOV(64, R(RAX), ImmPtr(&m_cycles_left));
       MOV(16, R(ECX), MatR(RAX));
       CMP(16, R(ECX), Imm16(m_block_size[m_start_address] + m_block_size[dest]));
-      FixupBranch notEnoughCycles = J_CC(CC_BE);
+      FixupBranch not_enough_cycles = J_CC(CC_BE);
 
       SUB(16, R(ECX), Imm16(m_block_size[m_start_address]));
       MOV(16, MatR(RAX), R(ECX));
       JMP(m_block_links[dest], Jump::Near);
-      SetJumpTarget(notEnoughCycles);
+      SetJumpTarget(not_enough_cycles);
     }
     else
     {
@@ -322,28 +322,28 @@ void DSPEmitter::HandleLoop()
   MOVZX(32, 16, ECX, M_SDSP_r_st(3));
 
   TEST(32, R(RCX), R(RCX));
-  FixupBranch rLoopCntG = J_CC(CC_E, Jump::Near);
+  FixupBranch r_loop_cnt_g = J_CC(CC_E, Jump::Near);
   CMP(16, R(RAX), Imm16(m_compile_pc - 1));
-  FixupBranch rLoopAddrG = J_CC(CC_NE, Jump::Near);
+  FixupBranch r_loop_addr_g = J_CC(CC_NE, Jump::Near);
 
   SUB(16, M_SDSP_r_st(3), Imm16(1));
   CMP(16, M_SDSP_r_st(3), Imm16(0));
 
-  FixupBranch loadStack = J_CC(CC_E, Jump::Near);
+  FixupBranch load_stack = J_CC(CC_E, Jump::Near);
   MOVZX(32, 16, ECX, M_SDSP_r_st(0));
   MOV(16, M_SDSP_pc(), R(RCX));
-  FixupBranch loopUpdated = J(Jump::Near);
+  FixupBranch loop_updated = J(Jump::Near);
 
-  SetJumpTarget(loadStack);
+  SetJumpTarget(load_stack);
   DSPJitRegCache c(m_gpr);
   dsp_reg_load_stack(StackRegister::Call);
   dsp_reg_load_stack(StackRegister::LoopAddress);
   dsp_reg_load_stack(StackRegister::LoopCounter);
   m_gpr.FlushRegs(c);
 
-  SetJumpTarget(loopUpdated);
-  SetJumpTarget(rLoopAddrG);
-  SetJumpTarget(rLoopCntG);
+  SetJumpTarget(loop_updated);
+  SetJumpTarget(r_loop_addr_g);
+  SetJumpTarget(r_loop_cnt_g);
 }
 
 // LOOP $R

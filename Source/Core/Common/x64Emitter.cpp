@@ -18,7 +18,7 @@ struct NormalOpDef
 };
 
 // 0xCC is code for invalid combination of immediates
-static const NormalOpDef normalops[11] = {
+static const NormalOpDef NORMALOPS[11] = {
     {0x00, 0x01, 0x02, 0x03, 0x80, 0x81, 0x83, 0x04, 0x05, 0},  // ADD
     {0x10, 0x11, 0x12, 0x13, 0x80, 0x81, 0x83, 0x14, 0x15, 2},  // ADC
 
@@ -246,26 +246,26 @@ void OpArg::WriteREX(XEmitter* emit, int opBits, int bits, int customOp) const
 void OpArg::WriteVEX(XEmitter* emit, X64Reg regOp1, X64Reg regOp2, int L, int pp, int mmmmm,
                      int W) const
 {
-  int R = !(regOp1 & 8);
-  int X = !(indexReg & 8);
-  int B = !(offsetOrBaseReg & 8);
+  int r = !(regOp1 & 8);
+  int x = !(indexReg & 8);
+  int b = !(offsetOrBaseReg & 8);
 
   int vvvv = (regOp2 == X64Reg::INVALID_REG) ? 0xf : (regOp2 ^ 0xf);
 
   // do we need any VEX fields that only appear in the three-byte form?
-  if (X == 1 && B == 1 && W == 0 && mmmmm == 1)
+  if (x == 1 && b == 1 && W == 0 && mmmmm == 1)
   {
-    u8 RvvvvLpp = (R << 7) | (vvvv << 3) | (L << 2) | pp;
+    u8 rvvvv_lpp = (r << 7) | (vvvv << 3) | (L << 2) | pp;
     emit->Write8(0xC5);
-    emit->Write8(RvvvvLpp);
+    emit->Write8(rvvvv_lpp);
   }
   else
   {
-    u8 RXBmmmmm = (R << 7) | (X << 6) | (B << 5) | mmmmm;
-    u8 WvvvvLpp = (W << 7) | (vvvv << 3) | (L << 2) | pp;
+    u8 rx_bmmmmm = (r << 7) | (x << 6) | (b << 5) | mmmmm;
+    u8 wvvvv_lpp = (W << 7) | (vvvv << 3) | (L << 2) | pp;
     emit->Write8(0xC4);
-    emit->Write8(RXBmmmmm);
-    emit->Write8(WvvvvLpp);
+    emit->Write8(rx_bmmmmm);
+    emit->Write8(wvvvv_lpp);
   }
 }
 
@@ -276,20 +276,20 @@ void OpArg::WriteRest(XEmitter* emit, int extraBytes, X64Reg _operandReg,
     _operandReg = (X64Reg)this->operandReg;
   int mod = 0;
   int ireg = indexReg;
-  bool SIB = false;
-  int _offsetOrBaseReg = this->offsetOrBaseReg;
+  bool sib = false;
+  int offset_or_base_reg = this->offsetOrBaseReg;
 
   if (scale == SCALE_RIP)  // Also, on 32-bit, just an immediate address
   {
     // Oh, RIP addressing.
-    _offsetOrBaseReg = 5;
-    emit->WriteModRM(0, _operandReg, _offsetOrBaseReg);
+    offset_or_base_reg = 5;
+    emit->WriteModRM(0, _operandReg, offset_or_base_reg);
     // TODO : add some checks
-    u64 ripAddr = (u64)emit->GetCodePtr() + 4 + extraBytes;
-    s64 distance = (s64)offset - (s64)ripAddr;
+    u64 rip_addr = (u64)emit->GetCodePtr() + 4 + extraBytes;
+    s64 distance = (s64)offset - (s64)rip_addr;
     ASSERT_MSG(DYNA_REC,
                (distance < 0x80000000LL && distance >= -0x80000000LL) || !warn_64bit_offset,
-               "WriteRest: op out of range ({:#x} uses {:#x})", ripAddr, offset);
+               "WriteRest: op out of range ({:#x} uses {:#x})", rip_addr, offset);
     s32 offs = (s32)distance;
     emit->Write32((u32)offs);
     return;
@@ -302,28 +302,28 @@ void OpArg::WriteRest(XEmitter* emit, int extraBytes, X64Reg _operandReg,
   }
   else if (scale >= SCALE_NOBASE_2 && scale <= SCALE_NOBASE_8)
   {
-    SIB = true;
+    sib = true;
     mod = 0;
-    _offsetOrBaseReg = 5;
+    offset_or_base_reg = 5;
     // Always has 32-bit displacement
   }
   else
   {
     if (scale != SCALE_ATREG)
     {
-      SIB = true;
+      sib = true;
     }
-    else if ((_offsetOrBaseReg & 7) == 4)
+    else if ((offset_or_base_reg & 7) == 4)
     {
       // Special case for which SCALE_ATREG needs SIB
-      SIB = true;
-      ireg = _offsetOrBaseReg;
+      sib = true;
+      ireg = offset_or_base_reg;
     }
 
     // Okay, we're fine. Just disp encoding.
     // We need displacement. Which size?
     int ioff = (int)(s64)offset;
-    if (ioff == 0 && (_offsetOrBaseReg & 7) != 5)
+    if (ioff == 0 && (offset_or_base_reg & 7) != 5)
     {
       mod = 0;  // No displacement
     }
@@ -339,20 +339,20 @@ void OpArg::WriteRest(XEmitter* emit, int extraBytes, X64Reg _operandReg,
 
   // Okay. Time to do the actual writing
   // ModRM byte:
-  int oreg = _offsetOrBaseReg;
-  if (SIB)
+  int oreg = offset_or_base_reg;
+  if (sib)
     oreg = 4;
 
   emit->WriteModRM(mod, _operandReg & 7, oreg & 7);
 
-  if (SIB)
+  if (sib)
   {
     // SIB byte
     int ss;
     switch (scale)
     {
     case SCALE_NONE:
-      _offsetOrBaseReg = 4;
+      offset_or_base_reg = 4;
       ss = 0;
       break;  // RSP
     case SCALE_1:
@@ -384,7 +384,7 @@ void OpArg::WriteRest(XEmitter* emit, int extraBytes, X64Reg _operandReg,
       ss = 0;
       break;
     }
-    emit->Write8((u8)((ss << 6) | ((ireg & 7) << 3) | (_offsetOrBaseReg & 7)));
+    emit->Write8((u8)((ss << 6) | ((ireg & 7) << 3) | (offset_or_base_reg & 7)));
   }
 
   if (mod == 1)  // 8-bit disp
@@ -1195,7 +1195,7 @@ void XEmitter::LEA(int bits, X64Reg dest, OpArg src)
 void XEmitter::WriteShift(int bits, OpArg dest, const OpArg& shift, int ext)
 {
   CheckFlags();
-  bool writeImm = false;
+  bool write_imm = false;
   if (dest.IsImm())
   {
     ASSERT_MSG(DYNA_REC, 0, "WriteShift - can't shift imms");
@@ -1219,7 +1219,7 @@ void XEmitter::WriteShift(int bits, OpArg dest, const OpArg& shift, int ext)
     }
     else
     {
-      writeImm = true;
+      write_imm = true;
       Write8(bits == 8 ? 0xC0 : 0xC1);
     }
   }
@@ -1227,8 +1227,8 @@ void XEmitter::WriteShift(int bits, OpArg dest, const OpArg& shift, int ext)
   {
     Write8(bits == 8 ? 0xD2 : 0xD3);
   }
-  dest.WriteRest(this, writeImm ? 1 : 0);
-  if (writeImm)
+  dest.WriteRest(this, write_imm ? 1 : 0);
+  if (write_imm)
     Write8((u8)shift.offset);
 }
 
@@ -1398,7 +1398,7 @@ void OpArg::WriteSingleByteOp(XEmitter* emit, u8 op, X64Reg _operandReg, int bit
 void OpArg::WriteNormalOp(XEmitter* emit, bool toRM, NormalOp op, const OpArg& operand,
                           int bits) const
 {
-  X64Reg _operandReg;
+  X64Reg operand_reg;
   if (IsImm())
   {
     ASSERT_MSG(DYNA_REC, 0, "WriteNormalOp - Imm argument, wrong order");
@@ -1407,8 +1407,8 @@ void OpArg::WriteNormalOp(XEmitter* emit, bool toRM, NormalOp op, const OpArg& o
   if (bits == 16)
     emit->Write8(0x66);
 
-  int immToWrite = 0;
-  const NormalOpDef& op_def = normalops[static_cast<int>(op)];
+  int imm_to_write = 0;
+  const NormalOpDef& op_def = NORMALOPS[static_cast<int>(op)];
 
   if (operand.IsImm())
   {
@@ -1437,7 +1437,7 @@ void OpArg::WriteNormalOp(XEmitter* emit, bool toRM, NormalOp op, const OpArg& o
       }
       // op r/m8, imm8
       emit->Write8(op_def.imm8);
-      immToWrite = 8;
+      imm_to_write = 8;
     }
     else if ((operand.scale == SCALE_IMM16 && bits == 16) ||
              (operand.scale == SCALE_IMM32 && bits == 32) ||
@@ -1451,7 +1451,7 @@ void OpArg::WriteNormalOp(XEmitter* emit, bool toRM, NormalOp op, const OpArg& o
            (operand.scale == SCALE_IMM32 && (s32)operand.offset == (s8)operand.offset)))
       {
         emit->Write8(op_def.simm8);
-        immToWrite = 8;
+        imm_to_write = 8;
       }
       else
       {
@@ -1477,7 +1477,7 @@ void OpArg::WriteNormalOp(XEmitter* emit, bool toRM, NormalOp op, const OpArg& o
         }
         // op r/m, imm
         emit->Write8(op_def.imm32);
-        immToWrite = bits == 16 ? 16 : 32;
+        imm_to_write = bits == 16 ? 16 : 32;
       }
     }
     else if ((operand.scale == SCALE_IMM8 && bits == 16) ||
@@ -1486,7 +1486,7 @@ void OpArg::WriteNormalOp(XEmitter* emit, bool toRM, NormalOp op, const OpArg& o
     {
       // op r/m, imm8
       emit->Write8(op_def.simm8);
-      immToWrite = 8;
+      imm_to_write = 8;
     }
     else if (operand.scale == SCALE_IMM64 && bits == 64)
     {
@@ -1507,7 +1507,7 @@ void OpArg::WriteNormalOp(XEmitter* emit, bool toRM, NormalOp op, const OpArg& o
         }
         // mov reg64, simm32 (7 bytes)
         emit->Write8(op_def.imm32);
-        immToWrite = 32;
+        imm_to_write = 32;
       }
       else
       {
@@ -1520,12 +1520,12 @@ void OpArg::WriteNormalOp(XEmitter* emit, bool toRM, NormalOp op, const OpArg& o
     }
 
     // pass extension in REG of ModRM
-    _operandReg = static_cast<X64Reg>(op_def.ext);
+    operand_reg = static_cast<X64Reg>(op_def.ext);
   }
   else
   {
-    _operandReg = (X64Reg)operand.offsetOrBaseReg;
-    WriteREX(emit, bits, bits, _operandReg);
+    operand_reg = (X64Reg)operand.offsetOrBaseReg;
+    WriteREX(emit, bits, bits, operand_reg);
     // op r/m, reg
     if (toRM)
     {
@@ -1537,8 +1537,8 @@ void OpArg::WriteNormalOp(XEmitter* emit, bool toRM, NormalOp op, const OpArg& o
       emit->Write8(bits == 8 ? op_def.fromRm8 : op_def.fromRm32);
     }
   }
-  WriteRest(emit, immToWrite >> 3, _operandReg);
-  switch (immToWrite)
+  WriteRest(emit, imm_to_write >> 3, operand_reg);
+  switch (imm_to_write)
   {
   case 0:
     break;
@@ -1901,8 +1901,8 @@ void XEmitter::WriteBMIOp(int size, u8 opPrefix, u16 op, X64Reg regOp1, X64Reg r
     PanicAlertFmt("BMI1/2 instructions don't support immediate operands.");
   if (size != 32 && size != 64)
     PanicAlertFmt("BMI1/2 instructions only support 32-bit and 64-bit modes!");
-  const int W = size == 64;
-  WriteVEXOp(opPrefix, op, regOp1, regOp2, arg, W, extrabytes);
+  const int w = size == 64;
+  WriteVEXOp(opPrefix, op, regOp1, regOp2, arg, w, extrabytes);
 }
 
 void XEmitter::WriteBMI1Op(int size, u8 opPrefix, u16 op, X64Reg regOp1, X64Reg regOp2,

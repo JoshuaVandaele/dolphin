@@ -16,9 +16,9 @@
 
 namespace WiimoteEmu
 {
-constexpr std::array<u8, 6> drums_id{{0x01, 0x00, 0xa4, 0x20, 0x01, 0x03}};
+constexpr std::array<u8, 6> DRUMS_ID{{0x01, 0x00, 0xa4, 0x20, 0x01, 0x03}};
 
-constexpr std::array<u8, 6> drum_pad_bitmasks{{
+constexpr std::array<u8, 6> DRUM_PAD_BITMASKS{{
     Drums::PAD_RED,
     Drums::PAD_YELLOW,
     Drums::PAD_BLUE,
@@ -27,7 +27,7 @@ constexpr std::array<u8, 6> drum_pad_bitmasks{{
     Drums::PAD_BASS,
 }};
 
-constexpr std::array<const char*, 6> drum_pad_names{{
+constexpr std::array<const char*, 6> DRUM_PAD_NAMES{{
     _trans("Red"),
     _trans("Yellow"),
     _trans("Blue"),
@@ -36,7 +36,7 @@ constexpr std::array<const char*, 6> drum_pad_names{{
     _trans("Bass"),
 }};
 
-constexpr std::array<Drums::VelocityID, 6> drum_pad_velocity_ids{{
+constexpr std::array<Drums::VelocityID, 6> DRUM_PAD_VELOCITY_IDS{{
     Drums::VelocityID::Red,
     Drums::VelocityID::Yellow,
     Drums::VelocityID::Blue,
@@ -45,7 +45,7 @@ constexpr std::array<Drums::VelocityID, 6> drum_pad_velocity_ids{{
     Drums::VelocityID::Bass,
 }};
 
-constexpr std::array<u8, 2> drum_button_bitmasks{{
+constexpr std::array<u8, 2> DRUM_BUTTON_BITMASKS{{
     Drums::BUTTON_MINUS,
     Drums::BUTTON_PLUS,
 }};
@@ -56,7 +56,7 @@ Drums::Drums() : Extension1stParty("Drums", _trans("Drum Kit"))
 
   // Pads.
   groups.emplace_back(m_pads = new ControllerEmu::Buttons(_trans("Pads")));
-  for (auto& drum_pad_name : drum_pad_names)
+  for (auto& drum_pad_name : DRUM_PAD_NAMES)
   {
     m_pads->AddInput(Translatability::Translate, drum_pad_name);
   }
@@ -95,10 +95,10 @@ void Drums::BuildDesiredExtensionState(DesiredExtensionState* target_state)
   }
 
   state.buttons = 0;
-  m_buttons->GetState(&state.buttons, drum_button_bitmasks.data(), m_input_override_function);
+  m_buttons->GetState(&state.buttons, DRUM_BUTTON_BITMASKS.data(), m_input_override_function);
 
   state.drum_pads = 0;
-  m_pads->GetState(&state.drum_pads, drum_pad_bitmasks.data(), m_input_override_function);
+  m_pads->GetState(&state.drum_pads, DRUM_PAD_BITMASKS.data(), m_input_override_function);
 
   state.softness = u8(0x7F - std::lround(m_hit_strength_setting.GetValue() * 0x7F / 100));
 }
@@ -143,20 +143,20 @@ void Drums::Update(const DesiredExtensionState& target_state)
   m_prev_pad_input = current_pad_input;
 
   static_assert(std::tuple_size<decltype(m_pad_remaining_frames)>::value ==
-                    drum_pad_bitmasks.size(),
+                    DRUM_PAD_BITMASKS.size(),
                 "Array sizes do not match.");
 
   // Figure out which velocity id to send. (needs to be sent once for each newly hit drum-pad)
-  for (std::size_t i = 0; i != drum_pad_bitmasks.size(); ++i)
+  for (std::size_t i = 0; i != DRUM_PAD_BITMASKS.size(); ++i)
   {
-    const auto drum_pad = drum_pad_bitmasks[i];
+    const auto drum_pad = DRUM_PAD_BITMASKS[i];
 
     if (m_new_pad_hits & drum_pad)
     {
       // Clear the bit so velocity data is not sent again until the next hit.
       m_new_pad_hits &= ~drum_pad;
 
-      drum_data.velocity_id = u8(drum_pad_velocity_ids[i]);
+      drum_data.velocity_id = u8(DRUM_PAD_VELOCITY_IDS[i]);
 
       drum_data.no_velocity_data_1 = 0;
       drum_data.no_velocity_data_2 = 0;
@@ -180,13 +180,13 @@ void Drums::Update(const DesiredExtensionState& target_state)
   // Figure out which drum-pad bits to send.
   // Note: Relevent bits are not set until after velocity data has been sent.
   // My drums never exposed simultaneous hits. One pad bit was always sent before the other.
-  for (std::size_t i = 0; i != drum_pad_bitmasks.size(); ++i)
+  for (std::size_t i = 0; i != DRUM_PAD_BITMASKS.size(); ++i)
   {
     auto& remaining_frames = m_pad_remaining_frames[i];
 
     if (remaining_frames != 0)
     {
-      drum_data.drum_pads |= drum_pad_bitmasks[i];
+      drum_data.drum_pads |= DRUM_PAD_BITMASKS[i];
       --remaining_frames;
     }
   }
@@ -203,7 +203,7 @@ void Drums::Reset()
 {
   EncryptedExtension::Reset();
 
-  m_reg.identifier = drums_id;
+  m_reg.identifier = DRUMS_ID;
 
   // Both 16-byte blocks of calibration data seem to be 0xff filled.
   m_reg.calibration.fill(0xff);

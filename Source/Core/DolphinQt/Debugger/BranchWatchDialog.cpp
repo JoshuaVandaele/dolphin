@@ -474,7 +474,7 @@ BranchWatchDialog::BranchWatchDialog(Core::System& system, Core::BranchWatch& br
   // Column Visibility Menu
   m_mnu_column_visibility = new QMenu(this);
   {
-    static constexpr std::array<const char*, Column::NumberOfColumns> headers = {
+    static constexpr std::array<const char*, Column::NumberOfColumns> HEADERS = {
         QT_TR_NOOP("Instruction"),   QT_TR_NOOP("Condition"),         QT_TR_NOOP("Origin"),
         QT_TR_NOOP("Destination"),   QT_TR_NOOP("Recent Hits"),       QT_TR_NOOP("Total Hits"),
         QT_TR_NOOP("Origin Symbol"), QT_TR_NOOP("Destination Symbol")};
@@ -482,7 +482,7 @@ BranchWatchDialog::BranchWatchDialog(Core::System& system, Core::BranchWatch& br
     for (int column = 0; column < Column::NumberOfColumns; ++column)
     {
       auto* const action =
-          m_mnu_column_visibility->addAction(tr(headers[column]), [this, column](bool enabled) {
+          m_mnu_column_visibility->addAction(tr(HEADERS[column]), [this, column](bool enabled) {
             m_table_view->setColumnHidden(column, !enabled);
           });
       action->setChecked(!m_table_view->isColumnHidden(column));

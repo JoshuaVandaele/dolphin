@@ -32,12 +32,12 @@ TEST(BitSet, BitGetSet)
 
 TEST(BitSet, Count)
 {
-  constexpr std::array<std::pair<u32, u32>, 20> random_32bit_number_bitcount_pairs = {
+  constexpr std::array<std::pair<u32, u32>, 20> RANDOM_32BIT_NUMBER_BITCOUNT_PAIRS = {
       {{0x2cb0b5f3, 17}, {0x81ab32a6, 14}, {0xd9030dc5, 14}, {0x325ffe26, 19}, {0xb2fcaee3, 20},
        {0x4ccf188a, 14}, {0xf8be36dc, 20}, {0xb2fcecd5, 20}, {0xb750c2e5, 16}, {0x31d19074, 13},
        {0xf267644a, 16}, {0xac00a719, 12}, {0x6d45f19b, 18}, {0xf7e91c5b, 20}, {0xf687e694, 18},
        {0x9057c24e, 14}, {0x5eb65c39, 18}, {0x85d3038b, 14}, {0x101f4e66, 14}, {0xc202d136, 12}}};
-  for (const auto& [number, bitcount] : random_32bit_number_bitcount_pairs)
+  for (const auto& [number, bitcount] : RANDOM_32BIT_NUMBER_BITCOUNT_PAIRS)
   {
     const auto bitset = BitSet32(number);
     EXPECT_EQ(bitset.Count(), bitcount);
@@ -47,7 +47,7 @@ TEST(BitSet, Count)
     EXPECT_EQ(iterating_count, bitcount);
   }
 
-  constexpr std::array<std::pair<u64, u32>, 9> random_64bit_number_bitcount_pairs = {
+  constexpr std::array<std::pair<u64, u32>, 9> RANDOM_64BIT_NUMBER_BITCOUNT_PAIRS = {
       {{0xf86cd6f6ef09d7d4ULL, 39},
        {0x6f2d8533255ead3cULL, 34},
        {0x9da7941e0e52b345ULL, 31},
@@ -57,7 +57,7 @@ TEST(BitSet, Count)
        {0x09d470516694c64bULL, 27},
        {0x38cd077e075c778fULL, 35},
        {0xd69ebfa6355ebfdeULL, 43}}};
-  for (const auto& [number, bitcount] : random_64bit_number_bitcount_pairs)
+  for (const auto& [number, bitcount] : RANDOM_64BIT_NUMBER_BITCOUNT_PAIRS)
   {
     const auto bitset = BitSet64(number);
     EXPECT_EQ(bitset.Count(), bitcount);

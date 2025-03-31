@@ -38,7 +38,7 @@
 
 static std::unique_ptr<Platform> s_platform;
 
-static void signal_handler(int)
+static void SignalHandler(int)
 {
   const char message[] = "A signal was received. A second signal will force Dolphin to stop.\n";
 #ifdef _WIN32
@@ -313,7 +313,7 @@ int main(int argc, char* argv[])
 #else
   // Shut down cleanly on SIGINT and SIGTERM
   struct sigaction sa;
-  sa.sa_handler = signal_handler;
+  sa.sa_handler = SignalHandler;
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = SA_RESETHAND;
   sigaction(SIGINT, &sa, nullptr);

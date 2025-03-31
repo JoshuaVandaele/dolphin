@@ -38,7 +38,7 @@
 
 namespace PatchEngine
 {
-constexpr std::array<const char*, 3> s_patch_type_strings{{
+constexpr std::array<const char*, 3> S_PATCH_TYPE_STRINGS{{
     "byte",
     "word",
     "dword",
@@ -50,7 +50,7 @@ static std::mutex s_on_frame_memory_mutex;
 
 const char* PatchTypeAsString(PatchType type)
 {
-  return s_patch_type_strings.at(static_cast<int>(type));
+  return S_PATCH_TYPE_STRINGS.at(static_cast<int>(type));
 }
 
 std::optional<PatchEntry> DeserializeLine(std::string line)
@@ -77,10 +77,10 @@ std::optional<PatchEntry> DeserializeLine(std::string line)
     entry.conditional = true;
   }
 
-  const auto iter = std::ranges::find(s_patch_type_strings, items[1]);
-  if (iter == s_patch_type_strings.end())
+  const auto iter = std::ranges::find(S_PATCH_TYPE_STRINGS, items[1]);
+  if (iter == S_PATCH_TYPE_STRINGS.end())
     return std::nullopt;
-  entry.type = static_cast<PatchType>(std::distance(s_patch_type_strings.begin(), iter));
+  entry.type = static_cast<PatchType>(std::distance(S_PATCH_TYPE_STRINGS.begin(), iter));
 
   return entry;
 }
@@ -105,7 +105,7 @@ void LoadPatchSection(const std::string& section, std::vector<Patch>* patches,
   for (const auto* ini : {&globalIni, &localIni})
   {
     std::vector<std::string> lines;
-    Patch currentPatch;
+    Patch current_patch;
     ini->GetLines(section, &lines);
 
     for (std::string& line : lines)
@@ -116,26 +116,26 @@ void LoadPatchSection(const std::string& section, std::vector<Patch>* patches,
       if (line[0] == '$')
       {
         // Take care of the previous code
-        if (!currentPatch.name.empty())
+        if (!current_patch.name.empty())
         {
-          patches->push_back(currentPatch);
+          patches->push_back(current_patch);
         }
-        currentPatch.entries.clear();
+        current_patch.entries.clear();
 
         // Set name and whether the patch is user defined
-        currentPatch.name = line.substr(1, line.size() - 1);
-        currentPatch.user_defined = (ini == &localIni);
+        current_patch.name = line.substr(1, line.size() - 1);
+        current_patch.user_defined = (ini == &localIni);
       }
       else
       {
         if (std::optional<PatchEntry> entry = DeserializeLine(line))
-          currentPatch.entries.push_back(*entry);
+          current_patch.entries.push_back(*entry);
       }
     }
 
-    if (!currentPatch.name.empty() && !currentPatch.entries.empty())
+    if (!current_patch.name.empty() && !current_patch.entries.empty())
     {
-      patches->push_back(currentPatch);
+      patches->push_back(current_patch);
     }
 
     ReadEnabledAndDisabled(*ini, section, patches);
@@ -177,10 +177,10 @@ void LoadPatches()
 {
   const auto& sconfig = SConfig::GetInstance();
   Common::IniFile merged = sconfig.LoadGameIni();
-  Common::IniFile globalIni = sconfig.LoadDefaultGameIni();
-  Common::IniFile localIni = sconfig.LoadLocalGameIni();
+  Common::IniFile global_ini = sconfig.LoadDefaultGameIni();
+  Common::IniFile local_ini = sconfig.LoadLocalGameIni();
 
-  LoadPatchSection("OnFrame", &s_on_frame, globalIni, localIni);
+  LoadPatchSection("OnFrame", &s_on_frame, global_ini, local_ini);
 
 #ifdef USE_RETRO_ACHIEVEMENTS
   AchievementManager::GetInstance().FilterApprovedPatches(s_on_frame, sconfig.GetGameID(),
@@ -195,9 +195,9 @@ void LoadPatches()
   }
   else
   {
-    Gecko::SetActiveCodes(Gecko::LoadCodes(globalIni, localIni), sconfig.GetGameID(),
+    Gecko::SetActiveCodes(Gecko::LoadCodes(global_ini, local_ini), sconfig.GetGameID(),
                           sconfig.GetRevision());
-    ActionReplay::LoadAndApplyCodes(globalIni, localIni, sconfig.GetGameID(),
+    ActionReplay::LoadAndApplyCodes(global_ini, local_ini, sconfig.GetGameID(),
                                     sconfig.GetRevision());
   }
 }
@@ -262,20 +262,20 @@ static bool IsStackValid(const Core::CPUThreadGuard& guard)
   DEBUG_ASSERT(ppc_state.msr.DR && ppc_state.msr.IR);
 
   // Check the stack pointer
-  const u32 SP = ppc_state.gpr[1];
-  if (!PowerPC::MMU::HostIsRAMAddress(guard, SP))
+  const u32 sp = ppc_state.gpr[1];
+  if (!PowerPC::MMU::HostIsRAMAddress(guard, sp))
     return false;
 
   // Read the frame pointer from the stack (find 2nd frame from top), assert that it makes sense
-  const u32 next_SP = PowerPC::MMU::HostRead_U32(guard, SP);
-  if (next_SP <= SP || !PowerPC::MMU::HostIsRAMAddress(guard, next_SP) ||
-      !PowerPC::MMU::HostIsRAMAddress(guard, next_SP + 4))
+  const u32 next_sp = PowerPC::MMU::HostRead_U32(guard, sp);
+  if (next_sp <= sp || !PowerPC::MMU::HostIsRAMAddress(guard, next_sp) ||
+      !PowerPC::MMU::HostIsRAMAddress(guard, next_sp + 4))
   {
     return false;
   }
 
   // Check the link register makes sense (that it points to a valid IBAT address)
-  const u32 address = PowerPC::MMU::HostRead_U32(guard, next_SP + 4);
+  const u32 address = PowerPC::MMU::HostRead_U32(guard, next_sp + 4);
   return PowerPC::MMU::HostIsInstructionRAMAddress(guard, address) &&
          0 != PowerPC::MMU::HostRead_Instruction(guard, address);
 }

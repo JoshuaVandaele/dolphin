@@ -33,11 +33,11 @@
 
 namespace VideoCommon
 {
-static const char s_empty_pixel_shader[] = "void main() { SetOutput(Sample()); }\n";
-static const char s_default_pixel_shader_name[] = "default_pre_post_process";
+static const char S_EMPTY_PIXEL_SHADER[] = "void main() { SetOutput(Sample()); }\n";
+static const char S_DEFAULT_PIXEL_SHADER_NAME[] = "default_pre_post_process";
 // Keep the highest quality possible to avoid losing quality on subtle gamma conversions.
 // RGBA16F should have enough quality even if we store colors in gamma space on it.
-static const AbstractTextureFormat s_intermediary_buffer_format = AbstractTextureFormat::RGBA16F;
+static const AbstractTextureFormat S_INTERMEDIARY_BUFFER_FORMAT = AbstractTextureFormat::RGBA16F;
 
 static bool LoadShaderFromFile(const std::string& shader, const std::string& sub_dir,
                                std::string& out_code)
@@ -104,7 +104,7 @@ void PostProcessingConfiguration::LoadDefaultShader()
   m_options.clear();
   m_any_options_dirty = false;
   m_current_shader = "";
-  m_current_shader_code = s_empty_pixel_shader;
+  m_current_shader_code = S_EMPTY_PIXEL_SHADER;
 }
 
 void PostProcessingConfiguration::LoadOptions(const std::string& code)
@@ -391,7 +391,7 @@ static std::vector<std::string> GetShaders(const std::string& sub_dir = "")
   {
     std::string name;
     SplitPath(path, nullptr, &name, nullptr);
-    if (name == s_default_pixel_shader_name)
+    if (name == S_DEFAULT_PIXEL_SHADER_NAME)
       continue;
     result.push_back(name);
   }
@@ -527,7 +527,7 @@ void PostProcessing::BlitFromTexture(const MathUtil::Rectangle<int>& dst,
     {
       const TextureConfig intermediary_color_texture_config(
           target_width, target_height, 1, target_layers, src_tex->GetSamples(),
-          s_intermediary_buffer_format, AbstractTextureFlag_RenderTarget,
+          S_INTERMEDIARY_BUFFER_FORMAT, AbstractTextureFlag_RenderTarget,
           AbstractTextureType::Texture_2DArray);
       m_intermediary_color_texture = g_gfx->CreateTexture(intermediary_color_texture_config,
                                                           "Intermediary post process texture");
@@ -963,7 +963,7 @@ bool PostProcessing::CompilePixelShader()
   // Generate GLSL and compile the new shaders:
 
   std::string default_pixel_shader_code;
-  if (LoadShaderFromFile(s_default_pixel_shader_name, "", default_pixel_shader_code))
+  if (LoadShaderFromFile(S_DEFAULT_PIXEL_SHADER_NAME, "", default_pixel_shader_code))
   {
     m_default_pixel_shader = g_gfx->CreateShaderFromSource(
         ShaderStage::Pixel, GetHeader(false) + default_pixel_shader_code + GetFooter(),
@@ -1043,7 +1043,7 @@ bool PostProcessing::CompilePipeline()
   config.depth_state = RenderState::GetNoDepthTestingDepthState();
   config.blending_state = RenderState::GetNoBlendingBlendState();
   config.framebuffer_state = RenderState::GetColorFramebufferState(
-      needs_intermediary_buffer ? s_intermediary_buffer_format : m_framebuffer_format);
+      needs_intermediary_buffer ? S_INTERMEDIARY_BUFFER_FORMAT : m_framebuffer_format);
   config.usage = AbstractPipelineUsage::Utility;
   // We continue even if it failed, it will be skipped later on
   if (config.pixel_shader)

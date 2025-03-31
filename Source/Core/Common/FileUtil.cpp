@@ -799,8 +799,8 @@ static std::string CreateSysDirectoryPath()
 
 const std::string& GetSysDirectory()
 {
-  static const std::string sys_directory = CreateSysDirectoryPath();
-  return sys_directory;
+  static const std::string SYS_DIRECTORY = CreateSysDirectoryPath();
+  return SYS_DIRECTORY;
 }
 
 #ifdef ANDROID

@@ -619,7 +619,7 @@ JITWidget::JITWidget(Core::System& system, QWidget* parent) : QDockWidget(parent
 
   m_status_bar = new ClickableStatusBar(nullptr);
   m_status_bar->setSizeGripEnabled(false);
-  connect(m_status_bar, &ClickableStatusBar::pressed, this, &JITWidget::OnStatusBarPressed);
+  connect(m_status_bar, &ClickableStatusBar::Pressed, this, &JITWidget::OnStatusBarPressed);
 
   m_table_context_menu = new QMenu(this);
   m_table_context_menu->addAction(tr("View &Code"), this, &JITWidget::OnTableMenuViewCode);
@@ -629,7 +629,7 @@ JITWidget::JITWidget(Core::System& system, QWidget* parent) : QDockWidget(parent
 
   m_column_visibility_menu = new QMenu(this);
   // These table header display names have abbreviated counterparts in JitBlockTableModel.cpp
-  static constexpr std::array<const char*, Column::NumberOfColumns> headers = {
+  static constexpr std::array<const char*, Column::NumberOfColumns> HEADERS = {
       QT_TR_NOOP("PPC Feature Flags"),
       // i18n: "Effective" means this memory address might be translated within the MMU.
       QT_TR_NOOP("Effective Address"),
@@ -658,7 +658,7 @@ JITWidget::JITWidget(Core::System& system, QWidget* parent) : QDockWidget(parent
   for (int column = 0; column < Column::NumberOfColumns; ++column)
   {
     auto* const action =
-        m_column_visibility_menu->addAction(tr(headers[column]), [this, column](bool enabled) {
+        m_column_visibility_menu->addAction(tr(HEADERS[column]), [this, column](bool enabled) {
           m_table_view->setColumnHidden(column, !enabled);
         });
     action->setChecked(!m_table_view->isColumnHidden(column));

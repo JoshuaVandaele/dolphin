@@ -63,11 +63,11 @@ const Info<std::string>& GetInfoForMemcardPath(ExpansionInterface::Slot slot)
 {
   ASSERT(ExpansionInterface::IsMemcardSlot(slot));
   static constexpr Common::EnumMap<const Info<std::string>*, ExpansionInterface::MAX_MEMCARD_SLOT>
-      infos{
+      INFOS{
           &MAIN_MEMCARD_A_PATH,
           &MAIN_MEMCARD_B_PATH,
       };
-  return *infos[slot];
+  return *INFOS[slot];
 }
 const Info<std::string> MAIN_AGP_CART_A_PATH{{System::Main, "Core", "AgpCartAPath"}, ""};
 const Info<std::string> MAIN_AGP_CART_B_PATH{{System::Main, "Core", "AgpCartBPath"}, ""};
@@ -75,11 +75,11 @@ const Info<std::string>& GetInfoForAGPCartPath(ExpansionInterface::Slot slot)
 {
   ASSERT(ExpansionInterface::IsMemcardSlot(slot));
   static constexpr Common::EnumMap<const Info<std::string>*, ExpansionInterface::MAX_MEMCARD_SLOT>
-      infos{
+      INFOS{
           &MAIN_AGP_CART_A_PATH,
           &MAIN_AGP_CART_B_PATH,
       };
-  return *infos[slot];
+  return *INFOS[slot];
 }
 const Info<std::string> MAIN_GCI_FOLDER_A_PATH{{System::Main, "Core", "GCIFolderAPath"}, ""};
 const Info<std::string> MAIN_GCI_FOLDER_B_PATH{{System::Main, "Core", "GCIFolderBPath"}, ""};
@@ -87,11 +87,11 @@ const Info<std::string>& GetInfoForGCIPath(ExpansionInterface::Slot slot)
 {
   ASSERT(ExpansionInterface::IsMemcardSlot(slot));
   static constexpr Common::EnumMap<const Info<std::string>*, ExpansionInterface::MAX_MEMCARD_SLOT>
-      infos{
+      INFOS{
           &MAIN_GCI_FOLDER_A_PATH,
           &MAIN_GCI_FOLDER_B_PATH,
       };
-  return *infos[slot];
+  return *INFOS[slot];
 }
 const Info<std::string> MAIN_GCI_FOLDER_A_PATH_OVERRIDE{
     {System::Main, "Core", "GCIFolderAPathOverride"}, ""};
@@ -101,11 +101,11 @@ const Info<std::string>& GetInfoForGCIPathOverride(ExpansionInterface::Slot slot
 {
   ASSERT(ExpansionInterface::IsMemcardSlot(slot));
   static constexpr Common::EnumMap<const Info<std::string>*, ExpansionInterface::MAX_MEMCARD_SLOT>
-      infos{
+      INFOS{
           &MAIN_GCI_FOLDER_A_PATH_OVERRIDE,
           &MAIN_GCI_FOLDER_B_PATH_OVERRIDE,
       };
-  return *infos[slot];
+  return *INFOS[slot];
 }
 
 const Info<int> MAIN_MEMORY_CARD_SIZE{{System::Main, "Core", "MemoryCardSize"}, -1};
@@ -123,13 +123,13 @@ const Info<ExpansionInterface::EXIDeviceType>& GetInfoForEXIDevice(ExpansionInte
 {
   static constexpr Common::EnumMap<const Info<ExpansionInterface::EXIDeviceType>*,
                                    ExpansionInterface::MAX_SLOT>
-      infos{
+      INFOS{
           &MAIN_SLOT_A,
           &MAIN_SLOT_B,
           &MAIN_SERIAL_PORT_1,
           &MAIN_SERIAL_PORT_2,
       };
-  return *infos[slot];
+  return *INFOS[slot];
 }
 
 const Info<std::string> MAIN_BBA_MAC{{System::Main, "Core", "BBA_MAC"}, ""};
@@ -147,7 +147,7 @@ const Info<std::string> MAIN_BBA_BUILTIN_IP{{System::Main, "Core", "BBA_BUILTIN_
 
 const Info<SerialInterface::SIDevices>& GetInfoForSIDevice(int channel)
 {
-  static const std::array<const Info<SerialInterface::SIDevices>, 4> infos{
+  static const std::array<const Info<SerialInterface::SIDevices>, 4> INFOS{
       Info<SerialInterface::SIDevices>{{System::Main, "Core", "SIDevice0"},
                                        SerialInterface::SIDEVICE_GC_CONTROLLER},
       Info<SerialInterface::SIDevices>{{System::Main, "Core", "SIDevice1"},
@@ -157,29 +157,29 @@ const Info<SerialInterface::SIDevices>& GetInfoForSIDevice(int channel)
       Info<SerialInterface::SIDevices>{{System::Main, "Core", "SIDevice3"},
                                        SerialInterface::SIDEVICE_NONE},
   };
-  return infos[channel];
+  return INFOS[channel];
 }
 
 const Info<bool>& GetInfoForAdapterRumble(int channel)
 {
-  static const std::array<const Info<bool>, 4> infos{
+  static const std::array<const Info<bool>, 4> INFOS{
       Info<bool>{{System::Main, "Core", "AdapterRumble0"}, true},
       Info<bool>{{System::Main, "Core", "AdapterRumble1"}, true},
       Info<bool>{{System::Main, "Core", "AdapterRumble2"}, true},
       Info<bool>{{System::Main, "Core", "AdapterRumble3"}, true},
   };
-  return infos[channel];
+  return INFOS[channel];
 }
 
 const Info<bool>& GetInfoForSimulateKonga(int channel)
 {
-  static const std::array<const Info<bool>, 4> infos{
+  static const std::array<const Info<bool>, 4> INFOS{
       Info<bool>{{System::Main, "Core", "SimulateKonga0"}, false},
       Info<bool>{{System::Main, "Core", "SimulateKonga1"}, false},
       Info<bool>{{System::Main, "Core", "SimulateKonga2"}, false},
       Info<bool>{{System::Main, "Core", "SimulateKonga3"}, false},
   };
-  return infos[channel];
+  return INFOS[channel];
 }
 
 const Info<bool> MAIN_WII_SD_CARD{{System::Main, "Core", "WiiSDCard"}, true};
@@ -664,23 +664,23 @@ std::string GetMemcardPath(std::string configured_filename, ExpansionInterface::
   UnifyPathSeparators(configured_filename);
   SplitPath(configured_filename, &dir, &name, &ext);
 
-  constexpr std::string_view us_region = "." USA_DIR;
-  constexpr std::string_view jp_region = "." JAP_DIR;
-  constexpr std::string_view eu_region = "." EUR_DIR;
+  constexpr std::string_view US_REGION = "." USA_DIR;
+  constexpr std::string_view JP_REGION = "." JAP_DIR;
+  constexpr std::string_view EU_REGION = "." EUR_DIR;
   std::optional<DiscIO::Region> path_region = std::nullopt;
-  if (name.ends_with(us_region))
+  if (name.ends_with(US_REGION))
   {
-    name = name.substr(0, name.size() - us_region.size());
+    name = name.substr(0, name.size() - US_REGION.size());
     path_region = DiscIO::Region::NTSC_U;
   }
-  else if (name.ends_with(jp_region))
+  else if (name.ends_with(JP_REGION))
   {
-    name = name.substr(0, name.size() - jp_region.size());
+    name = name.substr(0, name.size() - JP_REGION.size());
     path_region = DiscIO::Region::NTSC_J;
   }
-  else if (name.ends_with(eu_region))
+  else if (name.ends_with(EU_REGION))
   {
-    name = name.substr(0, name.size() - eu_region.size());
+    name = name.substr(0, name.size() - EU_REGION.size());
     path_region = DiscIO::Region::PAL;
   }
 
@@ -723,24 +723,24 @@ std::string GetGCIFolderPath(std::string configured_folder, ExpansionInterface::
   while (configured_folder.ends_with('/'))
     configured_folder.pop_back();
 
-  constexpr std::string_view us_region = "/" USA_DIR;
-  constexpr std::string_view jp_region = "/" JPN_DIR;
-  constexpr std::string_view eu_region = "/" EUR_DIR;
+  constexpr std::string_view US_REGION = "/" USA_DIR;
+  constexpr std::string_view JP_REGION = "/" JPN_DIR;
+  constexpr std::string_view EU_REGION = "/" EUR_DIR;
   std::string_view base_path = configured_folder;
   std::optional<DiscIO::Region> path_region = std::nullopt;
-  if (base_path.ends_with(us_region))
+  if (base_path.ends_with(US_REGION))
   {
-    base_path = base_path.substr(0, base_path.size() - us_region.size());
+    base_path = base_path.substr(0, base_path.size() - US_REGION.size());
     path_region = DiscIO::Region::NTSC_U;
   }
-  else if (base_path.ends_with(jp_region))
+  else if (base_path.ends_with(JP_REGION))
   {
-    base_path = base_path.substr(0, base_path.size() - jp_region.size());
+    base_path = base_path.substr(0, base_path.size() - JP_REGION.size());
     path_region = DiscIO::Region::NTSC_J;
   }
-  else if (base_path.ends_with(eu_region))
+  else if (base_path.ends_with(EU_REGION))
   {
-    base_path = base_path.substr(0, base_path.size() - eu_region.size());
+    base_path = base_path.substr(0, base_path.size() - EU_REGION.size());
     path_region = DiscIO::Region::PAL;
   }
 

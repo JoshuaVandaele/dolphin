@@ -50,7 +50,7 @@ std::unique_ptr<VertexManagerBase> g_vertex_manager;
 using OpcodeDecoder::Primitive;
 
 // GX primitive -> RenderState primitive, no primitive restart
-constexpr Common::EnumMap<PrimitiveType, Primitive::GX_DRAW_POINTS> primitive_from_gx{
+constexpr Common::EnumMap<PrimitiveType, Primitive::GX_DRAW_POINTS> PRIMITIVE_FROM_GX{
     PrimitiveType::Triangles,  // GX_DRAW_QUADS
     PrimitiveType::Triangles,  // GX_DRAW_QUADS_2
     PrimitiveType::Triangles,  // GX_DRAW_TRIANGLES
@@ -62,7 +62,7 @@ constexpr Common::EnumMap<PrimitiveType, Primitive::GX_DRAW_POINTS> primitive_fr
 };
 
 // GX primitive -> RenderState primitive, using primitive restart
-constexpr Common::EnumMap<PrimitiveType, Primitive::GX_DRAW_POINTS> primitive_from_gx_pr{
+constexpr Common::EnumMap<PrimitiveType, Primitive::GX_DRAW_POINTS> PRIMITIVE_FROM_GX_PR{
     PrimitiveType::TriangleStrip,  // GX_DRAW_QUADS
     PrimitiveType::TriangleStrip,  // GX_DRAW_QUADS_2
     PrimitiveType::TriangleStrip,  // GX_DRAW_TRIANGLES
@@ -157,8 +157,8 @@ DataReader VertexManagerBase::PrepareForAdditionalData(OpcodeDecoder::Primitive 
 
   // We can't merge different kinds of primitives, so we have to flush here
   PrimitiveType new_primitive_type = g_backend_info.bSupportsPrimitiveRestart ?
-                                         primitive_from_gx_pr[primitive] :
-                                         primitive_from_gx[primitive];
+                                         PRIMITIVE_FROM_GX_PR[primitive] :
+                                         PRIMITIVE_FROM_GX[primitive];
   if (m_current_primitive_type != new_primitive_type) [[unlikely]]
   {
     Flush();
@@ -706,7 +706,7 @@ void VertexManagerBase::DoState(PointerWrap& p)
 void VertexManagerBase::CalculateZSlope(NativeVertexFormat* format)
 {
   float out[12];
-  float viewOffset[2] = {xfmem.viewport.xOrig - bpmem.scissorOffset.x * 2,
+  float view_offset[2] = {xfmem.viewport.xOrig - bpmem.scissorOffset.x * 2,
                          xfmem.viewport.yOrig - bpmem.scissorOffset.y * 2};
 
   if (m_current_primitive_type != PrimitiveType::Triangles &&
@@ -716,7 +716,7 @@ void VertexManagerBase::CalculateZSlope(NativeVertexFormat* format)
   }
 
   // Global matrix ID.
-  u32 mtxIdx = g_main_cp_state.matrix_index_a.PosNormalMtxIdx;
+  u32 mtx_idx = g_main_cp_state.matrix_index_a.PosNormalMtxIdx;
   const PortableVertexDeclaration vert_decl = format->GetVertexDeclaration();
 
   // Make sure the buffer contains at least 3 vertices.
@@ -732,19 +732,19 @@ void VertexManagerBase::CalculateZSlope(NativeVertexFormat* format)
   {
     // If this vertex format has per-vertex position matrix IDs, look it up.
     if (vert_decl.posmtx.enable)
-      mtxIdx = VertexLoaderManager::position_matrix_index_cache[2 - i];
+      mtx_idx = VertexLoaderManager::position_matrix_index_cache[2 - i];
 
     if (vert_decl.position.components == 2)
       VertexLoaderManager::position_cache[2 - i][2] = 0;
 
     vertex_shader_manager.TransformToClipSpace(&VertexLoaderManager::position_cache[2 - i][0],
-                                               &out[i * 4], mtxIdx);
+                                               &out[i * 4], mtx_idx);
 
     // Transform to Screenspace
     float inv_w = 1.0f / out[3 + i * 4];
 
-    out[0 + i * 4] = out[0 + i * 4] * inv_w * xfmem.viewport.wd + viewOffset[0];
-    out[1 + i * 4] = out[1 + i * 4] * inv_w * xfmem.viewport.ht + viewOffset[1];
+    out[0 + i * 4] = out[0 + i * 4] * inv_w * xfmem.viewport.wd + view_offset[0];
+    out[1 + i * 4] = out[1 + i * 4] * inv_w * xfmem.viewport.ht + view_offset[1];
     out[2 + i * 4] = out[2 + i * 4] * inv_w * xfmem.viewport.zRange + xfmem.viewport.farZ;
   }
 
@@ -753,10 +753,10 @@ void VertexManagerBase::CalculateZSlope(NativeVertexFormat* format)
   float dy12 = out[1] - out[5];
   float dy31 = out[9] - out[1];
 
-  float DF31 = out[10] - out[2];
-  float DF21 = out[6] - out[2];
-  float a = DF31 * -dy12 - DF21 * dy31;
-  float b = dx31 * DF21 + dx12 * DF31;
+  float d_f31 = out[10] - out[2];
+  float d_f21 = out[6] - out[2];
+  float a = d_f31 * -dy12 - d_f21 * dy31;
+  float b = dx31 * d_f21 + dx12 * d_f31;
   float c = -dx12 * dy31 - dx31 * -dy12;
 
   // Sometimes we process de-generate triangles. Stop any divide by zeros

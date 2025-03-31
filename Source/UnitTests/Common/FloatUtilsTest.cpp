@@ -68,7 +68,7 @@ TEST(FloatUtils, FlushToZero)
 
 TEST(FloatUtils, ApproximateReciprocalSquareRoot)
 {
-  constexpr std::array<u64, 57> expected_values{
+  constexpr std::array<u64, 57> EXPECTED_VALUES{
       0x7FF0'0000'0000'0000, 0x617F'FE80'0000'0000, 0x60BF'FE80'0000'0000, 0x5FE0'0008'2C00'0000,
       0x5FDF'FE80'0000'0000, 0x5FDF'FE80'0000'0000, 0x3FEF'FE80'0000'0000, 0x1FF0'0008'2C00'0000,
       0x0000'0000'0000'0000, 0x7FF8'0000'0000'0001, 0x7FFF'FFFF'FFFF'FFFF, 0x7FF8'0000'0000'0000,
@@ -90,7 +90,7 @@ TEST(FloatUtils, ApproximateReciprocalSquareRoot)
     u64 ivalue = double_test_values[i];
     double dvalue = std::bit_cast<double>(ivalue);
 
-    u64 expected = expected_values[i];
+    u64 expected = EXPECTED_VALUES[i];
 
     u64 actual = std::bit_cast<u64>(Common::ApproximateReciprocalSquareRoot(dvalue));
 

@@ -529,14 +529,14 @@ void OGLGfx::ApplyDepthState(const DepthState state)
   if (m_current_depth_state == state)
     return;
 
-  const GLenum glCmpFuncs[8] = {GL_NEVER,   GL_LESS,     GL_EQUAL,  GL_LEQUAL,
+  const GLenum gl_cmp_funcs[8] = {GL_NEVER,   GL_LESS,     GL_EQUAL,  GL_LEQUAL,
                                 GL_GREATER, GL_NOTEQUAL, GL_GEQUAL, GL_ALWAYS};
 
   if (state.testenable)
   {
     glEnable(GL_DEPTH_TEST);
     glDepthMask(state.updateenable ? GL_TRUE : GL_FALSE);
-    glDepthFunc(glCmpFuncs[u32(state.func.Value())]);
+    glDepthFunc(gl_cmp_funcs[u32(state.func.Value())]);
   }
   else
   {
@@ -555,14 +555,14 @@ void OGLGfx::ApplyBlendingState(const BlendingState state)
   if (m_current_blend_state == state)
     return;
 
-  bool useDualSource = state.usedualsrc;
+  bool use_dual_source = state.usedualsrc;
 
   const GLenum src_factors[8] = {GL_ZERO,
                                  GL_ONE,
                                  GL_DST_COLOR,
                                  GL_ONE_MINUS_DST_COLOR,
-                                 useDualSource ? GL_SRC1_ALPHA : (GLenum)GL_SRC_ALPHA,
-                                 useDualSource ? GL_ONE_MINUS_SRC1_ALPHA :
+                                 use_dual_source ? GL_SRC1_ALPHA : (GLenum)GL_SRC_ALPHA,
+                                 use_dual_source ? GL_ONE_MINUS_SRC1_ALPHA :
                                                  (GLenum)GL_ONE_MINUS_SRC_ALPHA,
                                  GL_DST_ALPHA,
                                  GL_ONE_MINUS_DST_ALPHA};
@@ -570,8 +570,8 @@ void OGLGfx::ApplyBlendingState(const BlendingState state)
                                  GL_ONE,
                                  GL_SRC_COLOR,
                                  GL_ONE_MINUS_SRC_COLOR,
-                                 useDualSource ? GL_SRC1_ALPHA : (GLenum)GL_SRC_ALPHA,
-                                 useDualSource ? GL_ONE_MINUS_SRC1_ALPHA :
+                                 use_dual_source ? GL_SRC1_ALPHA : (GLenum)GL_SRC_ALPHA,
+                                 use_dual_source ? GL_ONE_MINUS_SRC1_ALPHA :
                                                  (GLenum)GL_ONE_MINUS_SRC_ALPHA,
                                  GL_DST_ALPHA,
                                  GL_ONE_MINUS_DST_ALPHA};
@@ -586,8 +586,8 @@ void OGLGfx::ApplyBlendingState(const BlendingState state)
   // driver issues?). See https://bugs.dolphin-emu.org/issues/10120 : "Sonic
   // Adventure 2 Battle: graphics crash when loading first Dark level"
   GLenum equation = state.subtract ? GL_FUNC_REVERSE_SUBTRACT : GL_FUNC_ADD;
-  GLenum equationAlpha = state.subtractAlpha ? GL_FUNC_REVERSE_SUBTRACT : GL_FUNC_ADD;
-  glBlendEquationSeparate(equation, equationAlpha);
+  GLenum equation_alpha = state.subtractAlpha ? GL_FUNC_REVERSE_SUBTRACT : GL_FUNC_ADD;
+  glBlendEquationSeparate(equation, equation_alpha);
   glBlendFuncSeparate(src_factors[u32(state.srcfactor.Value())],
                       dst_factors[u32(state.dstfactor.Value())],
                       src_factors[u32(state.srcfactoralpha.Value())],

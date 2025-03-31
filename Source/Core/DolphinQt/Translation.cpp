@@ -59,62 +59,62 @@ public:
   // This is the actual underlying logic of accessing a Mo file. Patterned after the
   // boost::iterator_facade library, which nicely separates out application logic from
   // iterator-concept logic.
-  void advance(difference_type n) { m_index += n; }
-  difference_type distance_to(const MoIterator& other) const
+  void Advance(difference_type n) { m_index += n; }
+  difference_type DistanceTo(const MoIterator& other) const
   {
     return static_cast<difference_type>(other.m_index) - m_index;
   }
-  reference dereference() const
+  reference Dereference() const
   {
     u32 offset = ReadU32(&m_data[m_table_offset + m_index * 8 + 4]);
     return &m_data[offset];
   }
 
   // Needed for Iterator concept
-  reference operator*() const { return dereference(); }
+  reference operator*() const { return Dereference(); }
   MoIterator& operator++()
   {
-    advance(1);
+    Advance(1);
     return *this;
   }
 
   // Needed for InputIterator concept
-  bool operator==(const MoIterator& other) const { return distance_to(other) == 0; }
-  pointer operator->() const { return dereference(); }
+  bool operator==(const MoIterator& other) const { return DistanceTo(other) == 0; }
+  pointer operator->() const { return Dereference(); }
   MoIterator operator++(int)
   {
     MoIterator tmp(*this);
-    advance(1);
+    Advance(1);
     return tmp;
   }
 
   // Needed for BidirectionalIterator concept
   MoIterator& operator--()
   {
-    advance(-1);
+    Advance(-1);
     return *this;
   }
   MoIterator operator--(int)
   {
     MoIterator tmp(*this);
-    advance(-1);
+    Advance(-1);
     return tmp;
   }
 
   // Needed for RandomAccessIterator concept
-  bool operator<(const MoIterator& other) const { return distance_to(other) > 0; }
-  bool operator<=(const MoIterator& other) const { return distance_to(other) >= 0; }
-  bool operator>(const MoIterator& other) const { return distance_to(other) < 0; }
-  bool operator>=(const MoIterator& other) const { return distance_to(other) <= 0; }
+  bool operator<(const MoIterator& other) const { return DistanceTo(other) > 0; }
+  bool operator<=(const MoIterator& other) const { return DistanceTo(other) >= 0; }
+  bool operator>(const MoIterator& other) const { return DistanceTo(other) < 0; }
+  bool operator>=(const MoIterator& other) const { return DistanceTo(other) <= 0; }
   reference operator[](difference_type n) const { return *(*this + n); }
   MoIterator& operator+=(difference_type n)
   {
-    advance(n);
+    Advance(n);
     return *this;
   }
   MoIterator& operator-=(difference_type n)
   {
-    advance(-n);
+    Advance(-n);
     return *this;
   }
   friend MoIterator operator+(difference_type n, const MoIterator& it) { return it + n; }
@@ -124,7 +124,7 @@ public:
     tmp += n;
     return tmp;
   }
-  difference_type operator-(const MoIterator& other) const { return other.distance_to(*this); }
+  difference_type operator-(const MoIterator& other) const { return other.DistanceTo(*this); }
   friend MoIterator operator-(difference_type n, const MoIterator& it) { return it - n; }
   friend MoIterator operator-(const MoIterator& it, difference_type n)
   {

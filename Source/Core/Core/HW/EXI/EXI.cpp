@@ -238,11 +238,11 @@ void ExpansionInterfaceManager::UpdateInterrupts()
   // Channel 1 Device 0 generates interrupt on channel 1
   m_channels[2]->SetEXIINT(m_channels[0]->GetDevice(4)->IsInterruptSet());
 
-  bool causeInt = false;
+  bool cause_int = false;
   for (auto& channel : m_channels)
-    causeInt |= channel->IsCausingInterrupt();
+    cause_int |= channel->IsCausingInterrupt();
 
-  m_system.GetProcessorInterface().SetInterrupt(ProcessorInterface::INT_CAUSE_EXI, causeInt);
+  m_system.GetProcessorInterface().SetInterrupt(ProcessorInterface::INT_CAUSE_EXI, cause_int);
 }
 
 void ExpansionInterfaceManager::UpdateInterruptsCallback(Core::System& system, u64 userdata,

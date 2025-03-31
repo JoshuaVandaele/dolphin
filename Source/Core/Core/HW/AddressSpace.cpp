@@ -205,10 +205,10 @@ struct EffectiveAddressSpaceAccessors : Accessors
 
 struct AuxiliaryAddressSpaceAccessors : Accessors
 {
-  static constexpr u32 aram_base_address = 0;
+  static constexpr u32 ARAM_BASE_ADDRESS = 0;
   bool IsValidAddress(const Core::CPUThreadGuard& guard, u32 address) const override
   {
-    return !guard.GetSystem().IsWii() && (address - aram_base_address) < GetSize();
+    return !guard.GetSystem().IsWii() && (address - ARAM_BASE_ADDRESS) < GetSize();
   }
   u8 ReadU8(const Core::CPUThreadGuard& guard, u32 address) const override
   {

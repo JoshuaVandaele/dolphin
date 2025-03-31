@@ -561,24 +561,24 @@ Device::Device(std::string name, int index, std::string server_address, u16 serv
   AddInput(new TouchInput("Touch Y+", m_touch_y, TOUCH_Y_AXIS_MAX));
 
   // Convert Gs to meters per second squared
-  constexpr auto accel_scale = 1.0 / GRAVITY_ACCELERATION;
+  constexpr auto ACCEL_SCALE = 1.0 / GRAVITY_ACCELERATION;
 
-  AddInput(new AccelerometerInput("Accel Up", m_pad_data.accelerometer_y_g, -accel_scale));
-  AddInput(new AccelerometerInput("Accel Down", m_pad_data.accelerometer_y_g, accel_scale));
-  AddInput(new AccelerometerInput("Accel Left", m_pad_data.accelerometer_x_g, accel_scale));
-  AddInput(new AccelerometerInput("Accel Right", m_pad_data.accelerometer_x_g, -accel_scale));
-  AddInput(new AccelerometerInput("Accel Forward", m_pad_data.accelerometer_z_g, accel_scale));
-  AddInput(new AccelerometerInput("Accel Backward", m_pad_data.accelerometer_z_g, -accel_scale));
+  AddInput(new AccelerometerInput("Accel Up", m_pad_data.accelerometer_y_g, -ACCEL_SCALE));
+  AddInput(new AccelerometerInput("Accel Down", m_pad_data.accelerometer_y_g, ACCEL_SCALE));
+  AddInput(new AccelerometerInput("Accel Left", m_pad_data.accelerometer_x_g, ACCEL_SCALE));
+  AddInput(new AccelerometerInput("Accel Right", m_pad_data.accelerometer_x_g, -ACCEL_SCALE));
+  AddInput(new AccelerometerInput("Accel Forward", m_pad_data.accelerometer_z_g, ACCEL_SCALE));
+  AddInput(new AccelerometerInput("Accel Backward", m_pad_data.accelerometer_z_g, -ACCEL_SCALE));
 
   // Convert degrees per second to radians per second
-  constexpr auto gyro_scale = 360.0 / MathUtil::TAU;
+  constexpr auto GYRO_SCALE = 360.0 / MathUtil::TAU;
 
-  AddInput(new GyroInput("Gyro Pitch Up", m_pad_data.gyro_pitch_deg_s, gyro_scale));
-  AddInput(new GyroInput("Gyro Pitch Down", m_pad_data.gyro_pitch_deg_s, -gyro_scale));
-  AddInput(new GyroInput("Gyro Roll Left", m_pad_data.gyro_roll_deg_s, -gyro_scale));
-  AddInput(new GyroInput("Gyro Roll Right", m_pad_data.gyro_roll_deg_s, gyro_scale));
-  AddInput(new GyroInput("Gyro Yaw Left", m_pad_data.gyro_yaw_deg_s, -gyro_scale));
-  AddInput(new GyroInput("Gyro Yaw Right", m_pad_data.gyro_yaw_deg_s, gyro_scale));
+  AddInput(new GyroInput("Gyro Pitch Up", m_pad_data.gyro_pitch_deg_s, GYRO_SCALE));
+  AddInput(new GyroInput("Gyro Pitch Down", m_pad_data.gyro_pitch_deg_s, -GYRO_SCALE));
+  AddInput(new GyroInput("Gyro Roll Left", m_pad_data.gyro_roll_deg_s, -GYRO_SCALE));
+  AddInput(new GyroInput("Gyro Roll Right", m_pad_data.gyro_roll_deg_s, GYRO_SCALE));
+  AddInput(new GyroInput("Gyro Yaw Left", m_pad_data.gyro_yaw_deg_s, -GYRO_SCALE));
+  AddInput(new GyroInput("Gyro Yaw Right", m_pad_data.gyro_yaw_deg_s, GYRO_SCALE));
 
   AddInput(new BatteryInput(m_pad_data.battery_status));
 

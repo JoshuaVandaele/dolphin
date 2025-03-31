@@ -20,7 +20,7 @@ static bool InhibitMate();
 static bool InhibitPortal();
 static void Uninhibit();
 
-static constexpr char s_app_id[] = "org.DolphinEmu.dolphin-emu";
+static constexpr char S_APP_ID[] = "org.DolphinEmu.dolphin-emu";
 
 // Cookie for the org.freedesktop.ScreenSaver interface
 static uint32_t s_fdo_cookie = 0;
@@ -53,7 +53,7 @@ static bool InhibitXfce()
   if (!interface.isValid())
     return false;
 
-  QDBusReply<uint32_t> reply = interface.call("Inhibit", s_app_id, QObject::tr("Playing a game"));
+  QDBusReply<uint32_t> reply = interface.call("Inhibit", S_APP_ID, QObject::tr("Playing a game"));
   if (interface.lastError().isValid())
   {
     WARN_LOG_FMT(VIDEO, "org.xfce.ScreenSaver::Inhibit failed: {}",
@@ -74,7 +74,7 @@ static bool InhibitMate()
   if (!interface.isValid())
     return false;
 
-  QDBusReply<uint32_t> reply = interface.call("Inhibit", s_app_id, QObject::tr("Playing a game"));
+  QDBusReply<uint32_t> reply = interface.call("Inhibit", S_APP_ID, QObject::tr("Playing a game"));
   if (interface.lastError().isValid())
   {
     WARN_LOG_FMT(VIDEO, "org.mate.ScreenSaver::Inhibit failed: {}",
@@ -94,7 +94,7 @@ static bool InhibitFDO()
   if (!interface.isValid())
     return false;
 
-  QDBusReply<uint32_t> reply = interface.call("Inhibit", s_app_id, QObject::tr("Playing a game"));
+  QDBusReply<uint32_t> reply = interface.call("Inhibit", S_APP_ID, QObject::tr("Playing a game"));
   if (interface.lastError().isValid())
   {
     WARN_LOG_FMT(VIDEO, "org.freedesktop.ScreenSaver::Inhibit failed: {}",

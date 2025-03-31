@@ -353,7 +353,7 @@ void LibusbDevice::TransferCallback(libusb_transfer* transfer)
   });
 }
 
-static const std::map<u8, const char*> s_transfer_types = {
+static const std::map<u8, const char*> S_TRANSFER_TYPES = {
     {LIBUSB_TRANSFER_TYPE_CONTROL, "Control"},
     {LIBUSB_TRANSFER_TYPE_ISOCHRONOUS, "Isochronous"},
     {LIBUSB_TRANSFER_TYPE_BULK, "Bulk"},
@@ -394,7 +394,7 @@ void LibusbDevice::TransferEndpoint::HandleTransfer(libusb_transfer* transfer,
   case LIBUSB_TRANSFER_STALL:
     ERROR_LOG_FMT(IOS_USB, "[{:04x}:{:04x} {}] {} transfer (endpoint {:#04x}) failed: {}",
                   device->m_vid, device->m_pid, device->m_active_interface,
-                  s_transfer_types.at(transfer->type), transfer->endpoint,
+                  S_TRANSFER_TYPES.at(transfer->type), transfer->endpoint,
                   libusb_error_name(transfer->status));
     return_value = transfer->status == LIBUSB_TRANSFER_STALL ? -7004 : -5;
     break;

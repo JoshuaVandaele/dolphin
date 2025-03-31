@@ -61,7 +61,7 @@ std::optional<IPCReply> USB_VEN::IOCtl(const IOCtlRequest& request)
 
 std::optional<IPCReply> USB_VEN::IOCtlV(const IOCtlVRequest& request)
 {
-  static const std::map<u32, u32> s_num_vectors = {
+  static const std::map<u32, u32> S_NUM_VECTORS = {
       {USB::IOCTLV_USBV5_CTRLMSG, 2},
       {USB::IOCTLV_USBV5_INTRMSG, 2},
       {USB::IOCTLV_USBV5_BULKMSG, 2},
@@ -75,7 +75,7 @@ std::optional<IPCReply> USB_VEN::IOCtlV(const IOCtlVRequest& request)
   case USB::IOCTLV_USBV5_BULKMSG:
   case USB::IOCTLV_USBV5_ISOMSG:
   {
-    if (request.in_vectors.size() + request.io_vectors.size() != s_num_vectors.at(request.request))
+    if (request.in_vectors.size() + request.io_vectors.size() != S_NUM_VECTORS.at(request.request))
       return IPCReply(IPC_EINVAL);
 
     std::lock_guard lock{m_usbv5_devices_mutex};

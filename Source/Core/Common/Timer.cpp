@@ -17,25 +17,25 @@
 namespace Common
 {
 template <typename Clock, typename Duration>
-static typename Clock::rep time_now()
+static typename Clock::rep TimeNow()
 {
   return std::chrono::time_point_cast<Duration>(Clock::now()).time_since_epoch().count();
 }
 
 template <typename Duration>
-static auto steady_time_now()
+static auto SteadyTimeNow()
 {
-  return time_now<std::chrono::steady_clock, Duration>();
+  return TimeNow<std::chrono::steady_clock, Duration>();
 }
 
 u64 Timer::NowUs()
 {
-  return steady_time_now<std::chrono::microseconds>();
+  return SteadyTimeNow<std::chrono::microseconds>();
 }
 
 u64 Timer::NowMs()
 {
-  return steady_time_now<std::chrono::milliseconds>();
+  return SteadyTimeNow<std::chrono::milliseconds>();
 }
 
 void Timer::Start()
@@ -73,21 +73,21 @@ u64 Timer::GetLocalTimeSinceJan1970()
       std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now()));
   return seconds.get_local_time().time_since_epoch().count();
 #else
-  time_t sysTime, tzDiff, tzDST;
-  time(&sysTime);
-  tm* gmTime = localtime(&sysTime);
+  time_t sys_time, tz_diff, tz_dst;
+  time(&sys_time);
+  tm* gm_time = localtime(&sys_time);
 
   // Account for DST where needed
-  if (gmTime->tm_isdst == 1)
-    tzDST = 3600;
+  if (gm_time->tm_isdst == 1)
+    tz_dst = 3600;
   else
-    tzDST = 0;
+    tz_dst = 0;
 
   // Lazy way to get local time in sec
-  gmTime = gmtime(&sysTime);
-  tzDiff = sysTime - mktime(gmTime);
+  gm_time = gmtime(&sys_time);
+  tz_diff = sys_time - mktime(gm_time);
 
-  return static_cast<u64>(sysTime + tzDiff + tzDST);
+  return static_cast<u64>(sys_time + tz_diff + tz_dst);
 #endif
 }
 

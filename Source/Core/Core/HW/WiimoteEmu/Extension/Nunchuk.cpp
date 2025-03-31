@@ -23,9 +23,9 @@
 
 namespace WiimoteEmu
 {
-constexpr std::array<u8, 6> nunchuk_id{{0x00, 0x00, 0xa4, 0x20, 0x00, 0x00}};
+constexpr std::array<u8, 6> NUNCHUK_ID{{0x00, 0x00, 0xa4, 0x20, 0x00, 0x00}};
 
-constexpr std::array<u8, 2> nunchuk_button_bitmasks{{
+constexpr std::array<u8, 2> NUNCHUK_BUTTON_BITMASKS{{
     Nunchuk::BUTTON_C,
     Nunchuk::BUTTON_Z,
 }};
@@ -39,8 +39,8 @@ Nunchuk::Nunchuk() : Extension1stParty(_trans("Nunchuk"))
   m_buttons->AddInput(Translatability::DoNotTranslate, Z_BUTTON);
 
   // stick
-  constexpr auto gate_radius = ControlState(STICK_GATE_RADIUS) / STICK_RADIUS;
-  groups.emplace_back(m_stick = new ControllerEmu::OctagonAnalogStick(STICK_GROUP, gate_radius));
+  constexpr auto GATE_RADIUS = ControlState(STICK_GATE_RADIUS) / STICK_RADIUS;
+  groups.emplace_back(m_stick = new ControllerEmu::OctagonAnalogStick(STICK_GROUP, GATE_RADIUS));
 
   // Shake
   // Inverse the default intensity so shake is opposite that of wiimote.
@@ -92,7 +92,7 @@ void Nunchuk::BuildDesiredExtensionState(DesiredExtensionState* target_state)
 
   // buttons
   u8 buttons = 0;
-  m_buttons->GetState(&buttons, nunchuk_button_bitmasks.data(), m_input_override_function);
+  m_buttons->GetState(&buttons, NUNCHUK_BUTTON_BITMASKS.data(), m_input_override_function);
   nc_data.SetButtons(buttons);
 
   // Acceleration data:
@@ -129,7 +129,7 @@ void Nunchuk::Reset()
 {
   EncryptedExtension::Reset();
 
-  m_reg.identifier = nunchuk_id;
+  m_reg.identifier = NUNCHUK_ID;
 
   m_swing_state = {};
   m_tilt_state = {};

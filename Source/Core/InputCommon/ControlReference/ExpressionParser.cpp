@@ -175,8 +175,8 @@ Token Lexer::GetRealLiteral(char first_char)
   value += first_char;
   value += FetchCharsWhile([](char c) { return isdigit(c, std::locale::classic()) || ('.' == c); });
 
-  static const std::regex re(R"(\d+(\.\d+)?)");
-  if (std::regex_match(value, re))
+  static const std::regex RE(R"(\d+(\.\d+)?)");
+  if (std::regex_match(value, RE))
     return Token(TOK_LITERAL, value);
 
   return Token(TOK_INVALID);

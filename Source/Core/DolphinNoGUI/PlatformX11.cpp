@@ -7,7 +7,7 @@
 // None can be used in enums.  Work around that here by copying the definition
 // before it is undefined.
 #include <X11/X.h>
-static constexpr auto X_None = None;
+static constexpr auto X_NONE = None;
 
 #include "DolphinNoGUI/Platform.h"
 
@@ -54,7 +54,7 @@ private:
 
   Display* m_display = nullptr;
   Window m_window = {};
-  Cursor m_blank_cursor = X_None;
+  Cursor m_blank_cursor = X_NONE;
 #ifdef HAVE_XRANDR
   X11Utils::XRRConfiguration* m_xrr_config = nullptr;
 #endif
@@ -92,18 +92,18 @@ bool PlatformX11::Init()
   m_window = XCreateSimpleWindow(m_display, DefaultRootWindow(m_display), m_window_x, m_window_y,
                                  m_window_width, m_window_height, 0, 0, BlackPixel(m_display, 0));
   XSelectInput(m_display, m_window, StructureNotifyMask | KeyPressMask | FocusChangeMask);
-  Atom wmProtocols[1];
-  wmProtocols[0] = XInternAtom(m_display, "WM_DELETE_WINDOW", True);
-  XSetWMProtocols(m_display, m_window, wmProtocols, 1);
+  Atom wm_protocols[1];
+  wm_protocols[0] = XInternAtom(m_display, "WM_DELETE_WINDOW", True);
+  XSetWMProtocols(m_display, m_window, wm_protocols, 1);
   pid_t pid = getpid();
   XChangeProperty(m_display, m_window, XInternAtom(m_display, "_NET_WM_PID", False), XA_CARDINAL,
                   32, PropModeReplace, reinterpret_cast<unsigned char*>(&pid), 1);
   char host_name[HOST_NAME_MAX] = "";
   if (!gethostname(host_name, sizeof(host_name)))
   {
-    XTextProperty wmClientMachine = {reinterpret_cast<unsigned char*>(host_name), XA_STRING, 8,
+    XTextProperty wm_client_machine = {reinterpret_cast<unsigned char*>(host_name), XA_STRING, 8,
                                      strlen(host_name)};
-    XSetWMClientMachine(m_display, m_window, &wmClientMachine);
+    XSetWMClientMachine(m_display, m_window, &wm_client_machine);
   }
   XMapRaised(m_display, m_window);
   XFlush(m_display);
@@ -120,12 +120,12 @@ bool PlatformX11::Init()
   if (Config::Get(Config::MAIN_SHOW_CURSOR) == Config::ShowCursor::Never)
   {
     // make a blank cursor
-    Pixmap Blank;
-    XColor DummyColor;
-    char ZeroData[1] = {0};
-    Blank = XCreateBitmapFromData(m_display, m_window, ZeroData, 1, 1);
-    m_blank_cursor = XCreatePixmapCursor(m_display, Blank, Blank, &DummyColor, &DummyColor, 0, 0);
-    XFreePixmap(m_display, Blank);
+    Pixmap blank;
+    XColor dummy_color;
+    char zero_data[1] = {0};
+    blank = XCreateBitmapFromData(m_display, m_window, zero_data, 1, 1);
+    m_blank_cursor = XCreatePixmapCursor(m_display, blank, blank, &dummy_color, &dummy_color, 0, 0);
+    XFreePixmap(m_display, blank);
     XDefineCursor(m_display, m_window, m_blank_cursor);
   }
 
@@ -177,10 +177,10 @@ void PlatformX11::UpdateWindowPosition()
   if (m_window_fullscreen)
     return;
 
-  Window winDummy;
-  unsigned int borderDummy, depthDummy;
-  XGetGeometry(m_display, m_window, &winDummy, &m_window_x, &m_window_y, &m_window_width,
-               &m_window_height, &borderDummy, &depthDummy);
+  Window win_dummy;
+  unsigned int border_dummy, depth_dummy;
+  XGetGeometry(m_display, m_window, &win_dummy, &m_window_x, &m_window_y, &m_window_width,
+               &m_window_height, &border_dummy, &depth_dummy);
 }
 
 void PlatformX11::ProcessEvents()

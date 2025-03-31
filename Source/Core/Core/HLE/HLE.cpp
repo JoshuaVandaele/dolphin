@@ -28,7 +28,7 @@ namespace HLE
 static std::map<u32, u32> s_hooked_addresses;
 
 // clang-format off
-constexpr std::array<Hook, 23> os_patches{{
+constexpr std::array<Hook, 23> OS_PATCHES{{
     // Placeholder, os_patches[0] is the "non-existent function" index
     {"FAKE_TO_SKIP_0",               HLE_Misc::UnimplementedFunction,       HookType::Replace, HookFlag::Generic},
 
@@ -69,9 +69,9 @@ void Patch(Core::System& system, u32 addr, std::string_view func_name)
   auto& ppc_state = system.GetPPCState();
   auto& memory = system.GetMemory();
   auto& jit_interface = system.GetJitInterface();
-  for (u32 i = 1; i < os_patches.size(); ++i)
+  for (u32 i = 1; i < OS_PATCHES.size(); ++i)
   {
-    if (os_patches[i].name == func_name)
+    if (OS_PATCHES[i].name == func_name)
     {
       s_hooked_addresses[addr] = i;
       ppc_state.iCache.Invalidate(memory, jit_interface, addr);
@@ -119,7 +119,7 @@ void PatchFunctions(Core::System& system)
   // Remove all hooks that aren't fixed address hooks
   for (auto i = s_hooked_addresses.begin(); i != s_hooked_addresses.end();)
   {
-    if (os_patches[i->second].flags != HookFlag::Fixed)
+    if (OS_PATCHES[i->second].flags != HookFlag::Fixed)
     {
       ppc_state.iCache.Invalidate(memory, jit_interface, i->first);
       i = s_hooked_addresses.erase(i);
@@ -130,20 +130,20 @@ void PatchFunctions(Core::System& system)
     }
   }
 
-  for (u32 i = 1; i < os_patches.size(); ++i)
+  for (u32 i = 1; i < OS_PATCHES.size(); ++i)
   {
     // Fixed hooks don't map to symbols
-    if (os_patches[i].flags == HookFlag::Fixed)
+    if (OS_PATCHES[i].flags == HookFlag::Fixed)
       continue;
 
-    for (const auto& symbol : ppc_symbol_db.GetSymbolsFromName(os_patches[i].name))
+    for (const auto& symbol : ppc_symbol_db.GetSymbolsFromName(OS_PATCHES[i].name))
     {
       for (u32 addr = symbol->address; addr < symbol->address + symbol->size; addr += 4)
       {
         s_hooked_addresses[addr] = i;
         ppc_state.iCache.Invalidate(memory, jit_interface, addr);
       }
-      INFO_LOG_FMT(OSHLE, "Patching {} {:08x}", os_patches[i].name, symbol->address);
+      INFO_LOG_FMT(OSHLE, "Patching {} {:08x}", OS_PATCHES[i].name, symbol->address);
     }
   }
 
@@ -165,9 +165,9 @@ void Reload(Core::System& system)
 void Execute(const Core::CPUThreadGuard& guard, u32 current_pc, u32 hook_index)
 {
   hook_index &= 0xFFFFF;
-  if (hook_index > 0 && hook_index < os_patches.size())
+  if (hook_index > 0 && hook_index < OS_PATCHES.size())
   {
-    os_patches[hook_index].function(guard);
+    OS_PATCHES[hook_index].function(guard);
   }
   else
   {
@@ -192,7 +192,7 @@ u32 GetHookByFunctionAddress(PPCSymbolDB& ppc_symbol_db, u32 address)
 {
   const u32 index = GetHookByAddress(address);
   // Fixed hooks use a fixed address and don't patch the whole function
-  if (index == 0 || os_patches[index].flags == HookFlag::Fixed)
+  if (index == 0 || OS_PATCHES[index].flags == HookFlag::Fixed)
     return index;
 
   const Common::Symbol* const symbol = ppc_symbol_db.GetSymbolFromAddr(address);
@@ -201,17 +201,17 @@ u32 GetHookByFunctionAddress(PPCSymbolDB& ppc_symbol_db, u32 address)
 
 const char* GetHookNameByIndex(u32 index)
 {
-  return os_patches[index].name;
+  return OS_PATCHES[index].name;
 }
 
 HookType GetHookTypeByIndex(u32 index)
 {
-  return os_patches[index].type;
+  return OS_PATCHES[index].type;
 }
 
 HookFlag GetHookFlagsByIndex(u32 index)
 {
-  return os_patches[index].flags;
+  return OS_PATCHES[index].flags;
 }
 
 TryReplaceFunctionResult TryReplaceFunction(PPCSymbolDB& ppc_symbol_db, u32 address,
@@ -240,8 +240,8 @@ bool IsEnabled(HookFlag flag, PowerPC::CoreMode mode)
 
 u32 UnPatch(Core::System& system, std::string_view patch_name)
 {
-  const auto patch = std::ranges::find(os_patches, patch_name, &Hook::name);
-  if (patch == std::end(os_patches))
+  const auto patch = std::ranges::find(OS_PATCHES, patch_name, &Hook::name);
+  if (patch == std::end(OS_PATCHES))
     return 0;
 
   auto& power_pc = system.GetPowerPC();
@@ -251,7 +251,7 @@ u32 UnPatch(Core::System& system, std::string_view patch_name)
 
   if (patch->flags == HookFlag::Fixed)
   {
-    const u32 patch_idx = static_cast<u32>(std::distance(os_patches.begin(), patch));
+    const u32 patch_idx = static_cast<u32>(std::distance(OS_PATCHES.begin(), patch));
     u32 addr = 0;
     // Reverse search by OSPatch key instead of address
     for (auto i = s_hooked_addresses.begin(); i != s_hooked_addresses.end();)
@@ -299,7 +299,7 @@ u32 UnpatchRange(Core::System& system, u32 start_addr, u32 end_addr)
   while (i != s_hooked_addresses.end() && i->first < end_addr)
   {
     INFO_LOG_FMT(OSHLE, "Unpatch HLE hooks [{:08x};{:08x}): {} at {:08x}", start_addr, end_addr,
-                 os_patches[i->second].name, i->first);
+                 OS_PATCHES[i->second].name, i->first);
     ppc_state.iCache.Invalidate(memory, jit_interface, i->first);
     i = s_hooked_addresses.erase(i);
     count += 1;

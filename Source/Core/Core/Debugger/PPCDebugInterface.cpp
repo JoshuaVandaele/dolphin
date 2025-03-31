@@ -394,16 +394,16 @@ void PPCDebugInterface::ToggleMemCheck(u32 address, bool read, bool write, bool 
   if (!IsMemCheck(address))
   {
     // Add Memory Check
-    TMemCheck MemCheck;
-    MemCheck.start_address = address;
-    MemCheck.end_address = address;
-    MemCheck.is_break_on_read = read;
-    MemCheck.is_break_on_write = write;
+    TMemCheck mem_check;
+    mem_check.start_address = address;
+    mem_check.end_address = address;
+    mem_check.is_break_on_read = read;
+    mem_check.is_break_on_write = write;
 
-    MemCheck.log_on_hit = log;
-    MemCheck.break_on_hit = true;
+    mem_check.log_on_hit = log;
+    mem_check.break_on_hit = true;
 
-    m_system.GetPowerPC().GetMemChecks().Add(std::move(MemCheck));
+    m_system.GetPowerPC().GetMemChecks().Add(std::move(mem_check));
   }
   else
   {
@@ -427,7 +427,7 @@ u32 PPCDebugInterface::GetColor(const Core::CPUThreadGuard* guard, u32 address) 
   if (symbol->type != Common::Symbol::Type::Function)
     return 0xEEEEFF;
 
-  static constexpr std::array<u32, 6> colors{
+  static constexpr std::array<u32, 6> COLORS{
       0xd0FFFF,  // light cyan
       0xFFd0d0,  // light red
       0xd8d8FF,  // light blue
@@ -435,7 +435,7 @@ u32 PPCDebugInterface::GetColor(const Core::CPUThreadGuard* guard, u32 address) 
       0xd0FFd0,  // light green
       0xFFFFd0,  // light yellow
   };
-  return colors[symbol->index % colors.size()];
+  return COLORS[symbol->index % COLORS.size()];
 }
 // =============
 
@@ -447,12 +447,12 @@ std::string_view PPCDebugInterface::GetDescription(u32 address) const
 std::optional<u32>
 PPCDebugInterface::GetMemoryAddressFromInstruction(const std::string& instruction) const
 {
-  static const std::regex re(",[^r0-]*(-?)(?:0[xX])?([0-9a-fA-F]+|r\\d+)[^r^s]*.(p|toc|\\d+)");
+  static const std::regex RE(",[^r0-]*(-?)(?:0[xX])?([0-9a-fA-F]+|r\\d+)[^r^s]*.(p|toc|\\d+)");
   std::smatch match;
 
   // Instructions should be identified as a load or store before using this function. This error
   // check should never trigger.
-  if (!std::regex_search(instruction, match, re))
+  if (!std::regex_search(instruction, match, RE))
     return std::nullopt;
 
   // match[1]: negative sign for offset or no match.
@@ -460,10 +460,10 @@ PPCDebugInterface::GetMemoryAddressFromInstruction(const std::string& instructio
   // match[3]: will either be p, toc, or NN. Always a gpr.
   const std::string_view offset_match{&*match[2].first, size_t(match[2].length())};
   const std::string_view register_match{&*match[3].first, size_t(match[3].length())};
-  constexpr char is_reg = 'r';
+  constexpr char IS_REG = 'r';
   u32 offset = 0;
 
-  if (is_reg == offset_match[0])
+  if (IS_REG == offset_match[0])
   {
     unsigned register_index = 0;
     Common::FromChars(offset_match.substr(1), register_index, 10);
@@ -475,13 +475,13 @@ PPCDebugInterface::GetMemoryAddressFromInstruction(const std::string& instructio
   }
 
   // sp and rtoc need to be converted to 1 and 2.
-  constexpr char is_sp = 'p';
-  constexpr char is_rtoc = 't';
+  constexpr char IS_SP = 'p';
+  constexpr char IS_RTOC = 't';
   u32 i = 0;
 
-  if (is_sp == register_match[0])
+  if (IS_SP == register_match[0])
     i = 1;
-  else if (is_rtoc == register_match[0])
+  else if (IS_RTOC == register_match[0])
     i = 2;
   else
     Common::FromChars(register_match, i, 10);

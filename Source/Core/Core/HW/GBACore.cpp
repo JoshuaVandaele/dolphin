@@ -62,7 +62,7 @@ static u32 GetCoreFrequency(mCore* core)
   }
 }
 
-static VFile* OpenROM_Archive(const char* path)
+static VFile* OpenRomArchive(const char* path)
 {
   VFile* vf{};
   VDir* archive = VDirOpenArchive(path);
@@ -85,7 +85,7 @@ static VFile* OpenROM_Archive(const char* path)
   return vf;
 }
 
-static VFile* OpenROM_Zip(const char* path)
+static VFile* OpenRomZip(const char* path)
 {
   VFile* vf{};
   unzFile zip = unzOpen(path);
@@ -120,9 +120,9 @@ static VFile* OpenROM(const char* rom_path)
 {
   VFile* vf{};
 
-  vf = OpenROM_Archive(rom_path);
+  vf = OpenRomArchive(rom_path);
   if (!vf)
-    vf = OpenROM_Zip(rom_path);
+    vf = OpenRomZip(rom_path);
   if (!vf)
     vf = VFileOpen(rom_path, O_RDONLY);
   if (!vf)

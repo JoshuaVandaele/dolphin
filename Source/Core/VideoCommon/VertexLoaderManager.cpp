@@ -156,7 +156,7 @@ NativeVertexFormat* GetUberVertexFormat(const PortableVertexDeclaration& decl)
   std::memset(static_cast<void*>(&new_decl), 0, sizeof(new_decl));
   new_decl.stride = decl.stride;
 
-  auto MakeDummyAttribute = [](AttributeFormat& attr, ComponentFormat type, int components,
+  auto make_dummy_attribute = [](AttributeFormat& attr, ComponentFormat type, int components,
                                bool integer) {
     attr.type = type;
     attr.components = components;
@@ -164,7 +164,7 @@ NativeVertexFormat* GetUberVertexFormat(const PortableVertexDeclaration& decl)
     attr.enable = true;
     attr.integer = integer;
   };
-  auto CopyAttribute = [](AttributeFormat& attr, const AttributeFormat& src) {
+  auto copy_attribute = [](AttributeFormat& attr, const AttributeFormat& src) {
     attr.type = src.type;
     attr.components = src.components;
     attr.offset = src.offset;
@@ -173,34 +173,34 @@ NativeVertexFormat* GetUberVertexFormat(const PortableVertexDeclaration& decl)
   };
 
   if (decl.position.enable)
-    CopyAttribute(new_decl.position, decl.position);
+    copy_attribute(new_decl.position, decl.position);
   else
-    MakeDummyAttribute(new_decl.position, ComponentFormat::Float, 1, false);
+    make_dummy_attribute(new_decl.position, ComponentFormat::Float, 1, false);
   for (size_t i = 0; i < std::size(new_decl.normals); i++)
   {
     if (decl.normals[i].enable)
-      CopyAttribute(new_decl.normals[i], decl.normals[i]);
+      copy_attribute(new_decl.normals[i], decl.normals[i]);
     else
-      MakeDummyAttribute(new_decl.normals[i], ComponentFormat::Float, 1, false);
+      make_dummy_attribute(new_decl.normals[i], ComponentFormat::Float, 1, false);
   }
   for (size_t i = 0; i < std::size(new_decl.colors); i++)
   {
     if (decl.colors[i].enable)
-      CopyAttribute(new_decl.colors[i], decl.colors[i]);
+      copy_attribute(new_decl.colors[i], decl.colors[i]);
     else
-      MakeDummyAttribute(new_decl.colors[i], ComponentFormat::UByte, 4, false);
+      make_dummy_attribute(new_decl.colors[i], ComponentFormat::UByte, 4, false);
   }
   for (size_t i = 0; i < std::size(new_decl.texcoords); i++)
   {
     if (decl.texcoords[i].enable)
-      CopyAttribute(new_decl.texcoords[i], decl.texcoords[i]);
+      copy_attribute(new_decl.texcoords[i], decl.texcoords[i]);
     else
-      MakeDummyAttribute(new_decl.texcoords[i], ComponentFormat::Float, 1, false);
+      make_dummy_attribute(new_decl.texcoords[i], ComponentFormat::Float, 1, false);
   }
   if (decl.posmtx.enable)
-    CopyAttribute(new_decl.posmtx, decl.posmtx);
+    copy_attribute(new_decl.posmtx, decl.posmtx);
   else
-    MakeDummyAttribute(new_decl.posmtx, ComponentFormat::UByte, 1, true);
+    make_dummy_attribute(new_decl.posmtx, ComponentFormat::UByte, 1, true);
 
   return GetOrCreateMatchingFormat(new_decl);
 }
@@ -210,9 +210,9 @@ namespace detail
 template <bool IsPreprocess>
 VertexLoaderBase* GetOrCreateLoader(int vtx_attr_group)
 {
-  constexpr CPState* state = IsPreprocess ? &g_preprocess_cp_state : &g_main_cp_state;
-  constexpr BitSet8& attr_dirty = IsPreprocess ? g_preprocess_vat_dirty : g_main_vat_dirty;
-  constexpr auto& vertex_loaders =
+  constexpr CPState* STATE = IsPreprocess ? &g_preprocess_cp_state : &g_main_cp_state;
+  constexpr BitSet8& ATTR_DIRTY = IsPreprocess ? g_preprocess_vat_dirty : g_main_vat_dirty;
+  constexpr auto& VERTEX_LOADERS =
       IsPreprocess ? g_preprocess_vertex_loaders : g_main_vertex_loaders;
 
   VertexLoaderBase* loader;
@@ -221,7 +221,7 @@ VertexLoaderBase* GetOrCreateLoader(int vtx_attr_group)
   // thread
   bool check_for_native_format = !IsPreprocess;
 
-  VertexLoaderUID uid(state->vtx_desc, state->vtx_attr[vtx_attr_group]);
+  VertexLoaderUID uid(STATE->vtx_desc, STATE->vtx_attr[vtx_attr_group]);
   std::lock_guard<std::mutex> lk(s_vertex_loader_map_lock);
   VertexLoaderMap::iterator iter = s_vertex_loader_map.find(uid);
   if (iter != s_vertex_loader_map.end())
@@ -233,7 +233,7 @@ VertexLoaderBase* GetOrCreateLoader(int vtx_attr_group)
   {
     auto [it, added] = s_vertex_loader_map.try_emplace(
         uid,
-        VertexLoaderBase::CreateVertexLoader(state->vtx_desc, state->vtx_attr[vtx_attr_group]));
+        VertexLoaderBase::CreateVertexLoader(STATE->vtx_desc, STATE->vtx_attr[vtx_attr_group]));
     loader = it->second.get();
     INCSTAT(g_stats.num_vertex_loaders);
   }
@@ -242,8 +242,8 @@ VertexLoaderBase* GetOrCreateLoader(int vtx_attr_group)
     // search for a cached native vertex format
     loader->m_native_vertex_format = GetOrCreateMatchingFormat(loader->m_native_vtx_decl);
   }
-  vertex_loaders[vtx_attr_group] = loader;
-  attr_dirty[vtx_attr_group] = false;
+  VERTEX_LOADERS[vtx_attr_group] = loader;
+  ATTR_DIRTY[vtx_attr_group] = false;
   return loader;
 }
 

@@ -338,7 +338,7 @@ void HotkeyScheduler::Run()
       else if (IsHotkey(HK_NEXT_GAME_WIIMOTE_PROFILE_4))
         m_profile_cycler.NextWiimoteProfileForGame(3);
 
-      auto ShowVolume = []() {
+      auto show_volume = []() {
         OSD::AddMessage(std::string("Volume: ") +
                         (Config::Get(Config::MAIN_AUDIO_MUTED) ?
                              "Muted" :
@@ -349,24 +349,24 @@ void HotkeyScheduler::Run()
       if (IsHotkey(HK_VOLUME_DOWN))
       {
         settings.DecreaseVolume(3);
-        ShowVolume();
+        show_volume();
       }
 
       if (IsHotkey(HK_VOLUME_UP))
       {
         settings.IncreaseVolume(3);
-        ShowVolume();
+        show_volume();
       }
 
       if (IsHotkey(HK_VOLUME_TOGGLE_MUTE))
       {
         AudioCommon::ToggleMuteVolume(system);
-        ShowVolume();
+        show_volume();
       }
 
       // Graphics
       const auto efb_scale = Config::Get(Config::GFX_EFB_SCALE);
-      const auto ShowEFBScale = [](int new_efb_scale) {
+      const auto show_efb_scale = [](int new_efb_scale) {
         switch (new_efb_scale)
         {
         case EFB_SCALE_AUTO_INTEGRAL:
@@ -384,14 +384,14 @@ void HotkeyScheduler::Run()
       if (IsHotkey(HK_INCREASE_IR))
       {
         Config::SetCurrent(Config::GFX_EFB_SCALE, efb_scale + 1);
-        ShowEFBScale(efb_scale + 1);
+        show_efb_scale(efb_scale + 1);
       }
       if (IsHotkey(HK_DECREASE_IR))
       {
         if (efb_scale > EFB_SCALE_AUTO_INTEGRAL)
         {
           Config::SetCurrent(Config::GFX_EFB_SCALE, efb_scale - 1);
-          ShowEFBScale(efb_scale - 1);
+          show_efb_scale(efb_scale - 1);
         }
       }
 
@@ -443,7 +443,7 @@ void HotkeyScheduler::Run()
         OSD::AddMessage(fmt::format("Copy EFB: {}", new_value ? "to Texture" : "to RAM"));
       }
 
-      auto ShowXFBCopies = []() {
+      auto show_xfb_copies = []() {
         OSD::AddMessage(fmt::format(
             "Copy XFB: {}{}", Config::Get(Config::GFX_HACK_IMMEDIATE_XFB) ? " (Immediate)" : "",
             Config::Get(Config::GFX_HACK_SKIP_XFB_COPY_TO_RAM) ? "to Texture" : "to RAM"));
@@ -453,13 +453,13 @@ void HotkeyScheduler::Run()
       {
         Config::SetCurrent(Config::GFX_HACK_SKIP_XFB_COPY_TO_RAM,
                            !Config::Get(Config::GFX_HACK_SKIP_XFB_COPY_TO_RAM));
-        ShowXFBCopies();
+        show_xfb_copies();
       }
       if (IsHotkey(HK_TOGGLE_IMMEDIATE_XFB))
       {
         Config::SetCurrent(Config::GFX_HACK_IMMEDIATE_XFB,
                            !Config::Get(Config::GFX_HACK_IMMEDIATE_XFB));
-        ShowXFBCopies();
+        show_xfb_copies();
       }
       if (IsHotkey(HK_TOGGLE_FOG))
       {
@@ -497,7 +497,7 @@ void HotkeyScheduler::Run()
         AudioCommon::UpdateSoundStream(system);
       }
 
-      auto ShowEmulationSpeed = []() {
+      auto show_emulation_speed = []() {
         const float emulation_speed = Config::Get(Config::MAIN_EMULATION_SPEED);
         if (!AchievementManager::GetInstance().IsHardcoreModeActive() ||
             Config::Get(Config::MAIN_EMULATION_SPEED) >= 1.0f ||
@@ -517,7 +517,7 @@ void HotkeyScheduler::Run()
           speed = (speed >= 0.95 && speed <= 1.05) ? 1.0 : speed;
           Config::SetCurrent(Config::MAIN_EMULATION_SPEED, speed);
         }
-        ShowEmulationSpeed();
+        show_emulation_speed();
       }
 
       if (IsHotkey(HK_INCREASE_EMULATION_SPEED))
@@ -525,7 +525,7 @@ void HotkeyScheduler::Run()
         auto speed = Config::Get(Config::MAIN_EMULATION_SPEED) + 0.1;
         speed = (speed >= 0.95 && speed <= 1.05) ? 1.0 : speed;
         Config::SetCurrent(Config::MAIN_EMULATION_SPEED, speed);
-        ShowEmulationSpeed();
+        show_emulation_speed();
       }
 
       // USB Device Emulation

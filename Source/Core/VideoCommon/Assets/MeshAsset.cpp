@@ -264,13 +264,13 @@ bool ReadGLTFMesh(std::string_view mesh_file, const tinygltf::Model& model,
     }
 
     chunk.vertex_stride = 0;
-    static constexpr std::array<std::string_view, 12> all_names = {
+    static constexpr std::array<std::string_view, 12> ALL_NAMES = {
         "POSITION",   "NORMAL",     "COLOR_0",    "COLOR_1",    "TEXCOORD_0", "TEXCOORD_1",
         "TEXCOORD_2", "TEXCOORD_3", "TEXCOORD_4", "TEXCOORD_5", "TEXCOORD_6", "TEXCOORD_7",
     };
-    for (std::size_t i = 0; i < all_names.size(); i++)
+    for (std::size_t i = 0; i < ALL_NAMES.size(); i++)
     {
-      const auto it = primitive.attributes.find(std::string{all_names[i]});
+      const auto it = primitive.attributes.find(std::string{ALL_NAMES[i]});
       if (it != primitive.attributes.end())
       {
         if (!UpdateVertexStrideFromPrimitive(model, it->second, &chunk))
@@ -326,13 +326,13 @@ bool ReadGLTFMesh(std::string_view mesh_file, const tinygltf::Model& model,
     chunk.maximum_position.y = static_cast<float>(pos_accessor.maxValues[1]);
     chunk.maximum_position.z = static_cast<float>(pos_accessor.maxValues[2]);
 
-    static constexpr std::array<std::string_view, 2> color_names = {
+    static constexpr std::array<std::string_view, 2> COLOR_NAMES = {
         "COLOR_0",
         "COLOR_1",
     };
-    for (std::size_t i = 0; i < color_names.size(); i++)
+    for (std::size_t i = 0; i < COLOR_NAMES.size(); i++)
     {
-      const auto color_it = primitive.attributes.find(std::string{color_names[i]});
+      const auto color_it = primitive.attributes.find(std::string{COLOR_NAMES[i]});
       if (color_it != primitive.attributes.end())
       {
         chunk.vertex_declaration.colors[i].offset = static_cast<int>(outbound_offset);
@@ -347,7 +347,7 @@ bool ReadGLTFMesh(std::string_view mesh_file, const tinygltf::Model& model,
                                                 &chunk.vertex_declaration.colors[i]))
         {
           ERROR_LOG_FMT(VIDEO, "Mesh '{}' has invalid attribute format for {}", mesh_file,
-                        color_names[i]);
+                        COLOR_NAMES[i]);
           return false;
         }
       }
@@ -379,13 +379,13 @@ bool ReadGLTFMesh(std::string_view mesh_file, const tinygltf::Model& model,
       chunk.vertex_declaration.normals[0].enable = false;
     }
 
-    static constexpr std::array<std::string_view, 8> texcoord_names = {
+    static constexpr std::array<std::string_view, 8> TEXCOORD_NAMES = {
         "TEXCOORD_0", "TEXCOORD_1", "TEXCOORD_2", "TEXCOORD_3",
         "TEXCOORD_4", "TEXCOORD_5", "TEXCOORD_6", "TEXCOORD_7",
     };
-    for (std::size_t i = 0; i < texcoord_names.size(); i++)
+    for (std::size_t i = 0; i < TEXCOORD_NAMES.size(); i++)
     {
-      const auto texture_it = primitive.attributes.find(std::string{texcoord_names[i]});
+      const auto texture_it = primitive.attributes.find(std::string{TEXCOORD_NAMES[i]});
       if (texture_it != primitive.attributes.end())
       {
         chunk.vertex_declaration.texcoords[i].offset = static_cast<int>(outbound_offset);
@@ -399,7 +399,7 @@ bool ReadGLTFMesh(std::string_view mesh_file, const tinygltf::Model& model,
                                                 &chunk.vertex_declaration.texcoords[i]))
         {
           ERROR_LOG_FMT(VIDEO, "Mesh '{}' has invalid attribute format for {}", mesh_file,
-                        texcoord_names[i]);
+                        TEXCOORD_NAMES[i]);
           return false;
         }
       }

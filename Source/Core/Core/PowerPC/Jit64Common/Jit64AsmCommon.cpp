@@ -26,11 +26,11 @@
 
 using namespace Gen;
 
-alignas(16) static const __m128i double_fraction = _mm_set_epi64x(0, 0x000fffffffffffff);
-alignas(16) static const __m128i double_sign_bit = _mm_set_epi64x(0, 0x8000000000000000);
-alignas(16) static const __m128i double_explicit_top_bit = _mm_set_epi64x(0, 0x0010000000000000);
-alignas(16) static const __m128i double_top_two_bits = _mm_set_epi64x(0, 0xc000000000000000);
-alignas(16) static const __m128i double_bottom_bits = _mm_set_epi64x(0, 0x07ffffffe0000000);
+alignas(16) static const __m128i DOUBLE_FRACTION = _mm_set_epi64x(0, 0x000fffffffffffff);
+alignas(16) static const __m128i DOUBLE_SIGN_BIT = _mm_set_epi64x(0, 0x8000000000000000);
+alignas(16) static const __m128i DOUBLE_EXPLICIT_TOP_BIT = _mm_set_epi64x(0, 0x0010000000000000);
+alignas(16) static const __m128i DOUBLE_TOP_TWO_BITS = _mm_set_epi64x(0, 0xc000000000000000);
+alignas(16) static const __m128i DOUBLE_BOTTOM_BITS = _mm_set_epi64x(0, 0x07ffffffe0000000);
 
 // Since the following float conversion functions are used in non-arithmetic PPC float
 // instructions, they must convert floats bitexact and never flush denormals to zero or turn SNaNs
@@ -62,7 +62,7 @@ void CommonAsmRoutines::GenConvertDoubleToSingle()
   // Check if the double is in the range of valid single subnormal
   SUB(16, R(RSCRATCH), Imm16(874));
   CMP(16, R(RSCRATCH), Imm16(896 - 874));
-  FixupBranch Denormalize = J_CC(CC_NA);
+  FixupBranch denormalize = J_CC(CC_NA);
 
   // Don't Denormalize
 
@@ -75,11 +75,11 @@ void CommonAsmRoutines::GenConvertDoubleToSingle()
   else
   {
     // We want bits 0, 1
-    avx_op(&XEmitter::VPAND, &XEmitter::PAND, XMM1, R(XMM0), MConst(double_top_two_bits));
+    AVXOP(&XEmitter::VPAND, &XEmitter::PAND, XMM1, R(XMM0), MConst(DOUBLE_TOP_TWO_BITS));
     PSRLQ(XMM1, 32);
 
     // And 5 through to 34
-    PAND(XMM0, MConst(double_bottom_bits));
+    PAND(XMM0, MConst(DOUBLE_BOTTOM_BITS));
     PSRLQ(XMM0, 29);
 
     // OR them togther
@@ -89,7 +89,7 @@ void CommonAsmRoutines::GenConvertDoubleToSingle()
   RET();
 
   // Denormalise
-  SetJumpTarget(Denormalize);
+  SetJumpTarget(denormalize);
 
   // shift = (905 - Exponent) plus the 21 bit double to single shift
   NEG(16, R(RSCRATCH));
@@ -97,8 +97,8 @@ void CommonAsmRoutines::GenConvertDoubleToSingle()
   MOVQ_xmm(XMM1, R(RSCRATCH));
 
   // XMM0 = fraction | 0x0010000000000000
-  PAND(XMM0, MConst(double_fraction));
-  POR(XMM0, MConst(double_explicit_top_bit));
+  PAND(XMM0, MConst(DOUBLE_FRACTION));
+  POR(XMM0, MConst(DOUBLE_EXPLICIT_TOP_BIT));
 
   // fraction >> shift
   PSRLQ(XMM0, R(XMM1));
@@ -328,15 +328,15 @@ void CommonAsmRoutines::GenMfcr()
 }
 
 // Safe + Fast Quantizers, originally from JITIL by magumagu
-alignas(16) static const float m_65535[4] = {65535.0f, 65535.0f, 65535.0f, 65535.0f};
-alignas(16) static const float m_32767 = 32767.0f;
-alignas(16) static const float m_m32768 = -32768.0f;
-alignas(16) static const float m_255 = 255.0f;
-alignas(16) static const float m_127 = 127.0f;
-alignas(16) static const float m_m128 = -128.0f;
+alignas(16) static const float M_65535[4] = {65535.0f, 65535.0f, 65535.0f, 65535.0f};
+alignas(16) static const float M_32767 = 32767.0f;
+alignas(16) static const float M_M32768 = -32768.0f;
+alignas(16) static const float M_255 = 255.0f;
+alignas(16) static const float M_127 = 127.0f;
+alignas(16) static const float M_M128 = -128.0f;
 
 // Sizes of the various quantized store types
-constexpr std::array<u8, 8> sizes{{32, 0, 0, 0, 8, 16, 8, 16}};
+constexpr std::array<u8, 8> SIZES{{32, 0, 0, 0, 8, 16, 8, 16}};
 
 void CommonAsmRoutines::GenQuantizedStores()
 {
@@ -410,8 +410,8 @@ void QuantizedMemoryRoutines::GenQuantizedStore(bool single, EQuantizeType type,
 {
   // In: one or two single floats in XMM0, if quantize is -1, a quantization factor in RSCRATCH2
 
-  int size = sizes[type] * (single ? 1 : 2);
-  bool isInline = quantize != -1;
+  int size = SIZES[type] * (single ? 1 : 2);
+  bool is_inline = quantize != -1;
 
   // illegal
   if (type == QUANTIZE_INVALID1 || type == QUANTIZE_INVALID2 || type == QUANTIZE_INVALID3)
@@ -422,7 +422,7 @@ void QuantizedMemoryRoutines::GenQuantizedStore(bool single, EQuantizeType type,
 
   if (type == QUANTIZE_FLOAT)
   {
-    GenQuantizedStoreFloat(single, isInline);
+    GenQuantizedStoreFloat(single, is_inline);
   }
   else if (single)
   {
@@ -442,20 +442,20 @@ void QuantizedMemoryRoutines::GenQuantizedStore(bool single, EQuantizeType type,
     case QUANTIZE_U8:
       XORPS(XMM1, R(XMM1));
       MAXSS(XMM0, R(XMM1));
-      MINSS(XMM0, MConst(m_255));
+      MINSS(XMM0, MConst(M_255));
       break;
     case QUANTIZE_S8:
-      MAXSS(XMM0, MConst(m_m128));
-      MINSS(XMM0, MConst(m_127));
+      MAXSS(XMM0, MConst(M_M128));
+      MINSS(XMM0, MConst(M_127));
       break;
     case QUANTIZE_U16:
       XORPS(XMM1, R(XMM1));
       MAXSS(XMM0, R(XMM1));
-      MINSS(XMM0, MConst(m_65535));
+      MINSS(XMM0, MConst(M_65535));
       break;
     case QUANTIZE_S16:
-      MAXSS(XMM0, MConst(m_m32768));
-      MINSS(XMM0, MConst(m_32767));
+      MAXSS(XMM0, MConst(M_M32768));
+      MINSS(XMM0, MConst(M_32767));
       break;
     default:
       break;
@@ -478,11 +478,11 @@ void QuantizedMemoryRoutines::GenQuantizedStore(bool single, EQuantizeType type,
       MULPS(XMM0, R(XMM1));
     }
 
-    bool hasPACKUSDW = cpu_info.bSSE4_1;
+    bool has_packusdw = cpu_info.bSSE4_1;
 
     // Special case: if we don't have PACKUSDW we need to clamp to zero as well so the shuffle
     // below can work
-    if (type == QUANTIZE_U16 && !hasPACKUSDW)
+    if (type == QUANTIZE_U16 && !has_packusdw)
     {
       XORPS(XMM1, R(XMM1));
       MAXPS(XMM0, R(XMM1));
@@ -492,7 +492,7 @@ void QuantizedMemoryRoutines::GenQuantizedStore(bool single, EQuantizeType type,
     // is out of int32 range while it's OK for large negatives, it isn't for positives
     // I don't know whether the overflow actually happens in any games but it potentially can
     // cause problems, so we need some clamping
-    MINPS(XMM0, MConst(m_65535));
+    MINPS(XMM0, MConst(M_65535));
     CVTTPS2DQ(XMM0, R(XMM0));
 
     switch (type)
@@ -508,7 +508,7 @@ void QuantizedMemoryRoutines::GenQuantizedStore(bool single, EQuantizeType type,
       MOVD_xmm(R(RSCRATCH), XMM0);
       break;
     case QUANTIZE_U16:
-      if (hasPACKUSDW)
+      if (has_packusdw)
       {
         PACKUSDW(XMM0, R(XMM0));         // AAAABBBB CCCCDDDD ... -> AABBCCDD ...
         MOVD_xmm(R(RSCRATCH), XMM0);     // AABBCCDD ... -> AABBCCDD
@@ -534,9 +534,9 @@ void QuantizedMemoryRoutines::GenQuantizedStore(bool single, EQuantizeType type,
     }
   }
 
-  int flags = isInline ? 0 :
-                         SAFE_LOADSTORE_NO_FASTMEM | SAFE_LOADSTORE_NO_PROLOG |
-                             SAFE_LOADSTORE_DR_ON | SAFE_LOADSTORE_NO_UPDATE_PC;
+  int flags = is_inline ? 0 :
+                          SAFE_LOADSTORE_NO_FASTMEM | SAFE_LOADSTORE_NO_PROLOG |
+                              SAFE_LOADSTORE_DR_ON | SAFE_LOADSTORE_NO_UPDATE_PC;
   if (!single)
     flags |= SAFE_LOADSTORE_NO_SWAP;
 
@@ -572,8 +572,8 @@ void QuantizedMemoryRoutines::GenQuantizedLoad(bool single, EQuantizeType type, 
   // time. The methods generated AOT assume that the quantize flag is placed in RSCRATCH in
   // the second lowest byte, ie: 0x0000xx00
 
-  int size = sizes[type] * (single ? 1 : 2);
-  bool isInline = quantize != -1;
+  int size = SIZES[type] * (single ? 1 : 2);
+  bool is_inline = quantize != -1;
 
   // illegal
   if (type == QUANTIZE_INVALID1 || type == QUANTIZE_INVALID2 || type == QUANTIZE_INVALID3)
@@ -585,17 +585,17 @@ void QuantizedMemoryRoutines::GenQuantizedLoad(bool single, EQuantizeType type, 
   // Floats don't use quantization and can generate more optimal code
   if (type == QUANTIZE_FLOAT)
   {
-    GenQuantizedLoadFloat(single, isInline);
+    GenQuantizedLoadFloat(single, is_inline);
     return;
   }
 
   bool extend = single && (type == QUANTIZE_S8 || type == QUANTIZE_S16);
 
-  BitSet32 regsToSave = QUANTIZED_REGS_TO_SAVE_LOAD;
-  int flags = isInline ? 0 :
-                         SAFE_LOADSTORE_NO_FASTMEM | SAFE_LOADSTORE_NO_PROLOG |
-                             SAFE_LOADSTORE_DR_ON | SAFE_LOADSTORE_NO_UPDATE_PC;
-  SafeLoadToReg(RSCRATCH_EXTRA, R(RSCRATCH_EXTRA), size, 0, regsToSave, extend, flags);
+  BitSet32 regs_to_save = QUANTIZED_REGS_TO_SAVE_LOAD;
+  int flags = is_inline ? 0 :
+                          SAFE_LOADSTORE_NO_FASTMEM | SAFE_LOADSTORE_NO_PROLOG |
+                              SAFE_LOADSTORE_DR_ON | SAFE_LOADSTORE_NO_UPDATE_PC;
+  SafeLoadToReg(RSCRATCH_EXTRA, R(RSCRATCH_EXTRA), size, 0, regs_to_save, extend, flags);
   if (!single && (type == QUANTIZE_U8 || type == QUANTIZE_S8))
   {
     // TODO: Support not swapping in safeLoadToReg to avoid bswapping twice
@@ -699,11 +699,11 @@ void QuantizedMemoryRoutines::GenQuantizedLoadFloat(bool single, bool isInline)
   int size = single ? 32 : 64;
   bool extend = false;
 
-  BitSet32 regsToSave = QUANTIZED_REGS_TO_SAVE;
+  BitSet32 regs_to_save = QUANTIZED_REGS_TO_SAVE;
   int flags = isInline ? 0 :
                          SAFE_LOADSTORE_NO_FASTMEM | SAFE_LOADSTORE_NO_PROLOG |
                              SAFE_LOADSTORE_DR_ON | SAFE_LOADSTORE_NO_UPDATE_PC;
-  SafeLoadToReg(RSCRATCH_EXTRA, R(RSCRATCH_EXTRA), size, 0, regsToSave, extend, flags);
+  SafeLoadToReg(RSCRATCH_EXTRA, R(RSCRATCH_EXTRA), size, 0, regs_to_save, extend, flags);
 
   if (single)
   {

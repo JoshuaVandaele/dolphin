@@ -142,19 +142,19 @@ void Interpreter::HandleLoop()
   auto& state = m_dsp_core.DSPState();
 
   // Handle looping hardware.
-  const u16 rCallAddress = state.r.st[0];
-  const u16 rLoopAddress = state.r.st[2];
-  u16& rLoopCounter = state.r.st[3];
+  const u16 r_call_address = state.r.st[0];
+  const u16 r_loop_address = state.r.st[2];
+  u16& r_loop_counter = state.r.st[3];
 
-  if (rLoopAddress > 0 && rLoopCounter > 0)
+  if (r_loop_address > 0 && r_loop_counter > 0)
   {
     // FIXME: why -1? because we just read past it.
-    if (state.pc - 1 == rLoopAddress)
+    if (state.pc - 1 == r_loop_address)
     {
-      rLoopCounter--;
-      if (rLoopCounter > 0)
+      r_loop_counter--;
+      if (r_loop_counter > 0)
       {
-        state.pc = rCallAddress;
+        state.pc = r_call_address;
       }
       else
       {

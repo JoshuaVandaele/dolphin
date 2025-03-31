@@ -40,7 +40,7 @@ void VertexShaderManager::Init()
 
 Common::Matrix44 VertexShaderManager::LoadProjectionMatrix()
 {
-  const auto& rawProjection = xfmem.projection.rawProjection;
+  const auto& raw_projection = xfmem.projection.rawProjection;
 
   switch (xfmem.projection.type)
   {
@@ -49,20 +49,20 @@ Common::Matrix44 VertexShaderManager::LoadProjectionMatrix()
     const Common::Vec2 fov_multiplier = g_freelook_camera.IsActive() ?
                                             g_freelook_camera.GetFieldOfViewMultiplier() :
                                             Common::Vec2{1, 1};
-    m_projection_matrix[0] = rawProjection[0] * g_ActiveConfig.fAspectRatioHackW * fov_multiplier.x;
+    m_projection_matrix[0] = raw_projection[0] * g_ActiveConfig.fAspectRatioHackW * fov_multiplier.x;
     m_projection_matrix[1] = 0.0f;
-    m_projection_matrix[2] = rawProjection[1] * g_ActiveConfig.fAspectRatioHackW * fov_multiplier.x;
+    m_projection_matrix[2] = raw_projection[1] * g_ActiveConfig.fAspectRatioHackW * fov_multiplier.x;
     m_projection_matrix[3] = 0.0f;
 
     m_projection_matrix[4] = 0.0f;
-    m_projection_matrix[5] = rawProjection[2] * g_ActiveConfig.fAspectRatioHackH * fov_multiplier.y;
-    m_projection_matrix[6] = rawProjection[3] * g_ActiveConfig.fAspectRatioHackH * fov_multiplier.y;
+    m_projection_matrix[5] = raw_projection[2] * g_ActiveConfig.fAspectRatioHackH * fov_multiplier.y;
+    m_projection_matrix[6] = raw_projection[3] * g_ActiveConfig.fAspectRatioHackH * fov_multiplier.y;
     m_projection_matrix[7] = 0.0f;
 
     m_projection_matrix[8] = 0.0f;
     m_projection_matrix[9] = 0.0f;
-    m_projection_matrix[10] = rawProjection[4];
-    m_projection_matrix[11] = rawProjection[5];
+    m_projection_matrix[10] = raw_projection[4];
+    m_projection_matrix[11] = raw_projection[5];
 
     m_projection_matrix[12] = 0.0f;
     m_projection_matrix[13] = 0.0f;
@@ -76,20 +76,20 @@ Common::Matrix44 VertexShaderManager::LoadProjectionMatrix()
 
   case ProjectionType::Orthographic:
   {
-    m_projection_matrix[0] = rawProjection[0];
+    m_projection_matrix[0] = raw_projection[0];
     m_projection_matrix[1] = 0.0f;
     m_projection_matrix[2] = 0.0f;
-    m_projection_matrix[3] = rawProjection[1];
+    m_projection_matrix[3] = raw_projection[1];
 
     m_projection_matrix[4] = 0.0f;
-    m_projection_matrix[5] = rawProjection[2];
+    m_projection_matrix[5] = raw_projection[2];
     m_projection_matrix[6] = 0.0f;
-    m_projection_matrix[7] = rawProjection[3];
+    m_projection_matrix[7] = raw_projection[3];
 
     m_projection_matrix[8] = 0.0f;
     m_projection_matrix[9] = 0.0f;
-    m_projection_matrix[10] = rawProjection[4];
-    m_projection_matrix[11] = rawProjection[5];
+    m_projection_matrix[10] = raw_projection[4];
+    m_projection_matrix[11] = raw_projection[5];
 
     m_projection_matrix[12] = 0.0f;
     m_projection_matrix[13] = 0.0f;
@@ -98,7 +98,7 @@ Common::Matrix44 VertexShaderManager::LoadProjectionMatrix()
     m_projection_matrix[15] = 1.0f;
 
     g_stats.g2proj = m_projection_matrix;
-    g_stats.proj = rawProjection;
+    g_stats.proj = raw_projection;
   }
   break;
 
@@ -106,8 +106,8 @@ Common::Matrix44 VertexShaderManager::LoadProjectionMatrix()
     ERROR_LOG_FMT(VIDEO, "Unknown projection type: {}", xfmem.projection.type);
   }
 
-  PRIM_LOG("Projection: {} {} {} {} {} {}", rawProjection[0], rawProjection[1], rawProjection[2],
-           rawProjection[3], rawProjection[4], rawProjection[5]);
+  PRIM_LOG("Projection: {} {} {} {} {} {}", raw_projection[0], raw_projection[1], raw_projection[2],
+           raw_projection[3], raw_projection[4], raw_projection[5]);
 
   auto corrected_matrix = Common::Matrix44::FromArray(m_projection_matrix);
 
@@ -339,11 +339,11 @@ void VertexShaderManager::SetConstants(const std::vector<std::string>& textures,
     // NOTE: If we ever emulate antialiasing, the sample locations set by
     // BP registers 0x01-0x04 need to be considered here.
     const float pixel_center_correction = 7.0f / 12.0f - 0.5f;
-    const bool bUseVertexRounding = g_ActiveConfig.UseVertexRounding();
-    const float viewport_width = bUseVertexRounding ?
+    const bool b_use_vertex_rounding = g_ActiveConfig.UseVertexRounding();
+    const float viewport_width = b_use_vertex_rounding ?
                                      (2.f * xfmem.viewport.wd) :
                                      g_framebuffer_manager->EFBToScaledXf(2.f * xfmem.viewport.wd);
-    const float viewport_height = bUseVertexRounding ?
+    const float viewport_height = b_use_vertex_rounding ?
                                       (2.f * xfmem.viewport.ht) :
                                       g_framebuffer_manager->EFBToScaledXf(2.f * xfmem.viewport.ht);
     const float pixel_size_x = 2.f / viewport_width;

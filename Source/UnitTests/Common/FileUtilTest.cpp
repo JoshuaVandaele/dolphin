@@ -32,7 +32,7 @@ protected:
     }
   }
 
-  constexpr static std::array<File::IfAbsentBehavior, 2> s_warning_behaviors = {
+  constexpr static std::array<File::IfAbsentBehavior, 2> S_WARNING_BEHAVIORS = {
       File::IfAbsentBehavior::ConsoleWarning,
       File::IfAbsentBehavior::NoConsoleWarning,
   };
@@ -83,7 +83,7 @@ static void DeleteDirShouldReturnTrueForInvalidPath(const std::string& path,
 
 TEST_F(FileUtilTest, Delete)
 {
-  for (const auto behavior : s_warning_behaviors)
+  for (const auto behavior : S_WARNING_BEHAVIORS)
   {
     DeleteShouldNotRemoveDirectory(m_directory_path, behavior);
     DeleteShouldRemoveFile(m_file_path, behavior);
@@ -93,7 +93,7 @@ TEST_F(FileUtilTest, Delete)
 
 TEST_F(FileUtilTest, DeleteDir)
 {
-  for (const auto behavior : s_warning_behaviors)
+  for (const auto behavior : S_WARNING_BEHAVIORS)
   {
     DeleteDirShouldRemoveDirectory(m_directory_path, behavior);
     DeleteDirShouldNotRemoveFile(m_file_path, behavior);

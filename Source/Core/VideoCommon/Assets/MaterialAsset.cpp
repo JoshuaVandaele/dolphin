@@ -21,7 +21,7 @@ namespace
 // While not optimal, we pad our data to match std140 shader requirements
 // this memory constant indicates the memory stride for a single uniform
 // regardless of data type
-constexpr std::size_t MemorySize = sizeof(float) * 4;
+constexpr std::size_t MEMORY_SIZE = sizeof(float) * 4;
 
 template <typename ElementType, std::size_t ElementCount>
 bool ParseNumeric(const CustomAssetLibrary::AssetID& asset_id, const picojson::value& json_value,
@@ -213,8 +213,8 @@ void MaterialProperty::WriteToMemory(u8*& buffer, const MaterialProperty& proper
 {
   const auto write_memory = [&](const void* raw_value, std::size_t data_size) {
     std::memcpy(buffer, raw_value, data_size);
-    std::memset(buffer + data_size, 0, MemorySize - data_size);
-    buffer += MemorySize;
+    std::memset(buffer + data_size, 0, MEMORY_SIZE - data_size);
+    buffer += MEMORY_SIZE;
   };
   std::visit(
       overloaded{
@@ -235,15 +235,15 @@ std::size_t MaterialProperty::GetMemorySize(const MaterialProperty& property)
 {
   std::size_t result = 0;
   std::visit(overloaded{[&](const CustomAssetLibrary::AssetID&) {},
-                        [&](s32) { result = MemorySize; },
-                        [&](const std::array<s32, 2>&) { result = MemorySize; },
-                        [&](const std::array<s32, 3>&) { result = MemorySize; },
-                        [&](const std::array<s32, 4>&) { result = MemorySize; },
-                        [&](float) { result = MemorySize; },
-                        [&](const std::array<float, 2>&) { result = MemorySize; },
-                        [&](const std::array<float, 3>&) { result = MemorySize; },
-                        [&](const std::array<float, 4>&) { result = MemorySize; },
-                        [&](bool) { result = MemorySize; }},
+                        [&](s32) { result = MEMORY_SIZE; },
+                        [&](const std::array<s32, 2>&) { result = MEMORY_SIZE; },
+                        [&](const std::array<s32, 3>&) { result = MEMORY_SIZE; },
+                        [&](const std::array<s32, 4>&) { result = MEMORY_SIZE; },
+                        [&](float) { result = MEMORY_SIZE; },
+                        [&](const std::array<float, 2>&) { result = MEMORY_SIZE; },
+                        [&](const std::array<float, 3>&) { result = MEMORY_SIZE; },
+                        [&](const std::array<float, 4>&) { result = MEMORY_SIZE; },
+                        [&](bool) { result = MEMORY_SIZE; }},
              property.m_value);
 
   return result;

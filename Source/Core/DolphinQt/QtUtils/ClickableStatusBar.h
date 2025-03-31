@@ -11,10 +11,10 @@ class ClickableStatusBar final : public QStatusBar
   Q_OBJECT
 
 signals:
-  void pressed();
+  void Pressed();
 
 protected:
-  void mousePressEvent(QMouseEvent* event) override { emit pressed(); }
+  void mousePressEvent(QMouseEvent* event) override { emit Pressed(); }
 
 public:
   explicit ClickableStatusBar(QWidget* parent) : QStatusBar(parent) {}

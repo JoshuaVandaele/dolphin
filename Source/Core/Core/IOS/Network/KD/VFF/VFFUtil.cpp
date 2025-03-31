@@ -25,7 +25,7 @@
 
 #include "Core/IOS/Uids.h"
 
-static DRESULT read_vff_header(IOS::HLE::FS::FileHandle* vff, FATFS* fs)
+static DRESULT ReadVffHeader(IOS::HLE::FS::FileHandle* vff, FATFS* fs)
 {
   IOS::HLE::NWC24::VFFHeader header;
   if (!vff->Read(&header, 1))
@@ -106,19 +106,19 @@ static DRESULT read_vff_header(IOS::HLE::FS::FileHandle* vff, FATFS* fs)
   return RES_OK;
 }
 
-static FRESULT vff_mount(IOS::HLE::FS::FileHandle* vff, FATFS* fs)
+static FRESULT VffMount(IOS::HLE::FS::FileHandle* vff, FATFS* fs)
 {
   fs->fs_type = 0;  // Clear the filesystem object
   fs->pdrv = 0;     // Volume hosting physical drive
 
-  DRESULT ret = read_vff_header(vff, fs);
+  DRESULT ret = ReadVffHeader(vff, fs);
   if (ret != RES_OK)
     return FR_DISK_ERR;
 
   return FR_OK;
 }
 
-static DRESULT vff_read(IOS::HLE::FS::FileHandle* vff, BYTE pdrv, BYTE* buff, LBA_t sector,
+static DRESULT VffRead(IOS::HLE::FS::FileHandle* vff, BYTE pdrv, BYTE* buff, LBA_t sector,
                         UINT count)
 {
   // We cannot read or write data to the 0th sector in a VFF.
@@ -145,7 +145,7 @@ static DRESULT vff_read(IOS::HLE::FS::FileHandle* vff, BYTE pdrv, BYTE* buff, LB
   return RES_OK;
 }
 
-static DRESULT vff_write(IOS::HLE::FS::FileHandle* vff, BYTE pdrv, const BYTE* buff, LBA_t sector,
+static DRESULT VffWrite(IOS::HLE::FS::FileHandle* vff, BYTE pdrv, const BYTE* buff, LBA_t sector,
                          UINT count)
 {
   if (sector == 0)
@@ -172,7 +172,7 @@ static DRESULT vff_write(IOS::HLE::FS::FileHandle* vff, BYTE pdrv, const BYTE* b
   return RES_OK;
 }
 
-static DRESULT vff_ioctl(IOS::HLE::FS::FileHandle* vff, BYTE pdrv, BYTE cmd, void* buff)
+static DRESULT VffIoctl(IOS::HLE::FS::FileHandle* vff, BYTE pdrv, BYTE cmd, void* buff)
 {
   switch (cmd)
   {
@@ -286,15 +286,15 @@ class VffFatFsCallbacks : public Common::FatFsCallbacks
 public:
   int DiskRead(u8 pdrv, u8* buff, u32 sector, unsigned int count) override
   {
-    return vff_read(m_vff, pdrv, buff, sector, count);
+    return VffRead(m_vff, pdrv, buff, sector, count);
   }
 
   int DiskWrite(u8 pdrv, const u8* buff, u32 sector, unsigned int count) override
   {
-    return vff_write(m_vff, pdrv, buff, sector, count);
+    return VffWrite(m_vff, pdrv, buff, sector, count);
   }
 
-  int DiskIOCtl(u8 pdrv, u8 cmd, void* buff) override { return vff_ioctl(m_vff, pdrv, cmd, buff); }
+  int DiskIOCtl(u8 pdrv, u8 cmd, void* buff) override { return VffIoctl(m_vff, pdrv, cmd, buff); }
 
   IOS::HLE::FS::FileHandle* m_vff = nullptr;
 };
@@ -330,7 +330,7 @@ ErrorCode WriteToVFF(const std::string& path, const std::string& filename,
 
     Common::ScopeGuard unmount_guard{[] { f_unmount(""); }};
 
-    const FRESULT vff_mount_error_code = vff_mount(callbacks.m_vff, &fatfs);
+    const FRESULT vff_mount_error_code = VffMount(callbacks.m_vff, &fatfs);
     if (vff_mount_error_code != FR_OK)
     {
       // The VFF is most likely broken.
@@ -383,7 +383,7 @@ ErrorCode ReadFromVFF(const std::string& path, const std::string& filename,
 
     Common::ScopeGuard unmount_guard{[] { f_unmount(""); }};
 
-    const FRESULT vff_mount_error_code = vff_mount(callbacks.m_vff, &fatfs);
+    const FRESULT vff_mount_error_code = VffMount(callbacks.m_vff, &fatfs);
     if (vff_mount_error_code != FR_OK)
     {
       // The VFF is most likely broken.
@@ -434,7 +434,7 @@ ErrorCode DeleteFileFromVFF(const std::string& path, const std::string& filename
 
     Common::ScopeGuard unmount_guard{[] { f_unmount(""); }};
 
-    const FRESULT vff_mount_error_code = vff_mount(callbacks.m_vff, &fatfs);
+    const FRESULT vff_mount_error_code = VffMount(callbacks.m_vff, &fatfs);
     if (vff_mount_error_code != FR_OK)
     {
       // The VFF is most likely broken.

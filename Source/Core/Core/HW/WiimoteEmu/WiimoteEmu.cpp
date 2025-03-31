@@ -52,14 +52,14 @@ namespace WiimoteEmu
 {
 using namespace WiimoteCommon;
 
-static const u16 button_bitmasks[] = {
+static const u16 BUTTON_BITMASKS[] = {
     Wiimote::BUTTON_A,     Wiimote::BUTTON_B,    Wiimote::BUTTON_ONE, Wiimote::BUTTON_TWO,
     Wiimote::BUTTON_MINUS, Wiimote::BUTTON_PLUS, Wiimote::BUTTON_HOME};
 
-static const u16 dpad_bitmasks[] = {Wiimote::PAD_UP, Wiimote::PAD_DOWN, Wiimote::PAD_LEFT,
+static const u16 DPAD_BITMASKS[] = {Wiimote::PAD_UP, Wiimote::PAD_DOWN, Wiimote::PAD_LEFT,
                                     Wiimote::PAD_RIGHT};
 
-static const u16 dpad_sideways_bitmasks[] = {Wiimote::PAD_RIGHT, Wiimote::PAD_LEFT, Wiimote::PAD_UP,
+static const u16 DPAD_SIDEWAYS_BITMASKS[] = {Wiimote::PAD_RIGHT, Wiimote::PAD_LEFT, Wiimote::PAD_UP,
                                              Wiimote::PAD_DOWN};
 
 void Wiimote::Reset()
@@ -486,9 +486,9 @@ void Wiimote::BuildDesiredWiimoteState(DesiredWiimoteState* target_state,
 
   // Fetch pressed buttons from user input.
   target_state->buttons.hex = 0;
-  m_buttons->GetState(&target_state->buttons.hex, button_bitmasks, m_input_override_function);
+  m_buttons->GetState(&target_state->buttons.hex, BUTTON_BITMASKS, m_input_override_function);
   m_dpad->GetState(&target_state->buttons.hex,
-                   IsSideways() ? dpad_sideways_bitmasks : dpad_bitmasks,
+                   IsSideways() ? DPAD_SIDEWAYS_BITMASKS : DPAD_BITMASKS,
                    m_input_override_function);
 
   // Calculate accelerometer state.
@@ -675,8 +675,8 @@ ButtonData Wiimote::GetCurrentlyPressedButtons()
   const auto lock = GetStateLock();
 
   ButtonData buttons{};
-  m_buttons->GetState(&buttons.hex, button_bitmasks, m_input_override_function);
-  m_dpad->GetState(&buttons.hex, IsSideways() ? dpad_sideways_bitmasks : dpad_bitmasks,
+  m_buttons->GetState(&buttons.hex, BUTTON_BITMASKS, m_input_override_function);
+  m_dpad->GetState(&buttons.hex, IsSideways() ? DPAD_SIDEWAYS_BITMASKS : DPAD_BITMASKS,
                    m_input_override_function);
 
   return buttons;

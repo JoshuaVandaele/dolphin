@@ -49,15 +49,15 @@ bool CEXIETHERNET::TAPNetworkInterface::Activate()
   memset(&ifr, 0, sizeof(ifr));
   ifr.ifr_flags = IFF_TAP | IFF_NO_PI | IFF_ONE_QUEUE;
 
-  const int MAX_INTERFACES = 32;
-  for (int i = 0; i < MAX_INTERFACES; ++i)
+  const int max_interfaces = 32;
+  for (int i = 0; i < max_interfaces; ++i)
   {
     fmt::format_to_n(ifr.ifr_name, IFNAMSIZ, "Dolphin{}", i);
 
     int err;
     if ((err = ioctl(fd, TUNSETIFF, (void*)&ifr)) < 0)
     {
-      if (i == (MAX_INTERFACES - 1))
+      if (i == (max_interfaces - 1))
       {
         close(fd);
         fd = -1;
@@ -109,11 +109,11 @@ bool CEXIETHERNET::TAPNetworkInterface::SendFrame(const u8* frame, u32 size)
 #ifdef __linux__
   DEBUG_LOG_FMT(SP1, "SendFrame {}\n{}", size, ArrayToString(frame, size, 0x10));
 
-  int writtenBytes = write(fd, frame, size);
-  if ((u32)writtenBytes != size)
+  int written_bytes = write(fd, frame, size);
+  if ((u32)written_bytes != size)
   {
     ERROR_LOG_FMT(SP1, "SendFrame(): expected to write {} bytes, instead wrote {}", size,
-                  writtenBytes);
+                  written_bytes);
     return false;
   }
   else
@@ -142,16 +142,16 @@ void CEXIETHERNET::TAPNetworkInterface::ReadThreadHandler(TAPNetworkInterface* s
     if (select(self->fd + 1, &rfds, nullptr, nullptr, &timeout) <= 0)
       continue;
 
-    int readBytes = read(self->fd, self->m_eth_ref->mRecvBuffer.get(), BBA_RECV_SIZE);
-    if (readBytes < 0)
+    int read_bytes = read(self->fd, self->m_eth_ref->mRecvBuffer.get(), BBA_RECV_SIZE);
+    if (read_bytes < 0)
     {
-      ERROR_LOG_FMT(SP1, "Failed to read from BBA, err={}", readBytes);
+      ERROR_LOG_FMT(SP1, "Failed to read from BBA, err={}", read_bytes);
     }
     else if (self->readEnabled.IsSet())
     {
       DEBUG_LOG_FMT(SP1, "Read data: {}",
-                    ArrayToString(self->m_eth_ref->mRecvBuffer.get(), readBytes, 0x10));
-      self->m_eth_ref->mRecvBufferLength = readBytes;
+                    ArrayToString(self->m_eth_ref->mRecvBuffer.get(), read_bytes, 0x10));
+      self->m_eth_ref->mRecvBufferLength = read_bytes;
       self->m_eth_ref->RecvHandlePacket();
     }
   }

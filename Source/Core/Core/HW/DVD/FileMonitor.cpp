@@ -27,7 +27,7 @@ static bool IsSoundFile(const std::string& filename)
   SplitPath(filename, nullptr, nullptr, &extension);
   Common::ToLower(&extension);
 
-  static const std::unordered_set<std::string> extensions = {
+  static const std::unordered_set<std::string> EXTENSIONS = {
       ".adp",    // 1080 Avalanche, Crash Bandicoot, etc.
       ".adx",    // Sonic Adventure 2 Battle, etc.
       ".afc",    // Zelda WW
@@ -43,7 +43,7 @@ static bool IsSoundFile(const std::string& filename)
       ".str",    // Harry Potter & the Sorcerer's Stone
   };
 
-  return extensions.contains(extension);
+  return EXTENSIONS.contains(extension);
 }
 
 FileLogger::FileLogger() = default;

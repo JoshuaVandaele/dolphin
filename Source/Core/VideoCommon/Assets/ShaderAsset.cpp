@@ -367,10 +367,10 @@ void PixelShaderData::ToJson(picojson::object& obj, const PixelShaderData& data)
 
 std::span<const std::string_view> ShaderProperty::GetValueTypeNames()
 {
-  static constexpr std::array<std::string_view, 14> values = {
+  static constexpr std::array<std::string_view, 14> VALUES = {
       "sampler2d", "sampler2darray", "samplercube", "int",    "int2", "int3", "int4",
       "float",     "float2",         "float3",      "float4", "rgb",  "rgba", "bool"};
-  return values;
+  return VALUES;
 }
 
 ShaderProperty::Value ShaderProperty::GetDefaultValueFromTypeName(std::string_view name)

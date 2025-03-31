@@ -574,10 +574,10 @@ void EmulationKernel::AddStaticDevices()
   }
   if (HasFeature(features, Feature::KD))
   {
-    constexpr auto time_device_name = "/dev/net/kd/time";
-    AddDevice(std::make_unique<NetKDTimeDevice>(*this, time_device_name));
+    constexpr auto TIME_DEVICE_NAME = "/dev/net/kd/time";
+    AddDevice(std::make_unique<NetKDTimeDevice>(*this, TIME_DEVICE_NAME));
     const auto time_device =
-        std::static_pointer_cast<NetKDTimeDevice>(GetDeviceByName(time_device_name));
+        std::static_pointer_cast<NetKDTimeDevice>(GetDeviceByName(TIME_DEVICE_NAME));
     AddDevice(std::make_unique<NetKDRequestDevice>(*this, "/dev/net/kd/request", time_device));
   }
   if (HasFeature(features, Feature::NCD))
@@ -688,10 +688,10 @@ std::optional<IPCReply> EmulationKernel::OpenDevice(OpenRequest& request)
 
   if (!device)
   {
-    constexpr std::string_view cios_devices[] = {"/dev/flash", "/dev/mload", "/dev/sdio/sdhc",
+    constexpr std::string_view CIOS_DEVICES[] = {"/dev/flash", "/dev/mload", "/dev/sdio/sdhc",
                                                  "/dev/usb123", "/dev/usb2"};
-    static_assert(std::ranges::is_sorted(cios_devices));
-    if (std::ranges::binary_search(cios_devices, request.path))
+    static_assert(std::ranges::is_sorted(CIOS_DEVICES));
+    if (std::ranges::binary_search(CIOS_DEVICES, request.path))
       WARN_LOG_FMT(IOS, "Possible anti-piracy check for cIOS device {}", request.path);
     else
       ERROR_LOG_FMT(IOS, "Unknown device: {}", request.path);

@@ -257,8 +257,8 @@ void DSPManager::RegisterMMIO(MMIO::Mapping* mmio, u32 base)
       MMIO::ComplexWrite<u16>([](Core::System& system, u32, u16 val) {
         auto& dsp = system.GetDSP();
 
-        UDSPControl tmpControl;
-        tmpControl.Hex = (val & ~DSP_CONTROL_MASK) |
+        UDSPControl tmp_control;
+        tmp_control.Hex = (val & ~DSP_CONTROL_MASK) |
                          (dsp.m_dsp_emulator->DSP_WriteControlRegister(val) & DSP_CONTROL_MASK);
 
         // Not really sure if this is correct, but it works...
@@ -270,27 +270,27 @@ void DSPManager::RegisterMMIO(MMIO::Mapping* mmio, u32 base)
         }
 
         // Update DSP related flags
-        dsp.m_dsp_control.DSPReset = tmpControl.DSPReset;
-        dsp.m_dsp_control.DSPAssertInt = tmpControl.DSPAssertInt;
-        dsp.m_dsp_control.DSPHalt = tmpControl.DSPHalt;
-        dsp.m_dsp_control.DSPInitCode = tmpControl.DSPInitCode;
-        dsp.m_dsp_control.DSPInit = tmpControl.DSPInit;
+        dsp.m_dsp_control.DSPReset = tmp_control.DSPReset;
+        dsp.m_dsp_control.DSPAssertInt = tmp_control.DSPAssertInt;
+        dsp.m_dsp_control.DSPHalt = tmp_control.DSPHalt;
+        dsp.m_dsp_control.DSPInitCode = tmp_control.DSPInitCode;
+        dsp.m_dsp_control.DSPInit = tmp_control.DSPInit;
 
         // Interrupt (mask)
-        dsp.m_dsp_control.AID_mask = tmpControl.AID_mask;
-        dsp.m_dsp_control.ARAM_mask = tmpControl.ARAM_mask;
-        dsp.m_dsp_control.DSP_mask = tmpControl.DSP_mask;
+        dsp.m_dsp_control.AID_mask = tmp_control.AID_mask;
+        dsp.m_dsp_control.ARAM_mask = tmp_control.ARAM_mask;
+        dsp.m_dsp_control.DSP_mask = tmp_control.DSP_mask;
 
         // Interrupt
-        if (tmpControl.AID)
+        if (tmp_control.AID)
           dsp.m_dsp_control.AID = 0;
-        if (tmpControl.ARAM)
+        if (tmp_control.ARAM)
           dsp.m_dsp_control.ARAM = 0;
-        if (tmpControl.DSP)
+        if (tmp_control.DSP)
           dsp.m_dsp_control.DSP = 0;
 
         // unknown
-        dsp.m_dsp_control.pad = tmpControl.pad;
+        dsp.m_dsp_control.pad = tmp_control.pad;
         if (dsp.m_dsp_control.pad != 0)
         {
           PanicAlertFmt(
@@ -461,8 +461,8 @@ void DSPManager::Do_ARAM_DMA()
   m_dsp_control.DMAState = 1;
 
   // ARAM DMA transfer rate has been measured on real hw
-  int ticksToTransfer = (m_aram_dma.Cnt.count / 32) * 246;
-  core_timing.ScheduleEvent(ticksToTransfer, m_event_type_complete_aram);
+  int ticks_to_transfer = (m_aram_dma.Cnt.count / 32) * 246;
+  core_timing.ScheduleEvent(ticks_to_transfer, m_event_type_complete_aram);
 
   // Real hardware DMAs in 32byte chunks, but we can get by with 8byte chunks
   if (m_aram_dma.Cnt.dir)

@@ -17,21 +17,21 @@
 
 namespace Common
 {
-static void spng_free(spng_ctx* ctx)
+static void SpngFree(spng_ctx* ctx)
 {
   if (ctx)
     spng_ctx_free(ctx);
 }
 
-static auto make_spng_ctx(int flags)
+static auto MakeSpngCtx(int flags)
 {
-  return std::unique_ptr<spng_ctx, decltype(&spng_free)>(spng_ctx_new(flags), spng_free);
+  return std::unique_ptr<spng_ctx, decltype(&SpngFree)>(spng_ctx_new(flags), SpngFree);
 }
 
 bool LoadPNG(const std::vector<u8>& input, std::vector<u8>* data_out, u32* width_out,
              u32* height_out)
 {
-  auto ctx = make_spng_ctx(0);
+  auto ctx = MakeSpngCtx(0);
   if (!ctx)
     return false;
 
@@ -76,7 +76,7 @@ bool SavePNG(const std::string& path, const u8* input, ImageByteFormat format, u
     return false;
   }
 
-  auto ctx = make_spng_ctx(SPNG_CTX_ENCODER);
+  auto ctx = MakeSpngCtx(SPNG_CTX_ENCODER);
   if (!ctx)
     return false;
 

@@ -65,7 +65,7 @@ void Jit64AsmRoutineManager::Generate()
   // something that can't pass the BLR test
   MOV(64, MDisp(RSP, 8), Imm32((u32)-1));
 
-  const u8* outerLoop = GetCodePtr();
+  const u8* outer_loop = GetCodePtr();
   ABI_PushRegistersAndAdjustStack({}, 0);
   ABI_CallFunction(CoreTiming::GlobalAdvance);
   ABI_PopRegistersAndAdjustStack({}, 0);
@@ -76,7 +76,7 @@ void Jit64AsmRoutineManager::Generate()
   MOV(64, R(RMEM), PPCSTATE(mem_ptr));
 
   // skip the sync and compare first time
-  FixupBranch skipToRealDispatch = J(enable_debugging ? Jump::Near : Jump::Short);
+  FixupBranch skip_to_real_dispatch = J(enable_debugging ? Jump::Near : Jump::Short);
 
   dispatcher_mispredicted_blr = GetCodePtr();
   AND(32, PPCSTATE(pc), Imm32(0xFFFFFFFC));
@@ -103,7 +103,7 @@ void Jit64AsmRoutineManager::Generate()
     dbg_exit = J_CC(CC_NE, Jump::Near);
   }
 
-  SetJumpTarget(skipToRealDispatch);
+  SetJumpTarget(skip_to_real_dispatch);
 
   dispatcher_no_check = GetCodePtr();
 
@@ -231,7 +231,7 @@ void Jit64AsmRoutineManager::Generate()
   // Gets checked on at the end of every slice
   MOV(64, R(RSCRATCH), ImmPtr(system.GetCPU().GetStatePtr()));
   CMP(32, MatR(RSCRATCH), Imm32(Common::ToUnderlying(CPU::State::Running)));
-  J_CC(CC_E, outerLoop);
+  J_CC(CC_E, outer_loop);
 
   // Landing pad for drec space
   dispatcher_exit = GetCodePtr();

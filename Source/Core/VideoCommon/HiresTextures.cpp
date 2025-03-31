@@ -30,7 +30,7 @@
 #include "VideoCommon/OnScreenDisplay.h"
 #include "VideoCommon/VideoConfig.h"
 
-constexpr std::string_view s_format_prefix{"tex1_"};
+constexpr std::string_view S_FORMAT_PREFIX{"tex1_"};
 
 static std::unordered_map<std::string, std::shared_ptr<HiresTexture>> s_hires_texture_cache;
 static std::unordered_map<std::string, bool> s_hires_texture_id_to_arbmipmap;
@@ -108,7 +108,7 @@ void HiresTexture::Update()
       std::string filename;
       SplitPath(path, nullptr, &filename, nullptr);
 
-      if (filename.substr(0, s_format_prefix.length()) == s_format_prefix)
+      if (filename.substr(0, S_FORMAT_PREFIX.length()) == S_FORMAT_PREFIX)
       {
         const size_t arb_index = filename.rfind("_arb");
         const bool has_arbitrary_mipmaps = arb_index != std::string::npos;

@@ -493,7 +493,7 @@ inline u8 CEXIETHERNET::HashIndex(const u8* dest_eth_addr)
 
 inline bool CEXIETHERNET::RecvMACFilter()
 {
-  static u8 const broadcast[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+  static u8 const BROADCAST[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
   // Accept all destination addrs?
   if (mBbaMem[BBA_NCRB] & NCRB_PR)
@@ -504,7 +504,7 @@ inline bool CEXIETHERNET::RecvMACFilter()
   {
     return memcmp(mRecvBuffer.get(), &mBbaMem[BBA_NAFR_PAR0], 6) == 0;
   }
-  else if (memcmp(mRecvBuffer.get(), broadcast, 6) == 0)
+  else if (memcmp(mRecvBuffer.get(), BROADCAST, 6) == 0)
   {
     // Accept broadcast?
     return !!(mBbaMem[BBA_NCRB] & NCRB_AB);

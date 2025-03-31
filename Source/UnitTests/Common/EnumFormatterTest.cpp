@@ -29,8 +29,8 @@ enum class Enum2 : s32
 template <>
 struct fmt::formatter<Enum2> : EnumFormatter<Enum2::F>
 {
-  static constexpr array_type names = {"D", "E", nullptr, "F"};
-  constexpr formatter() : EnumFormatter(names) {}
+  static constexpr array_type NAMES = {"D", "E", nullptr, "F"};
+  constexpr formatter() : EnumFormatter(NAMES) {}
 };
 
 TEST(EnumUtil, Enum1)

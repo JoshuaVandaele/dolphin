@@ -21,7 +21,7 @@
 #include "UICommon/GameFile.h"
 
 // NOTE: Qt likes to be case-sensitive here even though it shouldn't be thus this ugly regex hack
-static const QStringList game_filters{
+static const QStringList GAME_FILTERS{
     QStringLiteral("*.[gG][cC][mM]"),    QStringLiteral("*.[iI][sS][oO]"),
     QStringLiteral("*.[tT][gG][cC]"),    QStringLiteral("*.[cC][iI][sS][oO]"),
     QStringLiteral("*.[gG][cC][zZ]"),    QStringLiteral("*.[wW][bB][fF][sS]"),
@@ -243,7 +243,7 @@ void GameTracker::AddDirectoryInternal(const QString& dir)
 
 static std::unique_ptr<QDirIterator> GetIterator(const QString& dir)
 {
-  return std::make_unique<QDirIterator>(dir, game_filters, QDir::NoFilter,
+  return std::make_unique<QDirIterator>(dir, GAME_FILTERS, QDir::NoFilter,
                                         Config::Get(Config::MAIN_RECURSIVE_ISO_PATHS) ?
                                             QDirIterator::Subdirectories :
                                             QDirIterator::NoIteratorFlags);

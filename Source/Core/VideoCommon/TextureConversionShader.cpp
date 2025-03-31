@@ -198,23 +198,23 @@ static void WriteSwizzler(ShaderCode& code, const EFBCopyParams& params, APIType
              "  int2 sampleUv;\n"
              "  int2 uv1 = int2(gl_FragCoord.xy);\n");
 
-  const int blkW = TexDecoder_GetEFBCopyBlockWidthInTexels(params.copy_format);
-  const int blkH = TexDecoder_GetEFBCopyBlockHeightInTexels(params.copy_format);
+  const int blk_w = TexDecoder_GetEFBCopyBlockWidthInTexels(params.copy_format);
+  const int blk_h = TexDecoder_GetEFBCopyBlockHeightInTexels(params.copy_format);
   int samples = GetEncodedSampleCount(params.copy_format);
 
   code.Write("  int x_block_position = (uv1.x >> {}) << {};\n",
-             MathUtil::IntLog2(blkH * blkW / samples), MathUtil::IntLog2(blkW));
-  code.Write("  int y_block_position = uv1.y << {};\n", MathUtil::IntLog2(blkH));
+             MathUtil::IntLog2(blk_h * blk_w / samples), MathUtil::IntLog2(blk_w));
+  code.Write("  int y_block_position = uv1.y << {};\n", MathUtil::IntLog2(blk_h));
   if (samples == 1)
   {
     // With samples == 1, we write out pairs of blocks; one A8R8, one G8B8.
-    code.Write("  bool first = (uv1.x & {}) == 0;\n", blkH * blkW / 2);
+    code.Write("  bool first = (uv1.x & {}) == 0;\n", blk_h * blk_w / 2);
     samples = 2;
   }
-  code.Write("  int offset_in_block = uv1.x & {};\n", (blkH * blkW / samples) - 1);
+  code.Write("  int offset_in_block = uv1.x & {};\n", (blk_h * blk_w / samples) - 1);
   code.Write("  int y_offset_in_block = offset_in_block >> {};\n",
-             MathUtil::IntLog2(blkW / samples));
-  code.Write("  int x_offset_in_block = (offset_in_block & {}) << {};\n", (blkW / samples) - 1,
+             MathUtil::IntLog2(blk_w / samples));
+  code.Write("  int x_offset_in_block = (offset_in_block & {}) << {};\n", (blk_w / samples) - 1,
              MathUtil::IntLog2(samples));
 
   code.Write("  sampleUv.x = x_block_position + x_offset_in_block;\n"
@@ -507,7 +507,7 @@ std::string GenerateEncodingShader(const EFBCopyParams& params, APIType api_type
 }
 
 // NOTE: In these uniforms, a row refers to a row of blocks, not texels.
-static const char decoding_shader_header[] = R"(
+static const char DECODING_SHADER_HEADER[] = R"(
 #if defined(PALETTE_FORMAT_IA8) || defined(PALETTE_FORMAT_RGB565) || defined(PALETTE_FORMAT_RGB5A3)
 #define HAS_PALETTE 1
 #endif
@@ -660,7 +660,7 @@ float4 GetPaletteColorNormalized(uint index)
 
 )";
 
-static const std::map<TextureFormat, DecodingShaderInfo> s_decoding_shader_info{
+static const std::map<TextureFormat, DecodingShaderInfo> S_DECODING_SHADER_INFO{
     {TextureFormat::I4,
      {TEXEL_BUFFER_FORMAT_R8_UINT, 0, 8, 8, false,
       R"(
@@ -1036,8 +1036,8 @@ static const std::map<TextureFormat, DecodingShaderInfo> s_decoding_shader_info{
 
 const DecodingShaderInfo* GetDecodingShaderInfo(TextureFormat format)
 {
-  auto iter = s_decoding_shader_info.find(format);
-  return iter != s_decoding_shader_info.end() ? &iter->second : nullptr;
+  auto iter = S_DECODING_SHADER_INFO.find(format);
+  return iter != S_DECODING_SHADER_INFO.end() ? &iter->second : nullptr;
 }
 
 std::pair<u32, u32> GetDispatchCount(const DecodingShaderInfo* info, u32 width, u32 height)
@@ -1093,7 +1093,7 @@ std::string GenerateDecodingShader(TextureFormat format, std::optional<TLUTForma
     break;
   }
 
-  ss << decoding_shader_header;
+  ss << DECODING_SHADER_HEADER;
   ss << info->shader_body;
 
   return ss.str();

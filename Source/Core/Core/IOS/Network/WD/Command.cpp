@@ -22,13 +22,13 @@ namespace
 {
 // clang-format off
 //                           Channel:   FEDC BA98 7654 3210
-constexpr u16 LegalChannelMask =      0b0111'1111'1111'1110u;
-constexpr u16 LegalNitroChannelMask = 0b0011'1111'1111'1110u;
+constexpr u16 LEGAL_CHANNEL_MASK =      0b0111'1111'1111'1110u;
+constexpr u16 LEGAL_NITRO_CHANNEL_MASK = 0b0011'1111'1111'1110u;
 // clang-format on
 
 u16 SelectWifiChannel(u16 enabled_channels_mask, u16 current_channel)
 {
-  const Common::BitSet<u16> enabled_channels{enabled_channels_mask & LegalChannelMask};
+  const Common::BitSet<u16> enabled_channels{enabled_channels_mask & LEGAL_CHANNEL_MASK};
   u16 next_channel = current_channel;
   for (int i = 0; i < 16; ++i)
   {
@@ -42,7 +42,7 @@ u16 SelectWifiChannel(u16 enabled_channels_mask, u16 current_channel)
 
 u16 MakeNitroAllowedChannelMask(u16 enabled_channels_mask, u16 nitro_mask)
 {
-  nitro_mask &= LegalNitroChannelMask;
+  nitro_mask &= LEGAL_NITRO_CHANNEL_MASK;
   // TODO: WD's version of this function has some complicated logic to determine the actual mask.
   return enabled_channels_mask & nitro_mask;
 }
@@ -65,7 +65,7 @@ NetWDCommandDevice::NetWDCommandDevice(EmulationKernel& ios, const std::string& 
     : EmulationDevice(ios, device_name)
 {
   // TODO: use the MPCH setting in setting.txt to determine this value.
-  m_nitro_enabled_channels = LegalNitroChannelMask;
+  m_nitro_enabled_channels = LEGAL_NITRO_CHANNEL_MASK;
 
   // TODO: Set the version string here. This is exposed to the PPC.
   m_info.mac = Net::GetMACAddress();

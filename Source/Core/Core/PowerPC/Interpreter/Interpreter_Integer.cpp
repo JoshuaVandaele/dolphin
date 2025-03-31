@@ -152,12 +152,12 @@ void Interpreter::twi(Interpreter& interpreter, UGeckoInstruction inst)
   auto& ppc_state = interpreter.m_ppc_state;
   const s32 a = s32(ppc_state.gpr[inst.RA]);
   const s32 b = inst.SIMM_16;
-  const u32 TO = inst.TO;
+  const u32 to = inst.TO;
 
-  DEBUG_LOG_FMT(POWERPC, "twi rA {:x} SIMM {:x} TO {:x}", a, b, TO);
+  DEBUG_LOG_FMT(POWERPC, "twi rA {:x} SIMM {:x} TO {:x}", a, b, to);
 
-  if ((a < b && (TO & 0x10) != 0) || (a > b && (TO & 0x08) != 0) || (a == b && (TO & 0x04) != 0) ||
-      (u32(a) < u32(b) && (TO & 0x02) != 0) || (u32(a) > u32(b) && (TO & 0x01) != 0))
+  if ((a < b && (to & 0x10) != 0) || (a > b && (to & 0x08) != 0) || (a == b && (to & 0x04) != 0) ||
+      (u32(a) < u32(b) && (to & 0x02) != 0) || (u32(a) > u32(b) && (to & 0x01) != 0))
   {
     GenerateProgramException(ppc_state, ProgramExceptionCause::Trap);
     interpreter.m_system.GetPowerPC().CheckExceptions();
@@ -383,12 +383,12 @@ void Interpreter::tw(Interpreter& interpreter, UGeckoInstruction inst)
   auto& ppc_state = interpreter.m_ppc_state;
   const s32 a = s32(ppc_state.gpr[inst.RA]);
   const s32 b = s32(ppc_state.gpr[inst.RB]);
-  const u32 TO = inst.TO;
+  const u32 to = inst.TO;
 
-  DEBUG_LOG_FMT(POWERPC, "tw rA {:x} rB {:x} TO {:x}", a, b, TO);
+  DEBUG_LOG_FMT(POWERPC, "tw rA {:x} rB {:x} TO {:x}", a, b, to);
 
-  if ((a < b && (TO & 0x10) != 0) || (a > b && (TO & 0x08) != 0) || (a == b && (TO & 0x04) != 0) ||
-      ((u32(a) < u32(b)) && (TO & 0x02) != 0) || ((u32(a) > u32(b)) && (TO & 0x01) != 0))
+  if ((a < b && (to & 0x10) != 0) || (a > b && (to & 0x08) != 0) || (a == b && (to & 0x04) != 0) ||
+      ((u32(a) < u32(b)) && (to & 0x02) != 0) || ((u32(a) > u32(b)) && (to & 0x01) != 0))
   {
     GenerateProgramException(ppc_state, ProgramExceptionCause::Trap);
     interpreter.m_system.GetPowerPC().CheckExceptions();

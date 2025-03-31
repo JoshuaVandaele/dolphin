@@ -51,7 +51,7 @@ u32 HashEctor(const u8* data, size_t len)
 // Block read - if your platform needs to do endian-swapping or can only
 // handle aligned reads, do the conversion here
 
-static u64 getblock(const u64* p, int i)
+static u64 Getblock(const u64* p, int i)
 {
   return p[i];
 }
@@ -59,7 +59,7 @@ static u64 getblock(const u64* p, int i)
 //----------
 // Block mix - combine the key bits with the hash bits and scramble everything
 
-static void bmix64(u64& h1, u64& h2, u64& k1, u64& k2, u64& c1, u64& c2)
+static void Bmix64(u64& h1, u64& h2, u64& k1, u64& k2, u64& c1, u64& c2)
 {
   k1 *= c1;
   k1 = std::rotl(k1, 23);
@@ -85,7 +85,7 @@ static void bmix64(u64& h1, u64& h2, u64& k1, u64& k2, u64& c1, u64& c2)
 //----------
 // Finalization mix - avalanches all bits to within 0.05% bias
 
-static u64 fmix64(u64 k)
+static u64 Fmix64(u64 k)
 {
   k ^= k >> 33;
   k *= 0xff51afd7ed558ccd;
@@ -100,12 +100,12 @@ static u64 GetMurmurHash3(const u8* src, u32 len, u32 samples)
 {
   const u8* data = (const u8*)src;
   const int nblocks = len / 16;
-  u32 Step = (len / 8);
+  u32 step = (len / 8);
   if (samples == 0)
-    samples = std::max(Step, 1u);
-  Step = Step / samples;
-  if (Step < 1)
-    Step = 1;
+    samples = std::max(step, 1u);
+  step = step / samples;
+  if (step < 1)
+    step = 1;
 
   u64 h1 = 0x9368e53c2f6af274;
   u64 h2 = 0x586dcd208f7cd3fd;
@@ -118,12 +118,12 @@ static u64 GetMurmurHash3(const u8* src, u32 len, u32 samples)
 
   const u64* blocks = (const u64*)(data);
 
-  for (int i = 0; i < nblocks; i += Step)
+  for (int i = 0; i < nblocks; i += step)
   {
-    u64 k1 = getblock(blocks, i * 2 + 0);
-    u64 k2 = getblock(blocks, i * 2 + 1);
+    u64 k1 = Getblock(blocks, i * 2 + 0);
+    u64 k2 = Getblock(blocks, i * 2 + 1);
 
-    bmix64(h1, h2, k1, k2, c1, c2);
+    Bmix64(h1, h2, k1, k2, c1, c2);
   }
 
   //----------
@@ -167,7 +167,7 @@ static u64 GetMurmurHash3(const u8* src, u32 len, u32 samples)
     k1 ^= u64(tail[1]) << 8;
   case 1:
     k1 ^= u64(tail[0]) << 0;
-    bmix64(h1, h2, k1, k2, c1, c2);
+    Bmix64(h1, h2, k1, k2, c1, c2);
   };
 
   //----------
@@ -178,8 +178,8 @@ static u64 GetMurmurHash3(const u8* src, u32 len, u32 samples)
   h1 += h2;
   h2 += h1;
 
-  h1 = fmix64(h1);
-  h2 = fmix64(h2);
+  h1 = Fmix64(h1);
+  h2 = Fmix64(h2);
 
   h1 += h2;
 
@@ -321,32 +321,32 @@ static u64 GetMurmurHash3(const u8* src, u32 len, u32 samples)
 #if defined(_M_X86_64)
 
 FUNCTION_TARGET_SSE42
-static u64 GetHash64_SSE42_CRC32(const u8* src, u32 len, u32 samples)
+static u64 GetHash64SsE42CrC32(const u8* src, u32 len, u32 samples)
 {
   u64 h[4] = {len, 0, 0, 0};
-  u32 Step = (len / 8);
+  u32 step = (len / 8);
   const u64* data = (const u64*)src;
-  const u64* end = data + Step;
+  const u64* end = data + step;
   if (samples == 0)
-    samples = std::max(Step, 1u);
-  Step = Step / samples;
-  if (Step < 1)
-    Step = 1;
+    samples = std::max(step, 1u);
+  step = step / samples;
+  if (step < 1)
+    step = 1;
 
-  while (data < end - Step * 3)
+  while (data < end - step * 3)
   {
-    h[0] = _mm_crc32_u64(h[0], data[Step * 0]);
-    h[1] = _mm_crc32_u64(h[1], data[Step * 1]);
-    h[2] = _mm_crc32_u64(h[2], data[Step * 2]);
-    h[3] = _mm_crc32_u64(h[3], data[Step * 3]);
-    data += Step * 4;
+    h[0] = _mm_crc32_u64(h[0], data[step * 0]);
+    h[1] = _mm_crc32_u64(h[1], data[step * 1]);
+    h[2] = _mm_crc32_u64(h[2], data[step * 2]);
+    h[3] = _mm_crc32_u64(h[3], data[step * 3]);
+    data += step * 4;
   }
-  if (data < end - Step * 0)
-    h[0] = _mm_crc32_u64(h[0], data[Step * 0]);
-  if (data < end - Step * 1)
-    h[1] = _mm_crc32_u64(h[1], data[Step * 1]);
-  if (data < end - Step * 2)
-    h[2] = _mm_crc32_u64(h[2], data[Step * 2]);
+  if (data < end - step * 0)
+    h[0] = _mm_crc32_u64(h[0], data[step * 0]);
+  if (data < end - step * 1)
+    h[1] = _mm_crc32_u64(h[1], data[step * 1]);
+  if (data < end - step * 2)
+    h[2] = _mm_crc32_u64(h[2], data[step * 2]);
 
   if (len & 7)
   {
@@ -410,7 +410,7 @@ static u64 SetHash64Function(const u8* src, u32 len, u32 samples)
   if (cpu_info.bCRC32)
   {
 #if defined(_M_X86_64)
-    s_texture_hash_func = &GetHash64_SSE42_CRC32;
+    s_texture_hash_func = &GetHash64SsE42CrC32;
 #elif defined(_M_ARM_64)
     s_texture_hash_func = &GetHash64_ARMv8_CRC32;
 #endif

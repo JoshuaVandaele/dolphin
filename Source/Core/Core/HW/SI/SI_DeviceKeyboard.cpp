@@ -108,67 +108,67 @@ using KeyScanCodeArray = std::array<KeyScanCode, N>;
 
 CSIDevice_Keyboard::KeyArray CSIDevice_Keyboard::MapKeys(const KeyboardStatus& key_status) const
 {
-  static constexpr MaskArray<16> key0_masks{
+  static constexpr MaskArray<16> KEY0_MASKS{
       KEYMASK_HOME, KEYMASK_END, KEYMASK_PGUP, KEYMASK_PGDN, KEYMASK_SCROLLLOCK, KEYMASK_A,
       KEYMASK_B,    KEYMASK_C,   KEYMASK_D,    KEYMASK_E,    KEYMASK_F,          KEYMASK_G,
       KEYMASK_H,    KEYMASK_I,   KEYMASK_J,    KEYMASK_K,
   };
-  static constexpr KeyScanCodeArray<16> key0_keys{
+  static constexpr KeyScanCodeArray<16> KEY0_KEYS{
       KEY_HOME, KEY_END, KEY_PGUP, KEY_PGDN, KEY_SCROLLLOCK, KEY_A, KEY_B, KEY_C,
       KEY_D,    KEY_E,   KEY_F,    KEY_G,    KEY_H,          KEY_I, KEY_J, KEY_K,
   };
 
-  static constexpr MaskArray<16> key1_masks{
+  static constexpr MaskArray<16> KEY1_MASKS{
       KEYMASK_L, KEYMASK_M, KEYMASK_N, KEYMASK_O, KEYMASK_P, KEYMASK_Q, KEYMASK_R, KEYMASK_S,
       KEYMASK_T, KEYMASK_U, KEYMASK_V, KEYMASK_W, KEYMASK_X, KEYMASK_Y, KEYMASK_Z, KEYMASK_1,
   };
-  static constexpr KeyScanCodeArray<16> key1_keys{
+  static constexpr KeyScanCodeArray<16> KEY1_KEYS{
       KEY_L, KEY_M, KEY_N, KEY_O, KEY_P, KEY_Q, KEY_R, KEY_S,
       KEY_T, KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z, KEY_1,
   };
 
-  static constexpr MaskArray<16> key2_masks{
+  static constexpr MaskArray<16> KEY2_MASKS{
       KEYMASK_2,          KEYMASK_3,           KEYMASK_4,     KEYMASK_5,
       KEYMASK_6,          KEYMASK_7,           KEYMASK_8,     KEYMASK_9,
       KEYMASK_0,          KEYMASK_MINUS,       KEYMASK_PLUS,  KEYMASK_PRINTSCR,
       KEYMASK_BRACE_OPEN, KEYMASK_BRACE_CLOSE, KEYMASK_COLON, KEYMASK_QUOTE,
   };
-  static constexpr KeyScanCodeArray<16> key2_keys{
+  static constexpr KeyScanCodeArray<16> KEY2_KEYS{
       KEY_2,          KEY_3,           KEY_4,     KEY_5,     KEY_6,    KEY_7,
       KEY_8,          KEY_9,           KEY_0,     KEY_MINUS, KEY_PLUS, KEY_PRINTSCR,
       KEY_BRACE_OPEN, KEY_BRACE_CLOSE, KEY_COLON, KEY_QUOTE,
   };
 
-  static constexpr MaskArray<16> key3_masks{
+  static constexpr MaskArray<16> KEY3_MASKS{
       KEYMASK_HASH, KEYMASK_COMMA, KEYMASK_PERIOD, KEYMASK_QUESTIONMARK, KEYMASK_INTERNATIONAL1,
       KEYMASK_F1,   KEYMASK_F2,    KEYMASK_F3,     KEYMASK_F4,           KEYMASK_F5,
       KEYMASK_F6,   KEYMASK_F7,    KEYMASK_F8,     KEYMASK_F9,           KEYMASK_F10,
       KEYMASK_F11,
   };
-  static constexpr KeyScanCodeArray<16> key3_keys{
+  static constexpr KeyScanCodeArray<16> KEY3_KEYS{
       KEY_HASH, KEY_COMMA, KEY_PERIOD, KEY_QUESTIONMARK, KEY_INTERNATIONAL1,
       KEY_F1,   KEY_F2,    KEY_F3,     KEY_F4,           KEY_F5,
       KEY_F6,   KEY_F7,    KEY_F8,     KEY_F9,           KEY_F10,
       KEY_F11,
   };
 
-  static constexpr MaskArray<16> key4_masks{
+  static constexpr MaskArray<16> KEY4_MASKS{
       KEYMASK_F12,         KEYMASK_ESC,        KEYMASK_INSERT,       KEYMASK_DELETE,
       KEYMASK_TILDE,       KEYMASK_BACKSPACE,  KEYMASK_TAB,          KEYMASK_CAPSLOCK,
       KEYMASK_LEFTSHIFT,   KEYMASK_RIGHTSHIFT, KEYMASK_LEFTCONTROL,  KEYMASK_RIGHTALT,
       KEYMASK_LEFTWINDOWS, KEYMASK_SPACE,      KEYMASK_RIGHTWINDOWS, KEYMASK_MENU,
   };
-  static constexpr KeyScanCodeArray<16> key4_keys{
+  static constexpr KeyScanCodeArray<16> KEY4_KEYS{
       KEY_F12,         KEY_ESC,        KEY_INSERT,       KEY_DELETE,
       KEY_TILDE,       KEY_BACKSPACE,  KEY_TAB,          KEY_CAPSLOCK,
       KEY_LEFTSHIFT,   KEY_RIGHTSHIFT, KEY_LEFTCONTROL,  KEY_RIGHTALT,
       KEY_LEFTWINDOWS, KEY_SPACE,      KEY_RIGHTWINDOWS, KEY_MENU,
   };
 
-  static constexpr MaskArray<5> key5_masks{
+  static constexpr MaskArray<5> KEY5_MASKS{
       KEYMASK_LEFTARROW, KEYMASK_DOWNARROW, KEYMASK_UPARROW, KEYMASK_RIGHTARROW, KEYMASK_ENTER,
   };
-  static constexpr KeyScanCodeArray<5> key5_keys{
+  static constexpr KeyScanCodeArray<5> KEY5_KEYS{
       KEY_LEFTARROW, KEY_DOWNARROW, KEY_UPARROW, KEY_RIGHTARROW, KEY_ENTER,
   };
 
@@ -191,22 +191,22 @@ CSIDevice_Keyboard::KeyArray CSIDevice_Keyboard::MapKeys(const KeyboardStatus& k
     return false;
   };
 
-  if (check_masks(key0_masks, key0_keys, key_status.key0x))
+  if (check_masks(KEY0_MASKS, KEY0_KEYS, key_status.key0x))
     return key;
 
-  if (check_masks(key1_masks, key1_keys, key_status.key1x))
+  if (check_masks(KEY1_MASKS, KEY1_KEYS, key_status.key1x))
     return key;
 
-  if (check_masks(key2_masks, key2_keys, key_status.key2x))
+  if (check_masks(KEY2_MASKS, KEY2_KEYS, key_status.key2x))
     return key;
 
-  if (check_masks(key3_masks, key3_keys, key_status.key3x))
+  if (check_masks(KEY3_MASKS, KEY3_KEYS, key_status.key3x))
     return key;
 
-  if (check_masks(key4_masks, key4_keys, key_status.key4x))
+  if (check_masks(KEY4_MASKS, KEY4_KEYS, key_status.key4x))
     return key;
 
-  if (check_masks(key5_masks, key5_keys, key_status.key5x))
+  if (check_masks(KEY5_MASKS, KEY5_KEYS, key_status.key5x))
     return key;
 
   return key;

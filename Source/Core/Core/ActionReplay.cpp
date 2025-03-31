@@ -362,7 +362,7 @@ bool IsSelfLogging()
 
 // ----------------------
 // Code Functions
-static bool Subtype_RamWriteAndFill(const Core::CPUThreadGuard& guard, const ARAddr& addr,
+static bool SubtypeRamWriteAndFill(const Core::CPUThreadGuard& guard, const ARAddr& addr,
                                     const u32 data)
 {
   const u32 new_addr = addr.GCAddress();
@@ -420,7 +420,7 @@ static bool Subtype_RamWriteAndFill(const Core::CPUThreadGuard& guard, const ARA
   return true;
 }
 
-static bool Subtype_WriteToPointer(const Core::CPUThreadGuard& guard, const ARAddr& addr,
+static bool SubtypeWriteToPointer(const Core::CPUThreadGuard& guard, const ARAddr& addr,
                                    const u32 data)
 {
   const u32 new_addr = addr.GCAddress();
@@ -480,7 +480,7 @@ static bool Subtype_WriteToPointer(const Core::CPUThreadGuard& guard, const ARAd
   return true;
 }
 
-static bool Subtype_AddCode(const Core::CPUThreadGuard& guard, const ARAddr& addr, const u32 data)
+static bool SubtypeAddCode(const Core::CPUThreadGuard& guard, const ARAddr& addr, const u32 data)
 {
   // Used to increment/decrement a value in memory
   const u32 new_addr = addr.GCAddress();
@@ -546,7 +546,7 @@ static bool Subtype_AddCode(const Core::CPUThreadGuard& guard, const ARAddr& add
   return true;
 }
 
-static bool Subtype_MasterCodeAndWriteToCCXXXXXX(const ARAddr& addr, const u32 data)
+static bool SubtypeMasterCodeAndWriteToCcxxxxxx(const ARAddr& addr, const u32 data)
 {
   // code not yet implemented - TODO
   // u32 new_addr = (addr & 0x01FFFFFF) | 0x80000000;
@@ -560,7 +560,7 @@ static bool Subtype_MasterCodeAndWriteToCCXXXXXX(const ARAddr& addr, const u32 d
 }
 
 // This needs more testing
-static bool ZeroCode_FillAndSlide(const Core::CPUThreadGuard& guard, const u32 val_last,
+static bool ZeroCodeFillAndSlide(const Core::CPUThreadGuard& guard, const u32 val_last,
                                   const ARAddr& addr, const u32 data)
 {
   const u32 new_addr = ARAddr(val_last).GCAddress();
@@ -640,7 +640,7 @@ static bool ZeroCode_FillAndSlide(const Core::CPUThreadGuard& guard, const u32 v
 // kenobi's "memory copy" Z-code. Requires an additional master code
 // on a real AR device. Documented here:
 // https://github.com/dolphin-emu/dolphin/wiki/GameCube-Action-Replay-Code-Types#type-z4-size-3--memory-copy
-static bool ZeroCode_MemoryCopy(const Core::CPUThreadGuard& guard, const u32 val_last,
+static bool ZeroCodeMemoryCopy(const Core::CPUThreadGuard& guard, const u32 val_last,
                                 const ARAddr& addr, const u32 data)
 {
   const u32 addr_dest = val_last & ~0x06000000;
@@ -702,25 +702,25 @@ static bool NormalCode(const Core::CPUThreadGuard& guard, const ARAddr& addr, co
   {
   case SUB_RAM_WRITE:  // Ram write (and fill)
     LogInfo("Doing Ram Write And Fill");
-    if (!Subtype_RamWriteAndFill(guard, addr, data))
+    if (!SubtypeRamWriteAndFill(guard, addr, data))
       return false;
     break;
 
   case SUB_WRITE_POINTER:  // Write to pointer
     LogInfo("Doing Write To Pointer");
-    if (!Subtype_WriteToPointer(guard, addr, data))
+    if (!SubtypeWriteToPointer(guard, addr, data))
       return false;
     break;
 
   case SUB_ADD_CODE:  // Increment Value
     LogInfo("Doing Add Code");
-    if (!Subtype_AddCode(guard, addr, data))
+    if (!SubtypeAddCode(guard, addr, data))
       return false;
     break;
 
   case SUB_MASTER_CODE:  // Master Code & Write to CCXXXXXX
     LogInfo("Doing Master Code And Write to CCXXXXXX (ncode not supported)");
-    if (!Subtype_MasterCodeAndWriteToCCXXXXXX(addr, data))
+    if (!SubtypeMasterCodeAndWriteToCcxxxxxx(addr, data))
       return false;
     break;
 
@@ -889,7 +889,7 @@ static bool RunCodeLocked(const Core::CPUThreadGuard& guard, const ARCode& arcod
     {
       do_fill_and_slide = false;
       LogInfo("Doing Fill And Slide");
-      if (false == ZeroCode_FillAndSlide(guard, val_last, addr, data))
+      if (false == ZeroCodeFillAndSlide(guard, val_last, addr, data))
         return false;
       continue;
     }
@@ -899,7 +899,7 @@ static bool RunCodeLocked(const Core::CPUThreadGuard& guard, const ARCode& arcod
     {
       do_memory_copy = false;
       LogInfo("Doing Memory Copy");
-      if (false == ZeroCode_MemoryCopy(guard, val_last, addr, data))
+      if (false == ZeroCodeMemoryCopy(guard, val_last, addr, data))
         return false;
       continue;
     }

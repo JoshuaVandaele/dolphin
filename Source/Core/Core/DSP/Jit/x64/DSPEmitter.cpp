@@ -109,7 +109,7 @@ void DSPEmitter::checkExceptions(u32 retval)
 {
   // Check for interrupts and exceptions
   TEST(8, M_SDSP_exceptions(), Imm8(0xff));
-  FixupBranch skipCheck = J_CC(CC_Z, Jump::Near);
+  FixupBranch skip_check = J_CC(CC_Z, Jump::Near);
 
   MOV(16, M_SDSP_pc(), Imm16(m_compile_pc));
 
@@ -121,7 +121,7 @@ void DSPEmitter::checkExceptions(u32 retval)
   m_gpr.LoadRegs(false);
   m_gpr.FlushRegs(c, false);
 
-  SetJumpTarget(skipCheck);
+  SetJumpTarget(skip_check);
 }
 
 bool DSPEmitter::FlagsNeeded() const
@@ -230,7 +230,7 @@ void DSPEmitter::Compile(u16 start_addr)
   m_start_address = start_addr;
   m_unresolved_jumps[start_addr].clear();
 
-  const u8* entryPoint = AlignCode16();
+  const u8* entry_point = AlignCode16();
 
   m_gpr.LoadRegs();
 
@@ -265,11 +265,11 @@ void DSPEmitter::Compile(u16 start_addr)
     {
       MOVZX(32, 16, EAX, M_SDSP_r_st(2));
       TEST(32, R(EAX), R(EAX));
-      FixupBranch rLoopAddressExit = J_CC(CC_LE, Jump::Near);
+      FixupBranch r_loop_address_exit = J_CC(CC_LE, Jump::Near);
 
       MOVZX(32, 16, EAX, M_SDSP_r_st(3));
       TEST(32, R(EAX), R(EAX));
-      FixupBranch rLoopCounterExit = J_CC(CC_LE, Jump::Near);
+      FixupBranch r_loop_counter_exit = J_CC(CC_LE, Jump::Near);
 
       if (!opcode->branch)
       {
@@ -294,8 +294,8 @@ void DSPEmitter::Compile(u16 start_addr)
       m_gpr.LoadRegs(false);
       m_gpr.FlushRegs(c, false);
 
-      SetJumpTarget(rLoopAddressExit);
-      SetJumpTarget(rLoopCounterExit);
+      SetJumpTarget(r_loop_address_exit);
+      SetJumpTarget(r_loop_counter_exit);
     }
 
     if (opcode->branch)
@@ -313,7 +313,7 @@ void DSPEmitter::Compile(u16 start_addr)
         // look at g_dsp.pc if we actually branched
         MOV(16, R(AX), M_SDSP_pc());
         CMP(16, R(AX), Imm16(m_compile_pc));
-        FixupBranch rNoBranch = J_CC(CC_Z, Jump::Near);
+        FixupBranch r_no_branch = J_CC(CC_Z, Jump::Near);
 
         DSPJitRegCache c(m_gpr);
         // don't update g_dsp.pc -- the branch insn already did
@@ -330,7 +330,7 @@ void DSPEmitter::Compile(u16 start_addr)
         m_gpr.LoadRegs(false);
         m_gpr.FlushRegs(c, false);
 
-        SetJumpTarget(rNoBranch);
+        SetJumpTarget(r_no_branch);
       }
     }
 
@@ -346,7 +346,7 @@ void DSPEmitter::Compile(u16 start_addr)
     MOV(16, M_SDSP_pc(), Imm16(m_compile_pc));
   }
 
-  m_blocks[start_addr] = (DSPCompiledCode)entryPoint;
+  m_blocks[start_addr] = (DSPCompiledCode)entry_point;
 
   // Mark this block as a linkable destination if it does not contain
   // any unresolved CALL's
@@ -416,12 +416,12 @@ void DSPEmitter::CompileCurrent(DSPEmitter& emitter)
 
 const u8* DSPEmitter::CompileStub()
 {
-  const u8* entryPoint = AlignCode16();
+  const u8* entry_point = AlignCode16();
   MOV(64, R(ABI_PARAM1), Imm64(reinterpret_cast<u64>(this)));
   ABI_CallFunction(CompileCurrent);
   XOR(32, R(EAX), R(EAX));  // Return 0 cycles executed
   JMP(m_return_dispatcher);
-  return entryPoint;
+  return entry_point;
 }
 
 void DSPEmitter::CompileDispatcher()
@@ -433,18 +433,18 @@ void DSPEmitter::CompileDispatcher()
 
   MOV(64, R(R15), ImmPtr(&m_dsp_core.DSPState()));
 
-  const u8* dispatcherLoop = GetCodePtr();
+  const u8* dispatcher_loop = GetCodePtr();
 
-  FixupBranch exceptionExit;
+  FixupBranch exception_exit;
   if (Host::OnThread())
   {
     CMP(8, M_SDSP_external_interrupt_waiting(), Imm8(0));
-    exceptionExit = J_CC(CC_NE);
+    exception_exit = J_CC(CC_NE);
   }
 
   // Check for DSP halt
   TEST(8, M_SDSP_control_reg(), Imm8(CR_HALT));
-  FixupBranch _halt = J_CC(CC_NE);
+  FixupBranch halt = J_CC(CC_NE);
 
   // Execute block. Cycles executed returned in EAX.
   MOVZX(64, 16, ECX, M_SDSP_pc());
@@ -457,13 +457,13 @@ void DSPEmitter::CompileDispatcher()
   MOV(64, R(RCX), ImmPtr(&m_cycles_left));
   SUB(16, MatR(RCX), R(EAX));
 
-  J_CC(CC_A, dispatcherLoop);
+  J_CC(CC_A, dispatcher_loop);
 
   // DSP gave up the remaining cycles.
-  SetJumpTarget(_halt);
+  SetJumpTarget(halt);
   if (Host::OnThread())
   {
-    SetJumpTarget(exceptionExit);
+    SetJumpTarget(exception_exit);
   }
   // MOV(32, M(&cyclesLeft), Imm32(0));
   ABI_PopRegistersAndAdjustStack(registers_used, 8);

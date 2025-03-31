@@ -66,7 +66,7 @@ CompileShaderToSPV(EShLanguage stage, APIType api_type,
 
   shader->setStringsWithLengths(&pass_source_code, &pass_source_code_length, 1);
 
-  auto DumpBadShader = [&](const char* msg) {
+  auto dump_bad_shader = [&](const char* msg) {
     static int counter = 0;
     std::string filename = VideoBackendBase::BadShaderFilename(stage_filename, counter++);
     std::ofstream stream;
@@ -97,7 +97,7 @@ CompileShaderToSPV(EShLanguage stage, APIType api_type,
   if (!shader->parse(GetCompilerResourceLimits(), default_version, profile, false, true, messages,
                      includer))
   {
-    DumpBadShader("Failed to parse shader");
+    dump_bad_shader("Failed to parse shader");
     return std::nullopt;
   }
 
@@ -106,14 +106,14 @@ CompileShaderToSPV(EShLanguage stage, APIType api_type,
   program->addShader(shader.get());
   if (!program->link(messages))
   {
-    DumpBadShader("Failed to link program");
+    dump_bad_shader("Failed to link program");
     return std::nullopt;
   }
 
   glslang::TIntermediate* intermediate = program->getIntermediate(stage);
   if (!intermediate)
   {
-    DumpBadShader("Failed to generate SPIR-V");
+    dump_bad_shader("Failed to generate SPIR-V");
     return std::nullopt;
   }
 

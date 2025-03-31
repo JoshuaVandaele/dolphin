@@ -275,15 +275,15 @@ void CachedInterpreter::Jit(u32 em_address, bool clear_cache_and_retry_on_failur
   }
   FreeRanges();
 
-  const u32 nextPC =
+  const u32 next_pc =
       analyzer.Analyze(em_address, &code_block, &m_code_buffer, m_code_buffer.size());
   if (code_block.m_memory_exception)
   {
     // Address of instruction could not be translated
-    m_ppc_state.npc = nextPC;
+    m_ppc_state.npc = next_pc;
     m_ppc_state.Exceptions |= EXCEPTION_ISI;
     m_system.GetPowerPC().CheckExceptions();
-    WARN_LOG_FMT(POWERPC, "ISI exception at {:#010x}", nextPC);
+    WARN_LOG_FMT(POWERPC, "ISI exception at {:#010x}", next_pc);
     return;
   }
 
@@ -292,7 +292,7 @@ void CachedInterpreter::Jit(u32 em_address, bool clear_cache_and_retry_on_failur
     JitBlock* b = m_block_cache.AllocateBlock(em_address);
     b->normalEntry = b->near_begin = GetWritableCodePtr();
 
-    if (DoJit(em_address, b, nextPC))
+    if (DoJit(em_address, b, next_pc))
     {
       // Record what memory region was used so we know what to free if this block gets invalidated.
       b->near_end = GetWritableCodePtr();

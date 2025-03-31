@@ -106,8 +106,8 @@ bool IsTitlePath(const std::string& path, std::optional<FromWhichRoot> from, u64
 
 static bool IsIllegalCharacter(char c)
 {
-  static constexpr char illegal_chars[] = {'\"', '*', '/', ':', '<', '>', '?', '\\', '|', '\x7f'};
-  return static_cast<unsigned char>(c) <= 0x1F || Common::Contains(illegal_chars, c);
+  static constexpr char ILLEGAL_CHARS[] = {'\"', '*', '/', ':', '<', '>', '?', '\\', '|', '\x7f'};
+  return static_cast<unsigned char>(c) <= 0x1F || Common::Contains(ILLEGAL_CHARS, c);
 }
 
 std::string EscapeFileName(const std::string& filename)

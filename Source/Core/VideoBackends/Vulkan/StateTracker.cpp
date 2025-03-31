@@ -475,10 +475,10 @@ void StateTracker::UpdateDescriptorSet()
 
 void StateTracker::UpdateGXDescriptorSet()
 {
-  const size_t MAX_DESCRIPTOR_WRITES = NUM_UBO_DESCRIPTOR_SET_BINDINGS +  // UBO
+  const size_t max_descriptor_writes = NUM_UBO_DESCRIPTOR_SET_BINDINGS +  // UBO
                                        1 +                                // Samplers
                                        2;                                 // SSBO
-  std::array<VkWriteDescriptorSet, MAX_DESCRIPTOR_WRITES> writes;
+  std::array<VkWriteDescriptorSet, max_descriptor_writes> writes;
   u32 num_writes = 0;
 
   const bool needs_gs_ubo =

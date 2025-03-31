@@ -230,7 +230,7 @@ Expression::Expression(std::string_view text, ExprPointer ex, ExprVarListPointer
     : m_text(text), m_expr(std::move(ex)), m_vars(std::move(vars))
 {
   using LookupKV = std::pair<std::string_view, Expression::VarBinding>;
-  static constexpr auto sorted_lookup = []() consteval
+  static constexpr auto SORTED_LOOKUP = []() consteval
   {
     using enum Expression::VarBindingType;
     auto unsorted_lookup = std::to_array<LookupKV>({
@@ -387,13 +387,13 @@ Expression::Expression(std::string_view text, ExprPointer ex, ExprVarListPointer
     return unsorted_lookup;
   }
   ();
-  static_assert(std::ranges::adjacent_find(sorted_lookup, {}, &LookupKV::first) ==
-                    sorted_lookup.end(),
+  static_assert(std::ranges::adjacent_find(SORTED_LOOKUP, {}, &LookupKV::first) ==
+                    SORTED_LOOKUP.end(),
                 "Expression: Sorted lookup should not contain duplicate keys.");
   for (auto* v = m_vars->head; v != nullptr; v = v->next)
   {
-    const auto iter = std::ranges::lower_bound(sorted_lookup, v->name, {}, &LookupKV::first);
-    if (iter != sorted_lookup.end() && iter->first == v->name)
+    const auto iter = std::ranges::lower_bound(SORTED_LOOKUP, v->name, {}, &LookupKV::first);
+    if (iter != SORTED_LOOKUP.end() && iter->first == v->name)
       m_binds.emplace_back(iter->second);
     else
       m_binds.emplace_back();

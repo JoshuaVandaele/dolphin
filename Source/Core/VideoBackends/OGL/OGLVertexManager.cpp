@@ -75,7 +75,7 @@ bool VertexManager::Initialize()
 
     // Allocate texture views backed by buffer.
     static constexpr std::array<std::pair<TexelBufferFormat, GLenum>, NUM_TEXEL_BUFFER_FORMATS>
-        format_mapping = {{
+        FORMAT_MAPPING = {{
             {TEXEL_BUFFER_FORMAT_R8_UINT, GL_R8UI},
             {TEXEL_BUFFER_FORMAT_R16_UINT, GL_R16UI},
             {TEXEL_BUFFER_FORMAT_RGBA8_UINT, GL_RGBA8UI},
@@ -83,7 +83,7 @@ bool VertexManager::Initialize()
         }};
     glGenTextures(static_cast<GLsizei>(m_texel_buffer_views.size()), m_texel_buffer_views.data());
     glActiveTexture(GL_MUTABLE_TEXTURE_INDEX);
-    for (const auto& it : format_mapping)
+    for (const auto& it : FORMAT_MAPPING)
     {
       glBindTexture(GL_TEXTURE_BUFFER, m_texel_buffer_views[it.first]);
       glTexBuffer(GL_TEXTURE_BUFFER, it.second, m_texel_buffer->GetGLBufferId());

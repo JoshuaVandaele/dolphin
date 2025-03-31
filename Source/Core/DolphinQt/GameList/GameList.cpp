@@ -188,28 +188,28 @@ void GameList::MakeListView()
   if (!Settings::GetQSettings().contains(QStringLiteral("tableheader/state")))
     m_list->sortByColumn(static_cast<int>(GameListModel::Column::Title), Qt::AscendingOrder);
 
-  const auto SetResizeMode = [&hor_header](const GameListModel::Column column,
+  const auto set_resize_mode = [&hor_header](const GameListModel::Column column,
                                            const QHeaderView::ResizeMode mode) {
     hor_header->setSectionResizeMode(static_cast<int>(column), mode);
   };
   {
     using Column = GameListModel::Column;
     using Mode = QHeaderView::ResizeMode;
-    SetResizeMode(Column::Platform, Mode::Fixed);
-    SetResizeMode(Column::Banner, Mode::Fixed);
-    SetResizeMode(Column::Title, Mode::Interactive);
-    SetResizeMode(Column::Description, Mode::Interactive);
-    SetResizeMode(Column::Maker, Mode::Interactive);
-    SetResizeMode(Column::ID, Mode::Fixed);
-    SetResizeMode(Column::Country, Mode::Fixed);
-    SetResizeMode(Column::Size, Mode::Fixed);
-    SetResizeMode(Column::FileName, Mode::Interactive);
-    SetResizeMode(Column::FilePath, Mode::Interactive);
-    SetResizeMode(Column::FileFormat, Mode::Fixed);
-    SetResizeMode(Column::BlockSize, Mode::Fixed);
-    SetResizeMode(Column::Compression, Mode::Fixed);
-    SetResizeMode(Column::TimePlayed, Mode::Interactive);
-    SetResizeMode(Column::Tags, Mode::Interactive);
+    set_resize_mode(Column::Platform, Mode::Fixed);
+    set_resize_mode(Column::Banner, Mode::Fixed);
+    set_resize_mode(Column::Title, Mode::Interactive);
+    set_resize_mode(Column::Description, Mode::Interactive);
+    set_resize_mode(Column::Maker, Mode::Interactive);
+    set_resize_mode(Column::ID, Mode::Fixed);
+    set_resize_mode(Column::Country, Mode::Fixed);
+    set_resize_mode(Column::Size, Mode::Fixed);
+    set_resize_mode(Column::FileName, Mode::Interactive);
+    set_resize_mode(Column::FilePath, Mode::Interactive);
+    set_resize_mode(Column::FileFormat, Mode::Fixed);
+    set_resize_mode(Column::BlockSize, Mode::Fixed);
+    set_resize_mode(Column::Compression, Mode::Fixed);
+    set_resize_mode(Column::TimePlayed, Mode::Interactive);
+    set_resize_mode(Column::Tags, Mode::Interactive);
 
     // Cells have 3 pixels of padding, so the width of these needs to be image width + 6. Banners
     // are 96 pixels wide, platform and country icons are 32 pixels wide.
@@ -256,26 +256,26 @@ GameList::~GameList()
 
 void GameList::UpdateColumnVisibility()
 {
-  const auto SetVisiblity = [this](const GameListModel::Column column, const bool is_visible) {
+  const auto set_visiblity = [this](const GameListModel::Column column, const bool is_visible) {
     m_list->setColumnHidden(static_cast<int>(column), !is_visible);
   };
 
   using Column = GameListModel::Column;
-  SetVisiblity(Column::Platform, Config::Get(Config::MAIN_GAMELIST_COLUMN_PLATFORM));
-  SetVisiblity(Column::Banner, Config::Get(Config::MAIN_GAMELIST_COLUMN_BANNER));
-  SetVisiblity(Column::Title, Config::Get(Config::MAIN_GAMELIST_COLUMN_TITLE));
-  SetVisiblity(Column::Description, Config::Get(Config::MAIN_GAMELIST_COLUMN_DESCRIPTION));
-  SetVisiblity(Column::Maker, Config::Get(Config::MAIN_GAMELIST_COLUMN_MAKER));
-  SetVisiblity(Column::ID, Config::Get(Config::MAIN_GAMELIST_COLUMN_GAME_ID));
-  SetVisiblity(Column::Country, Config::Get(Config::MAIN_GAMELIST_COLUMN_REGION));
-  SetVisiblity(Column::Size, Config::Get(Config::MAIN_GAMELIST_COLUMN_FILE_SIZE));
-  SetVisiblity(Column::FileName, Config::Get(Config::MAIN_GAMELIST_COLUMN_FILE_NAME));
-  SetVisiblity(Column::FilePath, Config::Get(Config::MAIN_GAMELIST_COLUMN_FILE_PATH));
-  SetVisiblity(Column::FileFormat, Config::Get(Config::MAIN_GAMELIST_COLUMN_FILE_FORMAT));
-  SetVisiblity(Column::BlockSize, Config::Get(Config::MAIN_GAMELIST_COLUMN_BLOCK_SIZE));
-  SetVisiblity(Column::Compression, Config::Get(Config::MAIN_GAMELIST_COLUMN_COMPRESSION));
-  SetVisiblity(Column::TimePlayed, Config::Get(Config::MAIN_GAMELIST_COLUMN_TIME_PLAYED));
-  SetVisiblity(Column::Tags, Config::Get(Config::MAIN_GAMELIST_COLUMN_TAGS));
+  set_visiblity(Column::Platform, Config::Get(Config::MAIN_GAMELIST_COLUMN_PLATFORM));
+  set_visiblity(Column::Banner, Config::Get(Config::MAIN_GAMELIST_COLUMN_BANNER));
+  set_visiblity(Column::Title, Config::Get(Config::MAIN_GAMELIST_COLUMN_TITLE));
+  set_visiblity(Column::Description, Config::Get(Config::MAIN_GAMELIST_COLUMN_DESCRIPTION));
+  set_visiblity(Column::Maker, Config::Get(Config::MAIN_GAMELIST_COLUMN_MAKER));
+  set_visiblity(Column::ID, Config::Get(Config::MAIN_GAMELIST_COLUMN_GAME_ID));
+  set_visiblity(Column::Country, Config::Get(Config::MAIN_GAMELIST_COLUMN_REGION));
+  set_visiblity(Column::Size, Config::Get(Config::MAIN_GAMELIST_COLUMN_FILE_SIZE));
+  set_visiblity(Column::FileName, Config::Get(Config::MAIN_GAMELIST_COLUMN_FILE_NAME));
+  set_visiblity(Column::FilePath, Config::Get(Config::MAIN_GAMELIST_COLUMN_FILE_PATH));
+  set_visiblity(Column::FileFormat, Config::Get(Config::MAIN_GAMELIST_COLUMN_FILE_FORMAT));
+  set_visiblity(Column::BlockSize, Config::Get(Config::MAIN_GAMELIST_COLUMN_BLOCK_SIZE));
+  set_visiblity(Column::Compression, Config::Get(Config::MAIN_GAMELIST_COLUMN_COMPRESSION));
+  set_visiblity(Column::TimePlayed, Config::Get(Config::MAIN_GAMELIST_COLUMN_TIME_PLAYED));
+  set_visiblity(Column::Tags, Config::Get(Config::MAIN_GAMELIST_COLUMN_TAGS));
 }
 
 void GameList::MakeEmptyView()
@@ -993,7 +993,7 @@ void GameList::keyPressEvent(QKeyEvent* event)
 void GameList::OnColumnVisibilityToggled(const QString& row, bool visible)
 {
   using Column = GameListModel::Column;
-  static const QMap<QString, Column> rowname_to_column = {
+  static const QMap<QString, Column> ROWNAME_TO_COLUMN = {
       {tr("Platform"), Column::Platform},
       {tr("Banner"), Column::Banner},
       {tr("Title"), Column::Title},
@@ -1011,7 +1011,7 @@ void GameList::OnColumnVisibilityToggled(const QString& row, bool visible)
       {tr("Tags"), Column::Tags},
   };
 
-  m_list->setColumnHidden(static_cast<int>(rowname_to_column[row]), !visible);
+  m_list->setColumnHidden(static_cast<int>(ROWNAME_TO_COLUMN[row]), !visible);
 }
 
 void GameList::OnGameListVisibilityChanged()

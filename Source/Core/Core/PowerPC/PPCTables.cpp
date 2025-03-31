@@ -34,10 +34,10 @@ struct GekkoOPTemplate
   u64 flags;
 };
 
-constexpr GekkoOPTemplate s_unknown_op_info = {0, "unknown_instruction", OpType::Unknown, 0,
+constexpr GekkoOPTemplate S_UNKNOWN_OP_INFO = {0, "unknown_instruction", OpType::Unknown, 0,
                                                FL_ENDBLOCK};
 
-constexpr std::array<GekkoOPTemplate, 54> s_primary_table{{
+constexpr std::array<GekkoOPTemplate, 54> S_PRIMARY_TABLE{{
     {4, "RunTable4", OpType::Subtable, 0, 0},
     {19, "RunTable19", OpType::Subtable, 0, 0},
     {31, "RunTable31", OpType::Subtable, 0, 0},
@@ -116,7 +116,7 @@ constexpr std::array<GekkoOPTemplate, 54> s_primary_table{{
     // missing: 0, 1, 2, 5, 6, 9, 22, 30, 62, 58
 }};
 
-constexpr std::array<GekkoOPTemplate, 13> s_table4{{
+constexpr std::array<GekkoOPTemplate, 13> S_TABLE4{{
     // SUBOP10
     {0, "ps_cmpu0", OpType::PS, 1,
      FL_IN_FLOAT_AB | FL_SET_CRn | FL_USE_FPU | FL_READ_FPRF | FL_SET_FPRF | FL_PROGRAMEXCEPTION |
@@ -158,7 +158,7 @@ constexpr std::array<GekkoOPTemplate, 13> s_table4{{
     {1014, "dcbz_l", OpType::System, 1, FL_IN_A0B | FL_LOADSTORE | FL_PROGRAMEXCEPTION},
 }};
 
-constexpr std::array<GekkoOPTemplate, 17> s_table4_2{{
+constexpr std::array<GekkoOPTemplate, 17> S_TABLE4_2{{
     {10, "ps_sum0", OpType::PS, 1,
      FL_OUT_FLOAT_D | FL_IN_FLOAT_ABC | FL_RC_BIT_F | FL_USE_FPU | FL_SET_FPRF |
          FL_PROGRAMEXCEPTION | FL_FLOAT_EXCEPTION},
@@ -212,7 +212,7 @@ constexpr std::array<GekkoOPTemplate, 17> s_table4_2{{
          FL_PROGRAMEXCEPTION | FL_FLOAT_EXCEPTION},
 }};
 
-constexpr std::array<GekkoOPTemplate, 4> s_table4_3{{
+constexpr std::array<GekkoOPTemplate, 4> S_TABLE4_3{{
     {6, "psq_lx", OpType::LoadPS, 1, FL_OUT_FLOAT_D | FL_IN_A0B | FL_USE_FPU | FL_LOADSTORE},
     {7, "psq_stx", OpType::StorePS, 1, FL_IN_FLOAT_S | FL_IN_A0B | FL_USE_FPU | FL_LOADSTORE},
     {38, "psq_lux", OpType::LoadPS, 1,
@@ -221,7 +221,7 @@ constexpr std::array<GekkoOPTemplate, 4> s_table4_3{{
      FL_IN_FLOAT_S | FL_OUT_A | FL_IN_AB | FL_USE_FPU | FL_LOADSTORE},
 }};
 
-constexpr std::array<GekkoOPTemplate, 13> s_table19{{
+constexpr std::array<GekkoOPTemplate, 13> S_TABLE19{{
     {528, "bcctrx", OpType::Branch, 1, FL_ENDBLOCK | FL_READ_CR_BI},
     {16, "bclrx", OpType::Branch, 1, FL_ENDBLOCK | FL_READ_CR_BI},
     {257, "crand", OpType::CR, 1, 0},
@@ -239,7 +239,7 @@ constexpr std::array<GekkoOPTemplate, 13> s_table19{{
     {50, "rfi", OpType::System, 2, FL_ENDBLOCK | FL_CHECKEXCEPTIONS | FL_PROGRAMEXCEPTION},
 }};
 
-constexpr std::array<GekkoOPTemplate, 107> s_table31{{
+constexpr std::array<GekkoOPTemplate, 107> S_TABLE31{{
     {266, "addx", OpType::Integer, 1, FL_OUT_D | FL_IN_AB | FL_RC_BIT},
     {778, "addox", OpType::Integer, 1, FL_OUT_D | FL_IN_AB | FL_RC_BIT | FL_SET_OE},
     {10, "addcx", OpType::Integer, 1, FL_OUT_D | FL_IN_AB | FL_SET_CA | FL_RC_BIT},
@@ -392,7 +392,7 @@ constexpr std::array<GekkoOPTemplate, 107> s_table31{{
     {566, "tlbsync", OpType::System, 1, FL_PROGRAMEXCEPTION},
 }};
 
-constexpr std::array<GekkoOPTemplate, 9> s_table59{{
+constexpr std::array<GekkoOPTemplate, 9> S_TABLE59{{
     {18, "fdivsx", OpType::SingleFP, 17,
      FL_OUT_FLOAT_D | FL_IN_FLOAT_AB | FL_RC_BIT_F | FL_USE_FPU | FL_SET_FPRF | FL_FLOAT_EXCEPTION |
          FL_FLOAT_DIV},  // TODO
@@ -419,7 +419,7 @@ constexpr std::array<GekkoOPTemplate, 9> s_table59{{
          FL_FLOAT_EXCEPTION},
 }};
 
-constexpr std::array<GekkoOPTemplate, 15> s_table63{{
+constexpr std::array<GekkoOPTemplate, 15> S_TABLE63{{
     {264, "fabsx", OpType::DoubleFP, 1,
      FL_INOUT_FLOAT_D | FL_IN_FLOAT_B | FL_IN_FLOAT_B_BITEXACT | FL_RC_BIT_F | FL_USE_FPU},
 
@@ -456,7 +456,7 @@ constexpr std::array<GekkoOPTemplate, 15> s_table63{{
      FL_RC_BIT_F | FL_IN_FLOAT_B | FL_USE_FPU | FL_READ_FPRF | FL_SET_FPRF | FL_FLOAT_EXCEPTION},
 }};
 
-constexpr std::array<GekkoOPTemplate, 10> s_table63_2{{
+constexpr std::array<GekkoOPTemplate, 10> S_TABLE63_2{{
     {18, "fdivx", OpType::DoubleFP, 31,
      FL_INOUT_FLOAT_D | FL_IN_FLOAT_AB | FL_RC_BIT_F | FL_USE_FPU | FL_SET_FPRF |
          FL_FLOAT_EXCEPTION | FL_FLOAT_DIV},
@@ -489,8 +489,8 @@ constexpr std::array<GekkoOPTemplate, 10> s_table63_2{{
 }};
 
 constexpr size_t TOTAL_INSTRUCTION_COUNT =
-    1 + s_primary_table.size() + s_table4_2.size() + s_table4_3.size() + s_table4.size() +
-    s_table31.size() + s_table19.size() + s_table59.size() + s_table63.size() + s_table63_2.size();
+    1 + S_PRIMARY_TABLE.size() + S_TABLE4_2.size() + S_TABLE4_3.size() + S_TABLE4.size() +
+    S_TABLE31.size() + S_TABLE19.size() + S_TABLE59.size() + S_TABLE63.size() + S_TABLE63_2.size();
 
 struct Tables
 {
@@ -507,7 +507,7 @@ struct Tables
 
 static std::array<GekkoOPStats, TOTAL_INSTRUCTION_COUNT> s_all_instructions_stats;
 
-constexpr Tables s_tables = []() consteval
+constexpr Tables S_TABLES = []() consteval
 {
   Tables tables{};
 
@@ -524,11 +524,11 @@ constexpr Tables s_tables = []() consteval
     return counter++;
   };
 
-  u32 unknown_op_info = make_info(s_unknown_op_info);
+  u32 unknown_op_info = make_info(S_UNKNOWN_OP_INFO);
   tables.unknown_op_info = unknown_op_info;
 
   tables.primary_table.fill(unknown_op_info);
-  for (auto& tpl : s_primary_table)
+  for (auto& tpl : S_PRIMARY_TABLE)
   {
     ASSERT(tables.primary_table[tpl.opcode] == unknown_op_info);
     tables.primary_table[tpl.opcode] = make_info(tpl);
@@ -536,7 +536,7 @@ constexpr Tables s_tables = []() consteval
 
   tables.table4.fill(unknown_op_info);
 
-  for (const auto& tpl : s_table4_2)
+  for (const auto& tpl : S_TABLE4_2)
   {
     u32 info = make_info(tpl);
     for (u32 i = 0; i < 32; i++)
@@ -548,7 +548,7 @@ constexpr Tables s_tables = []() consteval
     }
   }
 
-  for (const auto& tpl : s_table4_3)
+  for (const auto& tpl : S_TABLE4_3)
   {
     u32 info = make_info(tpl);
     for (u32 i = 0; i < 16; i++)
@@ -560,7 +560,7 @@ constexpr Tables s_tables = []() consteval
     }
   }
 
-  for (const auto& tpl : s_table4)
+  for (const auto& tpl : S_TABLE4)
   {
     const u32 op = tpl.opcode;
     ASSERT(tables.table4[op] == unknown_op_info);
@@ -568,34 +568,34 @@ constexpr Tables s_tables = []() consteval
   }
 
   tables.table19.fill(unknown_op_info);
-  for (auto& tpl : s_table19)
+  for (auto& tpl : S_TABLE19)
   {
     ASSERT(tables.table19[tpl.opcode] == unknown_op_info);
     tables.table19[tpl.opcode] = make_info(tpl);
   };
 
   tables.table31.fill(unknown_op_info);
-  for (auto& tpl : s_table31)
+  for (auto& tpl : S_TABLE31)
   {
     ASSERT(tables.table31[tpl.opcode] == unknown_op_info);
     tables.table31[tpl.opcode] = make_info(tpl);
   };
 
   tables.table59.fill(unknown_op_info);
-  for (auto& tpl : s_table59)
+  for (auto& tpl : S_TABLE59)
   {
     ASSERT(tables.table59[tpl.opcode] == unknown_op_info);
     tables.table59[tpl.opcode] = make_info(tpl);
   };
 
   tables.table63.fill(unknown_op_info);
-  for (auto& tpl : s_table63)
+  for (auto& tpl : S_TABLE63)
   {
     ASSERT(tables.table63[tpl.opcode] == unknown_op_info);
     tables.table63[tpl.opcode] = make_info(tpl);
   };
 
-  for (const auto& tpl : s_table63_2)
+  for (const auto& tpl : S_TABLE63_2)
   {
     u32 info = make_info(tpl);
     for (u32 i = 0; i < 32; i++)
@@ -614,24 +614,24 @@ constexpr Tables s_tables = []() consteval
 
 const GekkoOPInfo* GetOpInfo(UGeckoInstruction inst, u32 pc)
 {
-  const GekkoOPInfo* info = &s_tables.all_instructions[s_tables.primary_table[inst.OPCD]];
+  const GekkoOPInfo* info = &S_TABLES.all_instructions[S_TABLES.primary_table[inst.OPCD]];
   if (info->type == OpType::Subtable)
   {
     switch (inst.OPCD)
     {
     case 4:
-      return &s_tables.all_instructions[s_tables.table4[inst.SUBOP10]];
+      return &S_TABLES.all_instructions[S_TABLES.table4[inst.SUBOP10]];
     case 19:
-      return &s_tables.all_instructions[s_tables.table19[inst.SUBOP10]];
+      return &S_TABLES.all_instructions[S_TABLES.table19[inst.SUBOP10]];
     case 31:
-      return &s_tables.all_instructions[s_tables.table31[inst.SUBOP10]];
+      return &S_TABLES.all_instructions[S_TABLES.table31[inst.SUBOP10]];
     case 59:
-      return &s_tables.all_instructions[s_tables.table59[inst.SUBOP5]];
+      return &S_TABLES.all_instructions[S_TABLES.table59[inst.SUBOP5]];
     case 63:
-      return &s_tables.all_instructions[s_tables.table63[inst.SUBOP10]];
+      return &S_TABLES.all_instructions[S_TABLES.table63[inst.SUBOP10]];
     default:
       ASSERT_MSG(POWERPC, 0, "GetOpInfo - invalid subtable op {:08x} @ {:08x}", inst.hex, pc);
-      return &s_tables.all_instructions[s_tables.unknown_op_info];
+      return &S_TABLES.all_instructions[S_TABLES.unknown_op_info];
     }
   }
   else
@@ -639,7 +639,7 @@ const GekkoOPInfo* GetOpInfo(UGeckoInstruction inst, u32 pc)
     if (info->type == OpType::Invalid)
     {
       ASSERT_MSG(POWERPC, 0, "GetOpInfo - invalid op {:08x} @ {:08x}", inst.hex, pc);
-      return &s_tables.all_instructions[s_tables.unknown_op_info];
+      return &S_TABLES.all_instructions[S_TABLES.unknown_op_info];
     }
     return info;
   }
@@ -692,7 +692,7 @@ void PrintInstructionRunCounts()
   std::array<OpInfo, TOTAL_INSTRUCTION_COUNT> temp;
   for (size_t i = 0; i < TOTAL_INSTRUCTION_COUNT; i++)
   {
-    const GekkoOPInfo& info = s_tables.all_instructions[i];
+    const GekkoOPInfo& info = S_TABLES.all_instructions[i];
     temp[i] = std::make_pair(info.opname, info.stats->run_count);
   }
   std::ranges::sort(temp, std::ranges::greater{}, Common::Projection::Second{});
@@ -713,7 +713,7 @@ void LogCompiledInstructions()
   File::IOFile f(fmt::format("{}inst_log{}.txt", File::GetUserPath(D_LOGS_IDX), time), "w");
   for (size_t i = 0; i < TOTAL_INSTRUCTION_COUNT; i++)
   {
-    const GekkoOPInfo& info = s_tables.all_instructions[i];
+    const GekkoOPInfo& info = S_TABLES.all_instructions[i];
     if (info.stats->compile_count > 0)
     {
       f.WriteString(fmt::format("{0}\t{1}\t{2}\t{3:08x}\n", info.opname, info.stats->compile_count,
@@ -724,7 +724,7 @@ void LogCompiledInstructions()
   f.Open(fmt::format("{}inst_not{}.txt", File::GetUserPath(D_LOGS_IDX), time), "w");
   for (size_t i = 0; i < TOTAL_INSTRUCTION_COUNT; i++)
   {
-    const GekkoOPInfo& info = s_tables.all_instructions[i];
+    const GekkoOPInfo& info = S_TABLES.all_instructions[i];
     if (info.stats->compile_count == 0)
     {
       f.WriteString(fmt::format("{0}\t{1}\t{2}\n", info.opname, info.stats->compile_count,

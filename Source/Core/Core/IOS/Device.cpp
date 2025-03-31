@@ -97,9 +97,9 @@ bool IOCtlVRequest::HasNumberOfValidVectors(const size_t in_count, const size_t 
   if (in_vectors.size() != in_count || io_vectors.size() != io_count)
     return false;
 
-  auto IsValidVector = [](const auto& vector) { return vector.size == 0 || vector.address != 0; };
-  return std::ranges::all_of(in_vectors, IsValidVector) &&
-         std::ranges::all_of(io_vectors, IsValidVector);
+  auto is_valid_vector = [](const auto& vector) { return vector.size == 0 || vector.address != 0; };
+  return std::ranges::all_of(in_vectors, is_valid_vector) &&
+         std::ranges::all_of(io_vectors, is_valid_vector);
 }
 
 void IOCtlRequest::Log(std::string_view device_name, Common::Log::LogType type,
@@ -179,7 +179,7 @@ std::optional<IPCReply> Device::Close(u32 fd)
 
 std::optional<IPCReply> Device::Unsupported(const Request& request)
 {
-  static const std::map<IPCCommandType, std::string_view> names{{
+  static const std::map<IPCCommandType, std::string_view> NAMES{{
       {IPC_CMD_READ, "Read"},
       {IPC_CMD_WRITE, "Write"},
       {IPC_CMD_SEEK, "Seek"},
@@ -187,7 +187,7 @@ std::optional<IPCReply> Device::Unsupported(const Request& request)
       {IPC_CMD_IOCTLV, "IOCtlV"},
   }};
 
-  WARN_LOG_FMT(IOS, "{} does not support {}()", m_name, names.at(request.command));
+  WARN_LOG_FMT(IOS, "{} does not support {}()", m_name, NAMES.at(request.command));
   return IPCReply{IPC_EINVAL};
 }
 }  // namespace IOS::HLE

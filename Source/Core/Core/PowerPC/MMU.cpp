@@ -63,7 +63,7 @@ MMU::~MMU() = default;
 {
   return val;
 }
-[[maybe_unused]] static s8 bswap(s8 val)
+[[maybe_unused]] static s8 Bswap(s8 val)
 {
   return val;
 }
@@ -71,7 +71,7 @@ MMU::~MMU() = default;
 {
   return Common::swap16(val);
 }
-[[maybe_unused]] static s16 bswap(s16 val)
+[[maybe_unused]] static s16 Bswap(s16 val)
 {
   return Common::swap16(val);
 }
@@ -95,7 +95,7 @@ static constexpr bool IsNoExceptionFlag(XCheckTLBFlag flag)
 }
 
 // Nasty but necessary. Super Mario Galaxy pointer relies on this stuff.
-static u32 EFB_Read(const u32 addr)
+static u32 EfbRead(const u32 addr)
 {
   u32 var = 0;
   // Convert address to coordinates. It's possible that this should be done
@@ -121,7 +121,7 @@ static u32 EFB_Read(const u32 addr)
   return var;
 }
 
-static void EFB_Write(u32 data, u32 addr)
+static void EfbWrite(u32 data, u32 addr)
 {
   const u32 x = (addr & 0xfff) >> 2;
   const u32 y = (addr >> 12) & 0x3ff;
@@ -189,7 +189,7 @@ T MMU::ReadFromHardware(u32 em_address)
   {
     if (em_address < 0x0c000000)
     {
-      return EFB_Read(em_address);
+      return EfbRead(em_address);
     }
     else
     {
@@ -343,7 +343,7 @@ void MMU::WriteToHardware(u32 em_address, const u32 data, const u32 size)
   {
     if (em_address < 0x0c000000)
     {
-      EFB_Write(data, em_address);
+      EfbWrite(data, em_address);
       return;
     }
 
@@ -1026,7 +1026,7 @@ void MMU::DMA_LCToMemory(const u32 mem_address, const u32 cache_address, const u
     for (u32 i = 0; i < 32 * num_blocks; i += 4)
     {
       const u32 data = Common::swap32(m_memory.GetL1Cache() + ((cache_address + i) & 0x3FFFF));
-      EFB_Write(data, mem_address + i);
+      EfbWrite(data, mem_address + i);
     }
     return;
   }
@@ -1055,7 +1055,7 @@ void MMU::DMA_MemoryToLC(const u32 cache_address, const u32 mem_address, const u
   {
     for (u32 i = 0; i < 32 * num_blocks; i += 4)
     {
-      const u32 data = Common::swap32(EFB_Read(mem_address + i));
+      const u32 data = Common::swap32(EfbRead(mem_address + i));
       std::memcpy(m_memory.GetL1Cache() + ((cache_address + i) & 0x3FFFF), &data, sizeof(u32));
     }
     return;
@@ -1284,13 +1284,13 @@ void MMU::GenerateDSIException(u32 effective_address, bool write)
     return;
   }
 
-  constexpr u32 dsisr_page = 1U << 30;
-  constexpr u32 dsisr_store = 1U << 25;
+  constexpr u32 DSISR_PAGE = 1U << 30;
+  constexpr u32 DSISR_STORE = 1U << 25;
 
   if (write)
-    m_ppc_state.spr[SPR_DSISR] = dsisr_page | dsisr_store;
+    m_ppc_state.spr[SPR_DSISR] = DSISR_PAGE | DSISR_STORE;
   else
-    m_ppc_state.spr[SPR_DSISR] = dsisr_page;
+    m_ppc_state.spr[SPR_DSISR] = DSISR_PAGE;
 
   m_ppc_state.spr[SPR_DAR] = effective_address;
 
@@ -1420,14 +1420,14 @@ template <const XCheckTLBFlag flag>
 MMU::TranslateAddressResult MMU::TranslatePageAddress(const EffectiveAddress address, bool* wi)
 {
   const auto sr = UReg_SR{m_ppc_state.sr[address.SR]};
-  const u32 VSID = sr.VSID;  // 24 bit
+  const u32 vsid = sr.VSID;  // 24 bit
 
   // TLB cache
   // This catches 99%+ of lookups in practice, so the actual page table entry code below doesn't
   // benefit much from optimization.
   u32 translated_address = 0;
   const TLBLookupResult res =
-      LookupTLBPageAddress(m_ppc_state, flag, address.Hex, VSID, &translated_address, wi);
+      LookupTLBPageAddress(m_ppc_state, flag, address.Hex, vsid, &translated_address, wi);
   if (res == TLBLookupResult::Found)
   {
     return TranslateAddressResult{TranslateAddressResultEnum::PAGE_TABLE_TRANSLATED,
@@ -1450,10 +1450,10 @@ MMU::TranslateAddressResult MMU::TranslatePageAddress(const EffectiveAddress add
   const u32 api = address.API;                //  6 bit (part of page_index)
 
   // hash function no 1 "xor" .360
-  u32 hash = (VSID ^ page_index);
+  u32 hash = (vsid ^ page_index);
 
   UPTE_Lo pte1;
-  pte1.VSID = VSID;
+  pte1.VSID = vsid;
   pte1.API = api;
   pte1.V = 1;
 
@@ -1470,13 +1470,13 @@ MMU::TranslateAddressResult MMU::TranslatePageAddress(const EffectiveAddress add
 
     for (int i = 0; i < 8; i++, pteg_addr += 8)
     {
-      constexpr XCheckTLBFlag pte_read_flag =
+      constexpr XCheckTLBFlag PTE_READ_FLAG =
           IsNoExceptionFlag(flag) ? XCheckTLBFlag::NoException : XCheckTLBFlag::Read;
-      const u32 pteg = ReadFromHardware<pte_read_flag, u32, true>(pteg_addr);
+      const u32 pteg = ReadFromHardware<PTE_READ_FLAG, u32, true>(pteg_addr);
 
       if (pte1.Hex == pteg)
       {
-        UPTE_Hi pte2(ReadFromHardware<pte_read_flag, u32, true>(pteg_addr + 4));
+        UPTE_Hi pte2(ReadFromHardware<PTE_READ_FLAG, u32, true>(pteg_addr + 4));
 
         // set the access bits
         switch (flag)
@@ -1503,7 +1503,7 @@ MMU::TranslateAddressResult MMU::TranslatePageAddress(const EffectiveAddress add
 
         // We already updated the TLB entry if this was caused by a C bit.
         if (res != TLBLookupResult::UpdateC)
-          UpdateTLBEntry(m_ppc_state, flag, pte2, address.Hex, VSID);
+          UpdateTLBEntry(m_ppc_state, flag, pte2, address.Hex, vsid);
 
         *wi = (pte2.WIMG & 0b1100) != 0;
 

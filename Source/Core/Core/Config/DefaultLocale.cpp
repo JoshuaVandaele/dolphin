@@ -26,8 +26,8 @@ namespace Config
 {
 static std::vector<std::string> GetPreferredLocales()
 {
-  static const std::vector<std::string> locales = Host_GetPreferredLocales();
-  return locales;
+  static const std::vector<std::string> LOCALES = Host_GetPreferredLocales();
+  return LOCALES;
 }
 
 static std::optional<DiscIO::Language> TryParseLanguage(const std::string& locale)
@@ -170,14 +170,14 @@ static DiscIO::Region ComputeDefaultRegion()
 
 DiscIO::Language GetDefaultLanguage()
 {
-  static const DiscIO::Language language = ComputeDefaultLanguage();
-  return language;
+  static const DiscIO::Language LANGUAGE = ComputeDefaultLanguage();
+  return LANGUAGE;
 }
 
 std::optional<u8> GetOptionalDefaultCountry()
 {
-  static const std::optional<u8> country = ComputeDefaultCountry();
-  return country;
+  static const std::optional<u8> COUNTRY = ComputeDefaultCountry();
+  return COUNTRY;
 }
 
 u8 GetDefaultCountry()
@@ -188,8 +188,8 @@ u8 GetDefaultCountry()
 
 DiscIO::Region GetDefaultRegion()
 {
-  static const DiscIO::Region region = ComputeDefaultRegion();
-  return region;
+  static const DiscIO::Region REGION = ComputeDefaultRegion();
+  return REGION;
 }
 
 }  // namespace Config

@@ -376,17 +376,17 @@ void FFMpegFrameDump::AddFrame(const FrameData& frame)
     }
   }
 
-  constexpr AVPixelFormat pix_fmt = AV_PIX_FMT_RGBA;
+  constexpr AVPixelFormat PIX_FMT = AV_PIX_FMT_RGBA;
 
   m_context->src_frame->data[0] = const_cast<u8*>(frame.data);
   m_context->src_frame->linesize[0] = frame.stride;
-  m_context->src_frame->format = pix_fmt;
+  m_context->src_frame->format = PIX_FMT;
   m_context->src_frame->width = m_context->width;
   m_context->src_frame->height = m_context->height;
 
   // Convert image from RGBA to desired pixel format.
   m_context->sws = sws_getCachedContext(
-      m_context->sws, frame.width, frame.height, pix_fmt, m_context->width, m_context->height,
+      m_context->sws, frame.width, frame.height, PIX_FMT, m_context->width, m_context->height,
       m_context->codec->pix_fmt, SWS_BICUBIC, nullptr, nullptr, nullptr);
   if (m_context->sws)
   {

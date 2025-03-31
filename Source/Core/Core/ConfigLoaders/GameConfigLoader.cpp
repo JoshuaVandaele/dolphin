@@ -82,7 +82,7 @@ using INIToSectionMap = std::map<std::string, SystemSection>;
 // See also: MapINIToRealLocation and GetINILocationFromConfig.
 static const INIToLocationMap& GetINIToLocationMap()
 {
-  static const INIToLocationMap ini_to_location = {
+  static const INIToLocationMap INI_TO_LOCATION = {
       {{"Core", "ProgressiveScan"}, {Config::SYSCONF_PROGRESSIVE_SCAN.GetLocation()}},
       {{"Core", "PAL60"}, {Config::SYSCONF_PAL60.GetLocation()}},
       {{"Wii", "Widescreen"}, {Config::SYSCONF_WIDESCREEN.GetLocation()}},
@@ -99,7 +99,7 @@ static const INIToLocationMap& GetINIToLocationMap()
       {{"Controls", "WiimoteSource3"}, {Config::WIIMOTE_4_SOURCE.GetLocation()}},
       {{"Controls", "WiimoteSourceBB"}, {Config::WIIMOTE_BB_SOURCE.GetLocation()}},
   };
-  return ini_to_location;
+  return INI_TO_LOCATION;
 }
 
 // This is a mapping from the legacy section names to system + section.
@@ -107,7 +107,7 @@ static const INIToLocationMap& GetINIToLocationMap()
 // See also: MapINIToRealLocation and GetINILocationFromConfig.
 static const INIToSectionMap& GetINIToSectionMap()
 {
-  static const INIToSectionMap ini_to_section = {
+  static const INIToSectionMap INI_TO_SECTION = {
       {"Core", {Config::System::Main, "Core"}},
       {"DSP", {Config::System::Main, "DSP"}},
       {"Display", {Config::System::Main, "Display"}},
@@ -119,7 +119,7 @@ static const INIToSectionMap& GetINIToSectionMap()
       {"Video", {Config::System::GFX, "GameSpecific"}},
       {"Controls", {Config::System::GameSettingsOnly, "Controls"}},
   };
-  return ini_to_section;
+  return INI_TO_SECTION;
 }
 
 // Converts from a legacy GameINI section-key tuple to a Location.
@@ -214,7 +214,7 @@ private:
   void LoadControllerConfig(Config::Layer* layer) const
   {
     // Game INIs can have controller profiles embedded in to them
-    static const std::array<char, 4> nums = {{'1', '2', '3', '4'}};
+    static const std::array<char, 4> NUMS = {{'1', '2', '3', '4'}};
 
     if (m_id == "00000000")
       return;
@@ -234,7 +234,7 @@ private:
         return Config::Location{std::get<2>(use_data), "Controls", key};
       };
 
-      for (const char num : nums)
+      for (const char num : NUMS)
       {
         if (auto profile = layer->Get<std::string>(control_section(type + "Profile" + num)))
         {

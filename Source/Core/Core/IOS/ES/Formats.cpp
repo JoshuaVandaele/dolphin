@@ -622,9 +622,9 @@ bool SharedContentMap::WriteEntries() const
   const std::string temp_path = "/tmp/content.map";
   // Atomically write the new content map.
   {
-    constexpr HLE::FS::Modes modes{HLE::FS::Mode::ReadWrite, HLE::FS::Mode::ReadWrite,
+    constexpr HLE::FS::Modes MODES{HLE::FS::Mode::ReadWrite, HLE::FS::Mode::ReadWrite,
                                    HLE::FS::Mode::None};
-    const auto file = m_fs->CreateAndOpenFile(PID_KERNEL, PID_KERNEL, temp_path, modes);
+    const auto file = m_fs->CreateAndOpenFile(PID_KERNEL, PID_KERNEL, temp_path, MODES);
     if (!file || !file->Write(m_entries.data(), m_entries.size()))
       return false;
   }
@@ -697,9 +697,9 @@ u32 UIDSys::GetOrInsertUIDForTitle(const u64 title_id)
   const u64 swapped_title_id = Common::swap64(title_id);
   const u32 swapped_uid = Common::swap32(uid);
 
-  constexpr HLE::FS::Modes modes{HLE::FS::Mode::ReadWrite, HLE::FS::Mode::ReadWrite,
+  constexpr HLE::FS::Modes MODES{HLE::FS::Mode::ReadWrite, HLE::FS::Mode::ReadWrite,
                                  HLE::FS::Mode::None};
-  const auto file = m_fs->CreateAndOpenFile(PID_KERNEL, PID_KERNEL, UID_MAP_PATH, modes);
+  const auto file = m_fs->CreateAndOpenFile(PID_KERNEL, PID_KERNEL, UID_MAP_PATH, MODES);
   if (!file || !file->Seek(0, HLE::FS::SeekMode::End) || !file->Write(&swapped_title_id, 1) ||
       !file->Write(&swapped_uid, 1))
   {
@@ -716,19 +716,19 @@ CertReader::CertReader(std::vector<u8>&& bytes) : SignedBlobReader(std::move(byt
     return;
 
   using CertStructInfo = std::tuple<SignatureType, PublicKeyType, size_t>;
-  static constexpr std::array<CertStructInfo, 4> types{{
+  static constexpr std::array<CertStructInfo, 4> TYPES{{
       {SignatureType::RSA4096, PublicKeyType::RSA2048, sizeof(CertRSA4096RSA2048)},
       {SignatureType::RSA2048, PublicKeyType::RSA2048, sizeof(CertRSA2048RSA2048)},
       {SignatureType::RSA2048, PublicKeyType::ECC, sizeof(CertRSA2048ECC)},
       {SignatureType::ECC, PublicKeyType::ECC, sizeof(CertECC)},
   }};
 
-  const auto info = std::ranges::find_if(types, [this](const CertStructInfo& entry) {
+  const auto info = std::ranges::find_if(TYPES, [this](const CertStructInfo& entry) {
     return m_bytes.size() >= std::get<2>(entry) && std::get<0>(entry) == GetSignatureType() &&
            std::get<1>(entry) == GetPublicKeyType();
   });
 
-  if (info == types.cend())
+  if (info == TYPES.cend())
     return;
 
   m_bytes.resize(std::get<2>(*info));

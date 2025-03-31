@@ -164,7 +164,7 @@ void ShaderCache::WaitForAsyncCompiler()
 {
   bool running = true;
 
-  constexpr auto update_ui_progress = [](size_t completed, size_t total) {
+  constexpr auto UPDATE_UI_PROGRESS = [](size_t completed, size_t total) {
     const float center_x = ImGui::GetIO().DisplaySize.x * 0.5f;
     const float center_y = ImGui::GetIO().DisplaySize.y * 0.5f;
     const float scale = ImGui::GetIO().DisplayFramebufferScale.x;
@@ -190,7 +190,7 @@ void ShaderCache::WaitForAsyncCompiler()
   while (running &&
          (m_async_shader_compiler->HasPendingWork() || m_async_shader_compiler->HasCompletedWork()))
   {
-    running = m_async_shader_compiler->WaitUntilCompletion(update_ui_progress);
+    running = m_async_shader_compiler->WaitUntilCompletion(UPDATE_UI_PROGRESS);
 
     m_async_shader_compiler->RetrieveWorkItems();
   }
@@ -1298,7 +1298,7 @@ void ShaderCache::QueueUberShaderPipelines()
   dummy_vertex_decl.stride = sizeof(float) * 4;
   NativeVertexFormat* dummy_vertex_format =
       VertexLoaderManager::GetUberVertexFormat(dummy_vertex_decl);
-  auto QueueDummyPipeline =
+  auto queue_dummy_pipeline =
       [&](const UberShader::VertexShaderUid& vs_uid, const GeometryShaderUid& gs_uid,
           const UberShader::PixelShaderUid& ps_uid, const BlendingState& blend) {
         GXUberPipelineUid config;
@@ -1341,7 +1341,7 @@ void ShaderCache::QueueUberShaderPipelines()
           return;
         }
         BlendingState blend = RenderState::GetNoBlendingBlendState();
-        QueueDummyPipeline(vuid, guid, cleared_puid, blend);
+        queue_dummy_pipeline(vuid, guid, cleared_puid, blend);
         if (g_backend_info.bSupportsDynamicVertexLoader)
         {
           // Not all GPUs need all the pipeline state compiled into shaders, so they tend to key
@@ -1365,10 +1365,10 @@ void ShaderCache::QueueUberShaderPipelines()
           //  - AMD: Keyed on dual source blend and vertex layout
           //  - Nvidia Kepler: No recompiles for changes to vertex layout or blend
           blend.alphaupdate = false;
-          QueueDummyPipeline(vuid, guid, cleared_puid, blend);
+          queue_dummy_pipeline(vuid, guid, cleared_puid, blend);
           blend.alphaupdate = true;
           blend.colorupdate = false;
-          QueueDummyPipeline(vuid, guid, cleared_puid, blend);
+          queue_dummy_pipeline(vuid, guid, cleared_puid, blend);
           blend.colorupdate = true;
           if (!cleared_puid.GetUidData()->no_dual_src && !cleared_puid.GetUidData()->uint_output)
           {
@@ -1376,7 +1376,7 @@ void ShaderCache::QueueUberShaderPipelines()
             blend.usedualsrc = true;
             blend.srcfactor = SrcBlendFactor::SrcAlpha;
             blend.dstfactor = DstBlendFactor::InvSrcAlpha;
-            QueueDummyPipeline(vuid, guid, cleared_puid, blend);
+            queue_dummy_pipeline(vuid, guid, cleared_puid, blend);
           }
         }
       });

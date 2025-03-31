@@ -183,8 +183,8 @@ template <typename F>
 QPolygonF GetPolygonFromRadiusGetter(F&& radius_getter)
 {
   // A multiple of 8 (octagon) and enough points to be visibly pleasing:
-  constexpr int shape_point_count = 32;
-  QPolygonF shape{shape_point_count};
+  constexpr int SHAPE_POINT_COUNT = 32;
+  QPolygonF shape{SHAPE_POINT_COUNT};
 
   int p = 0;
   for (auto& point : shape)
@@ -204,8 +204,8 @@ template <typename F>
 QPolygonF GetPolygonSegmentFromRadiusGetter(F&& radius_getter, double direction,
                                             double segment_size, double segment_depth)
 {
-  constexpr int shape_point_count = 6;
-  QPolygonF shape{shape_point_count};
+  constexpr int SHAPE_POINT_COUNT = 6;
+  QPolygonF shape{SHAPE_POINT_COUNT};
 
   // We subtract from the provided direction angle so it's better
   // to add Tau here to prevent a negative value instead of
@@ -317,14 +317,14 @@ void GenerateFibonacciSphere(int point_count, F&& callback)
 
 void MappingIndicator::paintEvent(QPaintEvent*)
 {
-  constexpr float max_elapsed_seconds = 0.1f;
+  constexpr float MAX_ELAPSED_SECONDS = 0.1f;
 
   const auto now = Clock::now();
   const float elapsed_seconds = std::chrono::duration_cast<DT_s>(now - m_last_update).count();
   m_last_update = now;
 
   const auto lock = ControllerEmu::EmulatedController::GetStateLock();
-  Update(std::min(elapsed_seconds, max_elapsed_seconds));
+  Update(std::min(elapsed_seconds, MAX_ELAPSED_SECONDS));
   Draw();
 }
 
@@ -458,15 +458,15 @@ void TiltIndicator::Draw()
   auto adj_coord = Common::DVec2{-m_motion_state.angle.y, m_motion_state.angle.x} / MathUtil::PI;
 
   // Angle values after dividing by pi.
-  constexpr auto norm_180_deg = 1;
-  constexpr auto norm_360_deg = 2;
+  constexpr auto NORM_180_DEG = 1;
+  constexpr auto NORM_360_DEG = 2;
 
   // Angle may extend beyond 180 degrees when wrapping around.
   // Apply modulo to draw within the indicator.
   // Scale down the value a bit so +1 does not become -1.
   adj_coord *= 0.9999f;
-  adj_coord.x = std::fmod(adj_coord.x + norm_360_deg + norm_180_deg, norm_360_deg) - norm_180_deg;
-  adj_coord.y = std::fmod(adj_coord.y + norm_360_deg + norm_180_deg, norm_360_deg) - norm_180_deg;
+  adj_coord.x = std::fmod(adj_coord.x + NORM_360_DEG + NORM_180_DEG, NORM_360_DEG) - NORM_180_DEG;
+  adj_coord.y = std::fmod(adj_coord.y + NORM_360_DEG + NORM_180_DEG, NORM_360_DEG) - NORM_180_DEG;
 
   DrawReshapableInput(m_group, TILT_GATE_COLOR,
                       (adj_coord.x || adj_coord.y) ? std::make_optional(adj_coord) : std::nullopt);

@@ -41,15 +41,15 @@ void Jit64::lfXXX(UGeckoInstruction inst)
   }
   if (indexed)
   {
-    RCOpArg Rb = gpr.Use(b, RCMode::Read);
-    RegCache::Realize(Rb);
+    RCOpArg rb = gpr.Use(b, RCMode::Read);
+    RegCache::Realize(rb);
     if (update)
     {
-      ADD(32, addr, Rb);
+      ADD(32, addr, rb);
     }
     else
     {
-      MOV_sum(32, RSCRATCH2, a ? addr.Location() : Imm32(0), Rb);
+      MOV_sum(32, RSCRATCH2, a ? addr.Location() : Imm32(0), rb);
       addr = RCOpArg::R(RSCRATCH2);
     }
   }
@@ -61,28 +61,28 @@ void Jit64::lfXXX(UGeckoInstruction inst)
       offset = (s16)inst.SIMM_16;
   }
 
-  RCMode Rd_mode = !single ? RCMode::ReadWrite : RCMode::Write;
-  RCX64Reg Rd = jo.memcheck && single ? fpr.RevertableBind(d, Rd_mode) : fpr.Bind(d, Rd_mode);
-  RegCache::Realize(Rd);
-  BitSet32 registersInUse = CallerSavedRegistersInUse();
+  RCMode rd_mode = !single ? RCMode::ReadWrite : RCMode::Write;
+  RCX64Reg rd = jo.memcheck && single ? fpr.RevertableBind(d, rd_mode) : fpr.Bind(d, rd_mode);
+  RegCache::Realize(rd);
+  BitSet32 registers_in_use = CallerSavedRegistersInUse();
   if (update && jo.memcheck)
-    registersInUse[RSCRATCH2] = true;
-  SafeLoadToReg(RSCRATCH, addr, single ? 32 : 64, offset, registersInUse, false);
+    registers_in_use[RSCRATCH2] = true;
+  SafeLoadToReg(RSCRATCH, addr, single ? 32 : 64, offset, registers_in_use, false);
 
   if (single)
   {
-    ConvertSingleToDouble(Rd, RSCRATCH, true);
+    ConvertSingleToDouble(rd, RSCRATCH, true);
   }
   else
   {
     MOVQ_xmm(XMM0, R(RSCRATCH));
-    MOVSD(Rd, R(XMM0));
+    MOVSD(rd, R(XMM0));
   }
   if (update && jo.memcheck)
   {
-    RCX64Reg Ra = gpr.Bind(a, RCMode::Write);
-    RegCache::Realize(Ra);
-    MOV(32, Ra, addr);
+    RCX64Reg ra = gpr.Bind(a, RCMode::Write);
+    RegCache::Realize(ra);
+    MOV(32, ra, addr);
   }
 }
 
@@ -99,7 +99,7 @@ void Jit64::stfXXX(UGeckoInstruction inst)
   int a = inst.RA;
   int b = inst.RB;
   s32 imm = (s16)inst.SIMM_16;
-  int accessSize = single ? 32 : 64;
+  int access_size = single ? 32 : 64;
 
   FALLBACK_IF(update && jo.memcheck && indexed && a == b);
 
@@ -107,34 +107,34 @@ void Jit64::stfXXX(UGeckoInstruction inst)
   {
     if (js.fpr_is_store_safe[s] && js.op->fprIsSingle[s])
     {
-      RCOpArg Rs = fpr.Use(s, RCMode::Read);
-      RegCache::Realize(Rs);
-      CVTSD2SS(XMM0, Rs);
+      RCOpArg rs = fpr.Use(s, RCMode::Read);
+      RegCache::Realize(rs);
+      CVTSD2SS(XMM0, rs);
       MOVD_xmm(R(RSCRATCH), XMM0);
     }
     else
     {
-      RCX64Reg Rs = fpr.Bind(s, RCMode::Read);
-      RegCache::Realize(Rs);
-      MOVAPD(XMM0, Rs);
+      RCX64Reg rs = fpr.Bind(s, RCMode::Read);
+      RegCache::Realize(rs);
+      MOVAPD(XMM0, rs);
       CALL(asm_routines.cdts);
     }
   }
   else
   {
-    RCOpArg Rs = fpr.Use(s, RCMode::Read);
-    RegCache::Realize(Rs);
-    if (Rs.IsSimpleReg())
-      MOVQ_xmm(R(RSCRATCH), Rs.GetSimpleReg());
+    RCOpArg rs = fpr.Use(s, RCMode::Read);
+    RegCache::Realize(rs);
+    if (rs.IsSimpleReg())
+      MOVQ_xmm(R(RSCRATCH), rs.GetSimpleReg());
     else
-      MOV(64, R(RSCRATCH), Rs);
+      MOV(64, R(RSCRATCH), rs);
   }
 
   if (!indexed && (!a || gpr.IsImm(a)))
   {
     u32 addr = (a ? gpr.Imm32(a) : 0) + imm;
     bool exception =
-        WriteToConstAddress(accessSize, R(RSCRATCH), addr, CallerSavedRegistersInUse());
+        WriteToConstAddress(access_size, R(RSCRATCH), addr, CallerSavedRegistersInUse());
 
     if (update)
     {
@@ -144,46 +144,46 @@ void Jit64::stfXXX(UGeckoInstruction inst)
       }
       else
       {
-        RCOpArg Ra = gpr.RevertableBind(a, RCMode::Write);
-        RegCache::Realize(Ra);
+        RCOpArg ra = gpr.RevertableBind(a, RCMode::Write);
+        RegCache::Realize(ra);
         MemoryExceptionCheck();
-        MOV(32, Ra, Imm32(addr));
+        MOV(32, ra, Imm32(addr));
       }
     }
     return;
   }
 
   s32 offset = 0;
-  RCOpArg Ra = update ? gpr.Bind(a, RCMode::ReadWrite) : gpr.Use(a, RCMode::Read);
-  RegCache::Realize(Ra);
+  RCOpArg ra = update ? gpr.Bind(a, RCMode::ReadWrite) : gpr.Use(a, RCMode::Read);
+  RegCache::Realize(ra);
   if (indexed)
   {
-    RCOpArg Rb = gpr.Use(b, RCMode::Read);
-    RegCache::Realize(Rb);
-    MOV_sum(32, RSCRATCH2, a ? Ra.Location() : Imm32(0), Rb);
+    RCOpArg rb = gpr.Use(b, RCMode::Read);
+    RegCache::Realize(rb);
+    MOV_sum(32, RSCRATCH2, a ? ra.Location() : Imm32(0), rb);
   }
   else
   {
     if (update)
     {
-      MOV_sum(32, RSCRATCH2, Ra, Imm32(imm));
+      MOV_sum(32, RSCRATCH2, ra, Imm32(imm));
     }
     else
     {
       offset = imm;
-      MOV(32, R(RSCRATCH2), Ra);
+      MOV(32, R(RSCRATCH2), ra);
     }
   }
 
-  BitSet32 registersInUse = CallerSavedRegistersInUse();
+  BitSet32 registers_in_use = CallerSavedRegistersInUse();
   // We need to save the (usually scratch) address register for the update.
   if (update)
-    registersInUse[RSCRATCH2] = true;
+    registers_in_use[RSCRATCH2] = true;
 
-  SafeWriteRegToReg(RSCRATCH, RSCRATCH2, accessSize, offset, registersInUse);
+  SafeWriteRegToReg(RSCRATCH, RSCRATCH2, access_size, offset, registers_in_use);
 
   if (update)
-    MOV(32, Ra, R(RSCRATCH2));
+    MOV(32, ra, R(RSCRATCH2));
 }
 
 // This one is a little bit weird; it stores the low 32 bits of a double without converting it
@@ -196,16 +196,16 @@ void Jit64::stfiwx(UGeckoInstruction inst)
   int a = inst.RA;
   int b = inst.RB;
 
-  RCOpArg Ra = a ? gpr.Use(a, RCMode::Read) : RCOpArg::Imm32(0);
-  RCOpArg Rb = gpr.Use(b, RCMode::Read);
-  RCOpArg Rs = fpr.Use(s, RCMode::Read);
-  RegCache::Realize(Ra, Rb, Rs);
+  RCOpArg ra = a ? gpr.Use(a, RCMode::Read) : RCOpArg::Imm32(0);
+  RCOpArg rb = gpr.Use(b, RCMode::Read);
+  RCOpArg rs = fpr.Use(s, RCMode::Read);
+  RegCache::Realize(ra, rb, rs);
 
-  MOV_sum(32, RSCRATCH2, Ra, Rb);
+  MOV_sum(32, RSCRATCH2, ra, rb);
 
-  if (Rs.IsSimpleReg())
-    MOVD_xmm(R(RSCRATCH), Rs.GetSimpleReg());
+  if (rs.IsSimpleReg())
+    MOVD_xmm(R(RSCRATCH), rs.GetSimpleReg());
   else
-    MOV(32, R(RSCRATCH), Rs);
+    MOV(32, R(RSCRATCH), rs);
   SafeWriteRegToReg(RSCRATCH, RSCRATCH2, 32, 0, CallerSavedRegistersInUse());
 }

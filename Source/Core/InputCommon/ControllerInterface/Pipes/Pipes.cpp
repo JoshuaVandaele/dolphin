@@ -22,12 +22,12 @@
 
 namespace ciface::Pipes
 {
-static const std::array<std::string, 12> s_button_tokens{
+static const std::array<std::string, 12> S_BUTTON_TOKENS{
     {"A", "B", "X", "Y", "Z", "START", "L", "R", "D_UP", "D_DOWN", "D_LEFT", "D_RIGHT"}};
 
-static const std::array<std::string, 2> s_shoulder_tokens{{"L", "R"}};
+static const std::array<std::string, 2> S_SHOULDER_TOKENS{{"L", "R"}};
 
-static const std::array<std::string, 2> s_axis_tokens{{"MAIN", "C"}};
+static const std::array<std::string, 2> S_AXIS_TOKENS{{"MAIN", "C"}};
 
 static double StringToDouble(const std::string& text)
 {
@@ -76,17 +76,17 @@ void InputBackend::PopulateDevices()
 
 PipeDevice::PipeDevice(int fd, const std::string& name) : m_fd(fd), m_name(name)
 {
-  for (const auto& tok : s_button_tokens)
+  for (const auto& tok : S_BUTTON_TOKENS)
   {
     PipeInput* btn = new PipeInput("Button " + tok);
     AddInput(btn);
     m_buttons[tok] = btn;
   }
-  for (const auto& tok : s_shoulder_tokens)
+  for (const auto& tok : S_SHOULDER_TOKENS)
   {
     AddAxis(tok, 0.0);
   }
-  for (const auto& tok : s_axis_tokens)
+  for (const auto& tok : S_AXIS_TOKENS)
   {
     AddAxis(tok + " X", 0.5);
     AddAxis(tok + " Y", 0.5);

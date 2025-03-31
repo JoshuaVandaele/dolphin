@@ -235,7 +235,7 @@ void SerialInterfaceManager::RegisterEvents()
   m_event_type_change_device = core_timing.RegisterEvent("ChangeSIDevice", ChangeDeviceCallback);
   m_event_type_tranfer_pending = core_timing.RegisterEvent("SITransferPending", GlobalRunSIBuffer);
 
-  constexpr std::array<CoreTiming::TimedCallback, MAX_SI_CHANNELS> event_callbacks = {
+  constexpr std::array<CoreTiming::TimedCallback, MAX_SI_CHANNELS> EVENT_CALLBACKS = {
       DeviceEventCallback<0>,
       DeviceEventCallback<1>,
       DeviceEventCallback<2>,
@@ -244,7 +244,7 @@ void SerialInterfaceManager::RegisterEvents()
   for (int i = 0; i < MAX_SI_CHANNELS; ++i)
   {
     m_event_types_device[i] =
-        core_timing.RegisterEvent(fmt::format("SIEventChannel{}", i), event_callbacks[i]);
+        core_timing.RegisterEvent(fmt::format("SIEventChannel{}", i), EVENT_CALLBACKS[i]);
   }
 }
 

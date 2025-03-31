@@ -20,7 +20,7 @@
 namespace DSP
 {
 // clang-format off
-const std::array<DSPOPCTemplate, 230> s_opcodes =
+const std::array<DSPOPCTemplate, 230> S_OPCODES =
 {{
   //              # of parameters----+   {type, size, loc, lshift, mask}                                                               branch        reads PC       // instruction approximation
   // name      opcode  mask  size-V  V   param 1                       param 2                       param 3                    extendable    uncond.       updates SR
@@ -311,7 +311,7 @@ const DSPOPCTemplate cw =
   {"CW",     0x0000, 0x0000, 1, 1, {{P_VAL, 2, 0, 0, 0xffff}}, false, false, false, false, false};
 
 // extended opcodes
-const std::array<DSPOPCTemplate, 25> s_opcodes_ext =
+const std::array<DSPOPCTemplate, 25> S_OPCODES_EXT =
 {{
   {"XXX",    0x0000, 0x00fc, 1, 1, {{P_VAL, 1, 0, 0, 0x00ff}}, false, false, false, false, false}, // no operation
 
@@ -531,8 +531,8 @@ auto FindByName(std::string_view name, const std::array<DSPOPCTemplate, N>& data
 
 const DSPOPCTemplate* FindOpInfoByOpcode(UDSPInstruction opcode)
 {
-  const auto iter = FindByOpcode(opcode, s_opcodes);
-  if (iter == s_opcodes.cend())
+  const auto iter = FindByOpcode(opcode, S_OPCODES);
+  if (iter == S_OPCODES.cend())
     return nullptr;
 
   return &*iter;
@@ -540,8 +540,8 @@ const DSPOPCTemplate* FindOpInfoByOpcode(UDSPInstruction opcode)
 
 const DSPOPCTemplate* FindOpInfoByName(std::string_view name)
 {
-  const auto iter = FindByName(name, s_opcodes);
-  if (iter == s_opcodes.cend())
+  const auto iter = FindByName(name, S_OPCODES);
+  if (iter == S_OPCODES.cend())
     return nullptr;
 
   return &*iter;
@@ -549,8 +549,8 @@ const DSPOPCTemplate* FindOpInfoByName(std::string_view name)
 
 const DSPOPCTemplate* FindExtOpInfoByOpcode(UDSPInstruction opcode)
 {
-  const auto iter = FindByOpcode(opcode, s_opcodes_ext);
-  if (iter == s_opcodes_ext.cend())
+  const auto iter = FindByOpcode(opcode, S_OPCODES_EXT);
+  if (iter == S_OPCODES_EXT.cend())
     return nullptr;
 
   return &*iter;
@@ -558,8 +558,8 @@ const DSPOPCTemplate* FindExtOpInfoByOpcode(UDSPInstruction opcode)
 
 const DSPOPCTemplate* FindExtOpInfoByName(std::string_view name)
 {
-  const auto iter = FindByName(name, s_opcodes_ext);
-  if (iter == s_opcodes_ext.cend())
+  const auto iter = FindByName(name, S_OPCODES_EXT);
+  if (iter == S_OPCODES_EXT.cend())
     return nullptr;
 
   return &*iter;
@@ -589,8 +589,8 @@ void InitInstructionTable()
   {
     s_ext_op_table[i] = &cw;
 
-    const auto iter = FindByOpcode(static_cast<UDSPInstruction>(i), s_opcodes_ext);
-    if (iter == s_opcodes_ext.cend())
+    const auto iter = FindByOpcode(static_cast<UDSPInstruction>(i), S_OPCODES_EXT);
+    if (iter == S_OPCODES_EXT.cend())
       continue;
 
     if (s_ext_op_table[i] == &cw)
@@ -613,8 +613,8 @@ void InitInstructionTable()
 
   for (size_t i = 0; i < s_op_table.size(); i++)
   {
-    const auto iter = FindByOpcode(static_cast<UDSPInstruction>(i), s_opcodes);
-    if (iter == s_opcodes.cend())
+    const auto iter = FindByOpcode(static_cast<UDSPInstruction>(i), S_OPCODES);
+    if (iter == S_OPCODES.cend())
       continue;
 
     if (s_op_table[i] == &cw)

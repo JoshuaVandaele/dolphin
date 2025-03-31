@@ -297,7 +297,7 @@ int ConvertCommand(const std::vector<std::string>& args)
   }
 
   // Perform the conversion
-  const auto NOOP_STATUS_CALLBACK = [](const std::string& text, float percent) { return true; };
+  const auto noop_status_callback = [](const std::string& text, float percent) { return true; };
 
   bool success = false;
 
@@ -306,7 +306,7 @@ int ConvertCommand(const std::vector<std::string>& args)
   case DiscIO::BlobType::PLAIN:
   {
     success = DiscIO::ConvertToPlain(blob_reader.get(), input_file_path, output_file_path,
-                                     NOOP_STATUS_CALLBACK);
+                                     noop_status_callback);
     break;
   }
 
@@ -321,7 +321,7 @@ int ConvertCommand(const std::vector<std::string>& args)
         sub_type = 1;
     }
     success = DiscIO::ConvertToGCZ(blob_reader.get(), input_file_path, output_file_path, sub_type,
-                                   block_size_o.value(), NOOP_STATUS_CALLBACK);
+                                   block_size_o.value(), noop_status_callback);
     break;
   }
 
@@ -331,7 +331,7 @@ int ConvertCommand(const std::vector<std::string>& args)
     success = DiscIO::ConvertToWIAOrRVZ(blob_reader.get(), input_file_path, output_file_path,
                                         format == DiscIO::BlobType::RVZ, compression_o.value(),
                                         compression_level_o.value(), block_size_o.value(),
-                                        NOOP_STATUS_CALLBACK);
+                                        noop_status_callback);
     break;
   }
 

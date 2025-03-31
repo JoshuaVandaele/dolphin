@@ -14,7 +14,7 @@
 
 namespace Common::ec
 {
-static const u8 square[16] = {0x00, 0x01, 0x04, 0x05, 0x10, 0x11, 0x14, 0x15,
+static const u8 SQUARE[16] = {0x00, 0x01, 0x04, 0x05, 0x10, 0x11, 0x14, 0x15,
                               0x40, 0x41, 0x44, 0x45, 0x50, 0x51, 0x54, 0x55};
 
 struct Elt;
@@ -46,8 +46,8 @@ struct Elt
     std::array<u8, 60> wide;
     for (std::size_t i = 0; i < data.size(); i++)
     {
-      wide[2 * i] = square[data[i] >> 4];
-      wide[2 * i + 1] = square[data[i] & 15];
+      wide[2 * i] = SQUARE[data[i] >> 4];
+      wide[2 * i + 1] = SQUARE[data[i] & 15];
     }
     for (std::size_t i = 0; i < data.size(); i++)
     {
@@ -165,17 +165,17 @@ private:
 };
 
 // y**2 + x*y = x**3 + x + b
-[[maybe_unused]] static const u8 ec_b[30] = {
+[[maybe_unused]] static const u8 EC_B[30] = {
     0x00, 0x66, 0x64, 0x7e, 0xde, 0x6c, 0x33, 0x2c, 0x7f, 0x8c, 0x09, 0x23, 0xbb, 0x58, 0x21,
     0x3b, 0x33, 0x3b, 0x20, 0xe9, 0xce, 0x42, 0x81, 0xfe, 0x11, 0x5f, 0x7d, 0x8f, 0x90, 0xad};
 
 // order of the addition group of points
-static const u8 ec_N[30] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+static const u8 EC_N[30] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                             0x00, 0x00, 0x00, 0x00, 0x00, 0x13, 0xe9, 0x74, 0xe7, 0x2f,
                             0x8a, 0x69, 0x22, 0x03, 0x1d, 0x26, 0x03, 0xcf, 0xe0, 0xd7};
 
 // base point
-constexpr Point ec_G{
+constexpr Point EC_G{
     {{{0x00, 0xfa, 0xc9, 0xdf, 0xcb, 0xac, 0x83, 0x13, 0xbb, 0x21, 0x39, 0xf1, 0xbb, 0x75, 0x5f,
        0xef, 0x65, 0xbc, 0x39, 0x1f, 0x8b, 0x36, 0xf8, 0xf8, 0xeb, 0x73, 0x71, 0xfd, 0x55, 0x8b}}},
     {{{0x01, 0x00, 0x6a, 0x08, 0xa4, 0x19, 0x03, 0x35, 0x06, 0x78, 0xe5, 0x85, 0x28, 0xbe, 0xbf,
@@ -232,24 +232,24 @@ Signature Sign(const u8* key, const u8* hash)
     // Generate 240 bits and keep 233.
     Common::Random::Generate(m, sizeof(m));
     m[0] &= 1;
-  } while (bn_compare(m, ec_N, sizeof(m)) >= 0);
+  } while (bn_compare(m, EC_N, sizeof(m)) >= 0);
 
-  Elt r = (m * ec_G).X();
-  if (bn_compare(r.data.data(), ec_N, 30) >= 0)
-    bn_sub_modulus(r.data.data(), ec_N, 30);
+  Elt r = (m * EC_G).X();
+  if (bn_compare(r.data.data(), EC_N, 30) >= 0)
+    bn_sub_modulus(r.data.data(), EC_N, 30);
 
   //	S = m**-1*(e + Rk) (mod N)
 
   u8 kk[30];
   std::copy_n(key, sizeof(kk), kk);
-  if (bn_compare(kk, ec_N, sizeof(kk)) >= 0)
-    bn_sub_modulus(kk, ec_N, sizeof(kk));
+  if (bn_compare(kk, EC_N, sizeof(kk)) >= 0)
+    bn_sub_modulus(kk, EC_N, sizeof(kk));
   Elt s;
-  bn_mul(s.data.data(), r.data.data(), kk, ec_N, 30);
-  bn_add(kk, s.data.data(), e, ec_N, sizeof(kk));
+  bn_mul(s.data.data(), r.data.data(), kk, EC_N, 30);
+  bn_add(kk, s.data.data(), e, EC_N, sizeof(kk));
   u8 minv[30];
-  bn_inv(minv, m, ec_N, sizeof(minv));
-  bn_mul(s.data.data(), minv, kk, ec_N, 30);
+  bn_inv(minv, m, EC_N, sizeof(minv));
+  bn_mul(s.data.data(), minv, kk, EC_N, 30);
 
   Signature signature;
   std::ranges::copy(r.data, signature.begin());
@@ -259,29 +259,29 @@ Signature Sign(const u8* key, const u8* hash)
 
 bool VerifySignature(const u8* public_key, const u8* signature, const u8* hash)
 {
-  const u8* R = signature;
-  const u8* S = signature + 30;
-  u8 Sinv[30];
+  const u8* r = signature;
+  const u8* s = signature + 30;
+  u8 sinv[30];
 
-  bn_inv(Sinv, S, ec_N, 30);
+  bn_inv(sinv, s, EC_N, 30);
   u8 e[30]{};
   memcpy(e + 10, hash, 20);
 
   u8 w1[30], w2[30];
-  bn_mul(w1, e, Sinv, ec_N, 30);
-  bn_mul(w2, R, Sinv, ec_N, 30);
+  bn_mul(w1, e, sinv, EC_N, 30);
+  bn_mul(w2, r, sinv, EC_N, 30);
 
-  Point r1 = w1 * ec_G + w2 * Point{public_key};
+  Point r1 = w1 * EC_G + w2 * Point{public_key};
   auto& rx = r1.X().data;
-  if (bn_compare(rx.data(), ec_N, 30) >= 0)
-    bn_sub_modulus(rx.data(), ec_N, 30);
+  if (bn_compare(rx.data(), EC_N, 30) >= 0)
+    bn_sub_modulus(rx.data(), EC_N, 30);
 
-  return (bn_compare(rx.data(), R, 30) == 0);
+  return (bn_compare(rx.data(), r, 30) == 0);
 }
 
 PublicKey PrivToPub(const u8* key)
 {
-  const Point data = key * ec_G;
+  const Point data = key * EC_G;
   PublicKey result;
   std::copy_n(data.Data(), result.size(), result.begin());
   return result;

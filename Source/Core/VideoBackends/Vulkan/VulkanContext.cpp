@@ -65,11 +65,11 @@ VulkanContext::PhysicalDeviceInfo::PhysicalDeviceInfo(VkPhysicalDevice device)
     // subgroupBallotFindLSB), and arithmetic (for subgroupMin/subgroupMax).
     // Shuffle is enabled as a workaround until SPIR-V >= 1.5 is enabled with broadcast(uniform)
     // support.
-    constexpr VkSubgroupFeatureFlags required_operations =
+    constexpr VkSubgroupFeatureFlags REQUIRED_OPERATIONS =
         VK_SUBGROUP_FEATURE_BASIC_BIT | VK_SUBGROUP_FEATURE_ARITHMETIC_BIT |
         VK_SUBGROUP_FEATURE_BALLOT_BIT | VK_SUBGROUP_FEATURE_SHUFFLE_BIT;
     shaderSubgroupOperations =
-        (properties_subgroup.supportedOperations & required_operations) == required_operations &&
+        (properties_subgroup.supportedOperations & REQUIRED_OPERATIONS) == REQUIRED_OPERATIONS &&
         properties_subgroup.supportedStages & VK_SHADER_STAGE_FRAGMENT_BIT;
   }
 
@@ -200,7 +200,7 @@ bool VulkanContext::CheckValidationLayerAvailablility()
   return supports_debug_utils && supports_validation_layers;
 }
 
-static u32 getAPIVersion()
+static u32 GetApiVersion()
 {
   u32 supported_version;
   u32 used_version = VK_API_VERSION_1_0;
@@ -237,7 +237,7 @@ VkInstance VulkanContext::CreateVulkanInstance(WindowSystemType wstype, bool ena
   app_info.applicationVersion = VK_MAKE_VERSION(5, 0, 0);
   app_info.pEngineName = "Dolphin Emulator";
   app_info.engineVersion = VK_MAKE_VERSION(5, 0, 0);
-  app_info.apiVersion = getAPIVersion();
+  app_info.apiVersion = GetApiVersion();
 
   *out_vk_api_version = app_info.apiVersion;
 
@@ -322,7 +322,7 @@ bool VulkanContext::SelectInstanceExtensions(std::vector<const char*>* extension
                  extension_properties.extensionName);
   }
 
-  auto AddExtension = [&](const char* name, bool required) {
+  auto add_extension = [&](const char* name, bool required) {
     bool extension_supported =
         Common::Contains(available_extension_list, std::string_view{name},
                          &VkExtensionProperties::extensionName) ||
@@ -343,7 +343,7 @@ bool VulkanContext::SelectInstanceExtensions(std::vector<const char*>* extension
   };
 
   // Common extensions
-  if (wstype != WindowSystemType::Headless && !AddExtension(VK_KHR_SURFACE_EXTENSION_NAME, true))
+  if (wstype != WindowSystemType::Headless && !add_extension(VK_KHR_SURFACE_EXTENSION_NAME, true))
   {
     return false;
   }
@@ -356,7 +356,7 @@ bool VulkanContext::SelectInstanceExtensions(std::vector<const char*>* extension
   }
 #endif
 #if defined(VK_USE_PLATFORM_XLIB_KHR)
-  if (wstype == WindowSystemType::X11 && !AddExtension(VK_KHR_XLIB_SURFACE_EXTENSION_NAME, true))
+  if (wstype == WindowSystemType::X11 && !add_extension(VK_KHR_XLIB_SURFACE_EXTENSION_NAME, true))
   {
     return false;
   }
@@ -375,14 +375,14 @@ bool VulkanContext::SelectInstanceExtensions(std::vector<const char*>* extension
   }
 #endif
 
-  AddExtension(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, false);
+  add_extension(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, false);
   if (wstype != WindowSystemType::Headless)
   {
-    AddExtension(VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME, false);
+    add_extension(VK_KHR_GET_SURFACE_CAPABILITIES_2_EXTENSION_NAME, false);
   }
 
   // VK_EXT_debug_utils
-  if (AddExtension(VK_EXT_DEBUG_UTILS_EXTENSION_NAME, false))
+  if (add_extension(VK_EXT_DEBUG_UTILS_EXTENSION_NAME, false))
   {
     g_backend_info.bSupportsSettingObjectNames = true;
   }
@@ -636,7 +636,7 @@ bool VulkanContext::SelectDeviceExtensions(bool enable_surface)
   for (const auto& extension_properties : available_extension_list)
     INFO_LOG_FMT(VIDEO, "Available extension: {}", extension_properties.extensionName);
 
-  auto AddExtension = [&](const char* name, bool required) {
+  auto add_extension = [&](const char* name, bool required) {
     if (Common::Contains(available_extension_list, std::string_view{name},
                          &VkExtensionProperties::extensionName))
     {
@@ -651,7 +651,7 @@ bool VulkanContext::SelectDeviceExtensions(bool enable_surface)
     return false;
   };
 
-  if (enable_surface && !AddExtension(VK_KHR_SWAPCHAIN_EXTENSION_NAME, true))
+  if (enable_surface && !add_extension(VK_KHR_SWAPCHAIN_EXTENSION_NAME, true))
     return false;
 
 #ifdef SUPPORTS_VULKAN_EXCLUSIVE_FULLSCREEN
@@ -660,8 +660,8 @@ bool VulkanContext::SelectDeviceExtensions(bool enable_surface)
     INFO_LOG_FMT(VIDEO, "Using VK_EXT_full_screen_exclusive for exclusive fullscreen.");
 #endif
 
-  AddExtension(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, false);
-  AddExtension(VK_EXT_MEMORY_BUDGET_EXTENSION_NAME, false);
+  add_extension(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME, false);
+  add_extension(VK_EXT_MEMORY_BUDGET_EXTENSION_NAME, false);
 
   return true;
 }
@@ -747,14 +747,14 @@ bool VulkanContext::CreateDevice(VkSurfaceKHR surface, bool enable_validation_la
   device_info.pNext = nullptr;
   device_info.flags = 0;
 
-  static constexpr float queue_priorities[] = {1.0f};
+  static constexpr float QUEUE_PRIORITIES[] = {1.0f};
   VkDeviceQueueCreateInfo graphics_queue_info = {};
   graphics_queue_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
   graphics_queue_info.pNext = nullptr;
   graphics_queue_info.flags = 0;
   graphics_queue_info.queueFamilyIndex = m_graphics_queue_family_index;
   graphics_queue_info.queueCount = 1;
-  graphics_queue_info.pQueuePriorities = queue_priorities;
+  graphics_queue_info.pQueuePriorities = QUEUE_PRIORITIES;
 
   VkDeviceQueueCreateInfo present_queue_info = {};
   present_queue_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -762,7 +762,7 @@ bool VulkanContext::CreateDevice(VkSurfaceKHR surface, bool enable_validation_la
   present_queue_info.flags = 0;
   present_queue_info.queueFamilyIndex = m_present_queue_family_index;
   present_queue_info.queueCount = 1;
-  present_queue_info.pQueuePriorities = queue_priorities;
+  present_queue_info.pQueuePriorities = QUEUE_PRIORITIES;
 
   std::array<VkDeviceQueueCreateInfo, 2> queue_infos = {{
       graphics_queue_info,

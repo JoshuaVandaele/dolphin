@@ -374,15 +374,15 @@ void VideoInterfaceManager::RegisterMMIO(MMIO::Mapping* mmio, u32 base)
                  MMIO::ComplexWrite<u16>([](Core::System& system, u32, u16 val) {
                    auto& vi = system.GetVideoInterface();
 
-                   UVIDisplayControlRegister tmpConfig(val);
-                   vi.m_display_control_register.ENB = tmpConfig.ENB;
-                   vi.m_display_control_register.NIN = tmpConfig.NIN;
-                   vi.m_display_control_register.DLR = tmpConfig.DLR;
-                   vi.m_display_control_register.LE0 = tmpConfig.LE0;
-                   vi.m_display_control_register.LE1 = tmpConfig.LE1;
-                   vi.m_display_control_register.FMT = tmpConfig.FMT;
+                   UVIDisplayControlRegister tmp_config(val);
+                   vi.m_display_control_register.ENB = tmp_config.ENB;
+                   vi.m_display_control_register.NIN = tmp_config.NIN;
+                   vi.m_display_control_register.DLR = tmp_config.DLR;
+                   vi.m_display_control_register.LE0 = tmp_config.LE0;
+                   vi.m_display_control_register.LE1 = tmp_config.LE1;
+                   vi.m_display_control_register.FMT = tmp_config.FMT;
 
-                   if (tmpConfig.RST)
+                   if (tmp_config.RST)
                    {
                      // shuffle2 clear all data, reset to default vals, and enter idle mode
                      vi.m_display_control_register.RST = 0;
@@ -746,7 +746,7 @@ u32 VideoInterfaceManager::GetTicksPerField() const
 
 void VideoInterfaceManager::LogField(FieldType field, u32 xfb_address) const
 {
-  static constexpr std::array<const char*, 2> field_type_names{{"Odd", "Even"}};
+  static constexpr std::array<const char*, 2> FIELD_TYPE_NAMES{{"Odd", "Even"}};
 
   const std::array<const UVIVBlankTimingRegister*, 2> vert_timing{{
       &m_vblank_timing_odd,
@@ -761,7 +761,7 @@ void VideoInterfaceManager::LogField(FieldType field, u32 xfb_address) const
                 xfb_address, m_picture_configuration.WPL, m_picture_configuration.STD,
                 m_vertical_timing_register.EQU, vert_timing[field_index]->PRB,
                 m_vertical_timing_register.ACV, vert_timing[field_index]->PSB,
-                field_type_names[field_index]);
+                FIELD_TYPE_NAMES[field_index]);
 
   DEBUG_LOG_FMT(VIDEOINTERFACE, "HorizScaling: {:04x} | fbwidth {} | {} | {}",
                 m_horizontal_scaling.Hex, m_fb_width.Hex, GetTicksPerEvenField(),
@@ -778,23 +778,23 @@ void VideoInterfaceManager::OutputField(FieldType field, u64 ticks)
   // Are there an odd number of half-lines per field (definition of interlaced video)
   bool interlaced_video_mode = (GetHalfLinesPerEvenField() & 1) == 1;
 
-  u32 fbStride = m_picture_configuration.STD * 16;
-  u32 fbWidth = m_picture_configuration.WPL * 16;
-  u32 fbHeight = m_vertical_timing_register.ACV;
+  u32 fb_stride = m_picture_configuration.STD * 16;
+  u32 fb_width = m_picture_configuration.WPL * 16;
+  u32 fb_height = m_vertical_timing_register.ACV;
 
-  u32 xfbAddr;
+  u32 xfb_addr;
 
   if (field == FieldType::Even)
   {
-    xfbAddr = GetXFBAddressBottom();
+    xfb_addr = GetXFBAddressBottom();
   }
   else
   {
-    xfbAddr = GetXFBAddressTop();
+    xfb_addr = GetXFBAddressTop();
   }
 
   // Multiply the stride by 2 to get the byte offset for each subsequent line.
-  fbStride *= 2;
+  fb_stride *= 2;
 
   if (potentially_interlaced_xfb && interlaced_video_mode &&
       Config::Get(Config::GFX_HACK_FORCE_PROGRESSIVE))
@@ -806,8 +806,8 @@ void VideoInterfaceManager::OutputField(FieldType field, u64 ticks)
     // forcing progressive output: there's usually useful data in the
     // other field.  One notable exception: the title screen teaser
     // videos in Metroid Prime don't render correctly using this hack.
-    fbStride /= 2;
-    fbHeight *= 2;
+    fb_stride /= 2;
+    fb_height *= 2;
 
     // PRB for the different fields should only ever differ by 1 in
     // interlaced mode, and which is less determines which field
@@ -815,25 +815,25 @@ void VideoInterfaceManager::OutputField(FieldType field, u64 ticks)
     // offset the xfb by (-stride_of_one_line) to get the start
     // address of the full xfb.
     if (field == FieldType::Odd && m_vblank_timing_odd.PRB == m_vblank_timing_even.PRB + 1 &&
-        xfbAddr)
+        xfb_addr)
     {
-      xfbAddr -= fbStride;
+      xfb_addr -= fb_stride;
     }
 
     if (field == FieldType::Even && m_vblank_timing_odd.PRB == m_vblank_timing_even.PRB - 1 &&
-        xfbAddr)
+        xfb_addr)
     {
-      xfbAddr -= fbStride;
+      xfb_addr -= fb_stride;
     }
   }
 
-  LogField(field, xfbAddr);
+  LogField(field, xfb_addr);
 
   // Outputting the entire frame using a single set of VI register values isn't accurate, as games
   // can change the register values during scanout. To correctly emulate the scanout process, we
   // would need to collate all changes to the VI registers during scanout.
-  if (xfbAddr)
-    g_video_backend->Video_OutputXFB(xfbAddr, fbWidth, fbStride, fbHeight, ticks);
+  if (xfb_addr)
+    g_video_backend->Video_OutputXFB(xfb_addr, fb_width, fb_stride, fb_height, ticks);
 }
 
 void VideoInterfaceManager::BeginField(FieldType field, u64 ticks)
@@ -867,12 +867,12 @@ void VideoInterfaceManager::EndField(FieldType field, u64 ticks)
 // Run when: When a frame is scanned (progressive/interlace)
 void VideoInterfaceManager::Update(u64 ticks)
 {
-  constexpr u32 odd_field_begin = 0;
+  constexpr u32 ODD_FIELD_BEGIN = 0;
   // Even-field begins where the odd-field ends.
   const u32 even_field_begin = GetHalfLinesPerOddField();
 
   const bool is_at_field_boundary =
-      m_half_line_count == odd_field_begin || m_half_line_count == even_field_begin;
+      m_half_line_count == ODD_FIELD_BEGIN || m_half_line_count == even_field_begin;
 
   // Movie's frame counter should be updated before actually rendering the frame,
   // in case frame counter display is enabled

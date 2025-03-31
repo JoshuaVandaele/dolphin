@@ -208,7 +208,7 @@ public:
   {
     // Unfortunately there doesn't seem to be a "standard" orientation
     // so we can't use "Accel Up"-like names.
-    constexpr std::array<const char*, 6> motion_data_names = {{
+    constexpr std::array<const char*, 6> MOTION_DATA_NAMES = {{
         "Accel X",
         "Accel Y",
         "Accel Z",
@@ -221,7 +221,7 @@ public:
     static_assert(ABS_X == 0, "evdev axis value sanity check");
     static_assert(ABS_RX == 3, "evdev axis value sanity check");
 
-    return std::string(motion_data_names[m_code]) + (m_range < 0 ? '-' : '+');
+    return std::string(MOTION_DATA_NAMES[m_code]) + (m_range < 0 ? '-' : '+');
   }
 
   bool IsDetectable() const override { return false; }
@@ -537,11 +537,11 @@ bool evdevDevice::AddNode(std::string devnode, int fd, libevdev* dev)
 
     // evdev resolution is specified in "g"s and deg/s.
     // Convert these to m/s/s and rad/s.
-    constexpr ControlState accel_scale = MathUtil::GRAVITY_ACCELERATION;
-    constexpr ControlState gyro_scale = MathUtil::TAU / 360;
+    constexpr ControlState ACCEL_SCALE = MathUtil::GRAVITY_ACCELERATION;
+    constexpr ControlState GYRO_SCALE = MathUtil::TAU / 360;
 
-    add_motion_inputs(ABS_X, accel_scale);
-    add_motion_inputs(ABS_RX, gyro_scale);
+    add_motion_inputs(ABS_X, ACCEL_SCALE);
+    add_motion_inputs(ABS_RX, GYRO_SCALE);
 
     return true;
   }

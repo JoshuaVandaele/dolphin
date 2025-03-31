@@ -65,9 +65,9 @@ VertexShaderUid GetVertexShaderUid()
     // CHECKME: does this only work for regular tex gen types?
     if (uid_data->dualTexTrans_enabled && texinfo.texgentype == TexGenType::Regular)
     {
-      auto& postInfo = uid_data->postMtxInfo[i];
-      postInfo.index = xfmem.postMtxInfo[i].index;
-      postInfo.normalize = xfmem.postMtxInfo[i].normalize;
+      auto& post_info = uid_data->postMtxInfo[i];
+      post_info.index = xfmem.postMtxInfo[i].index;
+      post_info.normalize = xfmem.postMtxInfo[i].normalize;
     }
   }
 
@@ -122,14 +122,14 @@ static void WriteTexCoordTransforms(APIType api_type, const ShaderHostConfig& ho
       // CHECKME: does this only work for regular tex gen types?
       if (uid_data->dualTexTrans_enabled)
       {
-        auto& postInfo = uid_data->postMtxInfo[i];
+        auto& post_info = uid_data->postMtxInfo[i];
 
         out.Write("\tvec4 P0 = " I_POSTTRANSFORMMATRICES "[{}];\n"
                   "\tvec4 P1 = " I_POSTTRANSFORMMATRICES "[{}];\n"
                   "\tvec4 P2 = " I_POSTTRANSFORMMATRICES "[{}];\n",
-                  postInfo.index & 0x3f, (postInfo.index + 1) & 0x3f, (postInfo.index + 2) & 0x3f);
+                  post_info.index & 0x3f, (post_info.index + 1) & 0x3f, (post_info.index + 2) & 0x3f);
 
-        if (postInfo.normalize)
+        if (post_info.normalize)
           out.Write("\tresult = normalize(result);\n");
 
         // multiply by postmatrix

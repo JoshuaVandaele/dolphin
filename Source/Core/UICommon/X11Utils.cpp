@@ -52,10 +52,10 @@ XRRConfiguration::XRRConfiguration(Display* _dpy, Window _win)
       fullMode(0), fs_fb_width(0), fs_fb_height(0), fs_fb_width_mm(0), fs_fb_height_mm(0),
       bValid(true), bIsFullscreen(false)
 {
-  int XRRMajorVersion, XRRMinorVersion;
+  int xrr_major_version, xrr_minor_version;
 
-  if (!XRRQueryVersion(dpy, &XRRMajorVersion, &XRRMinorVersion) ||
-      (XRRMajorVersion < 1 || (XRRMajorVersion == 1 && XRRMinorVersion < 3)))
+  if (!XRRQueryVersion(dpy, &xrr_major_version, &xrr_minor_version) ||
+      (xrr_major_version < 1 || (xrr_major_version == 1 && xrr_minor_version < 3)))
   {
     WARN_LOG_FMT(VIDEO, "XRRExtension not supported.");
     bValid = false;
@@ -70,7 +70,7 @@ XRRConfiguration::XRRConfiguration(Display* _dpy, Window _win)
   fb_width_mm = DisplayWidthMM(dpy, screen);
   fb_height_mm = DisplayHeightMM(dpy, screen);
 
-  INFO_LOG_FMT(VIDEO, "XRRExtension-Version {}.{}", XRRMajorVersion, XRRMinorVersion);
+  INFO_LOG_FMT(VIDEO, "XRRExtension-Version {}.{}", xrr_major_version, xrr_minor_version);
   Update();
 }
 
@@ -108,20 +108,20 @@ void XRRConfiguration::Update()
   fullMode = 0;
 
   // Get the resolution setings for fullscreen mode
-  unsigned int fullWidth, fullHeight;
+  unsigned int full_width, full_height;
   char* output_name = nullptr;
-  char auxFlag = '\0';
+  char aux_flag = '\0';
   if (fullscreen_display_res.find(':') == std::string::npos)
   {
-    fullWidth = fb_width;
-    fullHeight = fb_height;
+    full_width = fb_width;
+    full_height = fb_height;
   }
   else
   {
-    sscanf(fullscreen_display_res.c_str(), "%m[^:]: %ux%u%c", &output_name, &fullWidth, &fullHeight,
-           &auxFlag);
+    sscanf(fullscreen_display_res.c_str(), "%m[^:]: %ux%u%c", &output_name, &full_width, &full_height,
+           &aux_flag);
   }
-  bool want_interlaced = ('i' == auxFlag);
+  bool want_interlaced = ('i' == aux_flag);
 
   for (int i = 0; i < screenResources->noutput; i++)
   {
@@ -140,7 +140,7 @@ void XRRConfiguration::Update()
             output_name = strdup(output_info->name);
             Config::SetBaseOrCurrent(
                 Config::MAIN_FULLSCREEN_DISPLAY_RES,
-                fmt::format("{}: {}x{}", output_info->name, fullWidth, fullHeight));
+                fmt::format("{}: {}x{}", output_info->name, full_width, full_height));
           }
           outputInfo = output_info;
           crtcInfo = crtc_info;
@@ -150,8 +150,8 @@ void XRRConfiguration::Update()
             {
               if (output_info->modes[j] == screenResources->modes[k].id)
               {
-                if (fullWidth == screenResources->modes[k].width &&
-                    fullHeight == screenResources->modes[k].height &&
+                if (full_width == screenResources->modes[k].width &&
+                    full_height == screenResources->modes[k].height &&
                     want_interlaced == !!(screenResources->modes[k].modeFlags & RR_Interlace))
                 {
                   fullMode = screenResources->modes[k].id;
@@ -186,7 +186,7 @@ void XRRConfiguration::Update()
 
   if (outputInfo && crtcInfo && fullMode)
   {
-    INFO_LOG_FMT(VIDEO, "Fullscreen Resolution {}x{}", fullWidth, fullHeight);
+    INFO_LOG_FMT(VIDEO, "Fullscreen Resolution {}x{}", full_width, full_height);
   }
   else
   {
@@ -241,13 +241,13 @@ void XRRConfiguration::AddResolutions(std::vector<std::string>& resos)
           if (output_info->modes[j] == screenResources->modes[k].id)
           {
             bool interlaced = !!(screenResources->modes[k].modeFlags & RR_Interlace);
-            const std::string strRes = std::string(output_info->name) + ": " +
+            const std::string str_res = std::string(output_info->name) + ": " +
                                        std::string(screenResources->modes[k].name) +
                                        (interlaced ? "i" : "");
             // Only add unique resolutions
-            if (!Common::Contains(resos, strRes))
+            if (!Common::Contains(resos, str_res))
             {
-              resos.push_back(strRes);
+              resos.push_back(str_res);
             }
           }
         }

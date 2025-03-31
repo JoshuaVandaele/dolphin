@@ -14,7 +14,7 @@
 
 namespace
 {
-void TexCoord_Read_Dummy(VertexLoader* loader)
+void TexCoordReadDummy(VertexLoader* loader)
 {
   loader->m_tcIndex++;
 }
@@ -32,7 +32,7 @@ constexpr float TCScale(float val, [[maybe_unused]] float scale)
 }
 
 template <typename T, int N>
-void TexCoord_ReadDirect(VertexLoader* loader)
+void TexCoordReadDirect(VertexLoader* loader)
 {
   const auto scale = loader->m_tcScale[loader->m_tcIndex];
 
@@ -43,7 +43,7 @@ void TexCoord_ReadDirect(VertexLoader* loader)
 }
 
 template <typename I, typename T, int N>
-void TexCoord_ReadIndex(VertexLoader* loader)
+void TexCoordReadIndex(VertexLoader* loader)
 {
   static_assert(std::is_unsigned<I>::value, "Only unsigned I is sane!");
 
@@ -63,7 +63,7 @@ using ComponentCountRow = Common::EnumMap<TPipelineFunction, TexComponentCount::
 using ComponentFormatTable = Common::EnumMap<ComponentCountRow, ComponentFormat::InvalidFloat7>;
 using Table = Common::EnumMap<ComponentFormatTable, VertexComponentFormat::Index16>;
 
-constexpr Table s_table_read_tex_coord = {
+constexpr Table S_TABLE_READ_TEX_COORD = {
     ComponentFormatTable({
         ComponentCountRow(nullptr, nullptr),
         ComponentCountRow(nullptr, nullptr),
@@ -75,34 +75,34 @@ constexpr Table s_table_read_tex_coord = {
         ComponentCountRow(nullptr, nullptr),
     }),
     ComponentFormatTable({
-        ComponentCountRow(TexCoord_ReadDirect<u8, 1>, TexCoord_ReadDirect<u8, 2>),
-        ComponentCountRow(TexCoord_ReadDirect<s8, 1>, TexCoord_ReadDirect<s8, 2>),
-        ComponentCountRow(TexCoord_ReadDirect<u16, 1>, TexCoord_ReadDirect<u16, 2>),
-        ComponentCountRow(TexCoord_ReadDirect<s16, 1>, TexCoord_ReadDirect<s16, 2>),
-        ComponentCountRow(TexCoord_ReadDirect<float, 1>, TexCoord_ReadDirect<float, 2>),
-        ComponentCountRow(TexCoord_ReadDirect<float, 1>, TexCoord_ReadDirect<float, 2>),
-        ComponentCountRow(TexCoord_ReadDirect<float, 1>, TexCoord_ReadDirect<float, 2>),
-        ComponentCountRow(TexCoord_ReadDirect<float, 1>, TexCoord_ReadDirect<float, 2>),
+        ComponentCountRow(TexCoordReadDirect<u8, 1>, TexCoordReadDirect<u8, 2>),
+        ComponentCountRow(TexCoordReadDirect<s8, 1>, TexCoordReadDirect<s8, 2>),
+        ComponentCountRow(TexCoordReadDirect<u16, 1>, TexCoordReadDirect<u16, 2>),
+        ComponentCountRow(TexCoordReadDirect<s16, 1>, TexCoordReadDirect<s16, 2>),
+        ComponentCountRow(TexCoordReadDirect<float, 1>, TexCoordReadDirect<float, 2>),
+        ComponentCountRow(TexCoordReadDirect<float, 1>, TexCoordReadDirect<float, 2>),
+        ComponentCountRow(TexCoordReadDirect<float, 1>, TexCoordReadDirect<float, 2>),
+        ComponentCountRow(TexCoordReadDirect<float, 1>, TexCoordReadDirect<float, 2>),
     }),
     ComponentFormatTable({
-        ComponentCountRow(TexCoord_ReadIndex<u8, u8, 1>, TexCoord_ReadIndex<u8, u8, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u8, s8, 1>, TexCoord_ReadIndex<u8, s8, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u8, u16, 1>, TexCoord_ReadIndex<u8, u16, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u8, s16, 1>, TexCoord_ReadIndex<u8, s16, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u8, float, 1>, TexCoord_ReadIndex<u8, float, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u8, float, 1>, TexCoord_ReadIndex<u8, float, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u8, float, 1>, TexCoord_ReadIndex<u8, float, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u8, float, 1>, TexCoord_ReadIndex<u8, float, 2>),
+        ComponentCountRow(TexCoordReadIndex<u8, u8, 1>, TexCoordReadIndex<u8, u8, 2>),
+        ComponentCountRow(TexCoordReadIndex<u8, s8, 1>, TexCoordReadIndex<u8, s8, 2>),
+        ComponentCountRow(TexCoordReadIndex<u8, u16, 1>, TexCoordReadIndex<u8, u16, 2>),
+        ComponentCountRow(TexCoordReadIndex<u8, s16, 1>, TexCoordReadIndex<u8, s16, 2>),
+        ComponentCountRow(TexCoordReadIndex<u8, float, 1>, TexCoordReadIndex<u8, float, 2>),
+        ComponentCountRow(TexCoordReadIndex<u8, float, 1>, TexCoordReadIndex<u8, float, 2>),
+        ComponentCountRow(TexCoordReadIndex<u8, float, 1>, TexCoordReadIndex<u8, float, 2>),
+        ComponentCountRow(TexCoordReadIndex<u8, float, 1>, TexCoordReadIndex<u8, float, 2>),
     }),
     ComponentFormatTable({
-        ComponentCountRow(TexCoord_ReadIndex<u16, u8, 1>, TexCoord_ReadIndex<u16, u8, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u16, s8, 1>, TexCoord_ReadIndex<u16, s8, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u16, u16, 1>, TexCoord_ReadIndex<u16, u16, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u16, s16, 1>, TexCoord_ReadIndex<u16, s16, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u16, float, 1>, TexCoord_ReadIndex<u16, float, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u16, float, 1>, TexCoord_ReadIndex<u16, float, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u16, float, 1>, TexCoord_ReadIndex<u16, float, 2>),
-        ComponentCountRow(TexCoord_ReadIndex<u16, float, 1>, TexCoord_ReadIndex<u16, float, 2>),
+        ComponentCountRow(TexCoordReadIndex<u16, u8, 1>, TexCoordReadIndex<u16, u8, 2>),
+        ComponentCountRow(TexCoordReadIndex<u16, s8, 1>, TexCoordReadIndex<u16, s8, 2>),
+        ComponentCountRow(TexCoordReadIndex<u16, u16, 1>, TexCoordReadIndex<u16, u16, 2>),
+        ComponentCountRow(TexCoordReadIndex<u16, s16, 1>, TexCoordReadIndex<u16, s16, 2>),
+        ComponentCountRow(TexCoordReadIndex<u16, float, 1>, TexCoordReadIndex<u16, float, 2>),
+        ComponentCountRow(TexCoordReadIndex<u16, float, 1>, TexCoordReadIndex<u16, float, 2>),
+        ComponentCountRow(TexCoordReadIndex<u16, float, 1>, TexCoordReadIndex<u16, float, 2>),
+        ComponentCountRow(TexCoordReadIndex<u16, float, 1>, TexCoordReadIndex<u16, float, 2>),
     }),
 };
 }  // Anonymous namespace
@@ -111,10 +111,10 @@ TPipelineFunction VertexLoader_TextCoord::GetFunction(VertexComponentFormat type
                                                       ComponentFormat format,
                                                       TexComponentCount elements)
 {
-  return s_table_read_tex_coord[type][format][elements];
+  return S_TABLE_READ_TEX_COORD[type][format][elements];
 }
 
 TPipelineFunction VertexLoader_TextCoord::GetDummyFunction()
 {
-  return TexCoord_Read_Dummy;
+  return TexCoordReadDummy;
 }

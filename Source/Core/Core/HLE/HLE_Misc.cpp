@@ -68,15 +68,15 @@ void GeckoReturnTrampoline(const Core::CPUThreadGuard& guard)
   auto& ppc_state = system.GetPPCState();
 
   // Stack frame is built in GeckoCode.cpp, Gecko::RunCodeHandler.
-  const u32 SP = ppc_state.gpr[1];
-  ppc_state.gpr[1] = PowerPC::MMU::HostRead_U32(guard, SP + 8);
-  ppc_state.npc = PowerPC::MMU::HostRead_U32(guard, SP + 12);
-  LR(ppc_state) = PowerPC::MMU::HostRead_U32(guard, SP + 16);
-  ppc_state.cr.Set(PowerPC::MMU::HostRead_U32(guard, SP + 20));
+  const u32 sp = ppc_state.gpr[1];
+  ppc_state.gpr[1] = PowerPC::MMU::HostRead_U32(guard, sp + 8);
+  ppc_state.npc = PowerPC::MMU::HostRead_U32(guard, sp + 12);
+  LR(ppc_state) = PowerPC::MMU::HostRead_U32(guard, sp + 16);
+  ppc_state.cr.Set(PowerPC::MMU::HostRead_U32(guard, sp + 20));
   for (int i = 0; i < 14; ++i)
   {
-    ppc_state.ps[i].SetBoth(PowerPC::MMU::HostRead_U64(guard, SP + 24 + 2 * i * sizeof(u64)),
-                            PowerPC::MMU::HostRead_U64(guard, SP + 24 + (2 * i + 1) * sizeof(u64)));
+    ppc_state.ps[i].SetBoth(PowerPC::MMU::HostRead_U64(guard, sp + 24 + 2 * i * sizeof(u64)),
+                            PowerPC::MMU::HostRead_U64(guard, sp + 24 + (2 * i + 1) * sizeof(u64)));
   }
 }
 }  // namespace HLE_Misc

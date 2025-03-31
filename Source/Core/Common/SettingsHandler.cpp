@@ -34,27 +34,27 @@ const SettingsBuffer& SettingsWriter::GetBytes() const
 
 std::string SettingsReader::GetValue(std::string_view key) const
 {
-  constexpr char delim[] = "\n";
-  std::string toFind = std::string(delim).append(key).append("=");
-  size_t found = m_decoded.find(toFind);
+  constexpr char DELIM[] = "\n";
+  std::string to_find = std::string(DELIM).append(key).append("=");
+  size_t found = m_decoded.find(to_find);
 
   if (found != std::string_view::npos)
   {
-    size_t delimFound = m_decoded.find(delim, found + toFind.length());
-    if (delimFound == std::string_view::npos)
-      delimFound = m_decoded.length() - 1;
-    return m_decoded.substr(found + toFind.length(), delimFound - (found + toFind.length()));
+    size_t delim_found = m_decoded.find(DELIM, found + to_find.length());
+    if (delim_found == std::string_view::npos)
+      delim_found = m_decoded.length() - 1;
+    return m_decoded.substr(found + to_find.length(), delim_found - (found + to_find.length()));
   }
   else
   {
-    toFind = std::string(key).append("=");
-    found = m_decoded.find(toFind);
+    to_find = std::string(key).append("=");
+    found = m_decoded.find(to_find);
     if (found == 0)
     {
-      size_t delimFound = m_decoded.find(delim, found + toFind.length());
-      if (delimFound == std::string_view::npos)
-        delimFound = m_decoded.length() - 1;
-      return m_decoded.substr(found + toFind.length(), delimFound - (found + toFind.length()));
+      size_t delim_found = m_decoded.find(DELIM, found + to_find.length());
+      if (delim_found == std::string_view::npos)
+        delim_found = m_decoded.length() - 1;
+      return m_decoded.substr(found + to_find.length(), delim_found - (found + to_find.length()));
     }
   }
 

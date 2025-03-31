@@ -20,7 +20,7 @@ FreeLookCamera g_freelook_camera;
 
 namespace
 {
-std::string to_string(FreeLook::ControlType type)
+std::string ToString(FreeLook::ControlType type)
 {
   switch (type)
   {
@@ -316,8 +316,8 @@ void FreeLookCamera::DoState(PointerWrap& p)
     }
     else if (p.IsReadMode())
     {
-      const std::string old_type_name = old_type ? to_string(*old_type) : "";
-      const std::string loaded_type_name = m_current_type ? to_string(*m_current_type) : "";
+      const std::string old_type_name = old_type ? ToString(*old_type) : "";
+      const std::string loaded_type_name = m_current_type ? ToString(*m_current_type) : "";
       const std::string message =
           fmt::format("State needs same free look camera type. Settings value '{}', loaded value "
                       "'{}'.  Aborting load state",

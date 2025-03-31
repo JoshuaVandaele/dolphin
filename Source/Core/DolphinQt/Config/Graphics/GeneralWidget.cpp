@@ -195,16 +195,16 @@ void GeneralWidget::BackendWarning()
 {
   if (Config::GetActiveLayerForConfig(Config::MAIN_GFX_BACKEND) == Config::LayerType::Base)
   {
-    auto warningMessage = VideoBackendBase::GetAvailableBackends()[m_backend_combo->currentIndex()]
+    auto warning_message = VideoBackendBase::GetAvailableBackends()[m_backend_combo->currentIndex()]
                               ->GetWarningMessage();
-    if (warningMessage)
+    if (warning_message)
     {
       ModalMessageBox confirm_sw(this);
 
       confirm_sw.setIcon(QMessageBox::Warning);
       confirm_sw.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
       confirm_sw.setWindowTitle(tr("Confirm backend change"));
-      confirm_sw.setText(tr(warningMessage->c_str()));
+      confirm_sw.setText(tr(warning_message->c_str()));
 
       SetQWidgetWindowDecorations(&confirm_sw);
       if (confirm_sw.exec() != QMessageBox::Yes)

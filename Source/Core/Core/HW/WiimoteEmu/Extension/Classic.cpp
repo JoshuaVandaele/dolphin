@@ -18,9 +18,9 @@
 
 namespace WiimoteEmu
 {
-constexpr std::array<u8, 6> classic_id{{0x00, 0x00, 0xa4, 0x20, 0x01, 0x01}};
+constexpr std::array<u8, 6> CLASSIC_ID{{0x00, 0x00, 0xa4, 0x20, 0x01, 0x01}};
 
-constexpr std::array<u16, 9> classic_button_bitmasks{{
+constexpr std::array<u16, 9> CLASSIC_BUTTON_BITMASKS{{
     Classic::BUTTON_A,
     Classic::BUTTON_B,
     Classic::BUTTON_X,
@@ -35,12 +35,12 @@ constexpr std::array<u16, 9> classic_button_bitmasks{{
     Classic::BUTTON_HOME,
 }};
 
-constexpr std::array<u16, 2> classic_trigger_bitmasks{{
+constexpr std::array<u16, 2> CLASSIC_TRIGGER_BITMASKS{{
     Classic::TRIGGER_L,
     Classic::TRIGGER_R,
 }};
 
-constexpr std::array<u16, 4> classic_dpad_bitmasks{{
+constexpr std::array<u16, 4> CLASSIC_DPAD_BITMASKS{{
     Classic::PAD_UP,
     Classic::PAD_DOWN,
     Classic::PAD_LEFT,
@@ -61,11 +61,11 @@ Classic::Classic() : Extension1stParty("Classic", _trans("Classic Controller"))
   m_buttons->AddInput(Translatability::DoNotTranslate, HOME_BUTTON, "HOME");
 
   // sticks
-  constexpr auto gate_radius = ControlState(STICK_GATE_RADIUS) / CAL_STICK_RADIUS;
+  constexpr auto GATE_RADIUS = ControlState(STICK_GATE_RADIUS) / CAL_STICK_RADIUS;
   groups.emplace_back(m_left_stick =
-                          new ControllerEmu::OctagonAnalogStick(LEFT_STICK_GROUP, gate_radius));
+                          new ControllerEmu::OctagonAnalogStick(LEFT_STICK_GROUP, GATE_RADIUS));
   groups.emplace_back(m_right_stick =
-                          new ControllerEmu::OctagonAnalogStick(RIGHT_STICK_GROUP, gate_radius));
+                          new ControllerEmu::OctagonAnalogStick(RIGHT_STICK_GROUP, GATE_RADIUS));
 
   // triggers
   groups.emplace_back(m_triggers = new ControllerEmu::MixedTriggers(TRIGGERS_GROUP));
@@ -115,7 +115,7 @@ void Classic::BuildDesiredExtensionState(DesiredExtensionState* target_state)
   // triggers
   {
     ControlState triggers[2] = {0, 0};
-    m_triggers->GetState(&buttons, classic_trigger_bitmasks.data(), triggers,
+    m_triggers->GetState(&buttons, CLASSIC_TRIGGER_BITMASKS.data(), triggers,
                          m_input_override_function);
 
     const u8 lt = MapFloat<u8>(triggers[0], 0, 0, TRIGGER_RANGE);
@@ -126,8 +126,8 @@ void Classic::BuildDesiredExtensionState(DesiredExtensionState* target_state)
   }
 
   // buttons and dpad
-  m_buttons->GetState(&buttons, classic_button_bitmasks.data(), m_input_override_function);
-  m_dpad->GetState(&buttons, classic_dpad_bitmasks.data(), m_input_override_function);
+  m_buttons->GetState(&buttons, CLASSIC_BUTTON_BITMASKS.data(), m_input_override_function);
+  m_dpad->GetState(&buttons, CLASSIC_DPAD_BITMASKS.data(), m_input_override_function);
 
   classic_data.SetButtons(buttons);
 
@@ -143,7 +143,7 @@ void Classic::Reset()
 {
   EncryptedExtension::Reset();
 
-  m_reg.identifier = classic_id;
+  m_reg.identifier = CLASSIC_ID;
 
   // Build calibration data:
   // All values are to 8 bits of precision.

@@ -319,8 +319,8 @@ void CoreTimingManager::Advance()
   auto& power_pc = m_system.GetPowerPC();
   auto& ppc_state = power_pc.GetPPCState();
 
-  int cyclesExecuted = m_globals.slice_length - DowncountToCycles(ppc_state.downcount);
-  m_globals.global_timer += cyclesExecuted;
+  int cycles_executed = m_globals.slice_length - DowncountToCycles(ppc_state.downcount);
+  m_globals.global_timer += cycles_executed;
   m_last_oc_factor = m_config_oc_factor;
   m_globals.last_OC_factor_inverted = m_config_oc_inv_factor;
   m_globals.slice_length = MAX_SLICE_LENGTH;

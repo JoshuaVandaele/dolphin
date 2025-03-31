@@ -55,8 +55,8 @@ QoSSession::~QoSSession()
 QoSSession::QoSSession(ENetPeer* peer, int tos_val)
 {
 #if defined(__linux__)
-  constexpr int priority = 7;
-  setsockopt(peer->host->socket, SOL_SOCKET, SO_PRIORITY, &priority, sizeof(priority));
+  constexpr int PRIORITY = 7;
+  setsockopt(peer->host->socket, SOL_SOCKET, SO_PRIORITY, &PRIORITY, sizeof(PRIORITY));
 #endif
 
   m_success = setsockopt(peer->host->socket, IPPROTO_IP, IP_TOS, &tos_val, sizeof(tos_val)) == 0;

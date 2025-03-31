@@ -143,8 +143,8 @@ bool CPUCull::AreAllVerticesCulled(VertexLoaderBase* loader, OpcodeDecoder::Prim
   ASSERT_MSG(VIDEO, primitive < OpcodeDecoder::Primitive::GX_DRAW_LINES,
              "CPUCull should not be called on lines or points");
   const u32 stride = loader->m_native_vtx_decl.stride;
-  const bool posHas3Elems = loader->m_native_vtx_decl.position.components >= 3;
-  const bool perVertexPosMtx = loader->m_native_vtx_decl.posmtx.enable;
+  const bool pos_has3_elems = loader->m_native_vtx_decl.position.components >= 3;
+  const bool per_vertex_pos_mtx = loader->m_native_vtx_decl.posmtx.enable;
   if (m_transform_buffer_size < count) [[unlikely]]
   {
     u32 new_size = MathUtil::NextPowerOf2(count);
@@ -157,13 +157,13 @@ bool CPUCull::AreAllVerticesCulled(VertexLoaderBase* loader, OpcodeDecoder::Prim
   auto& system = Core::System::GetInstance();
   system.GetVertexShaderManager().SetProjectionMatrix(system.GetXFStateManager());
 
-  static constexpr Common::EnumMap<CullMode, CullMode::All> cullmode_invert = {
+  static constexpr Common::EnumMap<CullMode, CullMode::All> CULLMODE_INVERT = {
       CullMode::None, CullMode::Front, CullMode::Back, CullMode::All};
 
   CullMode cullmode = bpmem.genMode.cullmode;
   if (xfmem.viewport.ht > 0)  // See videosoftware Clipper.cpp:IsBackface
-    cullmode = cullmode_invert[cullmode];
-  const TransformFunction transform = m_transform_table[posHas3Elems][perVertexPosMtx];
+    cullmode = CULLMODE_INVERT[cullmode];
+  const TransformFunction transform = m_transform_table[pos_has3_elems][per_vertex_pos_mtx];
   transform(m_transform_buffer.get(), src, stride, count);
   const CullFunction cull = m_cull_table[primitive][cullmode];
   return cull(m_transform_buffer.get(), count);

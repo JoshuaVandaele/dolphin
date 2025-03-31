@@ -188,7 +188,7 @@ constexpr Common::ec::Signature DEFAULT_SIGNATURE = {{
 }};
 // clang-format on
 
-const std::map<std::pair<IOSC::ObjectType, IOSC::ObjectSubType>, size_t> s_type_to_size_map = {{
+const std::map<std::pair<IOSC::ObjectType, IOSC::ObjectSubType>, size_t> S_TYPE_TO_SIZE_MAP = {{
     {{IOSC::TYPE_SECRET_KEY, IOSC::ObjectSubType::AES128}, 16},
     {{IOSC::TYPE_SECRET_KEY, IOSC::ObjectSubType::MAC}, 20},
     {{IOSC::TYPE_SECRET_KEY, IOSC::ObjectSubType::ECC233}, 30},
@@ -201,8 +201,8 @@ const std::map<std::pair<IOSC::ObjectType, IOSC::ObjectSubType>, size_t> s_type_
 
 static size_t GetSizeForType(IOSC::ObjectType type, IOSC::ObjectSubType subtype)
 {
-  const auto iterator = s_type_to_size_map.find({type, subtype});
-  return iterator != s_type_to_size_map.end() ? iterator->second : 0;
+  const auto iterator = S_TYPE_TO_SIZE_MAP.find({type, subtype});
+  return iterator != S_TYPE_TO_SIZE_MAP.end() ? iterator->second : 0;
 }
 
 IOSC::IOSC(ConsoleType console_type) : m_console_type(console_type)
@@ -698,8 +698,8 @@ bool IOSC::HasOwnership(Handle handle, u32 pid) const
 
 bool IOSC::IsDefaultHandle(Handle handle) const
 {
-  constexpr Handle last_default_handle = HANDLE_NEW_COMMON_KEY;
-  return handle <= last_default_handle || handle == HANDLE_ROOT_KEY;
+  constexpr Handle LAST_DEFAULT_HANDLE = HANDLE_NEW_COMMON_KEY;
+  return handle <= LAST_DEFAULT_HANDLE || handle == HANDLE_ROOT_KEY;
 }
 
 void IOSC::DoState(PointerWrap& p)

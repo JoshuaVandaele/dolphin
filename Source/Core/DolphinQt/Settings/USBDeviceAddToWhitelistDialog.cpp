@@ -61,18 +61,18 @@ void USBDeviceAddToWhitelistDialog::InitControls()
 
   entry_hbox_layout = new QHBoxLayout();
   device_vid_textbox = new QLineEdit();
-  QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-  sizePolicy.setHorizontalStretch(1);
-  sizePolicy.setVerticalStretch(0);
-  sizePolicy.setHeightForWidth(device_vid_textbox->sizePolicy().hasHeightForWidth());
-  device_vid_textbox->setSizePolicy(sizePolicy);
+  QSizePolicy size_policy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+  size_policy.setHorizontalStretch(1);
+  size_policy.setVerticalStretch(0);
+  size_policy.setHeightForWidth(device_vid_textbox->sizePolicy().hasHeightForWidth());
+  device_vid_textbox->setSizePolicy(size_policy);
 
   // entry_hbox_layout->setWidget(2, QFormLayout::LabelRole, device_vid_textbox);
   entry_hbox_layout->addWidget(device_vid_textbox);
 
   device_pid_textbox = new QLineEdit();
-  sizePolicy.setHeightForWidth(device_pid_textbox->sizePolicy().hasHeightForWidth());
-  device_pid_textbox->setSizePolicy(sizePolicy);
+  size_policy.setHeightForWidth(device_pid_textbox->sizePolicy().hasHeightForWidth());
+  device_pid_textbox->setSizePolicy(size_policy);
 
   entry_hbox_layout->addWidget(device_pid_textbox);
   main_layout->addLayout(entry_hbox_layout);

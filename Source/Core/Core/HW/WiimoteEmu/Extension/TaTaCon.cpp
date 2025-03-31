@@ -17,19 +17,19 @@
 
 namespace WiimoteEmu
 {
-constexpr std::array<u8, 6> tatacon_id{{0x00, 0x00, 0xa4, 0x20, 0x01, 0x11}};
+constexpr std::array<u8, 6> TATACON_ID{{0x00, 0x00, 0xa4, 0x20, 0x01, 0x11}};
 
-constexpr std::array<u8, 2> center_bitmasks{{
+constexpr std::array<u8, 2> CENTER_BITMASKS{{
     TaTaCon::CENTER_LEFT,
     TaTaCon::CENTER_RIGHT,
 }};
 
-constexpr std::array<u8, 2> rim_bitmasks{{
+constexpr std::array<u8, 2> RIM_BITMASKS{{
     TaTaCon::RIM_LEFT,
     TaTaCon::RIM_RIGHT,
 }};
 
-constexpr std::array<const char*, 2> position_names{{
+constexpr std::array<const char*, 2> POSITION_NAMES{{
     _trans("Left"),
     _trans("Right"),
 }};
@@ -41,12 +41,12 @@ TaTaCon::TaTaCon() : Extension3rdParty("TaTaCon", _trans("Taiko Drum"))
 
   // i18n: Refers to the "center" of a TaTaCon drum.
   groups.emplace_back(m_center = new ControllerEmu::Buttons(_trans("Center")));
-  for (auto& name : position_names)
+  for (auto& name : POSITION_NAMES)
     m_center->AddInput(Translatability::Translate, name);
 
   // i18n: Refers to the "rim" of a TaTaCon drum.
   groups.emplace_back(m_rim = new ControllerEmu::Buttons(_trans("Rim")));
-  for (auto& name : position_names)
+  for (auto& name : POSITION_NAMES)
     m_rim->AddInput(Translatability::Translate, name);
 }
 
@@ -54,8 +54,8 @@ void TaTaCon::BuildDesiredExtensionState(DesiredExtensionState* target_state)
 {
   DesiredState tatacon_data = {};
 
-  m_center->GetState(&tatacon_data.state, center_bitmasks.data(), m_input_override_function);
-  m_rim->GetState(&tatacon_data.state, rim_bitmasks.data(), m_input_override_function);
+  m_center->GetState(&tatacon_data.state, CENTER_BITMASKS.data(), m_input_override_function);
+  m_rim->GetState(&tatacon_data.state, RIM_BITMASKS.data(), m_input_override_function);
 
   target_state->data = tatacon_data;
 }
@@ -77,7 +77,7 @@ void TaTaCon::Reset()
   EncryptedExtension::Reset();
 
   m_reg = {};
-  m_reg.identifier = tatacon_id;
+  m_reg.identifier = TATACON_ID;
 
   // Assuming calibration is 0xff filled like every other 3rd-party extension.
   m_reg.calibration.fill(0xff);

@@ -245,29 +245,29 @@ void StopAudioDump(Core::System& system)
 void IncreaseVolume(Core::System& system, unsigned short offset)
 {
   Config::SetBaseOrCurrent(Config::MAIN_AUDIO_MUTED, false);
-  int currentVolume = Config::Get(Config::MAIN_AUDIO_VOLUME);
-  currentVolume += offset;
-  if (currentVolume > AUDIO_VOLUME_MAX)
-    currentVolume = AUDIO_VOLUME_MAX;
-  Config::SetBaseOrCurrent(Config::MAIN_AUDIO_VOLUME, currentVolume);
+  int current_volume = Config::Get(Config::MAIN_AUDIO_VOLUME);
+  current_volume += offset;
+  if (current_volume > AUDIO_VOLUME_MAX)
+    current_volume = AUDIO_VOLUME_MAX;
+  Config::SetBaseOrCurrent(Config::MAIN_AUDIO_VOLUME, current_volume);
   UpdateSoundStream(system);
 }
 
 void DecreaseVolume(Core::System& system, unsigned short offset)
 {
   Config::SetBaseOrCurrent(Config::MAIN_AUDIO_MUTED, false);
-  int currentVolume = Config::Get(Config::MAIN_AUDIO_VOLUME);
-  currentVolume -= offset;
-  if (currentVolume < AUDIO_VOLUME_MIN)
-    currentVolume = AUDIO_VOLUME_MIN;
-  Config::SetBaseOrCurrent(Config::MAIN_AUDIO_VOLUME, currentVolume);
+  int current_volume = Config::Get(Config::MAIN_AUDIO_VOLUME);
+  current_volume -= offset;
+  if (current_volume < AUDIO_VOLUME_MIN)
+    current_volume = AUDIO_VOLUME_MIN;
+  Config::SetBaseOrCurrent(Config::MAIN_AUDIO_VOLUME, current_volume);
   UpdateSoundStream(system);
 }
 
 void ToggleMuteVolume(Core::System& system)
 {
-  bool isMuted = Config::Get(Config::MAIN_AUDIO_MUTED);
-  Config::SetBaseOrCurrent(Config::MAIN_AUDIO_MUTED, !isMuted);
+  bool is_muted = Config::Get(Config::MAIN_AUDIO_MUTED);
+  Config::SetBaseOrCurrent(Config::MAIN_AUDIO_MUTED, !is_muted);
   UpdateSoundStream(system);
 }
 }  // namespace AudioCommon

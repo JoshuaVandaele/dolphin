@@ -13,21 +13,21 @@
 #include "VideoCommon/VideoConfig.h"
 #include "VideoCommon/XFMemory.h"
 
-constexpr Common::EnumMap<const char*, PrimitiveType::TriangleStrip> primitives_ogl{
+constexpr Common::EnumMap<const char*, PrimitiveType::TriangleStrip> PRIMITIVES_OGL{
     "points",
     "lines",
     "triangles",
     "triangles",
 };
-constexpr Common::EnumMap<const char*, PrimitiveType::TriangleStrip> primitives_d3d{
+constexpr Common::EnumMap<const char*, PrimitiveType::TriangleStrip> PRIMITIVES_D3D{
     "point",
     "line",
     "triangle",
     "triangle",
 };
 
-constexpr Common::EnumMap<u32, PrimitiveType::TriangleStrip> vertex_in_map{1u, 2u, 3u, 3u};
-constexpr Common::EnumMap<u32, PrimitiveType::TriangleStrip> vertex_out_map{4u, 4u, 4u, 3u};
+constexpr Common::EnumMap<u32, PrimitiveType::TriangleStrip> VERTEX_IN_MAP{1u, 2u, 3u, 3u};
+constexpr Common::EnumMap<u32, PrimitiveType::TriangleStrip> VERTEX_OUT_MAP{4u, 4u, 4u, 3u};
 
 bool geometry_shader_uid_data::IsPassthrough() const
 {
@@ -65,8 +65,8 @@ ShaderCode GenerateGeometryShaderCode(APIType api_type, const ShaderHostConfig& 
   const bool ssaa = host_config.ssaa;
   const bool stereo = host_config.stereo;
   const auto primitive_type = static_cast<PrimitiveType>(uid_data->primitive_type);
-  const u32 vertex_in = vertex_in_map[primitive_type];
-  u32 vertex_out = vertex_out_map[primitive_type];
+  const u32 vertex_in = VERTEX_IN_MAP[primitive_type];
+  u32 vertex_out = VERTEX_OUT_MAP[primitive_type];
 
   if (wireframe)
     vertex_out++;
@@ -76,14 +76,14 @@ ShaderCode GenerateGeometryShaderCode(APIType api_type, const ShaderHostConfig& 
     // Insert layout parameters
     if (host_config.backend_gs_instancing)
     {
-      out.Write("layout({}, invocations = {}) in;\n", primitives_ogl[primitive_type],
+      out.Write("layout({}, invocations = {}) in;\n", PRIMITIVES_OGL[primitive_type],
                 stereo ? 2 : 1);
       out.Write("layout({}_strip, max_vertices = {}) out;\n", wireframe ? "line" : "triangle",
                 vertex_out);
     }
     else
     {
-      out.Write("layout({}) in;\n", primitives_ogl[primitive_type]);
+      out.Write("layout({}) in;\n", PRIMITIVES_OGL[primitive_type]);
       out.Write("layout({}_strip, max_vertices = {}) out;\n", wireframe ? "line" : "triangle",
                 stereo ? vertex_out * 2 : vertex_out);
     }
@@ -145,13 +145,13 @@ ShaderCode GenerateGeometryShaderCode(APIType api_type, const ShaderHostConfig& 
       out.Write("[maxvertexcount({})]\n[instance({})]\n", vertex_out, stereo ? 2 : 1);
       out.Write("void main({} VS_OUTPUT o[{}], inout {}Stream<VertexData> output, in uint "
                 "InstanceID : SV_GSInstanceID)\n{{\n",
-                primitives_d3d[primitive_type], vertex_in, wireframe ? "Line" : "Triangle");
+                PRIMITIVES_D3D[primitive_type], vertex_in, wireframe ? "Line" : "Triangle");
     }
     else
     {
       out.Write("[maxvertexcount({})]\n", stereo ? vertex_out * 2 : vertex_out);
       out.Write("void main({} VS_OUTPUT o[{}], inout {}Stream<VertexData> output)\n{{\n",
-                primitives_d3d[primitive_type], vertex_in, wireframe ? "Line" : "Triangle");
+                PRIMITIVES_D3D[primitive_type], vertex_in, wireframe ? "Line" : "Triangle");
     }
 
     out.Write("\tVertexData ps;\n");

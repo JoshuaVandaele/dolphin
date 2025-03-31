@@ -280,13 +280,13 @@ void Statistics::DisplayScissor()
       draw_list->AddLine(vec(x1, y1), vec(x1, y1, 0, -8), col);
     }
   };
-  static std::array<ImVec4, 6> COLORS = {
+  static std::array<ImVec4, 6> colors = {
       ImVec4(1, 0, 0, 1), ImVec4(1, 1, 0, 1), ImVec4(0, 1, 0, 1),
       ImVec4(0, 1, 1, 1), ImVec4(0, 0, 1, 1), ImVec4(1, 0, 1, 1),
   };
   const auto draw_scissor = [&](size_t index) {
     const auto& info = scissors[index];
-    const ImU32 col = ImGui::GetColorU32(COLORS[index % COLORS.size()]);
+    const ImU32 col = ImGui::GetColorU32(colors[index % colors.size()]);
     int x_off = info.scissor_off.x << 1;
     int y_off = info.scissor_off.y << 1;
     // Subtract 2048 instead of 1024, because when x_off is large enough we need to show two
@@ -343,7 +343,7 @@ void Statistics::DisplayScissor()
     int y0 = info.scissor_tl.y - info.viewport_top;
     int y1 = info.scissor_br.y - info.viewport_left;
     ImGui::TableNextColumn();
-    ImGui::TextColored(COLORS[index % COLORS.size()], "%zu", index + 1);
+    ImGui::TextColored(colors[index % colors.size()], "%zu", index + 1);
     ImGui::TableNextColumn();
     ImGui::Text("%d", x0);
     ImGui::TableNextColumn();
@@ -369,7 +369,7 @@ void Statistics::DisplayScissor()
     {
       // The last entry in the sorted list of results is the one that is used by hardware backends
       const u8 new_alpha = (i == info.m_result.size() - 1) ? 0x80 : 0x40;
-      const ImU32 col = ImGui::GetColorU32(COLORS[index % COLORS.size()]);
+      const ImU32 col = ImGui::GetColorU32(colors[index % colors.size()]);
       const ImU32 new_col = (col & ~IM_COL32_A_MASK) | (new_alpha << IM_COL32_A_SHIFT);
 
       const auto& r = info.m_result[i];
@@ -385,7 +385,7 @@ void Statistics::DisplayScissor()
     if (show_raw_scissors)
     {
       ImGui::TableNextColumn();
-      ImGui::TextColored(COLORS[index % COLORS.size()], "Raw");
+      ImGui::TextColored(colors[index % colors.size()], "Raw");
       ImGui::TableNextColumn();
       ImGui::Text("%d", info.scissor_tl.x_full.Value());
       ImGui::TableNextColumn();
@@ -404,12 +404,12 @@ void Statistics::DisplayScissor()
   const auto scissor_table_skip_row = [&](size_t index) {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    ImGui::TextColored(COLORS[index % COLORS.size()], "%zu", index + 1);
+    ImGui::TextColored(colors[index % colors.size()], "%zu", index + 1);
     if (show_raw_scissors)
     {
       ImGui::TableNextRow();
       ImGui::TableNextColumn();
-      ImGui::TextColored(COLORS[index % COLORS.size()], "Raw");
+      ImGui::TextColored(colors[index % colors.size()], "Raw");
     }
   };
   constexpr auto NUM_VIEWPORT_COLUMNS = 5;
@@ -424,7 +424,7 @@ void Statistics::DisplayScissor()
   const auto draw_viewport_table_row = [&](size_t index) {
     const auto& info = scissors[index];
     ImGui::TableNextColumn();
-    ImGui::TextColored(COLORS[index % COLORS.size()], "%zu", index + 1);
+    ImGui::TextColored(colors[index % colors.size()], "%zu", index + 1);
     ImGui::TableNextColumn();
     ImGui::Text("%.1f", info.viewport_left);
     ImGui::TableNextColumn();
@@ -437,7 +437,7 @@ void Statistics::DisplayScissor()
   const auto viewport_table_skip_row = [&](size_t index) {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    ImGui::TextColored(COLORS[index % COLORS.size()], "%zu", index + 1);
+    ImGui::TextColored(colors[index % colors.size()], "%zu", index + 1);
   };
   if (current_scissor == 0)
   {

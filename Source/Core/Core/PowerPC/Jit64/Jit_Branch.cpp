@@ -51,11 +51,11 @@ void Jit64::rfi(UGeckoInstruction inst)
 
   // See Interpreter rfi for details
   const u32 mask = 0x87C0FFFF;
-  const u32 clearMSR13 = 0xFFFBFFFF;  // Mask used to clear the bit MSR[13]
+  const u32 clear_ms_r13 = 0xFFFBFFFF;  // Mask used to clear the bit MSR[13]
   // MSR = ((MSR & ~mask) | (SRR1 & mask)) & clearMSR13;
-  AND(32, PPCSTATE(msr), Imm32((~mask) & clearMSR13));
+  AND(32, PPCSTATE(msr), Imm32((~mask) & clear_ms_r13));
   MOV(32, R(RSCRATCH), PPCSTATE_SRR1);
-  AND(32, R(RSCRATCH), Imm32(mask & clearMSR13));
+  AND(32, R(RSCRATCH), Imm32(mask & clear_ms_r13));
   OR(32, PPCSTATE(msr), R(RSCRATCH));
 
   // Call MSRUpdated to update feature_flags. Only the bits that come from SRR1
@@ -191,20 +191,20 @@ void Jit64::bcx(UGeckoInstruction inst)
 
   // USES_CR
 
-  FixupBranch pCTRDontBranch;
+  FixupBranch p_ctr_dont_branch;
   if ((inst.BO & BO_DONT_DECREMENT_FLAG) == 0)  // Decrement and test CTR
   {
     SUB(32, PPCSTATE_CTR, Imm8(1));
     if (inst.BO & BO_BRANCH_IF_CTR_0)
-      pCTRDontBranch = J_CC(CC_NZ, Jump::Near);
+      p_ctr_dont_branch = J_CC(CC_NZ, Jump::Near);
     else
-      pCTRDontBranch = J_CC(CC_Z, Jump::Near);
+      p_ctr_dont_branch = J_CC(CC_Z, Jump::Near);
   }
 
-  FixupBranch pConditionDontBranch;
+  FixupBranch p_condition_dont_branch;
   if ((inst.BO & BO_DONT_CHECK_CONDITION) == 0)  // Test a CR bit
   {
-    pConditionDontBranch =
+    p_condition_dont_branch =
         JumpIfCRFieldBit(inst.BI >> 2, 3 - (inst.BI & 3), !(inst.BO_2 & BO_BRANCH_IF_TRUE));
   }
 
@@ -254,9 +254,9 @@ void Jit64::bcx(UGeckoInstruction inst)
   }
 
   if ((inst.BO & BO_DONT_CHECK_CONDITION) == 0)
-    SetJumpTarget(pConditionDontBranch);
+    SetJumpTarget(p_condition_dont_branch);
   if ((inst.BO & BO_DONT_DECREMENT_FLAG) == 0)
-    SetJumpTarget(pCTRDontBranch);
+    SetJumpTarget(p_ctr_dont_branch);
 
   if (!analyzer.HasOption(PPCAnalyst::PPCAnalyzer::OPTION_CONDITIONAL_CONTINUE))
   {
@@ -360,20 +360,20 @@ void Jit64::bclrx(UGeckoInstruction inst)
   INSTRUCTION_START
   JITDISABLE(bJITBranchOff);
 
-  FixupBranch pCTRDontBranch;
+  FixupBranch p_ctr_dont_branch;
   if ((inst.BO & BO_DONT_DECREMENT_FLAG) == 0)  // Decrement and test CTR
   {
     SUB(32, PPCSTATE_CTR, Imm8(1));
     if (inst.BO & BO_BRANCH_IF_CTR_0)
-      pCTRDontBranch = J_CC(CC_NZ, Jump::Near);
+      p_ctr_dont_branch = J_CC(CC_NZ, Jump::Near);
     else
-      pCTRDontBranch = J_CC(CC_Z, Jump::Near);
+      p_ctr_dont_branch = J_CC(CC_Z, Jump::Near);
   }
 
-  FixupBranch pConditionDontBranch;
+  FixupBranch p_condition_dont_branch;
   if ((inst.BO & BO_DONT_CHECK_CONDITION) == 0)  // Test a CR bit
   {
-    pConditionDontBranch =
+    p_condition_dont_branch =
         JumpIfCRFieldBit(inst.BI >> 2, 3 - (inst.BI & 3), !(inst.BO_2 & BO_BRANCH_IF_TRUE));
   }
 
@@ -420,9 +420,9 @@ void Jit64::bclrx(UGeckoInstruction inst)
   }
 
   if ((inst.BO & BO_DONT_CHECK_CONDITION) == 0)
-    SetJumpTarget(pConditionDontBranch);
+    SetJumpTarget(p_condition_dont_branch);
   if ((inst.BO & BO_DONT_DECREMENT_FLAG) == 0)
-    SetJumpTarget(pCTRDontBranch);
+    SetJumpTarget(p_ctr_dont_branch);
 
   if (!analyzer.HasOption(PPCAnalyst::PPCAnalyzer::OPTION_CONDITIONAL_CONTINUE))
   {

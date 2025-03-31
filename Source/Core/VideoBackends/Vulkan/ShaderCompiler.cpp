@@ -94,11 +94,11 @@ static std::string GetShaderCode(std::string_view source, std::string_view heade
   std::string full_source_code;
   if (!header.empty())
   {
-    constexpr size_t subgroup_helper_header_length = std::size(SUBGROUP_HELPER_HEADER) - 1;
-    full_source_code.reserve(header.size() + subgroup_helper_header_length + source.size());
+    constexpr size_t SUBGROUP_HELPER_HEADER_LENGTH = std::size(SUBGROUP_HELPER_HEADER) - 1;
+    full_source_code.reserve(header.size() + SUBGROUP_HELPER_HEADER_LENGTH + source.size());
     full_source_code.append(header);
     if (g_vulkan_context->SupportsShaderSubgroupOperations())
-      full_source_code.append(SUBGROUP_HELPER_HEADER, subgroup_helper_header_length);
+      full_source_code.append(SUBGROUP_HELPER_HEADER, SUBGROUP_HELPER_HEADER_LENGTH);
     if (DriverDetails::HasBug(DriverDetails::BUG_INVERTED_IS_HELPER))
     {
       full_source_code.append("#define gl_HelperInvocation !gl_HelperInvocation "

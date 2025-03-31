@@ -53,13 +53,13 @@ enum
   NUM_INDICES = NUM_CLIPPED_VERTICES + 3
 };
 
-static OutputVertexData ClippedVertices[NUM_CLIPPED_VERTICES];
+static OutputVertexData clipped_vertices[NUM_CLIPPED_VERTICES];
 static OutputVertexData* Vertices[NUM_INDICES];
 
 void Init()
 {
   for (int i = 0; i < NUM_CLIPPED_VERTICES; ++i)
-    Vertices[i + 3] = &ClippedVertices[i];
+    Vertices[i + 3] = &clipped_vertices[i];
 }
 
 enum
@@ -270,18 +270,18 @@ static void ClipLine(int* indices)
   indices[0] = 0;
   indices[1] = 1;
 
-  int numVertices = 2;
+  int num_vertices = 2;
 
   if (clip_mask[0])
   {
-    indices[0] = numVertices;
-    AddInterpolatedVertex(t0, 0, 1, &numVertices);
+    indices[0] = num_vertices;
+    AddInterpolatedVertex(t0, 0, 1, &num_vertices);
   }
 
   if (clip_mask[1])
   {
-    indices[1] = numVertices;
-    AddInterpolatedVertex(t1, 1, 0, &numVertices);
+    indices[1] = num_vertices;
+    AddInterpolatedVertex(t1, 1, 0, &num_vertices);
   }
 }
 
@@ -330,7 +330,7 @@ void ProcessTriangle(OutputVertexData* v0, OutputVertexData* v1, OutputVertexDat
                               SKIP_FLAG, SKIP_FLAG, SKIP_FLAG, SKIP_FLAG, SKIP_FLAG, SKIP_FLAG,
                               SKIP_FLAG, SKIP_FLAG, SKIP_FLAG, SKIP_FLAG, SKIP_FLAG, SKIP_FLAG,
                               SKIP_FLAG, SKIP_FLAG, SKIP_FLAG};
-  int numIndices = 3;
+  int num_indices = 3;
 
   if (backface)
   {
@@ -362,9 +362,9 @@ void ProcessTriangle(OutputVertexData* v0, OutputVertexData* v1, OutputVertexDat
   }
 
   if (!skip_clipping)
-    ClipTriangle(indices, &numIndices);
+    ClipTriangle(indices, &num_indices);
 
-  for (int i = 0; i + 3 <= numIndices; i += 3)
+  for (int i = 0; i + 3 <= num_indices; i += 3)
   {
     ASSERT(i < NUM_INDICES);
     if (indices[i] != SKIP_FLAG)
@@ -419,7 +419,7 @@ void ProcessLine(OutputVertexData* lineV0, OutputVertexData* lineV1)
   Vertices[1] = lineV1;
 
   // point to a valid vertex to store to when clipping
-  Vertices[2] = &ClippedVertices[17];
+  Vertices[2] = &clipped_vertices[17];
 
   ClipLine(indices);
 
@@ -532,9 +532,9 @@ bool IsBackface(const OutputVertexData* v0, const OutputVertexData* v1, const Ou
   float w1 = v1->projectedPosition.w;
   float w2 = v2->projectedPosition.w;
 
-  float normalZDir = (x0 * w2 - x2 * w0) * y1 + (x2 * y0 - x0 * y2) * w1 + (y2 * w0 - y0 * w2) * x1;
+  float normal_z_dir = (x0 * w2 - x2 * w0) * y1 + (x2 * y0 - x0 * y2) * w1 + (y2 * w0 - y0 * w2) * x1;
 
-  bool backface = normalZDir <= 0.0f;
+  bool backface = normal_z_dir <= 0.0f;
   // Jimmie Johnson's Anything with an Engine has a positive viewport, while other games have a
   // negative viewport.  The positive viewport does not require vertices to be vertically mirrored,
   // but the backface test does need to be inverted for things to be drawn.
@@ -549,9 +549,9 @@ void PerspectiveDivide(OutputVertexData* vertex)
   Vec4& projected = vertex->projectedPosition;
   Vec3& screen = vertex->screenPosition;
 
-  float wInverse = 1.0f / projected.w;
-  screen.x = projected.x * wInverse * xfmem.viewport.wd + xfmem.viewport.xOrig;
-  screen.y = projected.y * wInverse * xfmem.viewport.ht + xfmem.viewport.yOrig;
-  screen.z = projected.z * wInverse * xfmem.viewport.zRange + xfmem.viewport.farZ;
+  float w_inverse = 1.0f / projected.w;
+  screen.x = projected.x * w_inverse * xfmem.viewport.wd + xfmem.viewport.xOrig;
+  screen.y = projected.y * w_inverse * xfmem.viewport.ht + xfmem.viewport.yOrig;
+  screen.z = projected.z * w_inverse * xfmem.viewport.zRange + xfmem.viewport.farZ;
 }
 }  // namespace Clipper

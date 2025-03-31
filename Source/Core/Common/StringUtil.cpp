@@ -85,7 +85,7 @@ std::string HexDump(const u8* data, size_t size)
 
 bool CharArrayFromFormatV(char* out, int outsize, const char* format, va_list args)
 {
-  int writtenCount;
+  int written_count;
 
 #ifdef _WIN32
   // You would think *printf are simple, right? Iterate on each character,
@@ -117,17 +117,17 @@ bool CharArrayFromFormatV(char* out, int outsize, const char* format, va_list ar
   writtenCount = _vsnprintf_l(out, outsize, format, c_locale, args);
 #else
 #if !defined(ANDROID) && !defined(__HAIKU__) && !defined(__OpenBSD__) && !defined(__NetBSD__)
-  locale_t previousLocale = uselocale(GetCLocale());
+  locale_t previous_locale = uselocale(GetCLocale());
 #endif
-  writtenCount = vsnprintf(out, outsize, format, args);
+  written_count = vsnprintf(out, outsize, format, args);
 #if !defined(ANDROID) && !defined(__HAIKU__) && !defined(__OpenBSD__) && !defined(__NetBSD__)
-  uselocale(previousLocale);
+  uselocale(previous_locale);
 #endif
 #endif
 
-  if (writtenCount > 0 && writtenCount < outsize)
+  if (written_count > 0 && written_count < outsize)
   {
-    out[writtenCount] = '\0';
+    out[written_count] = '\0';
     return true;
   }
   else
@@ -158,7 +158,7 @@ std::string StringFromFormatV(const char* format, va_list args)
   delete[] buf;
 #else
 #if !defined(ANDROID) && !defined(__HAIKU__) && !defined(__OpenBSD__) && !defined(__NetBSD__)
-  locale_t previousLocale = uselocale(GetCLocale());
+  locale_t previous_locale = uselocale(GetCLocale());
 #endif
   if (vasprintf(&buf, format, args) < 0)
   {
@@ -167,7 +167,7 @@ std::string StringFromFormatV(const char* format, va_list args)
   }
 
 #if !defined(ANDROID) && !defined(__HAIKU__) && !defined(__OpenBSD__) && !defined(__NetBSD__)
-  uselocale(previousLocale);
+  uselocale(previous_locale);
 #endif
 
   std::string temp = buf;
@@ -637,7 +637,7 @@ std::vector<std::string> CommandLineToUtf8Argv(const wchar_t* command_line)
 
 std::string GetEscapedHtml(std::string html)
 {
-  static constexpr std::array<std::array<const char*, 2>, 5> replacements{{
+  static constexpr std::array<std::array<const char*, 2>, 5> REPLACEMENTS{{
       // Escape ampersand first to avoid escaping the ampersands in other replacements
       {{"&", "&amp;"}},
       {{"<", "&lt;"}},
@@ -646,7 +646,7 @@ std::string GetEscapedHtml(std::string html)
       {{"'", "&apos;"}},
   }};
 
-  for (const auto& [unescaped, escaped] : replacements)
+  for (const auto& [unescaped, escaped] : REPLACEMENTS)
   {
     html = ReplaceAll(html, unescaped, escaped);
   }
