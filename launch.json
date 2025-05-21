@@ -24,8 +24,8 @@
       "target": "dolphin-emu",
       "arguments": "-d",
       "env": {
-        "QT_QPA_PLATFORM": "xcb",
-        "DOLPHIN_EMU_USERPATH": "${workspaceRoot}/build/Binaries/userpath"
+        "QT_QPA_PLATFORM": "xcb"
+        // "DOLPHIN_EMU_USERPATH": "${workspaceRoot}/build/Binaries/userpath"
       },
       "cwd": "${workspaceRoot}/build/Binaries",
       "valuesFormatting": "parseText",

@@ -39,8 +39,10 @@
         "-DRUSTFLAGS=-Ctarget-cpu=native -Cllvm-args=-enable-dfa-jump-thread",
         "-DCMAKE_BUILD_TYPE=Release",
         "-DUSE_SYSTEM_LIBS=OFF",
-        "-DUSE_SYSTEM_SDL2=ON",
-        "-G=Ninja"
+        "-DCMAKE_C_COMPILER=/usr/bin/gcc-13",
+        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-13",
+        "-G=Ninja",
+        "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
       ],
       "options": {
         "cwd": "${workspaceFolder}/build"
@@ -62,8 +64,10 @@
         "-DRUSTFLAGS=-Ctarget-cpu=native -Cllvm-args=-enable-dfa-jump-thread",
         "-DCMAKE_BUILD_TYPE=Debug",
         "-DUSE_SYSTEM_LIBS=OFF",
-        "-DUSE_SYSTEM_SDL2=ON",
-        "-G=Ninja"
+        "-DCMAKE_C_COMPILER=/usr/bin/gcc-13",
+        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-13",
+        "-G=Ninja",
+        "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
       ],
       "options": {
         "cwd": "${workspaceFolder}/build"
