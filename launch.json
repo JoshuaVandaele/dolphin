@@ -9,8 +9,8 @@
       "type": "gdb",
       "request": "launch",
       "target": "dolphin-emu",
+      "arguments": "-C Dolphin.Core.Fastmem=0",
       "env": {
-        "QT_QPA_PLATFORM": "xcb",
         "DOLPHIN_EMU_USERPATH": "${workspaceRoot}/build/Binaries/userpath"
       },
       "cwd": "${workspaceRoot}/build/Binaries",
@@ -22,10 +22,9 @@
       "type": "gdb",
       "request": "launch",
       "target": "dolphin-emu",
-      "arguments": "-d",
+      "arguments": "-d -C Dolphin.Core.Fastmem=0",
       "env": {
-        "QT_QPA_PLATFORM": "xcb"
-        // "DOLPHIN_EMU_USERPATH": "${workspaceRoot}/build/Binaries/userpath"
+        "DOLPHIN_EMU_USERPATH": "${workspaceRoot}/build/Binaries/userpath"
       },
       "cwd": "${workspaceRoot}/build/Binaries",
       "valuesFormatting": "parseText",
