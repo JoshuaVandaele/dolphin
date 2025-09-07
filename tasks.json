@@ -40,8 +40,8 @@
         "-DCMAKE_BUILD_TYPE=Release",
         "-DUSE_SYSTEM_LIBS=ON",
         "-DUSE_SYSTEM_LIBMGBA=OFF",
-        "-DCMAKE_C_COMPILER=/usr/bin/gcc-14",
-        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-14",
+        // "-DCMAKE_C_COMPILER=/usr/bin/gcc-14",
+        // "-DCMAKE_CXX_COMPILER=/usr/bin/g++-14",
         "-G=Ninja",
         "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
       ],
@@ -66,8 +66,8 @@
         "-DCMAKE_BUILD_TYPE=Debug",
         "-DUSE_SYSTEM_LIBS=ON",
         "-DUSE_SYSTEM_LIBMGBA=OFF",
-        "-DCMAKE_C_COMPILER=/usr/bin/gcc-14",
-        "-DCMAKE_CXX_COMPILER=/usr/bin/g++-14",
+        // "-DCMAKE_C_COMPILER=/usr/bin/gcc-14",
+        // "-DCMAKE_CXX_COMPILER=/usr/bin/g++-14",
         "-G=Ninja",
         "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
       ],
