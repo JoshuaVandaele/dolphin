@@ -78,6 +78,7 @@ PUBLIC
 PRIVATE
   fmt::fmt
   MINIZIP::minizip-ng
+  nlohmann_json::nlohmann_json
   pugixml
   ZLIB::ZLIB
 )

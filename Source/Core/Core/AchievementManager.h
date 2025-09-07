@@ -18,7 +18,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include <picojson.h>
+#include <nlohmann/json.hpp>
 
 #include <rcheevos/include/rc_api_runtime.h>
 #include <rcheevos/include/rc_api_user.h>
@@ -83,8 +83,8 @@ public:
   static constexpr std::string_view BLUE = "#0B71C1";
   static constexpr std::string_view APPROVED_LIST_FILENAME = "ApprovedInis.json";
   static const inline Common::SHA1::Digest APPROVED_LIST_HASH = {
-      0xEA, 0x2F, 0x74, 0xA1, 0x6C, 0xF3, 0xB5, 0xD4, 0x8A, 0xAF,
-      0x03, 0x30, 0x58, 0x2A, 0xE0, 0xF7, 0x0A, 0x88, 0x86, 0xB3};
+      0x61, 0xC8, 0xCD, 0x90, 0x0C, 0x8A, 0xCF, 0x0A, 0x21, 0xDC,
+      0x27, 0xE9, 0x14, 0xF0, 0xB4, 0x58, 0x85, 0x29, 0x3D, 0x9F};
 
   struct LeaderboardEntry
   {
@@ -189,7 +189,7 @@ private:
     std::unique_ptr<DiscIO::Volume> volume;
   };
 
-  static picojson::value LoadApprovedList();
+  static nlohmann::json LoadApprovedList();
 
   static void* FilereaderOpen(const char* path_utf8);
   static void FilereaderSeek(void* file_handle, int64_t offset, int origin);
@@ -277,7 +277,7 @@ private:
   std::chrono::steady_clock::time_point m_last_rp_time = std::chrono::steady_clock::now();
   std::chrono::steady_clock::time_point m_last_progress_message = std::chrono::steady_clock::now();
 
-  Common::Lazy<picojson::value> m_ini_root{LoadApprovedList};
+  Common::Lazy<nlohmann::json> m_ini_root{LoadApprovedList};
 
   std::unordered_map<AchievementId, LeaderboardStatus> m_leaderboard_map;
   bool m_challenges_updated = false;
