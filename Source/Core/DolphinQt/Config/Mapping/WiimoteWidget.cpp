@@ -196,6 +196,9 @@ void WiimoteWidget::PositionGroups()
   if (!m_svg_item || !m_renderer)
     return;
 
+  QRectF svg_rect = m_svg_item->sceneBoundingRect();
+  QRectF total_bounds = svg_rect;
+
   for (auto& group : m_button_groups)
   {
     QRectF group_bounds;
@@ -208,11 +211,36 @@ void WiimoteWidget::PositionGroups()
       group_bounds = group_bounds.isNull() ? elem_bounds : group_bounds.united(elem_bounds);
     }
 
-    QPointF center_in_svg = group_bounds.center();
-    QPointF scene_center = m_svg_item->mapToScene(center_in_svg);
+    QPointF group_center = m_svg_item->mapToScene(group_bounds.center());
     QRectF proxy_bounds = group.proxy->boundingRect();
-    QPointF offset = QPointF(proxy_bounds.width() / 2, proxy_bounds.height() / 2);
 
-    group.proxy->setPos(scene_center - offset);
+    QPointF new_pos;
+
+    switch (group.placement)
+    {
+    case ButtonGroup::Placement::Left:
+      new_pos.setX(group_bounds.left() + svg_rect.left() - proxy_bounds.width());
+      new_pos.setY(group_center.y() - proxy_bounds.height() / 2);
+      break;
+    case ButtonGroup::Placement::Right:
+      new_pos.setX(group_bounds.right() + (svg_rect.right() - group_bounds.right()));
+      new_pos.setY(group_center.y() - proxy_bounds.height() / 2);
+      break;
+    case ButtonGroup::Placement::Top:
+      new_pos.setX(group_center.x() - proxy_bounds.width() / 2);
+      new_pos.setY(group_bounds.top() + svg_rect.top() - proxy_bounds.height());
+      break;
+    case ButtonGroup::Placement::Bottom:
+      new_pos.setX(group_center.x() - proxy_bounds.width() / 2);
+      new_pos.setY(group_bounds.bottom() + (svg_rect.bottom() - group_bounds.bottom()));
+      break;
+    }
+
+    group.proxy->setPos(new_pos);
+
+    QRectF proxy_scene_rect = group.proxy->sceneBoundingRect();
+    total_bounds = total_bounds.united(proxy_scene_rect);
   }
+
+  m_scene->setSceneRect(total_bounds);
 }
