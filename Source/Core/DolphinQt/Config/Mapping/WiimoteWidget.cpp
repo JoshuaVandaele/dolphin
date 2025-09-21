@@ -63,7 +63,7 @@ void WiimoteWidget::CreateButtons()
   m_button_groups.push_back(power_group);
 
   ButtonGroup dpad_group;
-  dpad_group.placement = ButtonGroup::Placement::Left;
+  dpad_group.placement = ButtonGroup::Placement::Center;
   dpad_group.buttons.push_back(CreateButton("Up", "dpad_up"));
   dpad_group.buttons.push_back(CreateButton("Left", "dpad_left"));
   dpad_group.buttons.push_back(CreateButton("Right", "dpad_right"));
@@ -76,14 +76,14 @@ void WiimoteWidget::CreateButtons()
   m_button_groups.push_back(a_group);
 
   ButtonGroup menu_group;
-  menu_group.placement = ButtonGroup::Placement::Right;
+  menu_group.placement = ButtonGroup::Placement::Left;
   menu_group.buttons.push_back(CreateButton("+", "button_plus"));
   menu_group.buttons.push_back(CreateButton("HOME", "button_home"));
   menu_group.buttons.push_back(CreateButton("-", "button_minus"));
   m_button_groups.push_back(menu_group);
 
   ButtonGroup number_group;
-  number_group.placement = ButtonGroup::Placement::Bottom;
+  number_group.placement = ButtonGroup::Placement::Left;
   number_group.buttons.push_back(CreateButton("1", "button_one"));
   number_group.buttons.push_back(CreateButton("2", "button_two"));
   m_button_groups.push_back(number_group);
@@ -94,6 +94,7 @@ void WiimoteWidget::CreateGroups()
   for (auto& group : m_button_groups)
   {
     QWidget* group_widget = new QWidget();
+    group_widget->setAttribute(Qt::WA_TranslucentBackground);
     QGridLayout* layout = new QGridLayout(group_widget);
 
     QSet<int> x_values_set;
@@ -176,19 +177,57 @@ void WiimoteWidget::ScaleSvg()
   const QSizeF svg_size = m_renderer->defaultSize();
   const QSizeF view_size = m_view->viewport()->size();
 
-  const qreal scale_x = view_size.width() / svg_size.width();
-  const qreal scale_y = view_size.height() / svg_size.height();
+  double left_margin = 0;
+  double right_margin = 0;
+  double top_margin = 0;
+  double bottom_margin = 0;
+
+  for (const auto& group : m_button_groups)
+  {
+    if (!group.proxy)
+      continue;
+
+    const QRectF proxy_bounds = group.proxy->boundingRect();
+
+    switch (group.placement)
+    {
+    case ButtonGroup::Placement::Left:
+      left_margin = std::max(left_margin, proxy_bounds.width());
+      break;
+    case ButtonGroup::Placement::Right:
+      right_margin = std::max(right_margin, proxy_bounds.width());
+      break;
+    case ButtonGroup::Placement::Top:
+      top_margin = std::max(top_margin, proxy_bounds.height());
+      break;
+    case ButtonGroup::Placement::Bottom:
+      bottom_margin = std::max(bottom_margin, proxy_bounds.height());
+      break;
+    default:
+      break;
+    }
+  }
+
+  const int min_width = std::ceil(svg_size.width() + left_margin + right_margin);
+  const int min_height = std::ceil(svg_size.height() + top_margin + bottom_margin);
+  setMinimumSize(min_width, min_height);
+
+  const qreal effective_width = std::max(view_size.width() - left_margin - right_margin, 1.0);
+  const qreal effective_height = std::max(view_size.height() - top_margin - bottom_margin, 1.0);
+
+  const qreal scale_x = effective_width / svg_size.width();
+  const qreal scale_y = effective_height / svg_size.height();
   const qreal scale = qMin(scale_x, scale_y);
 
   QTransform transform;
   transform.scale(scale, scale);
   m_svg_item->setTransform(transform);
 
-  m_scene->setSceneRect(0, 0, view_size.width(), view_size.height());
-
-  const qreal x_offset = (view_size.width() - svg_size.width() * scale) / 2;
-  const qreal y_offset = (view_size.height() - svg_size.height() * scale) / 2;
+  const qreal x_offset = left_margin + (effective_width - svg_size.width() * scale) / 2;
+  const qreal y_offset = top_margin + (effective_height - svg_size.height() * scale) / 2;
   m_svg_item->setPos(x_offset, y_offset);
+
+  m_scene->setSceneRect(0, 0, view_size.width(), view_size.height());
 }
 
 void WiimoteWidget::PositionGroups()
@@ -204,8 +243,6 @@ void WiimoteWidget::PositionGroups()
   m_group_lines.clear();
 
   QRectF svg_rect = m_svg_item->sceneBoundingRect();
-  QRectF total_bounds = svg_rect;
-
   for (auto& group : m_button_groups)
   {
     QRectF group_bounds;
@@ -241,13 +278,27 @@ void WiimoteWidget::PositionGroups()
       new_pos.setX(group_center.x() - proxy_bounds.width() / 2);
       new_pos.setY(group_bounds.bottom() + (svg_rect.bottom() - group_bounds.bottom()));
       break;
+    case ButtonGroup::Placement::Center:
+      new_pos.setX(group_center.x() - proxy_bounds.width() / 2);
+      new_pos.setY(group_center.y() - proxy_bounds.height() / 2);
+      break;
     }
+
+    // clamp the position to be within the widget
+    const QRectF scene_rect = m_scene->sceneRect();
+    if (new_pos.x() < scene_rect.left())
+      new_pos.setX(scene_rect.left());
+    if (new_pos.y() < scene_rect.top())
+      new_pos.setY(scene_rect.top());
+    if (new_pos.x() + proxy_bounds.width() > scene_rect.right())
+      new_pos.setX(scene_rect.right() - proxy_bounds.width());
+    if (new_pos.y() + proxy_bounds.height() > scene_rect.bottom())
+      new_pos.setY(scene_rect.bottom() - proxy_bounds.height());
 
     group.proxy->setPos(new_pos);
 
     const QRectF proxy_rect = group.proxy->sceneBoundingRect();
-    QPointF line_start;
-
+    std::optional<QPointF> line_start;
     switch (group.placement)
     {
     case ButtonGroup::Placement::Left:
@@ -262,15 +313,16 @@ void WiimoteWidget::PositionGroups()
     case ButtonGroup::Placement::Bottom:
       line_start = QPointF(proxy_rect.center().x(), proxy_rect.top());
       break;
+    case ButtonGroup::Placement::Center:
+      break;
     }
 
-    QColor lineColor = palette().color(QPalette::WindowText);
-    auto* line = m_scene->addLine(QLineF(line_start, group_center), QPen(lineColor, 2));
-    line->setZValue(1);
-    m_group_lines.push_back(line);
-
-    total_bounds = total_bounds.united(proxy_rect);
+    if (line_start)
+    {
+      QColor lineColor = palette().color(QPalette::WindowText);
+      auto* line = m_scene->addLine(QLineF(*line_start, group_center), QPen(lineColor, 2));
+      line->setZValue(1);
+      m_group_lines.push_back(line);
+    }
   }
-
-  m_scene->setSceneRect(total_bounds);
 }

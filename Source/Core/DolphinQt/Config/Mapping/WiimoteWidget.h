@@ -39,7 +39,8 @@ private:
       Left,
       Right,
       Top,
-      Bottom
+      Bottom,
+      Center
     } placement;
     QGraphicsProxyWidget* proxy = nullptr;
   };

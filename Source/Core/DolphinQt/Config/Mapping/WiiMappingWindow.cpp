@@ -26,9 +26,7 @@ void WiiMappingWindow::CreateLayout()
 {
   auto* main_layout = new QHBoxLayout(this);
   main_layout->setAlignment(Qt::AlignCenter);
-  main_layout->addStretch();
   auto* mapping_widget = new WiimoteWidget(this);
   main_layout->addWidget(mapping_widget);
-  main_layout->addStretch();
   setLayout(main_layout);
 }
