@@ -31,7 +31,7 @@
 #include "Core/USBUtils.h"
 #include "Core/WiiUtils.h"
 
-#include "DolphinQt/Config/Mapping/MappingWindow.h"
+#include "DolphinQt/Config/Mapping/WiiMappingWindow.h"
 #include "DolphinQt/QtUtils/ModalMessageBox.h"
 #include "DolphinQt/QtUtils/NonDefaultQPushButton.h"
 #include "DolphinQt/QtUtils/QueueOnObject.h"
@@ -381,20 +381,18 @@ void WiimoteControllersWidget::OnWiimoteRefreshPressed()
 
 void WiimoteControllersWidget::OnWiimoteConfigure(size_t index)
 {
-  MappingWindow::Type type;
   switch (m_wiimote_boxes[index]->currentIndex())
   {
   case 0:  // None
   case 2:  // Real Wii Remote
     return;
   case 1:  // Emulated Wii Remote
-    type = MappingWindow::Type::MAPPING_WIIMOTE_EMU;
     break;
   default:
     return;
   }
 
-  MappingWindow* window = new MappingWindow(this, type, static_cast<int>(index));
+  WiiMappingWindow* window = new WiiMappingWindow(this, static_cast<int>(index));
   window->setAttribute(Qt::WA_DeleteOnClose, true);
   window->setWindowModality(Qt::WindowModality::WindowModal);
   window->show();

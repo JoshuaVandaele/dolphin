@@ -14,7 +14,7 @@ endif()
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Svg)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Svg SvgWidgets)
 message(STATUS "Found Qt version ${Qt6_VERSION}")
 
 set_property(TARGET Qt6::Core PROPERTY INTERFACE_COMPILE_FEATURES "")
@@ -162,6 +162,8 @@ add_executable(dolphin-emu
   Config/Mapping/MappingWidget.h
   Config/Mapping/MappingWindow.cpp
   Config/Mapping/MappingWindow.h
+  Config/Mapping/WiiMappingWindow.cpp
+  Config/Mapping/WiiMappingWindow.h
   Config/Mapping/WiimoteEmuExtension.cpp
   Config/Mapping/WiimoteEmuExtension.h
   Config/Mapping/WiimoteEmuExtensionMotionInput.cpp
@@ -329,6 +331,8 @@ add_executable(dolphin-emu
   QtUtils/PartiallyClosableTabWidget.h
   QtUtils/QtUtils.cpp
   QtUtils/QtUtils.h
+  QtUtils/ScalableSvgWidget.cpp
+  QtUtils/ScalableSvgWidget.h
   QtUtils/SetWindowDecorations.cpp
   QtUtils/SetWindowDecorations.h
   QtUtils/SignalBlocking.h
@@ -435,6 +439,7 @@ target_link_libraries(dolphin-emu
 PRIVATE
   core
   Qt6::Widgets
+  Qt6::SvgWidgets
   uicommon
   imgui
   implot
