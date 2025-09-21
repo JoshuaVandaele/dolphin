@@ -27,46 +27,35 @@ public:
 private:
   struct ButtonInfo
   {
-    enum class ButtonPlacement
+    QWidget* button;
+    QString svg_element_name;
+  };
+
+  struct ButtonGroup
+  {
+    std::vector<ButtonInfo> buttons;
+    enum class Placement
     {
       Left,
       Right,
       Top,
       Bottom
-    };
-    enum class LabelPlacement
-    {
-      Left,
-      Right,
-      Top,
-      Bottom,
-      Auto
-    };
-    QPushButton* button;
-    ButtonPlacement button_placement;
-    QLabel* label;
-    LabelPlacement label_placement;
-    QString svg_element_name;
-    int spacing;
-    QPoint offset;
-    QGraphicsProxyWidget* button_proxy = nullptr;
-    QGraphicsProxyWidget* label_proxy = nullptr;
+    } placement;
+    QGraphicsProxyWidget* proxy = nullptr;
   };
 
-  std::vector<ButtonInfo> m_buttons;
+  std::vector<ButtonGroup> m_button_groups;
 
   QGraphicsView* m_view;
   QGraphicsScene* m_scene;
   QGraphicsSvgItem* m_svg_item;
   QSvgRenderer* m_renderer;
 
-  void CreateButton(std::string label, std::string svg_element_name,
-                    ButtonInfo::ButtonPlacement button_placement,
-                    ButtonInfo::LabelPlacement label_placement = ButtonInfo::LabelPlacement::Auto,
-                    int spacing = 0, QPoint offset = QPoint());
+  ButtonInfo CreateButton(std::string label, std::string svg_element_name);
 
   void CreateLayout();
   void CreateButtons();
+  void CreateGroups();
   void ScaleSvg();
-  void PositionButtons();
+  void PositionGroups();
 };

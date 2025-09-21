@@ -4,117 +4,134 @@
 #include "WiimoteWidget.h"
 
 #include <QGraphicsEffect>
+#include <QGraphicsSvgItem>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPoint>
 #include <QPushButton>
-#include <qgraphicssvgitem.h>
-#include <qsvgrenderer.h>
+#include <QSize>
+#include <QSvgRenderer>
+
+#include <vector>
 
 #include "Common/FileUtil.h"
-#include "Common/Logging/Log.h"
 #include "DolphinQt/QtUtils/NonDefaultQPushButton.h"
 
 WiimoteWidget::WiimoteWidget(QWidget* parent, int port_num) : QWidget(parent)
 {
   CreateLayout();
   CreateButtons();
+  CreateGroups();
   ScaleSvg();
-  PositionButtons();
+  PositionGroups();
 }
 
 void WiimoteWidget::resizeEvent(QResizeEvent* event)
 {
   ScaleSvg();
-  PositionButtons();
+  PositionGroups();
   QWidget::resizeEvent(event);
 }
 
-void WiimoteWidget::CreateButton(std::string label, std::string svg_element_name,
-                                 ButtonInfo::ButtonPlacement button_placement,
-                                 ButtonInfo::LabelPlacement label_placement, int spacing,
-                                 QPoint offset)
+WiimoteWidget::ButtonInfo WiimoteWidget::CreateButton(std::string label,
+                                                      std::string svg_element_name)
 {
-  QPushButton* button_widget = new NonDefaultQPushButton(QString::fromStdString("Placeholder"));
+  QWidget* container = new QWidget();
+  QVBoxLayout* layout = new QVBoxLayout(container);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(0);
+
+  QPushButton* button_widget = new NonDefaultQPushButton(QString::fromStdString(svg_element_name));
   QLabel* label_widget = new QLabel(QString::fromStdString(label));
-  label_widget->adjustSize();
+  label_widget->setAlignment(Qt::AlignCenter);
 
-  auto button_proxy = m_scene->addWidget(button_widget);
-  button_proxy->setZValue(1);
+  layout->addWidget(label_widget);
+  layout->addWidget(button_widget);
 
-  auto label_proxy = m_scene->addWidget(label_widget);
-  label_proxy->setParentItem(button_proxy);
-  label_proxy->setZValue(2);
-
-  {
-    auto effective_label_placement = label_placement;
-    if (effective_label_placement == ButtonInfo::LabelPlacement::Auto)
-      effective_label_placement = static_cast<ButtonInfo::LabelPlacement>(button_placement);
-
-    const qreal label_gap = 6.0;
-
-    const QSizeF btn_size = button_proxy->size();
-    label_widget->adjustSize();
-    const QSizeF lbl_size = label_widget->size();
-
-    QPointF local_pos;
-    switch (effective_label_placement)
-    {
-    case ButtonInfo::LabelPlacement::Left:
-      local_pos.setX(-lbl_size.width() - label_gap);
-      local_pos.setY((btn_size.height() - lbl_size.height()) / 2.0);
-      break;
-    case ButtonInfo::LabelPlacement::Right:
-      local_pos.setX(btn_size.width() + label_gap);
-      local_pos.setY((btn_size.height() - lbl_size.height()) / 2.0);
-      break;
-    case ButtonInfo::LabelPlacement::Top:
-      local_pos.setX((btn_size.width() - lbl_size.width()) / 2.0);
-      local_pos.setY(-lbl_size.height() - label_gap);
-      break;
-    case ButtonInfo::LabelPlacement::Bottom:
-      local_pos.setX((btn_size.width() - lbl_size.width()) / 2.0);
-      local_pos.setY(btn_size.height() + label_gap);
-      break;
-    default:
-      // fallback: place to the right
-      local_pos.setX(btn_size.width() + label_gap);
-      local_pos.setY((btn_size.height() - lbl_size.height()) / 2.0);
-      break;
-    }
-
-    label_proxy->setPos(local_pos);
-  }
-
-  m_buttons.push_back(ButtonInfo{
-      .button = button_widget,
-      .button_placement = button_placement,
-      .label = label_widget,
-      .label_placement = label_placement,
+  return ButtonInfo{
+      .button = container,
       .svg_element_name = QString::fromStdString(svg_element_name),
-      .spacing = spacing,
-      .offset = offset,
-      .button_proxy = button_proxy,
-      .label_proxy = label_proxy,
-  });
+  };
 }
 
 void WiimoteWidget::CreateButtons()
 {
-  CreateButton("Power", "button_power", ButtonInfo::ButtonPlacement::Left);
-  CreateButton("Up", "dpad_up", ButtonInfo::ButtonPlacement::Top, ButtonInfo::LabelPlacement::Auto,
-               20);
-  CreateButton("Left", "dpad_left", ButtonInfo::ButtonPlacement::Left,
-               ButtonInfo::LabelPlacement::Auto, 20);
-  CreateButton("Right", "dpad_right", ButtonInfo::ButtonPlacement::Right,
-               ButtonInfo::LabelPlacement::Auto, 20);
-  CreateButton("Down", "dpad_down", ButtonInfo::ButtonPlacement::Bottom,
-               ButtonInfo::LabelPlacement::Left, 20);
-  CreateButton("A", "button_a", ButtonInfo::ButtonPlacement::Left);
-  CreateButton("+", "button_plus", ButtonInfo::ButtonPlacement::Right);
-  CreateButton("Home", "button_home", ButtonInfo::ButtonPlacement::Top);
-  CreateButton("-", "button_minus", ButtonInfo::ButtonPlacement::Left);
-  CreateButton("1", "button_one", ButtonInfo::ButtonPlacement::Left);
-  CreateButton("2", "button_two", ButtonInfo::ButtonPlacement::Left);
+  ButtonGroup power_group;
+  power_group.placement = ButtonGroup::Placement::Top;
+  power_group.buttons.push_back(CreateButton("Power", "button_power"));
+  m_button_groups.push_back(power_group);
+
+  ButtonGroup dpad_group;
+  dpad_group.placement = ButtonGroup::Placement::Left;
+  dpad_group.buttons.push_back(CreateButton("Up", "dpad_up"));
+  dpad_group.buttons.push_back(CreateButton("Left", "dpad_left"));
+  dpad_group.buttons.push_back(CreateButton("Right", "dpad_right"));
+  dpad_group.buttons.push_back(CreateButton("Down", "dpad_down"));
+  m_button_groups.push_back(dpad_group);
+
+  ButtonGroup a_group;
+  a_group.placement = ButtonGroup::Placement::Left;
+  a_group.buttons.push_back(CreateButton("A", "button_a"));
+  m_button_groups.push_back(a_group);
+
+  ButtonGroup menu_group;
+  menu_group.placement = ButtonGroup::Placement::Right;
+  menu_group.buttons.push_back(CreateButton("+", "button_plus"));
+  menu_group.buttons.push_back(CreateButton("HOME", "button_home"));
+  menu_group.buttons.push_back(CreateButton("-", "button_minus"));
+  m_button_groups.push_back(menu_group);
+
+  ButtonGroup number_group;
+  number_group.placement = ButtonGroup::Placement::Bottom;
+  number_group.buttons.push_back(CreateButton("1", "button_one"));
+  number_group.buttons.push_back(CreateButton("2", "button_two"));
+  m_button_groups.push_back(number_group);
+}
+
+void WiimoteWidget::CreateGroups()
+{
+  for (auto& group : m_button_groups)
+  {
+    QWidget* group_widget = new QWidget();
+    QGridLayout* layout = new QGridLayout(group_widget);
+
+    QSet<int> x_values_set;
+    QSet<int> y_values_set;
+    for (auto& btn : group.buttons)
+    {
+      if (!m_renderer->elementExists(btn.svg_element_name))
+        continue;
+
+      const QRectF elem_bounds = m_renderer->boundsOnElement(btn.svg_element_name);
+      const int elem_x = std::round(elem_bounds.x());
+      const int elem_y = std::round(elem_bounds.y());
+      x_values_set.insert(elem_x);
+      y_values_set.insert(elem_y);
+    }
+
+    QList<int> x_values = x_values_set.values();
+    QList<int> y_values = y_values_set.values();
+    std::sort(x_values.begin(), x_values.end());
+    std::sort(y_values.begin(), y_values.end());
+
+    for (auto& btn : group.buttons)
+    {
+      if (!m_renderer->elementExists(btn.svg_element_name))
+        continue;
+
+      const QRectF elem_bounds = m_renderer->boundsOnElement(btn.svg_element_name);
+      const int elem_x = std::round(elem_bounds.x());
+      const int elem_y = std::round(elem_bounds.y());
+
+      int col = x_values.indexOf(elem_x);
+      int row = y_values.indexOf(elem_y);
+
+      layout->addWidget(btn.button, row, col);
+    }
+
+    group.proxy = m_scene->addWidget(group_widget);
+  }
 }
 
 void WiimoteWidget::CreateLayout()
@@ -136,7 +153,8 @@ void WiimoteWidget::CreateLayout()
   m_scene->addItem(m_svg_item);
   m_svg_item->setZValue(0);
 
-  // The SVG is assumed to be plain black, make the color white if users are using a dark background
+  // The SVG is assumed to be plain black, make the color white if users are using a dark
+  // background
   QColor bg = palette().color(QPalette::Window);
   if (bg.valueF() < 0.5)
   {
@@ -173,51 +191,28 @@ void WiimoteWidget::ScaleSvg()
   m_svg_item->setPos(x_offset, y_offset);
 }
 
-void WiimoteWidget::PositionButtons()
+void WiimoteWidget::PositionGroups()
 {
   if (!m_svg_item || !m_renderer)
     return;
 
-  for (auto& info : m_buttons)
+  for (auto& group : m_button_groups)
   {
-    if (!m_renderer->elementExists(info.svg_element_name))
+    QRectF group_bounds;
+    for (auto& btn : group.buttons)
     {
-      ERROR_LOG_FMT(COMMON, "SVG element not found: {}", info.svg_element_name.toStdString());
-      continue;
+      if (!m_renderer->elementExists(btn.svg_element_name))
+        continue;
+
+      QRectF elem_bounds = m_renderer->boundsOnElement(btn.svg_element_name);
+      group_bounds = group_bounds.isNull() ? elem_bounds : group_bounds.united(elem_bounds);
     }
 
-    if (!info.button_proxy)
-      continue;
+    QPointF center_in_svg = group_bounds.center();
+    QPointF scene_center = m_svg_item->mapToScene(center_in_svg);
+    QRectF proxy_bounds = group.proxy->boundingRect();
+    QPointF offset = QPointF(proxy_bounds.width() / 2, proxy_bounds.height() / 2);
 
-    const QRectF element_bounds = m_renderer->boundsOnElement(info.svg_element_name);
-    const QRectF scene_bounds = m_svg_item->mapRectToScene(element_bounds);
-
-    const QSizeF button_size = info.button_proxy->size();
-
-    QPointF scene_pos;
-    const qreal gap = info.spacing;
-    switch (info.button_placement)
-    {
-    case ButtonInfo::ButtonPlacement::Left:
-      scene_pos.setX(scene_bounds.left() - button_size.width() - gap);
-      scene_pos.setY(scene_bounds.top() + (scene_bounds.height() - button_size.height()) / 2.0);
-      break;
-    case ButtonInfo::ButtonPlacement::Right:
-      scene_pos.setX(scene_bounds.right() + gap);
-      scene_pos.setY(scene_bounds.top() + (scene_bounds.height() - button_size.height()) / 2.0);
-      break;
-    case ButtonInfo::ButtonPlacement::Top:
-      scene_pos.setX(scene_bounds.left() + (scene_bounds.width() - button_size.width()) / 2.0);
-      scene_pos.setY(scene_bounds.top() - button_size.height() - gap);
-      break;
-    case ButtonInfo::ButtonPlacement::Bottom:
-      scene_pos.setX(scene_bounds.left() + (scene_bounds.width() - button_size.width()) / 2.0);
-      scene_pos.setY(scene_bounds.bottom() + gap);
-      break;
-    }
-
-    scene_pos += info.offset;
-
-    info.button_proxy->setPos(scene_pos);
+    group.proxy->setPos(scene_center - offset);
   }
 }
