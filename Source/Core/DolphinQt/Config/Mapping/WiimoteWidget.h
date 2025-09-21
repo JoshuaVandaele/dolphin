@@ -51,6 +51,8 @@ private:
   QGraphicsSvgItem* m_svg_item;
   QSvgRenderer* m_renderer;
 
+  std::vector<QGraphicsLineItem*> m_group_lines;
+
   ButtonInfo CreateButton(std::string label, std::string svg_element_name);
 
   void CreateLayout();

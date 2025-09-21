@@ -196,6 +196,13 @@ void WiimoteWidget::PositionGroups()
   if (!m_svg_item || !m_renderer)
     return;
 
+  for (auto* line : m_group_lines)
+  {
+    m_scene->removeItem(line);
+    delete line;
+  }
+  m_group_lines.clear();
+
   QRectF svg_rect = m_svg_item->sceneBoundingRect();
   QRectF total_bounds = svg_rect;
 
@@ -238,8 +245,31 @@ void WiimoteWidget::PositionGroups()
 
     group.proxy->setPos(new_pos);
 
-    QRectF proxy_scene_rect = group.proxy->sceneBoundingRect();
-    total_bounds = total_bounds.united(proxy_scene_rect);
+    const QRectF proxy_rect = group.proxy->sceneBoundingRect();
+    QPointF line_start;
+
+    switch (group.placement)
+    {
+    case ButtonGroup::Placement::Left:
+      line_start = QPointF(proxy_rect.right(), proxy_rect.center().y());
+      break;
+    case ButtonGroup::Placement::Right:
+      line_start = QPointF(proxy_rect.left(), proxy_rect.center().y());
+      break;
+    case ButtonGroup::Placement::Top:
+      line_start = QPointF(proxy_rect.center().x(), proxy_rect.bottom());
+      break;
+    case ButtonGroup::Placement::Bottom:
+      line_start = QPointF(proxy_rect.center().x(), proxy_rect.top());
+      break;
+    }
+
+    QColor lineColor = palette().color(QPalette::WindowText);
+    auto* line = m_scene->addLine(QLineF(line_start, group_center), QPen(lineColor, 2));
+    line->setZValue(1);
+    m_group_lines.push_back(line);
+
+    total_bounds = total_bounds.united(proxy_rect);
   }
 
   m_scene->setSceneRect(total_bounds);
