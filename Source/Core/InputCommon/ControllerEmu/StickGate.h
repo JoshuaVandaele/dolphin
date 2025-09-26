@@ -123,5 +123,4 @@ private:
   SettingValue<double> m_deadzone_setting;
   ReshapeData m_center;
 };
-
 }  // namespace ControllerEmu

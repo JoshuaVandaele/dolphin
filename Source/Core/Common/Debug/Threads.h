@@ -63,5 +63,4 @@ public:
 };
 
 using Threads = std::vector<std::unique_ptr<ThreadView>>;
-
 }  // namespace Common::Debug

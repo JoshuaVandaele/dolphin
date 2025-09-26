@@ -187,5 +187,4 @@ bool DumpDSPCode(const u8* code_be, size_t size_in_bytes, u32 crc)
 
   return File::WriteStringToFile(text_file, text);
 }
-
 }  // namespace DSP

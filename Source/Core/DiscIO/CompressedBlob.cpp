@@ -395,5 +395,4 @@ bool IsGCZBlob(File::IOFile& file)
   file.Seek(position, File::SeekOrigin::Begin);
   return is_gcz;
 }
-
 }  // namespace DiscIO

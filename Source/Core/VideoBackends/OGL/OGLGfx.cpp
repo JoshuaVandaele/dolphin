@@ -731,5 +731,4 @@ SurfaceInfo OGLGfx::GetSurfaceInfo() const
           std::max(m_main_gl_context->GetBackBufferHeight(), 1u), m_backbuffer_scale,
           AbstractTextureFormat::RGBA8};
 }
-
 }  // namespace OGL

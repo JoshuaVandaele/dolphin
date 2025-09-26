@@ -5,7 +5,6 @@
 
 namespace ControllerEmu
 {
-
 void AttachedController::LoadDefaults()
 {
 }
@@ -103,5 +102,4 @@ void Attachments::UpdateReferences(ciface::ExpressionParser::ControlEnvironment&
   for (auto& attachment : GetAttachmentList())
     attachment->UpdateGroupsReferences(env);
 }
-
 }  // namespace ControllerEmu

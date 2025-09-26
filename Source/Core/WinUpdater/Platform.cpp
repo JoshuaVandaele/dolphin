@@ -326,5 +326,4 @@ bool VersionCheck(const std::vector<TodoList::UpdateOp>& to_update,
   }
   return CheckBuildInfo(build_infos.value());
 }
-
 }  // namespace Platform

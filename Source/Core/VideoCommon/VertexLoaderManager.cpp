@@ -246,7 +246,6 @@ VertexLoaderBase* GetOrCreateLoader(int vtx_attr_group)
   attr_dirty[vtx_attr_group] = false;
   return loader;
 }
-
 }  // namespace detail
 
 static void CheckCPConfiguration(int vtx_attr_group)
@@ -481,5 +480,4 @@ NativeVertexFormat* GetCurrentVertexFormat()
 {
   return s_current_vtx_fmt;
 }
-
 }  // namespace VertexLoaderManager

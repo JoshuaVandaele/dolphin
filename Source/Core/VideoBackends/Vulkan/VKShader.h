@@ -37,5 +37,4 @@ private:
   VkPipeline m_compute_pipeline;
   std::string m_name;
 };
-
 }  // namespace Vulkan

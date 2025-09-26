@@ -47,5 +47,4 @@ private:
 };
 
 std::unique_ptr<FunctionExpression> MakeFunctionExpression(std::string_view name);
-
 }  // namespace ciface::ExpressionParser

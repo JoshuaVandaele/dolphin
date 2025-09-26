@@ -445,5 +445,4 @@ s32 ESDevice::WriteSystemFile(const std::string& path, const std::vector<u8>& da
 
   return IPC_SUCCESS;
 }
-
 }  // namespace IOS::HLE

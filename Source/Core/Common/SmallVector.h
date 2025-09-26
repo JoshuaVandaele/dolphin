@@ -11,7 +11,6 @@
 
 namespace Common
 {
-
 // TODO C++26: Replace with std::inplace_vector.
 
 // An std::vector-like container that uses no heap allocations but is limited to a maximum size.
@@ -113,5 +112,4 @@ private:
   std::array<ManuallyConstructedValue<T>, MaxSize> m_array;
   size_t m_size = 0;
 };
-
 }  // namespace Common

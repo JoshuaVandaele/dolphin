@@ -75,5 +75,4 @@ private:
   std::array<ComPtr<ID3D11ShaderResourceView>, NUM_TEXEL_BUFFER_FORMATS> m_texel_buffer_views;
   u32 m_texel_buffer_offset = 0;
 };
-
 }  // namespace DX11

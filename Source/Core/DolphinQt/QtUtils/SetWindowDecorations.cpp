@@ -15,7 +15,6 @@
 
 namespace
 {
-
 void SetQWidgetWindowDecorations(QWidget* widget)
 {
   if (!Settings::Instance().IsThemeDark())
@@ -65,17 +64,14 @@ public:
 private:
   QObject* const m_decoration_filter = new WindowDecorationFilter{this};
 };
-
 }  // namespace
 
 namespace QtUtils
 {
-
 void InstallWindowDecorationFilter(QApplication* app)
 {
   app->installEventFilter(new WindowDecorationFilterInstaller{app});
 }
-
 }  // namespace QtUtils
 
 #endif

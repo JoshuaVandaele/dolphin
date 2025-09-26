@@ -13,7 +13,6 @@
 
 namespace Common
 {
-
 namespace detail
 {
 template <typename T, bool IncludeWaitFunctionality>
@@ -118,5 +117,4 @@ using SPSCQueue = detail::SPSCQueueBase<T, false>;
 
 template <typename T>
 using WaitableSPSCQueue = detail::SPSCQueueBase<T, true>;
-
 }  // namespace Common

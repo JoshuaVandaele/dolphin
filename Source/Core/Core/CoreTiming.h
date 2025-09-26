@@ -232,5 +232,4 @@ private:
 
   int m_on_state_changed_handle;
 };
-
 }  // namespace CoreTiming

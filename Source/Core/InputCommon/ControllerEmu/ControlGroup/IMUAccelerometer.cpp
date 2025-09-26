@@ -39,5 +39,4 @@ std::optional<IMUAccelerometer::StateData> IMUAccelerometer::GetState() const
   state.z = (controls[0]->GetState() - controls[1]->GetState());
   return state;
 }
-
 }  // namespace ControllerEmu

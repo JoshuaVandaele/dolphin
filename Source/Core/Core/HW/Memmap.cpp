@@ -587,5 +587,4 @@ void MemoryManager::Write_U64_Swap(u64 value, u32 address)
 {
   CopyToEmu(address, &value, sizeof(value));
 }
-
 }  // namespace Memory

@@ -251,5 +251,4 @@ std::unique_ptr<BlobReader> CreateBlobReader(const std::string& filename)
     return PlainFileReader::Create(std::move(file));
   }
 }
-
 }  // namespace DiscIO

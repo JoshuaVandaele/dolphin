@@ -54,5 +54,4 @@ private:
     u16 buttons;
   };
 };
-
 }  // namespace WiimoteEmu

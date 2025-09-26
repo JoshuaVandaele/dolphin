@@ -194,7 +194,6 @@ constexpr Table s_table_read_color = {
         Color_ReadIndex_16b_4444<u16>, Color_ReadIndex_24b_6666<u16>,
         Color_ReadIndex_32b_8888<u16>),
 };
-
 }  // Anonymous namespace
 
 TPipelineFunction VertexLoader_Color::GetFunction(VertexComponentFormat type, ColorFormat format)

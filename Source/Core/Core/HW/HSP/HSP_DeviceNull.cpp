@@ -21,5 +21,4 @@ u64 CHSPDevice_Null::Read(u32 address)
 void CHSPDevice_Null::Write(u32 address, u64 value)
 {
 }
-
 }  // namespace HSP

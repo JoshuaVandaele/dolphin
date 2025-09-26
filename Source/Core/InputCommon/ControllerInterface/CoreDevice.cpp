@@ -502,5 +502,4 @@ auto InputDetector::TakeResults() -> Results
 {
   return std::move(m_detections);
 }
-
 }  // namespace ciface::Core

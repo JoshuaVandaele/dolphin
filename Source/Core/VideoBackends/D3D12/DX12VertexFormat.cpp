@@ -143,5 +143,4 @@ void DXVertexFormat::MapAttributes()
         m_decl.posmtx.offset);
   }
 }
-
 }  // namespace DX12

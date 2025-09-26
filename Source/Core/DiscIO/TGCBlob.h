@@ -66,5 +66,4 @@ private:
   // Stored as big endian in memory, regardless of the host endianness
   TGCHeader m_header = {};
 };
-
 }  // namespace DiscIO

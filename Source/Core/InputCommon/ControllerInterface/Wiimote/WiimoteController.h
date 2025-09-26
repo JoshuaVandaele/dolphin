@@ -282,5 +282,4 @@ private:
   Common::Quaternion m_orientation = Common::Quaternion::Identity();
   Clock::time_point m_last_report_time = Clock::now();
 };
-
 }  // namespace ciface::WiimoteController

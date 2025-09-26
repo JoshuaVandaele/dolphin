@@ -1399,5 +1399,4 @@ Type NormalizeSkylanderType(Type type)
     return Type::Unknown;
   }
 }
-
 }  // namespace IOS::HLE::USB

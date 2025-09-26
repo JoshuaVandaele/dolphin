@@ -19,5 +19,4 @@ extern const Info<bool> FREE_LOOK_BACKGROUND_INPUT;
 
 // FreeLook.Controller1
 extern const Info<FreeLook::ControlType> FL1_CONTROL_TYPE;
-
 }  // namespace Config

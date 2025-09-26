@@ -1913,5 +1913,4 @@ WiimoteDevice* BluetoothEmuDevice::AccessWiimote(u16 connection_handle)
 
   return nullptr;
 }
-
 }  // namespace IOS::HLE

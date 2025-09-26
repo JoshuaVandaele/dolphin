@@ -158,5 +158,4 @@ ImagePixelData ResizeKeepAspectRatio(ResizeMode mode, const ImagePixelData& src,
 
   return result;
 }
-
 }  // namespace InputCommon

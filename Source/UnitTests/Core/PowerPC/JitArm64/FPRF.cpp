@@ -60,7 +60,6 @@ public:
   std::function<void(u32)> fprf_single;
   std::function<void(u64)> fprf_double;
 };
-
 }  // namespace
 
 static u32 RunUpdateFPRF(PowerPC::PowerPCState& ppc_state, const std::function<void()>& f)

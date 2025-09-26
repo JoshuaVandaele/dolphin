@@ -60,7 +60,6 @@ class HIDWiimote;
 void UpdateSource(unsigned int index);
 
 HIDWiimote* GetHIDWiimoteSource(unsigned int index);
-
 }  // namespace WiimoteCommon
 
 namespace Wiimote
@@ -105,5 +104,4 @@ void Shutdown();
 void Resume();
 void Pause();
 void Refresh();
-
 }  // namespace WiimoteReal

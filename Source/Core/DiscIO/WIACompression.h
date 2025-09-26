@@ -245,5 +245,4 @@ private:
   ZSTD_outBuffer m_out_buffer{};
   std::vector<u8> m_buffer;
 };
-
 }  // namespace DiscIO

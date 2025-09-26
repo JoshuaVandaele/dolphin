@@ -37,7 +37,6 @@ void OnConfigChanged()
     s_should_run_callbacks.store(true, std::memory_order_relaxed);
   }
 }
-
 }  // namespace
 
 namespace CPUThreadConfigCallback
@@ -72,5 +71,4 @@ void CheckForConfigChanges()
   if (s_should_run_callbacks.exchange(false, std::memory_order_relaxed))
     RunCallbacks();
 }
-
 }  // namespace CPUThreadConfigCallback

@@ -197,5 +197,4 @@ std::optional<std::string> GetStringDescriptor(libusb_device_handle* dev_handle,
   return "__LIBUSB__ not defined";
 #endif
 }
-
 }  // namespace LibusbUtils

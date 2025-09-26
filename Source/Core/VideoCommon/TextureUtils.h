@@ -25,5 +25,4 @@ private:
 
 void DumpTexture(const ::AbstractTexture& texture, std::string basename, u32 level,
                  bool is_arbitrary);
-
 }  // namespace VideoCommon::TextureUtils

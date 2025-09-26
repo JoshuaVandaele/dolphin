@@ -599,5 +599,4 @@ u32 SerialInterfaceManager::GetPollXLines()
 {
   return m_poll.X;
 }
-
 }  // namespace SerialInterface

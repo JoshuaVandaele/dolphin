@@ -11,7 +11,6 @@
 
 namespace Common
 {
-
 namespace detail
 {
 template <auto MakeFunc>
@@ -88,5 +87,4 @@ using UniqueBuffer = detail::BufferBase<std::make_unique_for_overwrite<T[]>>;
 // TODO: std::make_shared_for_overwrite requires GCC 12.1+
 // template <typename T>
 // using SharedBuffer = detail::BufferBase<std::make_shared_for_overwrite<T[]>>;
-
 }  // namespace Common

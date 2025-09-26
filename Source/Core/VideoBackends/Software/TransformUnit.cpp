@@ -22,7 +22,6 @@
 
 namespace TransformUnit
 {
-
 using Vec3 = Common::Vec3;
 using Vec4 = Common::Vec4;
 

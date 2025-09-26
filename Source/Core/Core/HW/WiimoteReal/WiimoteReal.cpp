@@ -1019,5 +1019,4 @@ void HandleWiimotesInControllerInterfaceSettingChange()
 {
   g_controller_interface.PlatformPopulateDevices([] { ProcessWiimotePool(); });
 }
-
 }  // namespace WiimoteReal

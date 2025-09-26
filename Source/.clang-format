@@ -88,6 +88,7 @@ StatementAttributeLikeMacros:
   - emit
 TabWidth:        2
 UseTab:          Never
+WrapNamespaceBodyWithEmptyLines: Never
 ---
 # C++ Specific Config
 Language:        Cpp

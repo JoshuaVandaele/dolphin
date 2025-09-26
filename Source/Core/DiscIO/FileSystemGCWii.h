@@ -104,5 +104,4 @@ private:
 
   std::unique_ptr<FileInfo> FindFileInfo(std::string_view path, const FileInfo& file_info) const;
 };
-
 }  // namespace DiscIO

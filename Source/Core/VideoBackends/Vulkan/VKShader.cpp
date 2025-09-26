@@ -146,5 +146,4 @@ std::unique_ptr<VKShader> VKShader::CreateFromBinary(ShaderStage stage, const vo
 
   return CreateShaderObject(stage, std::move(spv), name);
 }
-
 }  // namespace Vulkan

@@ -540,5 +540,4 @@ std::string FormatSize(u64 bytes, int decimals)
   return fmt::format("{:.{}Lf} {}", bytes / unit_size, decimals,
                      Common::GetStringT(unit_symbols[unit]));
 }
-
 }  // namespace UICommon

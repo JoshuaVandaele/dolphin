@@ -52,5 +52,4 @@ Triggers::StateData Triggers::GetState(const InputOverrideFunction& override_fun
 
   return result;
 }
-
 }  // namespace ControllerEmu

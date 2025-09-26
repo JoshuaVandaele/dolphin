@@ -78,5 +78,4 @@ std::unique_ptr<OGLShader> OGLShader::CreateFromSource(ShaderStage stage, std::s
     return nullptr;
   return std::make_unique<OGLShader>(prog.glprogid, std::move(source_str), std::move(name_str));
 }
-
 }  // namespace OGL

@@ -47,5 +47,4 @@ std::string GenerateDecodingShader(TextureFormat format, std::optional<TLUTForma
 
 // Returns the GLSL string containing the palette conversion shader for the specified format.
 std::string GeneratePaletteConversionShader(TLUTFormat palette_format, APIType api_type);
-
 }  // namespace TextureConversionShaderTiled

@@ -179,5 +179,4 @@ private:
 
   int m_use_ctr = 0;
 };
-
 }  // namespace DSP::JIT::x64

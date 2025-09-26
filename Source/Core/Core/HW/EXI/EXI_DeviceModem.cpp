@@ -26,7 +26,6 @@
 
 namespace ExpansionInterface
 {
-
 CEXIModem::CEXIModem(Core::System& system, ModemDeviceType type) : IEXIDevice(system)
 {
   switch (type)
@@ -394,5 +393,4 @@ void CEXIModem::RunAllPendingATCommands()
     }
   }
 }
-
 }  // namespace ExpansionInterface

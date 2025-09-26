@@ -17,5 +17,4 @@ public:
   void FlushResults() override {}
   bool IsFlushed() const override { return true; }
 };
-
 }  // namespace Null

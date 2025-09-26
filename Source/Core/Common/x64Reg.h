@@ -91,5 +91,4 @@ enum X64Reg
 
   INVALID_REG = 0xFFFFFFFF
 };
-
 }  // namespace Gen

@@ -140,5 +140,4 @@ void PrintDataBuffer(const Core::System& system, Common::Log::LogType type, u32 
     GENERIC_LOG_FMT(type, Common::Log::LogLevel::LDEBUG, "   Data: {}", hex_line);
   }
 }
-
 }  // namespace Dolphin_Debugger

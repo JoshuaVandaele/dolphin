@@ -336,6 +336,5 @@ private:
 
   DSPCore& m_dsp_core;
 };
-
 }  // namespace JIT::x64
 }  // namespace DSP

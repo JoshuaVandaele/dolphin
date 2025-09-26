@@ -59,7 +59,6 @@ void RefreshConfig()
   for (int i = 0; i < MAX_BBMOTES; ++i)
     OnSourceChanged(i, Config::Get(Config::GetInfoForWiimoteSource(i)));
 }
-
 }  // namespace
 
 namespace WiimoteCommon
@@ -93,7 +92,6 @@ HIDWiimote* GetHIDWiimoteSource(unsigned int index)
 
   return hid_source;
 }
-
 }  // namespace WiimoteCommon
 
 namespace Wiimote

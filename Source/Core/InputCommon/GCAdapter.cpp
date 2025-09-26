@@ -1004,5 +1004,4 @@ bool IsDetected(const char** error_message)
   return s_detected;
 #endif
 }
-
 }  // namespace GCAdapter

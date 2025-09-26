@@ -153,5 +153,4 @@ void CustomAssetLoader::Reset(bool restart_worker_threads)
     StartWorkerThreads(static_cast<u32>(worker_thread_count));
   }
 }
-
 }  // namespace VideoCommon

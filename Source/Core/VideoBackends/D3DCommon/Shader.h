@@ -29,5 +29,4 @@ protected:
 
   BinaryData m_bytecode;
 };
-
 }  // namespace D3DCommon

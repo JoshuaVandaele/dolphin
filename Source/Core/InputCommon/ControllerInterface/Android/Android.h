@@ -8,5 +8,4 @@
 namespace ciface::Android
 {
 std::unique_ptr<ciface::InputBackend> CreateInputBackend(ControllerInterface* controller_interface);
-
 }  // namespace ciface::Android

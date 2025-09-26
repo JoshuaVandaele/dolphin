@@ -26,5 +26,4 @@ protected:
   {
   }
 };
-
 }  // namespace Null

@@ -128,5 +128,4 @@ protected:
   bool WorkerThreadInitWorkerThread(void* param) override;
   void WorkerThreadExit(void* param) override;
 };
-
 }  // namespace OGL

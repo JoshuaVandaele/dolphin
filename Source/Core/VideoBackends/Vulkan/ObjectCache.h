@@ -111,5 +111,4 @@ private:
 };
 
 extern std::unique_ptr<ObjectCache> g_object_cache;
-
 }  // namespace Vulkan

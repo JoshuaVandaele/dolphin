@@ -931,5 +931,4 @@ void Presenter::DoState(PointerWrap& p)
                   m_last_xfb_ticks);
   }
 }
-
 }  // namespace VideoCommon

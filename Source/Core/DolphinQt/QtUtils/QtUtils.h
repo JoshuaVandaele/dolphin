@@ -11,7 +11,6 @@ class QWidget;
 
 namespace QtUtils
 {
-
 void ShowFourDigitYear(QDateTimeEdit* widget);
 
 QWidget* CreateIconWarning(QWidget* parent, QStyle::StandardPixmap standard_pixmap, QLabel* label);
@@ -36,5 +35,4 @@ public:
   //  which would cause this to stack overflow.
   QSize sizeHint() const override { return Widget::minimumSizeHint(); }
 };
-
 }  // namespace QtUtils

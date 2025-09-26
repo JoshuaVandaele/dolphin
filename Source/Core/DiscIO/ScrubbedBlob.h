@@ -47,5 +47,4 @@ private:
   std::unique_ptr<BlobReader> m_blob_reader;
   DiscScrubber m_scrubber;
 };
-
 }  // namespace DiscIO

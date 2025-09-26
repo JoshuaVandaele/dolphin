@@ -109,5 +109,4 @@ ControlState OctagonAnalogStick::GetGateRadiusAtAngle(double ang) const
 {
   return AnalogStick::GetGateRadiusAtAngle(ang) * m_gate_size_setting.GetValue() / 100;
 }
-
 }  // namespace ControllerEmu

@@ -50,5 +50,4 @@ protected:
   std::array<DescriptorHandle, NUM_TEXEL_BUFFER_FORMATS> m_texel_buffer_views = {};
   DescriptorHandle m_vertex_srv = {};
 };
-
 }  // namespace DX12

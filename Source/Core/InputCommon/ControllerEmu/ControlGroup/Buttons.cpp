@@ -19,5 +19,4 @@ Buttons::Buttons(const std::string& ini_name, const std::string& group_name)
     : ControlGroup(ini_name, group_name, GroupType::Buttons)
 {
 }
-
 }  // namespace ControllerEmu

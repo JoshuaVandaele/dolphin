@@ -268,5 +268,4 @@ void OpenFStream(T& fstream, const std::string& filename, std::ios_base::openmod
     fstream.open(filename.c_str(), openmode);
 #endif
 }
-
 }  // namespace File

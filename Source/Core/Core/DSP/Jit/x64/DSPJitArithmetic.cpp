@@ -1677,5 +1677,4 @@ void DSPEmitter::asrnr(const UDSPInstruction opc)
     Update_SR_Register64(RDX, RCX);
   }
 }
-
 }  // namespace DSP::JIT::x64

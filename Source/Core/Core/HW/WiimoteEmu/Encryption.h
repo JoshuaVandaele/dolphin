@@ -68,5 +68,4 @@ private:
   EncryptionKey GenerateFallbackTables(const EncryptionKey::RandData& rand,
                                        const EncryptionKey::KeyData& key) const final override;
 };
-
 }  // namespace WiimoteEmu

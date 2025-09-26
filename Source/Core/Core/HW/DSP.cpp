@@ -602,5 +602,4 @@ u8* DSPManager::GetARAMPtr() const
 {
   return m_aram.ptr;
 }
-
 }  // end of namespace DSP

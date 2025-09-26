@@ -62,5 +62,4 @@ bool ExportFST(const Volume& volume, const Partition& partition,
 
 bool ExportSystemData(const Volume& volume, const Partition& partition,
                       const std::string& export_folder);
-
 }  // namespace DiscIO

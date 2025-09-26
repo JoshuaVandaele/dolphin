@@ -279,5 +279,4 @@ void ProcessorInterfaceManager::PowerButton_Tap()
   core_timing.ScheduleEvent(0, m_event_type_ios_notify_power_button, 0,
                             CoreTiming::FromThread::ANY);
 }
-
 }  // namespace ProcessorInterface

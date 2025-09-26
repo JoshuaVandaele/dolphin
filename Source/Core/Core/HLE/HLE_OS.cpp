@@ -572,5 +572,4 @@ std::string GetStringVA(HLEPrintArgs* args, std::string_view string)
 
   return result;
 }
-
 }  // namespace HLE_OS

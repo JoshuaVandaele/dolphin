@@ -160,5 +160,4 @@ private:
 };
 
 extern std::unique_ptr<VulkanContext> g_vulkan_context;
-
 }  // namespace Vulkan

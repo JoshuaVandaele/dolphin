@@ -16,5 +16,4 @@ extern const Info<WiimoteSource> WIIMOTE_4_SOURCE;
 extern const Info<WiimoteSource> WIIMOTE_BB_SOURCE;
 
 const Info<WiimoteSource>& GetInfoForWiimoteSource(int index);
-
 }  // namespace Config

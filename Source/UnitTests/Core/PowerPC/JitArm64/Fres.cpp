@@ -48,7 +48,6 @@ public:
 
   std::function<u64(u64)> fres;
 };
-
 }  // namespace
 
 TEST(JitArm64, Fres)

@@ -89,5 +89,4 @@ void FileLogger::Log(const DiscIO::Volume& volume, const DiscIO::Partition& part
   m_previous_partition = partition;
   m_previous_file_offset = file_offset;
 }
-
 }  // namespace FileMonitor

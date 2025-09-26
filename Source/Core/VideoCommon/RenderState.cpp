@@ -464,5 +464,4 @@ FramebufferState GetRGBA8FramebufferState()
 {
   return GetColorFramebufferState(AbstractTextureFormat::RGBA8);
 }
-
 }  // namespace RenderState

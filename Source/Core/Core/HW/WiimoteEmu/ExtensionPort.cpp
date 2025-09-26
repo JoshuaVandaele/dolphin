@@ -23,5 +23,4 @@ void ExtensionPort::AttachExtension(Extension* ext)
   m_extension = ext;
   m_i2c_bus.AddSlave(m_extension);
 }
-
 }  // namespace WiimoteEmu

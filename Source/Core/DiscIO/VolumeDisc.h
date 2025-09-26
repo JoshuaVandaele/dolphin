@@ -28,5 +28,4 @@ protected:
   Region RegionCodeToRegion(std::optional<u32> region_code) const;
   void AddGamePartitionToSyncHash(Common::SHA1::Context* context) const;
 };
-
 }  // namespace DiscIO

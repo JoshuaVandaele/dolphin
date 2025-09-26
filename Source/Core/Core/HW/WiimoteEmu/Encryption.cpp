@@ -452,7 +452,6 @@ constexpr std::array<SBox, 8> sboxes_3rd_party = {{
         0xe7,
     },
 }};
-
 }  // namespace
 
 namespace WiimoteEmu
@@ -617,5 +616,4 @@ void EncryptionKey::Decrypt(u8* const data, u32 addr, const u32 len) const
   for (u32 i = 0; i != len; ++i, ++addr)
     data[i] = (data[i] ^ sb[addr % 8]) + ft[addr % 8];
 }
-
 }  // namespace WiimoteEmu

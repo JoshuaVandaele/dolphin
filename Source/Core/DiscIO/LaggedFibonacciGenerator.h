@@ -47,5 +47,4 @@ private:
 
   size_t m_position_bytes = 0;
 };
-
 }  // namespace DiscIO

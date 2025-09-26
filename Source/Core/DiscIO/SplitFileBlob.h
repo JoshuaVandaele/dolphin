@@ -47,5 +47,4 @@ private:
   std::vector<SingleFile> m_files;
   u64 m_size;
 };
-
 }  // namespace DiscIO

@@ -297,5 +297,4 @@ void SystemTimersManager::Shutdown()
   Common::Timer::RestoreResolution();
   m_localtime_rtc_offset = 0;
 }
-
 }  // namespace SystemTimers

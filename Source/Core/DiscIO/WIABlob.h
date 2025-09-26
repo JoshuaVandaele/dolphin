@@ -398,5 +398,4 @@ private:
 
 using WIAFileReader = WIARVZFileReader<false>;
 using RVZFileReader = WIARVZFileReader<true>;
-
 }  // namespace DiscIO

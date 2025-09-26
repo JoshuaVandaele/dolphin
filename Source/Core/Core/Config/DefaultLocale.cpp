@@ -191,5 +191,4 @@ DiscIO::Region GetDefaultRegion()
   static const DiscIO::Region region = ComputeDefaultRegion();
   return region;
 }
-
 }  // namespace Config

@@ -26,5 +26,4 @@ void RemoveConfigChangedCallback(ConfigChangedCallbackID callback_id);
 
 // Should be called regularly from the CPU thread
 void CheckForConfigChanges();
-
 }  // namespace CPUThreadConfigCallback

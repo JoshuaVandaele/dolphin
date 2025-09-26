@@ -345,5 +345,4 @@ Control* ReshapableInput::GetModifierInput() const
 {
   return nullptr;
 }
-
 }  // namespace ControllerEmu

@@ -258,5 +258,4 @@ ShaderCode GeneratePixelShader(APIType api_type, const UidData* uid_data)
 
   return out;
 }
-
 }  // namespace TextureConversionShaderGen

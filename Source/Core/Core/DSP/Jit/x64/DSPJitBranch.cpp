@@ -488,5 +488,4 @@ void DSPEmitter::bloopi(const UDSPInstruction opc)
     WriteBranchExit();
   }
 }
-
 }  // namespace DSP::JIT::x64

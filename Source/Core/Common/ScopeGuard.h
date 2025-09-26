@@ -36,5 +36,4 @@ public:
 private:
   std::optional<Callable> m_finalizer;
 };
-
 }  // Namespace Common

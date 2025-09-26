@@ -446,7 +446,6 @@ constexpr std::array<Jit64::Instruction, 1024> s_dyna_op_table63 = []() consteva
 
   return table;
 }();
-
 }  // Anonymous namespace
 
 void Jit64::DynaRunTable4(UGeckoInstruction inst)

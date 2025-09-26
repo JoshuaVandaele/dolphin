@@ -58,5 +58,4 @@ private:
 
   LibusbUtils::Context m_context;
 };
-
 }  // namespace IOS::HLE

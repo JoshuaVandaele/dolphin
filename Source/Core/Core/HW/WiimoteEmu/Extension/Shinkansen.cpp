@@ -134,5 +134,4 @@ ControllerEmu::ControlGroup* Shinkansen::GetGroup(ShinkansenGroup group)
     return nullptr;
   }
 }
-
 }  // namespace WiimoteEmu

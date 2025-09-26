@@ -55,5 +55,4 @@ private:
   ComPtr<ID3D12QueryHeap> m_query_heap;
   ComPtr<ID3D12Resource> m_query_readback_buffer;
 };
-
 }  // namespace DX12

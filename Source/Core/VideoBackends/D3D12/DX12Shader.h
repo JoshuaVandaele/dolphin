@@ -34,5 +34,4 @@ private:
 
   std::wstring m_name;
 };
-
 }  // namespace DX12

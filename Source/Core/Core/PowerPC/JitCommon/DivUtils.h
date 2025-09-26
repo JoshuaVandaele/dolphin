@@ -38,5 +38,4 @@ struct UnsignedMagic
 /// https://ridiculousfish.com/blog/posts/labor-of-division-episode-iii.html
 /// https://rubenvannieuwpoort.nl/posts/division-by-constant-unsigned-integers
 UnsignedMagic UnsignedDivisionConstants(u32 divisor);
-
 }  // namespace JitCommon

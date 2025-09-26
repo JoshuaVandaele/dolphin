@@ -778,5 +778,4 @@ void DSPEmitter::msub(const UDSPInstruction opc)
   //	dsp_set_long_prod(prod);
   set_long_prod();
 }
-
 }  // namespace DSP::JIT::x64

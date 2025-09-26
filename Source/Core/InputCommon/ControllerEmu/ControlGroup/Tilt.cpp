@@ -78,5 +78,4 @@ Control* Tilt::GetModifierInput() const
 {
   return controls[4].get();
 }
-
 }  // namespace ControllerEmu

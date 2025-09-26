@@ -369,5 +369,4 @@ void DSPEmitter::ilrrn(const UDSPInstruction opc)
   dsp_conditional_extend_accum(dreg + DSP_REG_ACM0);
   increase_addr_reg(reg, reg);
 }
-
 }  // namespace DSP::JIT::x64

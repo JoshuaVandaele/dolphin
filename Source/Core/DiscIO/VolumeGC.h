@@ -115,5 +115,4 @@ private:
   bool m_is_triforce;
   std::array<char, 4> m_triforce_id;
 };
-
 }  // namespace DiscIO

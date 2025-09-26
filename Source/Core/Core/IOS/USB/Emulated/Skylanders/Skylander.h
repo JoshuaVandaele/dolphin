@@ -159,5 +159,4 @@ private:
 
   std::array<Skylander, MAX_SKYLANDERS> skylanders;
 };
-
 }  // namespace IOS::HLE::USB

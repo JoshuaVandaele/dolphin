@@ -202,7 +202,6 @@ struct DX12HRWrap
   constexpr explicit DX12HRWrap(HRESULT hr) : m_hr(hr) {}
   const HRESULT m_hr;
 };
-
 }  // namespace DX12
 
 template <>

@@ -505,5 +505,4 @@ D3D11_PRIMITIVE_TOPOLOGY StateCache::GetPrimitiveTopology(PrimitiveType primitiv
        D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP}};
   return primitives[static_cast<u32>(primitive)];
 }
-
 }  // namespace DX11

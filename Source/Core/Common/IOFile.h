@@ -123,5 +123,4 @@ private:
   std::FILE* m_file;
   bool m_good;
 };
-
 }  // namespace File

@@ -1361,7 +1361,6 @@ FMA4_TEST(VFNMSUB, P, true)
 FMA4_TEST(VFNMSUB, S, false)
 FMA4_TEST(VFMADDSUB, P, true)
 FMA4_TEST(VFMSUBADD, P, true)
-
 }  // namespace Gen
 
 #ifdef _MSC_VER

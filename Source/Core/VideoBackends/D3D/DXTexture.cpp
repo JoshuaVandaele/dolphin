@@ -504,5 +504,4 @@ DXFramebuffer::Create(DXTexture* color_attachment, DXTexture* depth_attachment,
       depth_format, width, height, layers, samples, std::move(rtv), std::move(integer_rtv),
       std::move(dsv), std::move(additional_rtvs));
 }
-
 }  // namespace DX11

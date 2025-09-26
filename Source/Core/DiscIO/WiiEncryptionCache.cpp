@@ -89,5 +89,4 @@ bool WiiEncryptionCache::EncryptGroups(u64 offset, u64 size, u8* out_ptr, u64 pa
 
   return true;
 }
-
 }  // namespace DiscIO

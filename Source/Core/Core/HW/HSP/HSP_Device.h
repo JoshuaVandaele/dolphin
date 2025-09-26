@@ -36,5 +36,4 @@ protected:
 };
 
 std::unique_ptr<IHSPDevice> HSPDevice_Create(HSPDeviceType device);
-
 }  // namespace HSP

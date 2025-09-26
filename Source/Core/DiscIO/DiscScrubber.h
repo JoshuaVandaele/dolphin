@@ -50,5 +50,4 @@ private:
   bool m_has_wii_hashes = false;
   bool m_is_scrubbing = false;
 };
-
 }  // namespace DiscIO

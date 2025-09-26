@@ -84,5 +84,4 @@ UnsignedMagic UnsignedDivisionConstants(u32 divisor)
 
   return mag;
 }
-
 }  // namespace JitCommon

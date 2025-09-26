@@ -273,6 +273,5 @@ private:
   Results m_detections;
   std::unique_ptr<Impl> m_state;
 };
-
 }  // namespace Core
 }  // namespace ciface

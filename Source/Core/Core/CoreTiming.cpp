@@ -618,5 +618,4 @@ void GlobalIdle()
 {
   Core::System::GetInstance().GetCoreTiming().Idle();
 }
-
 }  // namespace CoreTiming

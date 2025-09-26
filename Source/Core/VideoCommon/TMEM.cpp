@@ -286,5 +286,4 @@ void DoState(PointerWrap& p)
 {
   p.DoArray(s_unit);
 }
-
 }  // namespace TMEM

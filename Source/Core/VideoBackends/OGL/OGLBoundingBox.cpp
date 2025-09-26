@@ -73,5 +73,4 @@ void OGLBoundingBox::Write(u32 index, std::span<const BBoxType> values)
                   sizeof(BBoxType) * values.size(), values.data());
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
-
 }  // namespace OGL

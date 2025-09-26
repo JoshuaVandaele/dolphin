@@ -213,5 +213,4 @@ bool AnalyzeFunction(const Core::CPUThreadGuard& guard, u32 startAddr, Common::S
                      u32 max_size = 0);
 bool ReanalyzeFunction(const Core::CPUThreadGuard& guard, u32 start_addr, Common::Symbol& func,
                        u32 max_size = 0);
-
 }  // namespace PPCAnalyst

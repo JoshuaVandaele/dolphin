@@ -794,5 +794,4 @@ bool IsDebuggingEnabled()
   return Config::Get(::Config::MAIN_ENABLE_DEBUGGING) &&
          !AchievementManager::GetInstance().IsHardcoreModeActive();
 }
-
 }  // namespace Config

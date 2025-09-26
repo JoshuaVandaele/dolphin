@@ -31,5 +31,4 @@ private:
   std::array<float, 32768> m_float_conversion_buffer;
   Common::FixedSizeQueue<float, 32768> m_decoded_fifo;
 };
-
 }  // namespace AudioCommon

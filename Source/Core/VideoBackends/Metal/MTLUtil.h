@@ -55,6 +55,5 @@ static inline bool HasStencil(AbstractTextureFormat format)
 }
 
 std::optional<std::string> TranslateShaderToMSL(ShaderStage stage, std::string_view source);
-
 }  // namespace Util
 }  // namespace Metal

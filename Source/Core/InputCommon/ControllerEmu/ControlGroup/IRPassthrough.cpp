@@ -47,5 +47,4 @@ ControlState IRPassthrough::GetObjectSize(size_t object_index) const
 {
   return controls[object_index * 3 + 2]->GetState();
 }
-
 }  // namespace ControllerEmu

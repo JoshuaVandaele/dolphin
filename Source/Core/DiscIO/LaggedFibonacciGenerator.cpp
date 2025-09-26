@@ -208,5 +208,4 @@ bool LaggedFibonacciGenerator::Initialize(bool check_existing_data)
 
   return true;
 }
-
 }  // namespace DiscIO

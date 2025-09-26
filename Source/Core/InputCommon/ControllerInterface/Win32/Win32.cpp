@@ -124,5 +124,4 @@ InputBackend::~InputBackend()
   XInput::DeInit();
   WGInput::DeInit();
 }
-
 }  // namespace ciface::Win32

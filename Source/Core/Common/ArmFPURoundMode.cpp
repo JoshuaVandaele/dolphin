@@ -86,5 +86,4 @@ void LoadDefaultSIMDState()
 {
   SetFPCR(default_fpcr);
 }
-
 }  // namespace Common::FPU

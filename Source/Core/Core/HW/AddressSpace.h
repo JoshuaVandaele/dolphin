@@ -54,5 +54,4 @@ Accessors* GetAccessors(Type address_space);
 
 void Init();
 void Shutdown();
-
 }  // namespace AddressSpace

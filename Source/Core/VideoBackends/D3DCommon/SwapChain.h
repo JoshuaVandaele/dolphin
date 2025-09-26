@@ -74,5 +74,4 @@ protected:
   bool m_has_fullscreen = false;
   bool m_fullscreen_request = false;
 };
-
 }  // namespace D3DCommon

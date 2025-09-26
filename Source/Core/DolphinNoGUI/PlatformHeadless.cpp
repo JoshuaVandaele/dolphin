@@ -43,7 +43,6 @@ WindowSystemInfo PlatformHeadless::GetWindowSystemInfo() const
   wsi.render_surface = nullptr;
   return wsi;
 }
-
 }  // namespace
 
 std::unique_ptr<Platform> Platform::CreateHeadlessPlatform()

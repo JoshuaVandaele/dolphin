@@ -280,5 +280,4 @@ void GameFileCache::DoState(PointerWrap* p, u64 size)
     elem->DoState(state);
   });
 }
-
 }  // namespace UICommon

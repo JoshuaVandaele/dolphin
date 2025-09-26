@@ -48,5 +48,4 @@ class NullEFBInterface final : public EFBInterfaceBase
   u32 PeekColorInternal(u16 x, u16 y) override;
   u32 PeekDepthInternal(u16 x, u16 y) override;
 };
-
 }  // namespace Null

@@ -735,5 +735,4 @@ void StateTracker::UpdateComputeDescriptorSet()
     m_dirty_flags &= ~DIRTY_FLAG_COMPUTE_DESCRIPTOR_SET;
   }
 }
-
 }  // namespace Vulkan

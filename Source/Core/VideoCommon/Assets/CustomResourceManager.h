@@ -211,5 +211,4 @@ private:
 
   Common::EventHook m_xfb_event;
 };
-
 }  // namespace VideoCommon

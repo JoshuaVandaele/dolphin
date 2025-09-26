@@ -12,5 +12,4 @@ VertexManager::~VertexManager() = default;
 void VertexManager::DrawCurrentBatch(u32 base_index, u32 num_indices, u32 base_vertex)
 {
 }
-
 }  // namespace Null

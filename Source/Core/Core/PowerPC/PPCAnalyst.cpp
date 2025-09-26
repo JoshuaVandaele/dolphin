@@ -1154,5 +1154,4 @@ u32 PPCAnalyzer::Analyze(u32 address, CodeBlock* block, CodeBuffer* buffer,
   block->m_gpr_inputs = gprBlockInputs;
   return address;
 }
-
 }  // namespace PPCAnalyst

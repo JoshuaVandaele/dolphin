@@ -486,5 +486,4 @@ void Shutdown()
 {
   s_initialized = false;
 }
-
 }  // namespace AddressSpace

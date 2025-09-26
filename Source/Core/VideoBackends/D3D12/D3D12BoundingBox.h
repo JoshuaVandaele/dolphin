@@ -36,5 +36,4 @@ private:
   StreamBuffer m_upload_buffer;
   DescriptorHandle m_gpu_descriptor{};
 };
-
 }  // namespace DX12

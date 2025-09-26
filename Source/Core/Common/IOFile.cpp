@@ -177,5 +177,4 @@ bool IOFile::Resize(u64 size)
 
   return m_good;
 }
-
 }  // namespace File

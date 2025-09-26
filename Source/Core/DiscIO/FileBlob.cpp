@@ -118,5 +118,4 @@ bool ConvertToPlain(BlobReader* infile, const std::string& infile_path,
 
   return success;
 }
-
 }  // namespace DiscIO

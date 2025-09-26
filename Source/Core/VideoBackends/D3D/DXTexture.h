@@ -108,5 +108,4 @@ protected:
   ComPtr<ID3D11RenderTargetView> m_integer_rtv;
   ComPtr<ID3D11DepthStencilView> m_dsv;
 };
-
 }  // namespace DX11

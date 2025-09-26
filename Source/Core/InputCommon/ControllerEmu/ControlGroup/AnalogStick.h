@@ -43,5 +43,4 @@ private:
   SettingValue<double> m_virtual_notch_setting;
   SettingValue<double> m_gate_size_setting;
 };
-
 }  // namespace ControllerEmu

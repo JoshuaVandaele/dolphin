@@ -152,5 +152,4 @@ std::optional<IPCReply> USBHost::HandleTransfer(std::shared_ptr<USB::Device> dev
                 device->GetVid(), device->GetPid(), request, device->GetErrorName(ret));
   return IPCReply(ret <= 0 ? ret : IPC_EINVAL);
 }
-
 }  // namespace IOS::HLE

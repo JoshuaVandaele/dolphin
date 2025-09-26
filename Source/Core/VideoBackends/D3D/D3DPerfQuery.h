@@ -40,5 +40,4 @@ private:
   std::array<ActiveQuery, PERF_QUERY_BUFFER_SIZE> m_query_buffer;
   int m_query_read_pos;
 };
-
 }  // namespace DX11

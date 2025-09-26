@@ -167,7 +167,6 @@ ControllerEmu::InputOverrideFunction GetInputOverrideFunction(const ControlsMap&
     return input_state.overriding ? std::make_optional(input_state.override_state) : std::nullopt;
   };
 }
-
 }  // namespace
 
 void RegisterGameCubeInputOverrider(int controller_index)

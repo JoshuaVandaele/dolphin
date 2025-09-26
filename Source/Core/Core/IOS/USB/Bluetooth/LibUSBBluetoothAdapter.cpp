@@ -41,7 +41,6 @@ constexpr libusb_transfer_cb_fn LibUSBMemFunCallback()
     std::invoke(MemFun, static_cast<Common::ObjectType<MemFun>*>(tr->user_data), tr);
   };
 }
-
 }  // namespace
 
 bool LibUSBBluetoothAdapter::IsBluetoothDevice(const libusb_device_descriptor& descriptor)

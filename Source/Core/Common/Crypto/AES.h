@@ -48,5 +48,4 @@ std::unique_ptr<Context> CreateContextDecrypt(const u8* key);
 
 // OFB decryption for WiiConnect24
 void CryptOFB(const u8* key, const u8* iv, u8* iv_out, const u8* buf_in, u8* buf_out, size_t size);
-
 }  // namespace Common::AES

@@ -387,5 +387,4 @@ bool VertexManager::UploadTexelBuffer(const void* data, u32 data_size, TexelBuff
   Gfx::GetInstance()->SetTextureDescriptor(1, m_texel_buffer_views[palette_format].cpu_handle);
   return true;
 }
-
 }  // namespace DX12

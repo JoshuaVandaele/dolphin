@@ -66,5 +66,4 @@ private:
   std::string m_path;
   std::vector<std::shared_ptr<GameFile>> m_cached_files;
 };
-
 }  // namespace UICommon

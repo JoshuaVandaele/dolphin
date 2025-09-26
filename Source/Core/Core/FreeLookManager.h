@@ -38,7 +38,6 @@ void UpdateInput();
 
 InputConfig* GetInputConfig();
 ControllerEmu::ControlGroup* GetInputGroup(int pad_num, FreeLookGroup group);
-
 }  // namespace FreeLook
 
 class FreeLookController final : public ControllerEmu::EmulatedController

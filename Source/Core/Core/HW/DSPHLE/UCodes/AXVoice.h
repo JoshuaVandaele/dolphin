@@ -604,7 +604,6 @@ void ProcessVoice(HLEAccelerator* accelerator, PB_TYPE& pb, const AXBuffers& buf
 #undef WMCHAN_MIX_ON
 #endif
 }
-
 }  // namespace
 }  // inline namespace AXGC/AXWii
 }  // namespace DSP::HLE

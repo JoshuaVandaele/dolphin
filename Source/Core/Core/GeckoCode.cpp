@@ -291,5 +291,4 @@ void RunCodeHandler(const Core::CPUThreadGuard& guard)
   LR(ppc_state) = HLE_TRAMPOLINE_ADDRESS;
   ppc_state.pc = ppc_state.npc = ENTRY_POINT;
 }
-
 }  // namespace Gecko

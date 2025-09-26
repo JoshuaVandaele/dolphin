@@ -237,5 +237,4 @@ void AsyncShaderCompiler::WorkerThreadRun()
     }
   }
 }
-
 }  // namespace VideoCommon

@@ -36,5 +36,4 @@ constexpr u32 FIRST_PPC_UID = 0x1000;
 
 constexpr u32 SYSMENU_UID = FIRST_PPC_UID;
 constexpr u16 SYSMENU_GID = 1;
-
 }  // namespace IOS

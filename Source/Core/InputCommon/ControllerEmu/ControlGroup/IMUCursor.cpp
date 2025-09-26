@@ -59,5 +59,4 @@ ControlState IMUCursor::GetAccelWeight() const
 {
   return m_accel_weight_setting.GetValue() / 100;
 }
-
 }  // namespace ControllerEmu

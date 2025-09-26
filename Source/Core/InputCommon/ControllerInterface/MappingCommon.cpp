@@ -303,5 +303,4 @@ Common::DVec2 CalibrationBuilder::GetCenter() const
 {
   return m_center.value_or(Common::DVec2{});
 }
-
 }  // namespace ciface::MappingCommon

@@ -226,5 +226,4 @@ using WorkQueueThreadSP = detail::WorkQueueThreadBase<T, true>;
 
 using AsyncWorkThread = detail::AsyncWorkThreadBase<WorkQueueThread>;
 using AsyncWorkThreadSP = detail::AsyncWorkThreadBase<WorkQueueThreadSP>;
-
 }  // namespace Common

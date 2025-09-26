@@ -55,5 +55,4 @@ private:
   std::array<ActiveQuery, PERF_QUERY_BUFFER_SIZE> m_query_buffer = {};
   std::array<PerfQueryDataType, PERF_QUERY_BUFFER_SIZE> m_query_result_buffer = {};
 };
-
 }  // namespace Vulkan

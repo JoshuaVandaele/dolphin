@@ -311,5 +311,4 @@ bool NFSFileReader::Read(u64 offset, u64 nbytes, u8* out_ptr)
 
   return true;
 }
-
 }  // namespace DiscIO

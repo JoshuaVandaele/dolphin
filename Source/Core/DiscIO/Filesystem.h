@@ -125,5 +125,4 @@ public:
 // Calling Volume::GetFileSystem instead of manually constructing a filesystem is recommended,
 // because it will check IsValid for you, will automatically pick the right type of filesystem,
 // and will cache the filesystem in case it's needed again later.
-
 }  // namespace DiscIO

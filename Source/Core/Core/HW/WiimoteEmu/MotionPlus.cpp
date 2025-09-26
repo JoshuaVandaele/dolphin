@@ -709,5 +709,4 @@ void MotionPlus::ReversePassthroughModifications(PassthroughMode mode, u8* data)
     Common::SetBit<0>(data[4], true);
   }
 }
-
 }  // namespace WiimoteEmu

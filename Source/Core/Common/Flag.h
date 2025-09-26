@@ -41,5 +41,4 @@ public:
 private:
   std::atomic_bool m_val;
 };
-
 }  // namespace Common

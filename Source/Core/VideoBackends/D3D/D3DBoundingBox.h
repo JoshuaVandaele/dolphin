@@ -26,5 +26,4 @@ private:
   ComPtr<ID3D11Buffer> m_staging_buffer;
   ComPtr<ID3D11UnorderedAccessView> m_uav;
 };
-
 }  // namespace DX11

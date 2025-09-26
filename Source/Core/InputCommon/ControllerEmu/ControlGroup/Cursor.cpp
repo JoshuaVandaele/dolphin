@@ -190,5 +190,4 @@ bool Cursor::StateData::IsVisible() const
 {
   return !std::isnan(x);
 }
-
 }  // namespace ControllerEmu

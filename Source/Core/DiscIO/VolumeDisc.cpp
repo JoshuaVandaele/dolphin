@@ -124,5 +124,4 @@ void VolumeDisc::AddGamePartitionToSyncHash(Common::SHA1::Context* context) cons
       ReadAndAddToSyncHash(context, file_info->GetOffset(), file_info->GetSize(), partition);
   }
 }
-
 }  // namespace DiscIO

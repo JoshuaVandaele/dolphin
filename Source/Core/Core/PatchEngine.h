@@ -82,5 +82,4 @@ inline int GetPatchTypeCharLength(PatchType type)
   }
   return size;
 }
-
 }  // namespace PatchEngine

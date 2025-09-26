@@ -282,5 +282,4 @@ size_t MemPhysical()
   return (size_t)memInfo.totalram * memInfo.mem_unit;
 #endif
 }
-
 }  // namespace Common

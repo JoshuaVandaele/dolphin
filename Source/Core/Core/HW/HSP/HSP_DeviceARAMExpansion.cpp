@@ -44,5 +44,4 @@ void CHSPDevice_ARAMExpansion::DoState(PointerWrap& p)
 {
   p.DoArray(m_ptr, m_size);
 }
-
 }  // namespace HSP

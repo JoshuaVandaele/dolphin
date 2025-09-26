@@ -97,5 +97,4 @@ NullFramebuffer::Create(NullTexture* color_attachment, NullTexture* depth_attach
                                            std::move(additional_color_attachments), color_format,
                                            depth_format, width, height, layers, samples);
 }
-
 }  // namespace Null

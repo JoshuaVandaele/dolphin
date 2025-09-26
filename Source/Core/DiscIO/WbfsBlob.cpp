@@ -189,5 +189,4 @@ std::unique_ptr<WbfsFileReader> WbfsFileReader::Create(File::IOFile file, const 
 
   return reader;
 }
-
 }  // namespace DiscIO

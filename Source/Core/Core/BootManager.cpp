@@ -229,5 +229,4 @@ void RestoreConfig()
   Config::RemoveLayer(Config::LayerType::LocalGame);
   SConfig::GetInstance().ResetRunningGameMetadata();
 }
-
 }  // namespace BootManager

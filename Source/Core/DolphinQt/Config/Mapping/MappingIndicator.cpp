@@ -59,7 +59,6 @@ QPen GetInputDotPen(QPen pen)
   pen.setCapStyle(Qt::PenCapStyle::RoundCap);
   return GetCosmeticPen(pen);
 }
-
 }  // namespace
 
 QPen MappingIndicator::GetBBoxPen() const
@@ -303,7 +302,6 @@ void DrawPushedStick(QPainter& p, ReshapableInputIndicator& indicator, double va
   constexpr float alt_circle_radius = 0.45f;
   p.drawEllipse(QPointF{value * 0.45f, 0.f}, alt_circle_radius, alt_circle_radius);
 }
-
 }  // namespace
 
 void MappingIndicator::paintEvent(QPaintEvent*)

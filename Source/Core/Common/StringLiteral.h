@@ -16,5 +16,4 @@ struct StringLiteral
 
   char value[N];
 };
-
 }  // namespace Common

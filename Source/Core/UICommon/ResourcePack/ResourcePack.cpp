@@ -321,5 +321,4 @@ bool ResourcePack::operator==(const ResourcePack& pack) const
 {
   return pack.GetPath() == m_path;
 }
-
 }  // namespace ResourcePack

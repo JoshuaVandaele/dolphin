@@ -56,5 +56,4 @@ public:
 private:
   std::unique_ptr<SWOGLWindow> m_window;
 };
-
 }  // namespace SW

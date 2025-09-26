@@ -24,5 +24,4 @@ ControllerInterface& InputBackend::GetControllerInterface()
 {
   return m_controller_interface;
 }
-
 }  // namespace ciface

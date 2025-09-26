@@ -296,7 +296,5 @@ private:
 };
 
 extern std::unique_ptr<StateManager> stateman;
-
 }  // namespace D3D
-
 }  // namespace DX11

@@ -168,7 +168,6 @@ std::vector<std::string> GlobalConflicts(std::string_view source)
                     [](const std::string& s) { return s.size(); });
   return global_result;
 }
-
 }  // namespace
 
 void CustomPipeline::UpdatePixelData(std::shared_ptr<VideoCommon::CustomAssetLibrary>,

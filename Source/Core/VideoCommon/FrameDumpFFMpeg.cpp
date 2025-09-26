@@ -161,7 +161,6 @@ std::string AVErrorString(int error)
   av_make_error_string(&msg[0], msg.size(), error);
   return fmt::format("{:8x} {}", (u32)error, &msg[0]);
 }
-
 }  // namespace
 
 bool FFMpegFrameDump::Start(int w, int h, u64 start_ticks)

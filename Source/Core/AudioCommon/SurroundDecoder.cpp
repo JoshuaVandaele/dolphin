@@ -88,5 +88,4 @@ void SurroundDecoder::ReceiveFrames(float* out, const size_t num_frames_out)
     out[i] = m_decoded_fifo.pop_front();
   }
 }
-
 }  // namespace AudioCommon

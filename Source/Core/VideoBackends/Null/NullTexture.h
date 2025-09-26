@@ -62,5 +62,4 @@ public:
   Create(NullTexture* color_attachment, NullTexture* depth_attachment,
          std::vector<AbstractTexture*> additional_color_attachments);
 };
-
 }  // namespace Null

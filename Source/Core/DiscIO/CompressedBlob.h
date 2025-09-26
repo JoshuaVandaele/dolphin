@@ -76,5 +76,4 @@ private:
   std::vector<u8> m_zlib_buffer;
   std::string m_file_name;
 };
-
 }  // namespace DiscIO

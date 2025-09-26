@@ -698,5 +698,4 @@ void DSPEmitter::popExtValueToReg()
 
   m_store_index2 = -1;
 }
-
 }  // namespace DSP::JIT::x64

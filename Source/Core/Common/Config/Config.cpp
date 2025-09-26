@@ -245,5 +245,4 @@ ConfigChangeCallbackGuard::~ConfigChangeCallbackGuard()
 
   OnConfigChanged();
 }
-
 }  // namespace Config

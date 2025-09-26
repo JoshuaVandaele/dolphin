@@ -71,7 +71,6 @@ public:
 private:
   const u8* m_code_pointer = nullptr;
 };
-
 }  // namespace
 
 TEST(Arm64Emitter, CallFunction_ZeroParameters)

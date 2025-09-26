@@ -104,5 +104,4 @@ VertexLoaderBase* RefreshLoader(int vtx_attr_group)
 
   return loader;
 }
-
 }  // namespace VertexLoaderManager

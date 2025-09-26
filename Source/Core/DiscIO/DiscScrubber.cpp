@@ -231,5 +231,4 @@ void DiscScrubber::ParseFileSystemData(u64 partition_data_offset, const FileInfo
       MarkAsUsedE(partition_data_offset, file_info.GetOffset(), file_info.GetSize());
   }
 }
-
 }  // namespace DiscIO

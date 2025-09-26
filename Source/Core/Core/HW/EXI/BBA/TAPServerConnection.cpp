@@ -26,7 +26,6 @@
 
 namespace ExpansionInterface
 {
-
 #ifdef _WIN32
 using ws_ssize_t = int;
 #else
@@ -364,5 +363,4 @@ void TAPServerConnection::ReadThreadHandler()
     }
   }
 }
-
 }  // namespace ExpansionInterface

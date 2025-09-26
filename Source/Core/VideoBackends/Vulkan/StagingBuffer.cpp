@@ -204,5 +204,4 @@ std::unique_ptr<StagingBuffer> StagingBuffer::Create(STAGING_BUFFER_TYPE type, V
 
   return std::make_unique<StagingBuffer>(type, buffer, alloc, size, map_ptr);
 }
-
 }  // namespace Vulkan

@@ -667,5 +667,4 @@ std::optional<int> Device::GetPreferredId() const
 {
   return m_index;
 }
-
 }  // namespace ciface::DualShockUDPClient

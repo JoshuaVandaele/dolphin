@@ -304,5 +304,4 @@ void SetVisible(bool visible)
 {
   ShowWindow(window_handle, visible ? SW_SHOW : SW_HIDE);
 }
-
 }  // namespace UI

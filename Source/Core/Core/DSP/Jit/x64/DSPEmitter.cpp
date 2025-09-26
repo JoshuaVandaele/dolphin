@@ -513,5 +513,4 @@ Gen::OpArg DSPEmitter::M_SDSP_reg_stack_ptrs(size_t index)
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
-
 }  // namespace DSP::JIT::x64

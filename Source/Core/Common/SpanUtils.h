@@ -12,7 +12,6 @@
 
 namespace Common
 {
-
 // Like std::span::subspan, except undefined behavior is replaced with returning a 0-length span.
 template <class T>
 [[nodiscard]] constexpr std::span<T> SafeSubspan(std::span<T> span, size_t offset,
@@ -37,5 +36,4 @@ template <class T>
   std::memcpy(&result, subspan.data(), std::min(subspan.size(), sizeof(result)));
   return result;
 }
-
 }  // namespace Common

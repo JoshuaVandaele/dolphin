@@ -129,5 +129,4 @@ bool TGCFileReader::Read(u64 offset, u64 nbytes, u8* out_ptr)
   m_file.ClearError();
   return false;
 }
-
 }  // namespace DiscIO

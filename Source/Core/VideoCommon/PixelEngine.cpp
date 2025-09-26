@@ -250,5 +250,4 @@ void PixelEngineManager::SetFinish(int cycles_into_future)
 
   RaiseEvent(cycles_into_future);
 }
-
 }  // namespace PixelEngine

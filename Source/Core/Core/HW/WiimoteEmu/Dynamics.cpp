@@ -53,7 +53,6 @@ double CalculateStopDistance(double velocity, double max_accel)
 {
   return velocity * velocity / (2 * std::copysign(max_accel, velocity));
 }
-
 }  // namespace
 
 namespace WiimoteEmu
@@ -426,5 +425,4 @@ float GetYaw(const Common::Quaternion& world_rotation)
   const auto vec = world_rotation.Inverted() * Common::Vec3{0, 1, 0};
   return std::atan2(vec.x, vec.y);
 }
-
 }  // namespace WiimoteEmu

@@ -366,5 +366,4 @@ void UpdateInput()
     static_cast<FreeLookController*>(s_config.GetController(i))->Update();
   }
 }
-
 }  // namespace FreeLook

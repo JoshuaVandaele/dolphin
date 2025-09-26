@@ -52,7 +52,6 @@ enum class InputChannel
   FreeLook,
   Count,
 };
-
 }  // namespace ciface
 
 //

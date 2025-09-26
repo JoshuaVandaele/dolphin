@@ -169,5 +169,4 @@ void DSPEmitter::Update_SR_Register16_OverS32(Gen::X64Reg val, Gen::X64Reg full_
 
   m_gpr.PutReg(DSP_REG_SR);
 }
-
 }  // namespace DSP::JIT::x64

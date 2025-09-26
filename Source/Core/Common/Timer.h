@@ -64,5 +64,4 @@ public:
 
   static time_point now();
 };
-
 }  // Namespace Common

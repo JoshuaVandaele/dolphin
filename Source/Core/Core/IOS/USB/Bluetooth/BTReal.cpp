@@ -30,7 +30,6 @@
 
 namespace IOS::HLE
 {
-
 BluetoothRealDevice::BluetoothRealDevice(EmulationKernel& ios, const std::string& device_name)
     : BluetoothBaseDevice(ios, device_name)
 {
@@ -544,5 +543,4 @@ void BluetoothRealDevice::SaveLinkKeys()
 
   Config::SetBase(Config::MAIN_BLUETOOTH_PASSTHROUGH_LINK_KEYS, config_string);
 }
-
 }  // namespace IOS::HLE

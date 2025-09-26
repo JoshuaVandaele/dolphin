@@ -26,5 +26,4 @@ const Info<WiimoteSource>& GetInfoForWiimoteSource(int index)
   };
   return *infos[index];
 }
-
 }  // namespace Config

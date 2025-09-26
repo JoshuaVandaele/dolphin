@@ -90,5 +90,4 @@ struct ConditionRegister
   void Set(u32 new_cr);
   u32 Get() const;
 };
-
 }  // namespace PowerPC

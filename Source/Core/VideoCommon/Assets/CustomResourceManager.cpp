@@ -225,5 +225,4 @@ void CustomResourceManager::RemoveAssetsUntilBelowMemoryLimit()
                  UICommon::FormatSize(bytes_unloaded));
   }
 }
-
 }  // namespace VideoCommon

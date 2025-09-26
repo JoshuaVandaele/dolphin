@@ -186,5 +186,4 @@ double CalculateRawDiscReadTime(u64 offset, u64 length, bool wii_disc)
 
   return length / speed;
 }
-
 }  // namespace DVDMath

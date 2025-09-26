@@ -746,5 +746,4 @@ bool Gfx::UpdateComputeUAVDescriptorTable()
   m_state.compute_uav_descriptor_base = handle.gpu_handle;
   return true;
 }
-
 }  // namespace DX12

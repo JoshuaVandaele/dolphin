@@ -228,5 +228,4 @@ Fd HostFileSystem::ConvertHandleToFd(const Handle* handle) const
 {
   return handle - m_handles.data();
 }
-
 }  // namespace IOS::HLE::FS

@@ -1015,5 +1015,4 @@ void RunAllActive(const Core::CPUThreadGuard& cpu_guard)
   });
   s_disable_logging = true;
 }
-
 }  // namespace ActionReplay

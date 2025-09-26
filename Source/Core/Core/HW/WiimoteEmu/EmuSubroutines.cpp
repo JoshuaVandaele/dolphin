@@ -590,5 +590,4 @@ ControllerEmu::SubscribableSettingValue<bool>& Wiimote::GetMotionPlusSetting()
 {
   return m_motion_plus_setting;
 }
-
 }  // namespace WiimoteEmu

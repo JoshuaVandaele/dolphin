@@ -31,5 +31,4 @@ private:
   ComPtr<ID3D11DeviceChild> m_shader;
   std::string m_name;
 };
-
 }  // namespace DX11

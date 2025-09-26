@@ -791,5 +791,4 @@ void PopulateDevices()
     ERROR_LOG_FMT(CONTROLLERINTERFACE, "WGInput: PopulateDevices failed");
   }
 }
-
 }  // namespace ciface::WGInput

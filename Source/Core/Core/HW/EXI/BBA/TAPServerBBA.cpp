@@ -9,7 +9,6 @@
 
 namespace ExpansionInterface
 {
-
 CEXIETHERNET::TAPServerNetworkInterface::TAPServerNetworkInterface(CEXIETHERNET* eth_ref,
                                                                    const std::string& destination)
     : NetworkInterface(eth_ref),
@@ -71,5 +70,4 @@ void CEXIETHERNET::TAPServerNetworkInterface::HandleReceivedFrame(std::string&& 
   m_eth_ref->mRecvBufferLength = static_cast<u32>(data.size());
   m_eth_ref->RecvHandlePacket();
 }
-
 }  // namespace ExpansionInterface

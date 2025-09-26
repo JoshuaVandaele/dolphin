@@ -107,5 +107,4 @@ bool Manifest::IsCompressed() const
 {
   return m_compressed;
 }
-
 }  // namespace ResourcePack

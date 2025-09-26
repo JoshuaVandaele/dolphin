@@ -84,5 +84,4 @@ private:
   std::deque<WorkItemPtr> m_completed_work;
   std::mutex m_completed_work_lock;
 };
-
 }  // namespace VideoCommon

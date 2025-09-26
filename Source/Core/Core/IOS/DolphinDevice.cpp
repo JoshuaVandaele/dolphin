@@ -211,7 +211,6 @@ IPCReply ResetDiscord(const IOCtlVRequest& request)
 
   return IPCReply(IPC_SUCCESS);
 }
-
 }  // namespace
 
 IPCReply DolphinDevice::GetElapsedTime(const IOCtlVRequest& request) const

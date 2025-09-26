@@ -202,5 +202,4 @@ private:
 
 ParseResult ParseExpression(const std::string& expr);
 ParseResult ParseTokens(const std::vector<Token>& tokens);
-
 }  // namespace ciface::ExpressionParser

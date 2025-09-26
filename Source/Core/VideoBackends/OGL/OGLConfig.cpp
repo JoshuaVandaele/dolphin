@@ -762,5 +762,4 @@ bool PopulateConfig(GLContext* m_main_gl_context)
 
   return true;
 }
-
 }  // namespace OGL

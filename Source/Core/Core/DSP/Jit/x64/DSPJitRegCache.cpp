@@ -1061,5 +1061,4 @@ void DSPJitRegCache::PutXReg(X64Reg reg)
 
   m_xregs[reg].guest_reg = DSP_REG_NONE;
 }
-
 }  // namespace DSP::JIT::x64

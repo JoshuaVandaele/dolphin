@@ -290,5 +290,4 @@ AbstractShader::BinaryData Shader::CreateByteCode(const void* data, size_t lengt
 
   return {begin, end};
 }
-
 }  // namespace D3DCommon

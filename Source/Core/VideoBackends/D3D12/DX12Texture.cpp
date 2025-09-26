@@ -824,5 +824,4 @@ std::unique_ptr<DXStagingTexture> DXStagingTexture::Create(StagingTextureType ty
   return std::unique_ptr<DXStagingTexture>(
       new DXStagingTexture(type, config, resource.Get(), stride, size));
 }
-
 }  // namespace DX12

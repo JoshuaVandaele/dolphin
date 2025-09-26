@@ -757,5 +757,4 @@ void DSPEmitter::get_ax_h(int _reg, X64Reg axh)
   //	return (s16)g_dsp.r[DSP_REG_AXH0 + _reg];
   m_gpr.ReadReg(_reg + DSP_REG_AXH0, axh, RegisterExtension::Sign);
 }
-
 }  // namespace DSP::JIT::x64

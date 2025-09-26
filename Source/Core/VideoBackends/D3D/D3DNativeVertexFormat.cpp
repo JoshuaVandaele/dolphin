@@ -186,5 +186,4 @@ void D3DVertexFormat::AddAttribute(const AttributeFormat& format, ShaderAttrib s
     ++m_num_elems;
   }
 }
-
 }  // namespace DX11

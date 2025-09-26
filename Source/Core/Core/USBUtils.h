@@ -14,7 +14,6 @@ struct libusb_device_descriptor;
 
 namespace USBUtils
 {
-
 struct DeviceInfo
 {
   u16 vid;
@@ -36,5 +35,4 @@ ListDevices(const std::function<bool(const struct libusb_device_descriptor&)>& f
                 [](const struct libusb_device_descriptor&) { return true; });
 std::vector<DeviceInfo> ListDevices(const std::function<bool(const DeviceInfo&)>& filter =
                                         [](const DeviceInfo&) { return true; });
-
 }  // namespace USBUtils

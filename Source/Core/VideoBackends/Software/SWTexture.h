@@ -72,5 +72,4 @@ public:
   Create(SWTexture* color_attachment, SWTexture* depth_attachment,
          std::vector<AbstractTexture*> additional_color_attachments);
 };
-
 }  // namespace SW

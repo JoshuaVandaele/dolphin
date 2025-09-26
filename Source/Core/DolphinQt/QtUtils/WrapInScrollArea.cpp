@@ -13,7 +13,6 @@
 
 namespace
 {
-
 // This scroll area prefers the size of its underlying widget.
 class HintingScrollArea final : public QScrollArea
 {
@@ -39,7 +38,6 @@ public:
     return size_hint + scrollbar_padding;
   }
 };
-
 }  // namespace
 
 QWidget* GetWrappedWidget(QWidget* wrapped_widget)

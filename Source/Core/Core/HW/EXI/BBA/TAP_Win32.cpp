@@ -169,7 +169,6 @@ bool OpenTAP(HANDLE& adapter, const std::basic_string<TCHAR>& device_guid)
   }
   return true;
 }
-
 }  // namespace Win32TAPHelper
 
 namespace ExpansionInterface

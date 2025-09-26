@@ -320,5 +320,4 @@ Core::DeviceRemoval Device::UpdateInput()
 
   return Core::DeviceRemoval::Keep;
 }
-
 }  // namespace ciface::SteamDeck

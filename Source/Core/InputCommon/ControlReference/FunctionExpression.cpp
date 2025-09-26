@@ -724,5 +724,4 @@ u32 FunctionExpression::GetArgCount() const
 void FunctionExpression::SetValue(ControlState)
 {
 }
-
 }  // namespace ciface::ExpressionParser

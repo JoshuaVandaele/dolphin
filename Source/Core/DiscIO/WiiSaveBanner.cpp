@@ -77,5 +77,4 @@ std::vector<u32> WiiSaveBanner::GetBanner(u32* width, u32* height) const
   *height = BANNER_HEIGHT;
   return image_buffer;
 }
-
 }  // namespace DiscIO

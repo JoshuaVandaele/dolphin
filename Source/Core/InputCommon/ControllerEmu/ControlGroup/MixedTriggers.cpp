@@ -125,5 +125,4 @@ size_t MixedTriggers::GetTriggerCount() const
 {
   return controls.size() / 2;
 }
-
 }  // namespace ControllerEmu

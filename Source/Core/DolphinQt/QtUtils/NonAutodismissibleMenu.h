@@ -7,7 +7,6 @@
 
 namespace QtUtils
 {
-
 // A menu widget based on QMenu that will not be automatically dismissed when one of its checkable
 // actions are triggered.
 class NonAutodismissibleMenu : public QMenu
@@ -18,5 +17,4 @@ public:
 protected:
   void mouseReleaseEvent(QMouseEvent* event) override;
 };
-
 }  // namespace QtUtils

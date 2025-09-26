@@ -37,7 +37,6 @@ bool SupportsTextureFormat(DXGI_FORMAT format);
 
 // Checks for logic op support.
 bool SupportsLogicOp(u32 adapter_index);
-
 }  // namespace D3D
 
 // Wrapper for HRESULT to be used with fmt.  Note that we can't create a fmt::formatter directly
@@ -48,7 +47,6 @@ struct DX11HRWrap
   constexpr explicit DX11HRWrap(HRESULT hr) : m_hr(hr) {}
   const HRESULT m_hr;
 };
-
 }  // namespace DX11
 
 template <>

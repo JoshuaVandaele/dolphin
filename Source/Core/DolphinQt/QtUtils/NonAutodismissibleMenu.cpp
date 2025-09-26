@@ -8,7 +8,6 @@
 
 namespace QtUtils
 {
-
 void NonAutodismissibleMenu::mouseReleaseEvent(QMouseEvent* const event)
 {
   if (!event)
@@ -24,5 +23,4 @@ void NonAutodismissibleMenu::mouseReleaseEvent(QMouseEvent* const event)
 
   QMenu::mouseReleaseEvent(event);
 }
-
 }  // namespace QtUtils

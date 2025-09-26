@@ -71,5 +71,4 @@ private:
   // Pointers are unowned:
   std::vector<I2CSlave*> m_slaves;
 };
-
 }  // namespace WiimoteEmu

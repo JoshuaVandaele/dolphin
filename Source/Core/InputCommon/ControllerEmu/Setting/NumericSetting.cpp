@@ -74,5 +74,4 @@ SettingType NumericSetting<bool>::GetType() const
 {
   return SettingType::Bool;
 }
-
 }  // namespace ControllerEmu

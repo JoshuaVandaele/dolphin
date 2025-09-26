@@ -49,5 +49,4 @@ private:
   std::vector<BufferResources> m_buffers;
   u32 m_current_buffer = 0;
 };
-
 }  // namespace DX12

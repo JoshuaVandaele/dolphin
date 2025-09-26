@@ -111,5 +111,4 @@ struct CachedAsset
   std::shared_ptr<AssetType> m_asset;
   CustomAsset::TimeType m_cached_write_time;
 };
-
 }  // namespace VideoCommon

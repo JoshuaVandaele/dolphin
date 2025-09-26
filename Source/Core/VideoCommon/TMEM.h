@@ -22,5 +22,4 @@ bool IsValid(u32 unit);
 
 void Init();
 void DoState(PointerWrap& p);
-
 }  // namespace TMEM

@@ -123,5 +123,4 @@ void MemoryInterfaceManager::RegisterMMIO(MMIO::Mapping* mmio, u32 base)
                    MMIO::WriteToSmaller<u32>(mmio, base | i, base | (i + 2)));
   }
 }
-
 }  // namespace MemoryInterface

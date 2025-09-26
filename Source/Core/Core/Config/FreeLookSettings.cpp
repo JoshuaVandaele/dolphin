@@ -18,5 +18,4 @@ const Info<bool> FREE_LOOK_BACKGROUND_INPUT{{System::FreeLook, "General", "Backg
 // FreeLook.Controller1
 const Info<FreeLook::ControlType> FL1_CONTROL_TYPE{{System::FreeLook, "Camera1", "ControlType"},
                                                    FreeLook::ControlType::SixAxis};
-
 }  // namespace Config

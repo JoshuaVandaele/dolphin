@@ -212,5 +212,4 @@ const Info<bool> GFX_HACK_NO_MIPMAPPING{{System::GFX, "Hacks", "NoMipmapping"}, 
 // Graphics.GameSpecific
 
 const Info<bool> GFX_PERF_QUERIES_ENABLE{{System::GFX, "GameSpecific", "PerfQueriesEnable"}, false};
-
 }  // namespace Config

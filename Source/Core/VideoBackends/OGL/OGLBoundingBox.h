@@ -24,5 +24,4 @@ protected:
 private:
   GLuint m_buffer_id = 0;
 };
-
 }  // namespace OGL

@@ -324,5 +324,4 @@ private:
 
   std::unique_ptr<VolumeDisc> m_wrapped_volume;
 };
-
 }  // namespace DiscIO

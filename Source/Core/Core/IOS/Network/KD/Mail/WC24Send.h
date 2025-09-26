@@ -26,7 +26,6 @@ class FileSystem;
 }
 namespace NWC24::Mail
 {
-
 constexpr const char SEND_BOX_PATH[] = "/" WII_WC24CONF_DIR "/mbox"
                                        "/wc24send.mbx";
 class WC24SendList final

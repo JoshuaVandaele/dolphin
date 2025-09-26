@@ -7,7 +7,6 @@
 
 namespace ExpansionInterface
 {
-
 CEXIModem::TAPServerNetworkInterface::TAPServerNetworkInterface(CEXIModem* modem_ref,
                                                                 const std::string& destination)
     : NetworkInterface(modem_ref),
@@ -61,5 +60,4 @@ void CEXIModem::TAPServerNetworkInterface::HandleReceivedFrame(std::string&& dat
 {
   m_modem_ref->AddToReceiveBuffer(std::move(data));
 }
-
 }  // namespace ExpansionInterface

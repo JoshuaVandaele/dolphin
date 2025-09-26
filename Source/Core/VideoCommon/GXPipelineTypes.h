@@ -89,5 +89,4 @@ struct SerializedGXUberPipelineUid
   u32 blending_state_bits = 0;
 };
 #pragma pack(pop)
-
 }  // namespace VideoCommon

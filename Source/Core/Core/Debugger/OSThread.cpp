@@ -204,5 +204,4 @@ bool OSThreadView::IsValid(const Core::CPUThreadGuard& guard) const
 {
   return m_thread.IsValid(guard);
 }
-
 }  // namespace Core::Debug

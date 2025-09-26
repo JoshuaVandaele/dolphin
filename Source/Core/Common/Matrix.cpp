@@ -32,7 +32,6 @@ auto MatrixMultiply(const std::array<T, N * M>& a, const std::array<T, M * P>& b
 
   return result;
 }
-
 }  // namespace
 
 namespace Common
@@ -426,5 +425,4 @@ Matrix44 Matrix44::Inverted() const
 
   return result;
 }
-
 }  // namespace Common

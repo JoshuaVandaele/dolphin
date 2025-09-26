@@ -269,5 +269,4 @@ constexpr auto AsWritableU8Span(T& obj)
 {
   return std::span{reinterpret_cast<u8*>(std::addressof(obj)), sizeof(obj)};
 }
-
 }  // namespace Common

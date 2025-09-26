@@ -110,5 +110,4 @@ private:
   u32 m_height = 0;
   u32 m_layers = 0;
 };
-
 }  // namespace Vulkan

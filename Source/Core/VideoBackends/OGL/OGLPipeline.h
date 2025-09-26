@@ -40,5 +40,4 @@ private:
   PipelineProgram* m_program;
   GLenum m_gl_primitive;
 };
-
 }  // namespace OGL

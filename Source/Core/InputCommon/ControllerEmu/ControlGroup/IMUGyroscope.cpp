@@ -172,5 +172,4 @@ bool IMUGyroscope::IsCalibrating() const
   return calibration_period && (Clock::now() - m_calibration_period_start) >=
                                    std::chrono::duration<double>(calibration_period);
 }
-
 }  // namespace ControllerEmu

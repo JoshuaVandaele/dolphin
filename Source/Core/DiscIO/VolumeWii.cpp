@@ -650,5 +650,4 @@ void VolumeWii::DecryptBlockData(const u8* in, u8* out, Common::AES::Context* ae
 {
   aes_context->Crypt(&in[0x3d0], &in[sizeof(HashBlock)], out, BLOCK_DATA_SIZE);
 }
-
 }  // namespace DiscIO

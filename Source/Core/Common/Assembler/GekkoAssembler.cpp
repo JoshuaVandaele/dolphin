@@ -103,7 +103,6 @@ void AdjustOperandsForGas(GekkoMnemonic mnemonic, OperandList& ops_list)
     break;
   }
 }
-
 }  // namespace
 
 void CodeBlock::PushBigEndian(u32 val)

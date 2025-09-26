@@ -2082,5 +2082,4 @@ bool ConvertToWIAOrRVZ(BlobReader* infile, const std::string& infile_path,
 
 template class WIARVZFileReader<false>;
 template class WIARVZFileReader<true>;
-
 }  // namespace DiscIO

@@ -60,5 +60,4 @@ private:
   u32 m_block_size;
   MapType m_ciso_map[CISO_MAP_SIZE];
 };
-
 }  // namespace DiscIO

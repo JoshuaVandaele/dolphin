@@ -10,7 +10,6 @@
 
 namespace QtUtils
 {
-
 void ShowFourDigitYear(QDateTimeEdit* widget)
 {
   if (!widget->displayFormat().contains(QStringLiteral("yyyy")))
@@ -67,5 +66,4 @@ void CenterOnParentWindow(QWidget* const widget)
 
   widget->setGeometry(QRect(pos, size));
 }
-
 }  // namespace QtUtils

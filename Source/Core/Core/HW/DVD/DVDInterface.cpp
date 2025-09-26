@@ -1539,5 +1539,4 @@ void DVDInterface::ScheduleReads(u64 offset, u32 length, const DiscIO::Partition
                 unbuffered_blocks, buffered_blocks, ticks_until_completion,
                 ticks_until_completion * 1000000 / m_system.GetSystemTimers().GetTicksPerSecond());
 }
-
 }  // namespace DVD

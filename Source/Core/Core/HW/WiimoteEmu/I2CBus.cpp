@@ -49,5 +49,4 @@ int I2CBus::BusWrite(u8 slave_addr, u8 addr, int count, const u8* data_in)
 
   return 0;
 }
-
 }  // namespace WiimoteEmu

@@ -37,5 +37,4 @@ protected:
           std::string ui_name);
   Control(std::unique_ptr<ControlReference> ref, Translatability translate, std::string name);
 };
-
 }  // namespace ControllerEmu

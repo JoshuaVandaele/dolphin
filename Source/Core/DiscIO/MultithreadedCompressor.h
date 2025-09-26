@@ -220,5 +220,4 @@ private:
   std::atomic<ConversionResultCode> m_result = ConversionResultCode::Success;
   std::atomic<bool> m_shutting_down = false;
 };
-
 }  // namespace DiscIO

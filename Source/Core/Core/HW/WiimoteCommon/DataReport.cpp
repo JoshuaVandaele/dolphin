@@ -442,5 +442,4 @@ const u8* DataReportBuilder::GetExtDataPtr() const
 {
   return m_manip->GetExtDataPtr();
 }
-
 }  // namespace WiimoteCommon

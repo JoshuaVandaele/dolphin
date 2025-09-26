@@ -227,5 +227,4 @@ auto SteadyAwakeClock::now() -> time_point
   return time_point{std::chrono::seconds{ts.tv_sec} + std::chrono::nanoseconds{ts.tv_nsec}};
 #endif
 }
-
 }  // Namespace Common

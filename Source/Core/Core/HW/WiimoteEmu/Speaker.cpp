@@ -182,5 +182,4 @@ int SpeakerLogic::BusWrite(u8 slave_addr, u8 addr, int count, const u8* data_in)
     return RawWrite(&reg_data, addr, count, data_in);
   }
 }
-
 }  // namespace WiimoteEmu

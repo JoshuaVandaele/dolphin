@@ -222,5 +222,4 @@ std::tuple<void*, size_t> GetCurrentThreadStack()
 }
 
 #endif
-
 }  // namespace Common

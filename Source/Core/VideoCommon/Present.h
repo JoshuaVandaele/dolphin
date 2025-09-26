@@ -168,7 +168,6 @@ private:
 
   Common::EventHook m_config_changed;
 };
-
 }  // namespace VideoCommon
 
 extern std::unique_ptr<VideoCommon::Presenter> g_presenter;

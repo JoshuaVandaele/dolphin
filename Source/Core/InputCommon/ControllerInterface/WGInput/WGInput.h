@@ -8,5 +8,4 @@ namespace ciface::WGInput
 void Init();
 void DeInit();
 void PopulateDevices();
-
 }  // namespace ciface::WGInput

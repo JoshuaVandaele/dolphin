@@ -221,5 +221,4 @@ private:
 
   Core::System& m_system;
 };
-
 }  // namespace PixelEngine

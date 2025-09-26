@@ -119,5 +119,4 @@ public:
 protected:
   GLuint m_fbo;
 };
-
 }  // namespace OGL

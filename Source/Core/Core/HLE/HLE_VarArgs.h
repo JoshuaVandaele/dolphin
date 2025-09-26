@@ -177,5 +177,4 @@ private:
   u32 GetGPR(u32 gpr) const override;
   double GetFPR(u32 fpr) const override;
 };
-
 }  // namespace HLE::SystemVABI

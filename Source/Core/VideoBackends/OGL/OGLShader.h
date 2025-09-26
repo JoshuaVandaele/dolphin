@@ -39,5 +39,4 @@ private:
   std::string m_source;
   std::string m_name;
 };
-
 }  // namespace OGL

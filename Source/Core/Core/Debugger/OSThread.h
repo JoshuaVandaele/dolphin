@@ -154,5 +154,4 @@ private:
   u32 m_address = 0;
   OSThread m_thread;
 };
-
 }  // namespace Core::Debug

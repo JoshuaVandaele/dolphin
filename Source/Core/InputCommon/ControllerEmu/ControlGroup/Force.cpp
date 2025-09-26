@@ -186,5 +186,4 @@ ControlState Shake::GetFrequency() const
 {
   return m_frequency_setting.GetValue();
 }
-
 }  // namespace ControllerEmu

@@ -41,5 +41,4 @@ void ConditionRegister::Set(u32 cr)
     SetField(i, (cr >> (28 - i * 4)) & 0xF);
   }
 }
-
 }  // namespace PowerPC

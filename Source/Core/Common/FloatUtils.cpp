@@ -185,5 +185,4 @@ double ApproximateReciprocal(double val)
 
   return std::bit_cast<double>(integral);
 }
-
 }  // namespace Common

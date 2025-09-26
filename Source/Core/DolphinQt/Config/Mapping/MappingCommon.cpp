@@ -195,5 +195,4 @@ void CreateMappingProcessor(MappingWindow* window)
 {
   new MappingProcessor{window};
 }
-
 }  // namespace MappingCommon

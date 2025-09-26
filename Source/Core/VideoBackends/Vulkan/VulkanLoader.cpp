@@ -261,5 +261,4 @@ bool SupportsCustomDriver()
   return android_get_device_api_level() >= 28 && CheckKgslPresent();
 }
 #endif
-
 }  // namespace Vulkan

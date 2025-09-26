@@ -40,5 +40,4 @@ enum class SyncIdentifierComparison : u8
   DifferentGame,
   Unknown,
 };
-
 }  // namespace NetPlay

@@ -85,5 +85,4 @@ std::optional<IPCReply> AesDevice::IOCtlV(const IOCtlVRequest& request)
 
   return IPCReply(return_code);
 }
-
 }  // namespace IOS::HLE

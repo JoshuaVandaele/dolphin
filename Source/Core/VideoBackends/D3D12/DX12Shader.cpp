@@ -59,5 +59,4 @@ bool DXShader::CreateComputePipeline()
 
   return SUCCEEDED(hr);
 }
-
 }  // namespace DX12

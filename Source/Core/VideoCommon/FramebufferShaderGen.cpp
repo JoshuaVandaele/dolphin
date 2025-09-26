@@ -682,5 +682,4 @@ std::string GenerateImGuiPixelShader(bool linear_space_output)
 
   return code.GetBuffer();
 }
-
 }  // namespace FramebufferShaderGen

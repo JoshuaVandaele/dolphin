@@ -36,5 +36,4 @@ QString getSaveFileName(QWidget* parent = nullptr, const QString& caption = QStr
                         const QString& dir = QString(), const QString& filter = QString(),
                         QString* selectedFilter = nullptr,
                         QFileDialog::Options options = QFileDialog::Options());
-
 }  // namespace DolphinFileDialog

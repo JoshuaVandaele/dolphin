@@ -693,5 +693,4 @@ void SDIOSlot0Device::InitSDHC()
   m_protocol = SDProtocol::V2;
   m_status |= CARD_INITIALIZED;
 }
-
 }  // namespace IOS::HLE

@@ -90,5 +90,4 @@ void EmulateIMUCursor(IMUCursorState* state, ControllerEmu::IMUCursor* imu_ir_gr
 
 // Convert m/s/s acceleration data to the format used by Wiimote/Nunchuk (10-bit unsigned integers).
 WiimoteCommon::AccelData ConvertAccelData(const Common::Vec3& accel, u16 zero_g, u16 one_g);
-
 }  // namespace WiimoteEmu

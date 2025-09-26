@@ -1476,5 +1476,4 @@ void VolumeVerifier::AddProblem(Severity severity, std::string text)
 {
   m_result.problems.emplace_back(Problem{severity, std::move(text)});
 }
-
 }  // namespace DiscIO

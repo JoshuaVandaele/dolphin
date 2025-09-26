@@ -142,5 +142,4 @@ ControllerEmu::ControlGroup* UDrawTablet::GetGroup(UDrawTabletGroup group)
     return nullptr;
   }
 }
-
 }  // namespace WiimoteEmu

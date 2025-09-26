@@ -963,5 +963,4 @@ Common::Matrix44 Wiimote::GetTotalTransformation() const
       m_imu_cursor_state.rotation *
       Common::Quaternion::RotateX(m_imu_cursor_state.recentered_pitch)));
 }
-
 }  // namespace WiimoteEmu

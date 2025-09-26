@@ -242,5 +242,4 @@ bool IsDiscImageBlockSizeValid(int block_size, BlobType format)
 
   return true;
 }
-
 }  // namespace DiscIO

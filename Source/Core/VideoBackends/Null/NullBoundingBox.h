@@ -21,5 +21,4 @@ protected:
   }
   void Write(u32 index, std::span<const BBoxType> values) override {}
 };
-
 }  // namespace Null

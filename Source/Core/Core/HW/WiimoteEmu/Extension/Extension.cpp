@@ -153,5 +153,4 @@ void Extension3rdParty::UpdateEncryptionKey()
 {
   ext_key = KeyGen3rdParty().GenerateFromExtensionKeyData(m_reg.encryption_key_data);
 }
-
 }  // namespace WiimoteEmu

@@ -28,5 +28,4 @@ protected:
     // TODO: If we ever want to "fake" vram textures, we would need to implement this
   }
 };
-
 }  // namespace SW

@@ -36,12 +36,10 @@ constexpr int GetDirectionFromHatMask(int mask)
 
 static_assert(GetDirectionFromHatMask(SDL_HAT_UP) == 0);
 static_assert(GetDirectionFromHatMask(SDL_HAT_LEFT) == 3);
-
 }  // namespace
 
 namespace ciface::SDL
 {
-
 class Gamepad : public Core::Device
 {
 private:

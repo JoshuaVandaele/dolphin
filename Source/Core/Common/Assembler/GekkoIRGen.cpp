@@ -916,5 +916,4 @@ FailureOr<GekkoIR> ParseToIR(std::string_view assembly, u32 base_virtual_address
 
   return std::move(ret);
 }
-
 }  // namespace Common::GekkoAssembler::detail

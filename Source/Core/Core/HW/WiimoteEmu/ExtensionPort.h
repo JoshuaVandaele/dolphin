@@ -44,5 +44,4 @@ private:
   Extension* m_extension = nullptr;
   I2CBus& m_i2c_bus;
 };
-
 }  // namespace WiimoteEmu

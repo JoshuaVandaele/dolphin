@@ -218,5 +218,4 @@ void USBScanner::AddDevice(std::unique_ptr<USB::Device> device, DeviceMap* new_d
 {
   (*new_devices)[device->GetId()] = std::move(device);
 }
-
 }  // namespace IOS::HLE

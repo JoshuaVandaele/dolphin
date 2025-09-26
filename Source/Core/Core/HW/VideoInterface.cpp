@@ -1040,5 +1040,4 @@ void VideoInterfaceManager::FakeVIUpdate(u32 xfb_address, u32 fb_width, u32 fb_s
     m_xfb_info_top.FBB = (xfb_address >> 5);
   }
 }
-
 }  // namespace VideoInterface

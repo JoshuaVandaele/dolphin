@@ -72,5 +72,4 @@ private:
   // Platform-dependent data type representing a dynamic library handle.
   void* m_handle = nullptr;
 };
-
 }  // namespace Common

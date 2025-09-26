@@ -79,5 +79,4 @@ private:
   // Only use when non-empty
   void FlushOne();
 };
-
 }  // namespace OGL

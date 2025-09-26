@@ -460,7 +460,6 @@ void RegisterDevicesChangedCallbackIfNeeded(JNIEnv* env, jclass controller_inter
                                                          controller_interface_on_devices_changed);
       });
 }
-
 }  // namespace
 
 namespace ciface::Android
@@ -1017,7 +1016,6 @@ void InputBackend::PopulateDevices()
 
   AddSensorDevice(env);
 }
-
 }  // namespace ciface::Android
 
 extern "C" {

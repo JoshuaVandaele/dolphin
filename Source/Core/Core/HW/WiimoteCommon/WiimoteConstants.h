@@ -91,5 +91,4 @@ enum class ErrorCode : u8
   // Produced by accessing invalid regions of EEPROM or the EEPROM directly over i2c.
   InvalidAddress = 8,
 };
-
 }  // namespace WiimoteCommon

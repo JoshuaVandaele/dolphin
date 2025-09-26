@@ -254,7 +254,6 @@ private:
 
   Common::EventHook m_frame_end_handler;
 };
-
 }  // namespace VideoCommon
 
 extern std::unique_ptr<VideoCommon::ShaderCache> g_shader_cache;

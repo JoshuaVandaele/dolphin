@@ -126,5 +126,4 @@ private:
   FstEntry m_redirect_fst{};
   std::vector<NandRedirect> m_nand_redirects;
 };
-
 }  // namespace IOS::HLE::FS

@@ -9,7 +9,6 @@
 
 namespace Common
 {
-
 template <typename T>
 class MoveOnlyFunction;
 
@@ -47,5 +46,4 @@ private:
 
   std::unique_ptr<FuncBase> m_ptr;
 };
-
 }  // namespace Common

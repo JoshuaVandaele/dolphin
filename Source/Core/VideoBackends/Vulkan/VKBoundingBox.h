@@ -39,5 +39,4 @@ private:
 
   std::unique_ptr<StagingBuffer> m_readback_buffer;
 };
-
 }  // namespace Vulkan

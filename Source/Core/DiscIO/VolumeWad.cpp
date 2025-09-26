@@ -342,5 +342,4 @@ std::array<u8, 20> VolumeWAD::GetSyncHash() const
 
   return context->Finish();
 }
-
 }  // namespace DiscIO

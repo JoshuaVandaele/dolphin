@@ -51,5 +51,4 @@ Slider::StateData Slider::GetState(const InputOverrideFunction& override_func) c
 
   return {std::clamp(state, -1.0, 1.0)};
 }
-
 }  // namespace ControllerEmu

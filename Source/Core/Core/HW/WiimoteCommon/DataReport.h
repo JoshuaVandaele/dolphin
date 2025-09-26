@@ -103,5 +103,4 @@ private:
 
   std::unique_ptr<DataReportManipulator> m_manip;
 };
-
 }  // namespace WiimoteCommon

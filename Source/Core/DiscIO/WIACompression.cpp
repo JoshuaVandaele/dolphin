@@ -809,5 +809,4 @@ void ZstdCompressor::ExpandBuffer(size_t bytes_to_add)
   m_out_buffer.dst = m_buffer.data();
   m_out_buffer.size = m_buffer.size();
 }
-
 }  // namespace DiscIO

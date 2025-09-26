@@ -301,7 +301,6 @@ struct AccelCalibrationData
   u8 motor : 1;
   u8 checksum;
 };
-
 }  // namespace WiimoteCommon
 
 #pragma pack(pop)

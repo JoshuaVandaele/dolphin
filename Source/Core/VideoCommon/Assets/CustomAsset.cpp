@@ -52,5 +52,4 @@ const CustomAssetLibrary::AssetID& CustomAsset::GetAssetId() const
 {
   return m_asset_id;
 }
-
 }  // namespace VideoCommon

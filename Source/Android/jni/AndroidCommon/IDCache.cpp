@@ -580,7 +580,6 @@ jmethodID GetAudioUtilsGetFramesPerBuffer()
 {
   return s_audio_utils_get_frames_per_buffer;
 }
-
 }  // namespace IDCache
 
 extern "C" {

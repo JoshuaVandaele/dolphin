@@ -159,5 +159,4 @@ protected:
   VkRenderPass m_discard_render_pass;
   VkRenderPass m_clear_render_pass;
 };
-
 }  // namespace Vulkan

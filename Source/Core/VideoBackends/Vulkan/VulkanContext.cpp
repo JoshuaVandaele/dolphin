@@ -1111,5 +1111,4 @@ VulkanContext::GetPlatformExclusiveFullscreenInfo(const WindowSystemInfo& wsi)
   return info;
 }
 #endif
-
 }  // namespace Vulkan

@@ -562,5 +562,4 @@ void OnScreenUI::SetMousePress(u32 button_mask)
     ImGui::GetIO().AddMouseButtonEvent(static_cast<int>(i), (button_mask & (1u << i)) != 0);
   }
 }
-
 }  // namespace VideoCommon

@@ -1046,5 +1046,4 @@ bool ReadFileToString(const std::string& filename, std::string& str)
   str.resize(file.GetSize());
   return file.ReadArray(str.data(), str.size());
 }
-
 }  // namespace File

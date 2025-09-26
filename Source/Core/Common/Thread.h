@@ -43,5 +43,4 @@ void SetCurrentThreadName(const char* name);
 // Returns the lowest address of the stack and the size of the stack
 std::tuple<void*, size_t> GetCurrentThreadStack();
 #endif
-
 }  // namespace Common

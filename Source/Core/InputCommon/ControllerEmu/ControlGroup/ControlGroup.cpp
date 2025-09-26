@@ -141,5 +141,4 @@ bool ControlGroup::HasEnabledSetting() const
 {
   return enabled_setting != nullptr;
 }
-
 }  // namespace ControllerEmu

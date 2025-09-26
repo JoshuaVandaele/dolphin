@@ -34,5 +34,4 @@ bool ReadProtectMemory(void* ptr, size_t size);
 bool WriteProtectMemory(void* ptr, size_t size, bool executable = false);
 bool UnWriteProtectMemory(void* ptr, size_t size, bool allowExecute = false);
 size_t MemPhysical();
-
 }  // namespace Common

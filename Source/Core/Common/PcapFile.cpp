@@ -39,7 +39,6 @@ struct PCAPRecordHeader
   u32 real_size;     // Size before eventual truncation.
 };
 #pragma pack(pop)
-
 }  // namespace
 
 void PCAP::AddHeader(u32 link_type)

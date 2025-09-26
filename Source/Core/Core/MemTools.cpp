@@ -385,5 +385,4 @@ bool IsExceptionHandlerSupported()
 }
 
 #endif
-
 }  // namespace EMM

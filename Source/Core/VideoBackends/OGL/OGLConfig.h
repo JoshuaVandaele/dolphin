@@ -88,5 +88,4 @@ void InitDriverInfo();
 bool PopulateConfig(GLContext* main_gl_context);
 
 extern VideoConfig g_ogl_config;
-
 }  // namespace OGL

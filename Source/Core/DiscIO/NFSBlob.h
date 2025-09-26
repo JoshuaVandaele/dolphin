@@ -89,5 +89,4 @@ private:
   u64 m_data_size;
   Key m_key;
 };
-
 }  // namespace DiscIO

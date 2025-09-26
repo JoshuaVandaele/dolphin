@@ -714,5 +714,4 @@ void CommandProcessorManager::HandleUnknownOpcode(u8 cmd_byte, const u8* buffer,
                    cmd_byte, fmt::ptr(buffer), preprocess, Common::GetStringT(advice));
   }
 }
-
 }  // namespace CommandProcessor

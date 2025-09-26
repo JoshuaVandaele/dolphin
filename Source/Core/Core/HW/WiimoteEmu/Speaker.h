@@ -76,5 +76,4 @@ private:
 
   bool m_speaker_enabled = false;
 };
-
 }  // namespace WiimoteEmu

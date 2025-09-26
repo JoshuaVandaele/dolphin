@@ -38,7 +38,6 @@ void Update(u16 left, u16 right, u16 top, u16 bottom)
   SetCoordinate(Coordinate::Top, new_top);
   SetCoordinate(Coordinate::Bottom, new_bottom);
 }
-
 }  // namespace BBoxManager
 
 namespace SW
@@ -62,5 +61,4 @@ void SWBoundingBox::Write(u32 index, std::span<const BBoxType> values)
     BBoxManager::SetCoordinate(static_cast<BBoxManager::Coordinate>(index + i), values[i]);
   }
 }
-
 }  // namespace SW

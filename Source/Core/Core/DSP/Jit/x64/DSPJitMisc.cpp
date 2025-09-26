@@ -189,5 +189,4 @@ void DSPEmitter::srbith(const UDSPInstruction opc)
     break;
   }
 }
-
 }  // namespace DSP::JIT::x64

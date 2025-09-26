@@ -707,7 +707,6 @@ ATTR_TARGET static bool AreAllVerticesCulled(const CPUCull::TransformedVertex* t
 
   return true;
 }
-
 }  // namespace VECTOR_NAMESPACE
 
 #undef ATTR_TARGET

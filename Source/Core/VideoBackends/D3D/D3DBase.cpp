@@ -275,7 +275,5 @@ bool SupportsLogicOp(u32 adapter_index)
 
   return options.OutputMergerLogicOp != FALSE;
 }
-
 }  // namespace D3D
-
 }  // namespace DX11

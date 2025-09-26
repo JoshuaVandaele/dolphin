@@ -38,5 +38,4 @@ private:
   File::IOFile m_file;
   u64 m_size;
 };
-
 }  // namespace DiscIO

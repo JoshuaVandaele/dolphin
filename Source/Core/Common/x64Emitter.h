@@ -1209,5 +1209,4 @@ private:
     memset(region, 0xCC, region_size);
   }
 };
-
 }  // namespace Gen

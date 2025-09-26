@@ -1034,5 +1034,4 @@ void UndoSaveState(Core::System& system)
 {
   LoadAs(system, File::GetUserPath(D_STATESAVES_IDX) + "lastState.sav");
 }
-
 }  // namespace State

@@ -7,7 +7,6 @@
 
 namespace QtUtils
 {
-
 class BlockKeyboardInputFilter : public QObject
 {
   Q_OBJECT
@@ -26,5 +25,4 @@ void InstallKeyboardBlocker(QObject* obj, T* removal_signal_object, void (T::*re
                                  new QtUtils::BlockKeyboardInputFilter{obj},
                                  &QtUtils::BlockKeyboardInputFilter::ScheduleRemoval);
 }
-
 }  // namespace QtUtils

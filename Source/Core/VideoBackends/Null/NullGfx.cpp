@@ -112,5 +112,4 @@ u32 NullEFBInterface::PeekDepthInternal(u16 x, u16 y)
 {
   return 0;
 }
-
 }  // namespace Null

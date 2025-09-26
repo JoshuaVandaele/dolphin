@@ -118,5 +118,4 @@ inline OGLGfx* GetOGLGfx()
 {
   return static_cast<OGLGfx*>(g_gfx.get());
 }
-
 }  // namespace OGL

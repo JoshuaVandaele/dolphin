@@ -200,5 +200,4 @@ static void Uninhibit()
     s_portal_handle = QString();
   }
 }
-
 }  // namespace DBusUtils

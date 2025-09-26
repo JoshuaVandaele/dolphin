@@ -16,7 +16,6 @@ class PointerWrap;
 
 namespace ExpansionInterface
 {
-
 static constexpr std::size_t MODEM_RECV_SIZE = 0x800;
 
 enum

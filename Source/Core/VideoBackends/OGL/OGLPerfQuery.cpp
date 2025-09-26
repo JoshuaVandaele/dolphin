@@ -280,5 +280,4 @@ void PerfQueryGLESNV::FlushResults()
   while (!IsFlushed())
     FlushOne();
 }
-
 }  // namespace OGL

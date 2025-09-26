@@ -86,5 +86,4 @@ private:
   u32 m_data_size = 0;
   u32 m_opening_bnr_size = 0;
 };
-
 }  // namespace DiscIO

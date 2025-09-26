@@ -435,5 +435,4 @@ void CryptOFB(const u8* key, const u8* iv, u8* iv_out, const u8* buf_in, u8* buf
   if (iv_out)
     std::memcpy(iv_out, &iv_tmp[0], 16);
 }
-
 }  // namespace Common::AES

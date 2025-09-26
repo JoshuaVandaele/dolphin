@@ -162,5 +162,4 @@ void LazyMemoryRegion::Release()
     m_size = 0;
   }
 }
-
 }  // namespace Common

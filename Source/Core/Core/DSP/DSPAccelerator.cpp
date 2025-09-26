@@ -294,5 +294,4 @@ void Accelerator::SetInput(u16 input)
 {
   m_input = input;
 }
-
 }  // namespace DSP

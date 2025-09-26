@@ -108,7 +108,6 @@ std::string ArtworkForGameId()
   static constexpr char cover_url[] = "https://discord.dolphin-emu.org/cover-art/{}/{}.png";
   return fmt::format(cover_url, region_code, SConfig::GetInstance().GetGameTDBID());
 }
-
 }  // namespace
 #endif
 
@@ -329,5 +328,4 @@ void SetDiscordPresenceEnabled(bool enabled)
   if (Config::Get(Config::MAIN_USE_DISCORD_PRESENCE))
     Discord::Init();
 }
-
 }  // namespace Discord

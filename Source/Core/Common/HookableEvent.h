@@ -111,5 +111,4 @@ public:
       handle->m_fn(args...);
   }
 };
-
 }  // namespace Common

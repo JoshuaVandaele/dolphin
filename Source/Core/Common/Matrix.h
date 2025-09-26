@@ -456,5 +456,4 @@ inline Vec4 operator*(const Matrix44& lhs, Vec4 rhs)
   Matrix44::Multiply(lhs, rhs, &rhs);
   return rhs;
 }
-
 }  // namespace Common

@@ -1730,5 +1730,4 @@ void Device::ProcessStatusReport(const InputReportStatus& status)
     }
   }
 }
-
 }  // namespace ciface::WiimoteController

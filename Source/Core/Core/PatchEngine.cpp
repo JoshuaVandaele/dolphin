@@ -366,5 +366,4 @@ void Reload(Core::System& system)
   LoadPatches();
   ApplyStartupPatches(system);
 }
-
 }  // namespace PatchEngine

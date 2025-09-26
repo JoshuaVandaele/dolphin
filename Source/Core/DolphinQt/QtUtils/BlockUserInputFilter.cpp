@@ -10,7 +10,6 @@
 
 namespace QtUtils
 {
-
 // Leave filter active for a bit to prevent Return/Space detection from reactivating the button.
 constexpr auto REMOVAL_DELAY = std::chrono::milliseconds{100};
 
@@ -32,5 +31,4 @@ bool BlockKeyboardInputFilter::eventFilter(QObject* object, QEvent* event)
   const auto event_type = event->type();
   return event_type == QEvent::KeyPress || event_type == QEvent::KeyRelease;
 }
-
 }  // namespace QtUtils

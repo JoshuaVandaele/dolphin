@@ -27,5 +27,4 @@ private:
   VkPipelineLayout m_pipeline_layout;
   AbstractPipelineUsage m_usage;
 };
-
 }  // namespace Vulkan

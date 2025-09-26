@@ -49,7 +49,6 @@ public:
 
   std::function<u64(u64)> frsqrte;
 };
-
 }  // namespace
 
 TEST(JitArm64, Frsqrte)

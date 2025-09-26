@@ -275,5 +275,4 @@ private:
 
   Core::System& m_system;
 };
-
 }  // namespace Movie

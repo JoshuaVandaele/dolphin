@@ -488,7 +488,6 @@ static bool ReadMipLevel(VideoCommon::CustomTextureData::ArraySlice::Level* leve
 
   return true;
 }
-
 }  // namespace
 
 namespace VideoCommon

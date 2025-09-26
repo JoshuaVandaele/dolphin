@@ -325,5 +325,4 @@ bool ExportSystemData(const Volume& volume, const Partition& partition,
 
   return success;
 }
-
 }  // namespace DiscIO

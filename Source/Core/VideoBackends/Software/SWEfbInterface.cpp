@@ -736,7 +736,6 @@ void IncPerfCounterQuadCount(PerfQueryType type)
 
 namespace SW
 {
-
 void SWEFBInterface::ReinterpretPixelData(EFBReinterpretType convtype)
 {
 }
@@ -763,5 +762,4 @@ u32 SWEFBInterface::PeekDepthInternal(u16 x, u16 y)
 {
   return EfbInterface::GetDepth(x, y);
 }
-
 }  // namespace SW

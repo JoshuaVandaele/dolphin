@@ -10,7 +10,6 @@ class ControllerInterface;
 
 namespace ciface
 {
-
 namespace Core
 {
 class Device;
@@ -35,5 +34,4 @@ public:
 private:
   ControllerInterface& m_controller_interface;
 };
-
 }  // namespace ciface

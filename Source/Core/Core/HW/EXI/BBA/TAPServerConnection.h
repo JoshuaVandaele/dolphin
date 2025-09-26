@@ -12,7 +12,6 @@
 
 namespace ExpansionInterface
 {
-
 class TAPServerConnection
 {
 public:
@@ -44,5 +43,4 @@ private:
   bool StartReadThread();
   void ReadThreadHandler();
 };
-
 }  // namespace ExpansionInterface

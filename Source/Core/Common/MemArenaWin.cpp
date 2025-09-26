@@ -623,5 +623,4 @@ void LazyMemoryRegion::MakeMemoryBlockWritable(size_t block_index)
 
   m_writable_block_handles[block_index] = block;
 }
-
 }  // namespace Common

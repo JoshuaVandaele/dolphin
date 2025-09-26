@@ -161,5 +161,4 @@ private:
 };
 
 extern std::unique_ptr<CommandBufferManager> g_command_buffer_mgr;
-
 }  // namespace Vulkan

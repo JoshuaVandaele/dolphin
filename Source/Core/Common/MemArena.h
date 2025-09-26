@@ -200,5 +200,4 @@ private:
   void MakeMemoryBlockWritable(size_t offset);
 #endif
 };
-
 }  // namespace Common

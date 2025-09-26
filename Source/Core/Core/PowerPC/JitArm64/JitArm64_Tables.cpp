@@ -446,7 +446,6 @@ constexpr std::array<JitArm64::Instruction, 1024> s_dyna_op_table63 = []() const
 
   return table;
 }();
-
 }  // Anonymous namespace
 
 void JitArm64::DynaRunTable4(UGeckoInstruction inst)

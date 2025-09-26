@@ -21,5 +21,4 @@ u64 FileInfo::GetTotalSize() const
 }
 
 FileSystem::~FileSystem() = default;
-
 }  // namespace DiscIO

@@ -191,5 +191,4 @@ extern const Info<std::string> GFX_DRIVER_LIB_NAME;
 // Vertex loader
 
 extern const Info<VertexLoaderType> GFX_VERTEX_LOADER_TYPE;
-
 }  // namespace Config

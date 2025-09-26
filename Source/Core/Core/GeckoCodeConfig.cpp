@@ -270,5 +270,4 @@ std::optional<GeckoCode::Code> DeserializeLine(const std::string& line)
 
   return code;
 }
-
 }  // namespace Gecko

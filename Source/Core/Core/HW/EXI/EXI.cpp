@@ -269,5 +269,4 @@ void ExpansionInterfaceManager::ScheduleUpdateInterrupts(CoreTiming::FromThread 
 {
   m_system.GetCoreTiming().ScheduleEvent(cycles_late, m_event_type_update_interrupts, 0, from);
 }
-
 }  // namespace ExpansionInterface

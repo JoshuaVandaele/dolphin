@@ -118,7 +118,6 @@ private:
   std::function<u32(u64)> convert_double_to_single_lower;
   std::function<Pair<u32>(u64, u64)> convert_double_to_single_pair;
 };
-
 }  // namespace
 
 TEST(JitArm64, ConvertDoubleToSingle)

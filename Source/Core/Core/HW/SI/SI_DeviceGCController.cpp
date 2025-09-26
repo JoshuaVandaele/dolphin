@@ -353,5 +353,4 @@ DataResponse CSIDevice_TaruKonga::GetData(u32& hi, u32& low)
 
   return DataResponse::Success;
 }
-
 }  // namespace SerialInterface

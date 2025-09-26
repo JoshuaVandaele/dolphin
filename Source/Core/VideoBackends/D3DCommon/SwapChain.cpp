@@ -319,5 +319,4 @@ bool SwapChain::ChangeSurface(void* native_handle)
   // We only keep the swap chain settings (HDR/Stereo) that had successfully applied beofre
   return CreateSwapChain(m_stereo, m_hdr);
 }
-
 }  // namespace D3DCommon

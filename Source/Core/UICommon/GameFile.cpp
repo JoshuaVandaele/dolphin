@@ -865,5 +865,4 @@ const GameCover& GameFile::GetCoverImage() const
 {
   return m_custom_cover.empty() ? m_default_cover : m_custom_cover;
 }
-
 }  // namespace UICommon

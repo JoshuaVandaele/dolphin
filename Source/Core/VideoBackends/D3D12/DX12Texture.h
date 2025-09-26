@@ -134,5 +134,4 @@ private:
   u64 m_completed_fence = 0;
   u32 m_buffer_size;
 };
-
 }  // namespace DX12

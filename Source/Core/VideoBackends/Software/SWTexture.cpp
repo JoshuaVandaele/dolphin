@@ -189,5 +189,4 @@ SWFramebuffer::Create(SWTexture* color_attachment, SWTexture* depth_attachment,
                                          std::move(additional_color_attachments), color_format,
                                          depth_format, width, height, layers, samples);
 }
-
 }  // namespace SW

@@ -1061,5 +1061,4 @@ CPUThreadGuard::~CPUThreadGuard()
   if (!m_was_cpu_thread)
     PauseAndLock(m_system, false, m_was_unpaused);
 }
-
 }  // namespace Core

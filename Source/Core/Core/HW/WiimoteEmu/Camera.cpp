@@ -183,5 +183,4 @@ void CameraLogic::SetEnabled(bool is_enabled)
 {
   m_is_enabled = is_enabled;
 }
-
 }  // namespace WiimoteEmu

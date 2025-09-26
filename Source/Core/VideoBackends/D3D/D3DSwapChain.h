@@ -38,5 +38,4 @@ private:
   std::unique_ptr<DXTexture> m_texture;
   std::unique_ptr<DXFramebuffer> m_framebuffer;
 };
-
 }  // namespace DX11

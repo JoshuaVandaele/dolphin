@@ -22,5 +22,4 @@ extern const Config::Info<bool> SERVERS_ENABLED;
 }  // namespace Settings
 
 std::unique_ptr<ciface::InputBackend> CreateInputBackend(ControllerInterface* controller_interface);
-
 }  // namespace ciface::DualShockUDPClient

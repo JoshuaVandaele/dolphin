@@ -101,5 +101,4 @@ std::optional<IPCReply> ShaDevice::IOCtlV(const IOCtlVRequest& request)
 
   return IPCReply(return_code);
 }
-
 }  // namespace IOS::HLE

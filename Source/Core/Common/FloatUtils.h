@@ -104,5 +104,4 @@ extern const std::array<BaseAndDec, 32> fres_expected;
 // PowerPC approximation algorithms
 double ApproximateReciprocalSquareRoot(double val);
 double ApproximateReciprocal(double val);
-
 }  // namespace Common

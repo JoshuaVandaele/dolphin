@@ -165,5 +165,4 @@ void ControlGroupContainer::ClearInputOverrideFunction()
 {
   m_input_override_function = {};
 }
-
 }  // namespace ControllerEmu

@@ -218,5 +218,4 @@ private:
 // Used for controlling and accessing an IOS instance that is tied to emulation.
 void Init(Core::System& system);
 void Shutdown(Core::System& system);
-
 }  // namespace IOS::HLE

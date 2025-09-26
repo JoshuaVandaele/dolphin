@@ -106,5 +106,4 @@ private:
 
   Common::DVec2 m_prev_point{};
 };
-
 }  // namespace ciface::MappingCommon

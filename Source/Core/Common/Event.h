@@ -76,5 +76,4 @@ private:
   std::condition_variable m_condvar;
   std::mutex m_mutex;
 };
-
 }  // namespace Common

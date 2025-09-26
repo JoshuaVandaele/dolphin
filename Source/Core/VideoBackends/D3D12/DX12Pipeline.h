@@ -36,5 +36,4 @@ private:
   D3D12_PRIMITIVE_TOPOLOGY m_primitive_topology;
   bool m_use_integer_rtv;
 };
-
 }  // namespace DX12

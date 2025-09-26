@@ -54,7 +54,6 @@ public:
     EXPECT_EQ(value, result);
   }
 };
-
 }  // namespace
 
 TEST(JitArm64, MovI2R_32BitValues)

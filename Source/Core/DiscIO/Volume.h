@@ -180,5 +180,4 @@ std::unique_ptr<VolumeWAD> CreateWAD(std::unique_ptr<BlobReader> reader);
 std::unique_ptr<VolumeWAD> CreateWAD(const std::string& path);
 std::unique_ptr<Volume> CreateVolume(std::unique_ptr<BlobReader> reader);
 std::unique_ptr<Volume> CreateVolume(const std::string& path);
-
 }  // namespace DiscIO

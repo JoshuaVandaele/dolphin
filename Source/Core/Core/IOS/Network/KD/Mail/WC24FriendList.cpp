@@ -99,5 +99,4 @@ u64 WC24FriendList::ConvertEmailToFriendCode(std::string_view email)
 
   return u64{lower} << 32 | upper;
 }
-
 }  // namespace IOS::HLE::NWC24::Mail

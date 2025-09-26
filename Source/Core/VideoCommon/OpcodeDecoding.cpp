@@ -273,5 +273,4 @@ u8* RunFifo(DataReader src, u32* cycles)
 
 template u8* RunFifo<true>(DataReader src, u32* cycles);
 template u8* RunFifo<false>(DataReader src, u32* cycles);
-
 }  // namespace OpcodeDecoder

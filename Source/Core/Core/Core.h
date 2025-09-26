@@ -194,5 +194,4 @@ void DoFrameStep(Core::System& system);
 void UpdateInputGate(bool require_focus, bool require_full_focus = false);
 
 void UpdateTitle(Core::System& system);
-
 }  // namespace Core

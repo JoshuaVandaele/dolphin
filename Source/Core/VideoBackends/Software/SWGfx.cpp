@@ -139,5 +139,4 @@ SurfaceInfo SWGfx::GetSurfaceInfo() const
   return {std::max(context->GetBackBufferWidth(), 1u), std::max(context->GetBackBufferHeight(), 1u),
           1.0f, AbstractTextureFormat::RGBA8};
 }
-
 }  // namespace SW

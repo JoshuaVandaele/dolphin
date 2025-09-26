@@ -150,5 +150,4 @@ bool VKBoundingBox::CreateReadbackBuffer()
 
   return true;
 }
-
 }  // namespace Vulkan

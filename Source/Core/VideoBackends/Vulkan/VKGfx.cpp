@@ -620,5 +620,4 @@ SurfaceInfo VKGfx::GetSurfaceInfo() const
           m_swap_chain ? m_swap_chain->GetHeight() : 0u, m_backbuffer_scale,
           m_swap_chain ? m_swap_chain->GetTextureFormat() : AbstractTextureFormat::Undefined};
 }
-
 }  // namespace Vulkan

@@ -196,5 +196,4 @@ private:
     GameCover custom_cover;
   } m_pending{};
 };
-
 }  // namespace UICommon

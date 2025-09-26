@@ -94,5 +94,4 @@ struct TypedInputData
 };
 
 #pragma pack(pop)
-
 }  // namespace WiimoteCommon

@@ -64,5 +64,4 @@ private:
   SettingValue<double> m_intensity_setting;
   SettingValue<double> m_frequency_setting;
 };
-
 }  // namespace ControllerEmu

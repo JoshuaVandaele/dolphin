@@ -1216,5 +1216,4 @@ float4 DecodePixel(int val)
 
   return ss.str();
 }
-
 }  // namespace TextureConversionShaderTiled

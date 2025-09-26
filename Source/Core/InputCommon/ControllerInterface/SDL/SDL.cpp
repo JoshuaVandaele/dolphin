@@ -22,7 +22,6 @@
 
 namespace ciface::SDL
 {
-
 class InputBackend final : public ciface::InputBackend
 {
 public:
@@ -288,5 +287,4 @@ bool InputBackend::HandleEventAndContinue(const SDL_Event& e)
 
   return true;
 }
-
 }  // namespace ciface::SDL

@@ -113,5 +113,4 @@ std::vector<std::string> DoFileSearch(const std::vector<std::string>& directorie
 
   return result;
 }
-
 }  // namespace Common

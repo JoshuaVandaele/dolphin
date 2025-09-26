@@ -57,5 +57,4 @@ public:
 private:
   std::map<SamplerStateSet, D3D12_GPU_DESCRIPTOR_HANDLE> m_sampler_map;
 };
-
 }  // namespace DX12

@@ -161,5 +161,4 @@ bool SymbolDB::RenameSymbol(const Symbol& symbol, const std::string& symbol_name
   it->second.object_name = object_name;
   return true;
 }
-
 }  // namespace Common

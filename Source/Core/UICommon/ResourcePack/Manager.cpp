@@ -192,5 +192,4 @@ bool IsInstalled(const ResourcePack& pack)
 
   return installed;
 }
-
 }  // namespace ResourcePack

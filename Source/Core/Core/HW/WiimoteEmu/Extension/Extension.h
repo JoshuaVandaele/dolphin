@@ -131,5 +131,4 @@ protected:
 private:
   void UpdateEncryptionKey() final;
 };
-
 }  // namespace WiimoteEmu
