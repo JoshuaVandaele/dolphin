@@ -848,9 +848,7 @@ void ProgramShaderCache::CreateHeader()
       "#define int3 ivec3\n"
       "#define int4 ivec4\n"
       "#define frac fract\n"
-      "#define lerp mix\n"
-
-      ,
+      "#define lerp mix\n",
       GetGLSLVersionString(), v < Glsl140 ? "#extension GL_ARB_uniform_buffer_object : enable" : "",
       earlyz_string,
       (g_backend_info.bSupportsBindingLayout && v < GlslEs310) ?
@@ -876,9 +874,7 @@ void ProgramShaderCache::CreateHeader()
       SupportedESTextureBuffer,
       is_glsles && g_backend_info.bSupportsDualSourceBlend ?
           "#extension GL_EXT_blend_func_extended : enable" :
-          ""
-
-      ,
+          "",
       g_ogl_config.bSupportsImageLoadStore &&
               ((!is_glsles && v < Glsl430) || (is_glsles && v < GlslEs310)) ?
           "#extension GL_ARB_shader_image_load_store : enable" :
