@@ -1,0 +1,16 @@
+services:
+  dolphin-nodeps:
+    build:
+      context: .
+      target: dolphin-nodeps
+    container_name: dolphin-nodeps
+    volumes:
+      - ..:/dolphin
+
+  dolphin-alldeps:
+    build:
+      context: .
+      target: dolphin-alldeps
+    container_name: dolphin-alldeps
+    volumes:
+      - ..:/dolphin
