@@ -42,6 +42,8 @@ ENTRYPOINT ["/bin/sh", "-c", "\
         -G Ninja \
         -DCMAKE_POLICY_VERSION_MINIMUM=3.5 && \
     ninja && \
+    ninja tests && \
+    Binaries/Tests/tests && \
     echo 'Build finished successfully'"]
 
 
