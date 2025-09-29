@@ -14,3 +14,11 @@ services:
     container_name: dolphin-alldeps
     volumes:
       - ..:/dolphin
+  
+  dolphin-android:
+    build:
+      context: .
+      target: dolphin-android
+    container_name: dolphin-android
+    volumes:
+      - ..:/dolphin
