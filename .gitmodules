@@ -114,3 +114,7 @@
 	path = Externals/pugixml/pugixml
 	url = https://github.com/zeux/pugixml.git
 	shallow = true
+[submodule "Externals/liblzma/xz"]
+	path = Externals/liblzma/xz
+	url = https://github.com/tukaani-project/xz.git
+	shallow = true
