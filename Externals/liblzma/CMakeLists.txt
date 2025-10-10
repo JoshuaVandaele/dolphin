@@ -10,5 +10,5 @@ set(XZ_DOXYGEN OFF)
 set(XZ_DOC OFF)
 add_subdirectory(xz EXCLUDE_FROM_ALL)
 
-add_library(LibLZMA::LibLZMA ALIAS lzma)
+add_library(LibLZMA::LibLZMA ALIAS liblzma)
 dolphin_disable_warnings(liblzma)
