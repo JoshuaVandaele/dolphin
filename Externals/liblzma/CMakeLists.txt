@@ -12,7 +12,7 @@ add_subdirectory(xz EXCLUDE_FROM_ALL)
 
 target_include_directories(liblzma
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/xz/src/liblzma/api>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/xz/src/liblzma/api>
 )
 
 add_library(LibLZMA::LibLZMA ALIAS liblzma)
