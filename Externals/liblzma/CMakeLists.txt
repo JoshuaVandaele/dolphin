@@ -10,5 +10,10 @@ set(XZ_DOXYGEN OFF)
 set(XZ_DOC OFF)
 add_subdirectory(xz EXCLUDE_FROM_ALL)
 
+target_include_directories(liblzma
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/xz/src/liblzma/api>
+)
+
 add_library(LibLZMA::LibLZMA ALIAS liblzma)
 dolphin_disable_warnings(liblzma)
