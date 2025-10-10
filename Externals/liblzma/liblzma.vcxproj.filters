@@ -1,469 +1,469 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <ItemGroup>
-    <ClInclude Include="xz\srciblzma\api\lzma.h">
-      <Filter>xz\srciblzma\api</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma.h">
+      <Filter>xz\src\iblzma\api</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\base.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\base.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\bcj.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\bcj.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\block.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\block.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\check.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\check.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\container.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\container.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\delta.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\delta.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\filter.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\filter.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\hardware.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\hardware.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\index.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\index.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\index_hash.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\index_hash.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\lzma12.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\lzma12.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\stream_flags.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\stream_flags.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\version.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\version.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\api\lzma\vli.h">
-      <Filter>xz\srciblzma\api\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\api\lzma\vli.h">
+      <Filter>xz\src\iblzma\api\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\check\check.h">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClInclude Include="xz\src\iblzma\check\check.h">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\check\crc_macros.h">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClInclude Include="xz\src\iblzma\check\crc_macros.h">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\check\crc32_table_be.h">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClInclude Include="xz\src\iblzma\check\crc32_table_be.h">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\check\crc32_table_le.h">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClInclude Include="xz\src\iblzma\check\crc32_table_le.h">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\check\crc64_table_be.h">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClInclude Include="xz\src\iblzma\check\crc64_table_be.h">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\check\crc64_table_le.h">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClInclude Include="xz\src\iblzma\check\crc64_table_le.h">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\alone_decoder.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\alone_decoder.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\block_buffer_encoder.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\block_buffer_encoder.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\block_decoder.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\block_decoder.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\block_encoder.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\block_encoder.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\common.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\common.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\easy_preset.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\easy_preset.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\filter_common.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\filter_common.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\filter_decoder.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\filter_decoder.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\filter_encoder.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\filter_encoder.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\index.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\index.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\index_encoder.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\index_encoder.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\memcmplen.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\memcmplen.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\outqueue.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\outqueue.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\stream_decoder.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\stream_decoder.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\common\stream_flags_common.h">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClInclude Include="xz\src\iblzma\common\stream_flags_common.h">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\delta\delta_common.h">
-      <Filter>xz\srciblzma\delta</Filter>
+    <ClInclude Include="xz\src\iblzma\delta\delta_common.h">
+      <Filter>xz\src\iblzma\delta</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\delta\delta_decoder.h">
-      <Filter>xz\srciblzma\delta</Filter>
+    <ClInclude Include="xz\src\iblzma\delta\delta_decoder.h">
+      <Filter>xz\src\iblzma\delta</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\delta\delta_encoder.h">
-      <Filter>xz\srciblzma\delta</Filter>
+    <ClInclude Include="xz\src\iblzma\delta\delta_encoder.h">
+      <Filter>xz\src\iblzma\delta</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\delta\delta_private.h">
-      <Filter>xz\srciblzma\delta</Filter>
+    <ClInclude Include="xz\src\iblzma\delta\delta_private.h">
+      <Filter>xz\src\iblzma\delta</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\lz\lz_decoder.h">
-      <Filter>xz\srciblzma\lz</Filter>
+    <ClInclude Include="xz\src\iblzma\lz\lz_decoder.h">
+      <Filter>xz\src\iblzma\lz</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\lz\lz_encoder.h">
-      <Filter>xz\srciblzma\lz</Filter>
+    <ClInclude Include="xz\src\iblzma\lz\lz_encoder.h">
+      <Filter>xz\src\iblzma\lz</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\lz\lz_encoder_hash.h">
-      <Filter>xz\srciblzma\lz</Filter>
+    <ClInclude Include="xz\src\iblzma\lz\lz_encoder_hash.h">
+      <Filter>xz\src\iblzma\lz</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\lz\lz_encoder_hash_table.h">
-      <Filter>xz\srciblzma\lz</Filter>
+    <ClInclude Include="xz\src\iblzma\lz\lz_encoder_hash_table.h">
+      <Filter>xz\src\iblzma\lz</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\lzma\fastpos.h">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\lzma\fastpos.h">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\lzma\lzma_common.h">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\lzma\lzma_common.h">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\lzma\lzma_decoder.h">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\lzma\lzma_decoder.h">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\lzma\lzma_encoder.h">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\lzma\lzma_encoder.h">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\lzma\lzma_encoder_private.h">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\lzma\lzma_encoder_private.h">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\lzma\lzma2_decoder.h">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\lzma\lzma2_decoder.h">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\lzma\lzma2_encoder.h">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClInclude Include="xz\src\iblzma\lzma\lzma2_encoder.h">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\rangecoder\price.h">
-      <Filter>xz\srciblzma\rangecoder</Filter>
+    <ClInclude Include="xz\src\iblzma\rangecoder\price.h">
+      <Filter>xz\src\iblzma\rangecoder</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\rangecoder\range_common.h">
-      <Filter>xz\srciblzma\rangecoder</Filter>
+    <ClInclude Include="xz\src\iblzma\rangecoder\range_common.h">
+      <Filter>xz\src\iblzma\rangecoder</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\rangecoder\range_decoder.h">
-      <Filter>xz\srciblzma\rangecoder</Filter>
+    <ClInclude Include="xz\src\iblzma\rangecoder\range_decoder.h">
+      <Filter>xz\src\iblzma\rangecoder</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\rangecoder\range_encoder.h">
-      <Filter>xz\srciblzma\rangecoder</Filter>
+    <ClInclude Include="xz\src\iblzma\rangecoder\range_encoder.h">
+      <Filter>xz\src\iblzma\rangecoder</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\simple\simple_coder.h">
-      <Filter>xz\srciblzma\simple</Filter>
+    <ClInclude Include="xz\src\iblzma\simple\simple_coder.h">
+      <Filter>xz\src\iblzma\simple</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\simple\simple_decoder.h">
-      <Filter>xz\srciblzma\simple</Filter>
+    <ClInclude Include="xz\src\iblzma\simple\simple_decoder.h">
+      <Filter>xz\src\iblzma\simple</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\simple\simple_encoder.h">
-      <Filter>xz\srciblzma\simple</Filter>
+    <ClInclude Include="xz\src\iblzma\simple\simple_encoder.h">
+      <Filter>xz\src\iblzma\simple</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\simple\simple_private.h">
-      <Filter>xz\srciblzma\simple</Filter>
+    <ClInclude Include="xz\src\iblzma\simple\simple_private.h">
+      <Filter>xz\src\iblzma\simple</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\mythread.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\mythread.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\sysdefs.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\sysdefs.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\tuklib_common.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\tuklib_common.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\tuklib_config.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\tuklib_config.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\tuklib_cpucores.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\tuklib_cpucores.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\tuklib_exit.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\tuklib_exit.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\tuklib_gettext.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\tuklib_gettext.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\tuklib_integer.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\tuklib_integer.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\tuklib_mbstr.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\tuklib_mbstr.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\tuklib_open_stdxxx.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\tuklib_open_stdxxx.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\tuklib_physmem.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\tuklib_physmem.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\tuklib\tuklib_progname.h">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClInclude Include="xz\src\iblzma\tuklib\tuklib_progname.h">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClInclude>
-    <ClInclude Include="xz\srciblzma\config.h" />
+    <ClInclude Include="xz\src\iblzma\config.h" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="xz\srciblzma\api">
+    <Filter Include="xz\src\iblzma\api">
       <UniqueIdentifier>{2aae01e0-4f9a-4abc-b7e8-6622ea252cbe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xz\srciblzma\api\lzma">
+    <Filter Include="xz\src\iblzma\api\lzma">
       <UniqueIdentifier>{32f50db1-5a2e-4f5b-bcf0-ffb43969287f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xz\srciblzma\check">
+    <Filter Include="xz\src\iblzma\check">
       <UniqueIdentifier>{1a60cf76-1d90-40c7-b11d-a5c98f32895d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xz\srciblzma\common">
+    <Filter Include="xz\src\iblzma\common">
       <UniqueIdentifier>{ce106295-7acd-4259-9254-5c3e801f11a9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xz\srciblzma\delta">
+    <Filter Include="xz\src\iblzma\delta">
       <UniqueIdentifier>{36d95fac-7f84-42d2-a432-346d9f9d50e0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xz\srciblzma\lz">
+    <Filter Include="xz\src\iblzma\lz">
       <UniqueIdentifier>{d4258d74-90ac-4e56-8075-7b2e8f24825f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xz\srciblzma\lzma">
+    <Filter Include="xz\src\iblzma\lzma">
       <UniqueIdentifier>{b517cc3c-86c7-468f-97dd-86fb6d4a4316}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xz\srciblzma\rangecoder">
+    <Filter Include="xz\src\iblzma\rangecoder">
       <UniqueIdentifier>{36b5c9a4-420a-41d6-a0d5-c02255b55696}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xz\srciblzma\simple">
+    <Filter Include="xz\src\iblzma\simple">
       <UniqueIdentifier>{4f97f27d-2499-4492-ab35-edf73da89040}</UniqueIdentifier>
     </Filter>
-    <Filter Include="xz\srciblzma\tuklib">
+    <Filter Include="xz\src\iblzma\tuklib">
       <UniqueIdentifier>{bd28534b-ffc6-4488-90b3-708ac608e76c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="xz\srciblzma\check\check.c">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClCompile Include="xz\src\iblzma\check\check.c">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\check\crc32_fast.c">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClCompile Include="xz\src\iblzma\check\crc32_fast.c">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\check\crc32_table.c">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClCompile Include="xz\src\iblzma\check\crc32_table.c">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\check\crc64_fast.c">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClCompile Include="xz\src\iblzma\check\crc64_fast.c">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\check\crc64_table.c">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClCompile Include="xz\src\iblzma\check\crc64_table.c">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\check\sha256.c">
-      <Filter>xz\srciblzma\check</Filter>
+    <ClCompile Include="xz\src\iblzma\check\sha256.c">
+      <Filter>xz\src\iblzma\check</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\alone_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\alone_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\alone_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\alone_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\auto_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\auto_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\block_buffer_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\block_buffer_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\block_buffer_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\block_buffer_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\block_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\block_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\block_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\block_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\block_header_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\block_header_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\block_header_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\block_header_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\block_util.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\block_util.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\common.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\common.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\easy_buffer_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\easy_buffer_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\easy_decoder_memusage.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\easy_decoder_memusage.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\easy_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\easy_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\easy_encoder_memusage.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\easy_encoder_memusage.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\easy_preset.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\easy_preset.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\filter_buffer_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\filter_buffer_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\filter_buffer_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\filter_buffer_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\filter_common.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\filter_common.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\filter_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\filter_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\filter_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\filter_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\filter_flags_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\filter_flags_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\filter_flags_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\filter_flags_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\hardware_cputhreads.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\hardware_cputhreads.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\hardware_physmem.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\hardware_physmem.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\index.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\index.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\index_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\index_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\index_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\index_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\index_hash.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\index_hash.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\outqueue.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\outqueue.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\stream_buffer_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\stream_buffer_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\stream_buffer_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\stream_buffer_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\stream_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\stream_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\stream_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\stream_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\stream_encoder_mt.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\stream_encoder_mt.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\stream_flags_common.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\stream_flags_common.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\stream_flags_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\stream_flags_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\stream_flags_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\stream_flags_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\vli_decoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\vli_decoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\vli_encoder.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\vli_encoder.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\common\vli_size.c">
-      <Filter>xz\srciblzma\common</Filter>
+    <ClCompile Include="xz\src\iblzma\common\vli_size.c">
+      <Filter>xz\src\iblzma\common</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\delta\delta_common.c">
-      <Filter>xz\srciblzma\delta</Filter>
+    <ClCompile Include="xz\src\iblzma\delta\delta_common.c">
+      <Filter>xz\src\iblzma\delta</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\delta\delta_decoder.c">
-      <Filter>xz\srciblzma\delta</Filter>
+    <ClCompile Include="xz\src\iblzma\delta\delta_decoder.c">
+      <Filter>xz\src\iblzma\delta</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\delta\delta_encoder.c">
-      <Filter>xz\srciblzma\delta</Filter>
+    <ClCompile Include="xz\src\iblzma\delta\delta_encoder.c">
+      <Filter>xz\src\iblzma\delta</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\lz\lz_decoder.c">
-      <Filter>xz\srciblzma\lz</Filter>
+    <ClCompile Include="xz\src\iblzma\lz\lz_decoder.c">
+      <Filter>xz\src\iblzma\lz</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\lz\lz_encoder.c">
-      <Filter>xz\srciblzma\lz</Filter>
+    <ClCompile Include="xz\src\iblzma\lz\lz_encoder.c">
+      <Filter>xz\src\iblzma\lz</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\lz\lz_encoder_mf.c">
-      <Filter>xz\srciblzma\lz</Filter>
+    <ClCompile Include="xz\src\iblzma\lz\lz_encoder_mf.c">
+      <Filter>xz\src\iblzma\lz</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\lzma\fastpos_table.c">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClCompile Include="xz\src\iblzma\lzma\fastpos_table.c">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\lzma\lzma_decoder.c">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClCompile Include="xz\src\iblzma\lzma\lzma_decoder.c">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\lzma\lzma_encoder.c">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClCompile Include="xz\src\iblzma\lzma\lzma_encoder.c">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\lzma\lzma_encoder_optimum_fast.c">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClCompile Include="xz\src\iblzma\lzma\lzma_encoder_optimum_fast.c">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\lzma\lzma_encoder_optimum_normal.c">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClCompile Include="xz\src\iblzma\lzma\lzma_encoder_optimum_normal.c">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\lzma\lzma_encoder_presets.c">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClCompile Include="xz\src\iblzma\lzma\lzma_encoder_presets.c">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\lzma\lzma2_decoder.c">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClCompile Include="xz\src\iblzma\lzma\lzma2_decoder.c">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\lzma\lzma2_encoder.c">
-      <Filter>xz\srciblzma\lzma</Filter>
+    <ClCompile Include="xz\src\iblzma\lzma\lzma2_encoder.c">
+      <Filter>xz\src\iblzma\lzma</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\rangecoder\price_table.c">
-      <Filter>xz\srciblzma\rangecoder</Filter>
+    <ClCompile Include="xz\src\iblzma\rangecoder\price_table.c">
+      <Filter>xz\src\iblzma\rangecoder</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\simple\simple_coder.c">
-      <Filter>xz\srciblzma\simple</Filter>
+    <ClCompile Include="xz\src\iblzma\simple\simple_coder.c">
+      <Filter>xz\src\iblzma\simple</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\simple\simple_decoder.c">
-      <Filter>xz\srciblzma\simple</Filter>
+    <ClCompile Include="xz\src\iblzma\simple\simple_decoder.c">
+      <Filter>xz\src\iblzma\simple</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\simple\simple_encoder.c">
-      <Filter>xz\srciblzma\simple</Filter>
+    <ClCompile Include="xz\src\iblzma\simple\simple_encoder.c">
+      <Filter>xz\src\iblzma\simple</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\tuklib\tuklib_cpucores.c">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClCompile Include="xz\src\iblzma\tuklib\tuklib_cpucores.c">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\tuklib\tuklib_exit.c">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClCompile Include="xz\src\iblzma\tuklib\tuklib_exit.c">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\tuklib\tuklib_mbstr_fw.c">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClCompile Include="xz\src\iblzma\tuklib\tuklib_mbstr_fw.c">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\tuklib\tuklib_mbstr_width.c">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClCompile Include="xz\src\iblzma\tuklib\tuklib_mbstr_width.c">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\tuklib\tuklib_open_stdxxx.c">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClCompile Include="xz\src\iblzma\tuklib\tuklib_open_stdxxx.c">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\tuklib\tuklib_physmem.c">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClCompile Include="xz\src\iblzma\tuklib\tuklib_physmem.c">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClCompile>
-    <ClCompile Include="xz\srciblzma\tuklib\tuklib_progname.c">
-      <Filter>xz\srciblzma\tuklib</Filter>
+    <ClCompile Include="xz\src\iblzma\tuklib\tuklib_progname.c">
+      <Filter>xz\src\iblzma\tuklib</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
