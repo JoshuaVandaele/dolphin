@@ -54,6 +54,17 @@ FROM dolphin-base AS dolphin-nodeps
 ENV USE_SYSTEM_LIBS=OFF
 
 ############
+# Clang ++ #
+############
+FROM dolphin-nodeps AS dolphin-nodeps-clang
+
+RUN apk add --no-cache clang lld
+
+ENV CC=clang
+ENV CXX=clang++
+ENV LDFLAGS="-fuse-ld=lld"
+
+############
 # All Deps #
 ############
 FROM dolphin-base AS dolphin-alldeps
@@ -95,6 +106,95 @@ RUN apk add --no-cache \
     speexdsp-dev \
     bluez-dev \
     llvm
+
+
+##############
+# Debian     #
+##############
+FROM debian:13 AS dolphin-debian
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV BUILD_DIR=/build
+ENV DOLPHIN_DIR=/dolphin
+
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install -y \
+        build-essential \
+        git \
+        cmake \
+        ffmpeg \
+        libavcodec-dev \
+        libavformat-dev \
+        libavutil-dev \
+        libswscale-dev \
+        libevdev-dev \
+        libusb-1.0-0-dev \
+        libxrandr-dev \
+        libxi-dev \
+        libpangocairo-1.0-0 \
+        qt6-base-private-dev \
+        libqt6svg6-dev \
+        libbluetooth-dev \
+        libasound2-dev \
+        libpulse-dev \
+        libgl1-mesa-dev \
+        libcurl4-openssl-dev \
+        ninja-build \
+        pkg-config \
+        libudev-dev \
+        qt6-base-dev \
+        qt6-svg-dev \
+        libzstd-dev \
+        liblz4-dev \
+        libfftw3-dev \
+        libbz2-dev \
+        liblzo2-dev \
+        liblzma-dev \
+        libxext-dev \
+        libxinerama-dev \
+        libsdl3-dev \
+        libvulkan-dev \
+        libglfw3-dev \
+        libfmt-dev \
+        libpugixml-dev \
+        libenet-dev \
+        libxxhash-dev \
+        libminizip-dev \
+        libspng-dev \
+        libminiupnpc-dev \
+        libmbedtls-dev \
+        libhidapi-dev \
+        libspeexdsp-dev \
+        llvm \
+        clang \
+        lld \
+        glslang-tools \
+        glslang-dev \
+        libcubeb-dev \
+        libmbedtls21 \
+        libgtest-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN git config --global --add safe.directory /dolphin
+RUN mkdir -p $BUILD_DIR/Binaries
+WORKDIR $BUILD_DIR
+
+ENTRYPOINT ["/bin/bash", "-c", "\
+    cd $BUILD_DIR && \
+    ln -fs $DOLPHIN_DIR/Data/Sys $BUILD_DIR/Binaries/ && \
+    cmake $DOLPHIN_DIR \
+        -DLINUX_LOCAL_DEV=true \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DUSE_SYSTEM_LIBS=ON \
+        -DUSE_SYSTEM_LIBMGBA=OFF \
+        -DUSE_SYSTEM_SFML=OFF \
+        -DUSE_SYSTEM_MINIZIP-NG=OFF \
+        -DUSE_SYSTEM_MBEDTLS=OFF \
+        -G Ninja && \
+    ninja && \
+    ninja tests && \
+    Binaries/Tests/tests && \
+    echo 'Build finished successfully'"]
 
 ##############
 # Android    #

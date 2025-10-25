@@ -15,6 +15,14 @@ services:
     volumes:
       - ..:/dolphin
   
+  dolphin-debian:
+    build:
+      context: .
+      target: dolphin-debian
+    container_name: dolphin-debian
+    volumes:
+      - ..:/dolphin
+
   dolphin-android:
     build:
       context: .
