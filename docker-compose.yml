@@ -1,32 +1,144 @@
 services:
-  dolphin-nodeps:
+  alpine-nodeps-gcc:
     build:
       context: .
-      target: dolphin-nodeps
-    container_name: dolphin-nodeps
+      dockerfile: alpine.Dockerfile
+      target: alpine-nodeps-gcc
+    container_name: alpine-nodeps-gcc
     volumes:
       - ..:/dolphin
 
-  dolphin-alldeps:
+  alpine-nodeps-clang:
     build:
       context: .
-      target: dolphin-alldeps
-    container_name: dolphin-alldeps
+      dockerfile: alpine.Dockerfile
+      target: alpine-nodeps-clang
+    container_name: alpine-nodeps-clang
+    volumes:
+      - ..:/dolphin
+
+  alpine-alldeps-gcc:
+    build:
+      context: .
+      dockerfile: alpine.Dockerfile
+      target: alpine-alldeps-gcc
+    container_name: alpine-alldeps-gcc
+    volumes:
+      - ..:/dolphin
+
+  alpine-alldeps-clang:
+    build:
+      context: .
+      dockerfile: alpine.Dockerfile
+      target: alpine-alldeps-clang
+    container_name: alpine-alldeps-clang
+    volumes:
+      - ..:/dolphin
+
+  debian-alldeps-gcc:
+    build:
+      context: .
+      dockerfile: debian.Dockerfile
+      target: debian-alldeps-gcc
+    container_name: debian-alldeps-gcc
+    volumes:
+      - ..:/dolphin
+      
+  debian-nodeps-gcc:
+    build:
+      context: .
+      dockerfile: debian.Dockerfile
+      target: debian-nodeps-gcc
+    container_name: debian-nodeps-gcc
+    volumes:
+      - ..:/dolphin
+
+  debian-alldeps-clang:
+    build:
+      context: .
+      dockerfile: debian.Dockerfile
+      target: debian-alldeps-clang
+    container_name: debian-alldeps-clang
+    volumes:
+      - ..:/dolphin
+      
+  debian-nodeps-clang:
+    build:
+      context: .
+      dockerfile: debian.Dockerfile
+      target: debian-nodeps-clang
+    container_name: debian-nodeps-clang
     volumes:
       - ..:/dolphin
   
-  dolphin-debian:
+  fedora-alldeps-gcc:
     build:
       context: .
-      target: dolphin-debian
-    container_name: dolphin-debian
+      dockerfile: fedora.Dockerfile
+      target: fedora-alldeps-gcc
+    container_name: fedora-alldeps-gcc
+    volumes:
+      - ..:/dolphin
+      
+  fedora-nodeps-gcc:
+    build:
+      context: .
+      dockerfile: fedora.Dockerfile
+      target: fedora-nodeps-gcc
+    container_name: fedora-nodeps-gcc
     volumes:
       - ..:/dolphin
 
-  dolphin-android:
+  fedora-alldeps-clang:
     build:
       context: .
-      target: dolphin-android
-    container_name: dolphin-android
+      dockerfile: fedora.Dockerfile
+      target: fedora-alldeps-clang
+    container_name: fedora-alldeps-clang
+    volumes:
+      - ..:/dolphin
+      
+  fedora-nodeps-clang:
+    build:
+      context: .
+      dockerfile: fedora.Dockerfile
+      target: fedora-nodeps-clang
+    container_name: fedora-nodeps-clang
+    volumes:
+      - ..:/dolphin
+
+  arch-alldeps-gcc:
+    build:
+      context: .
+      dockerfile: arch.Dockerfile
+      target: arch-alldeps-gcc
+    container_name: arch-alldeps-gcc
+    volumes:
+      - ..:/dolphin
+      
+  arch-nodeps-gcc:
+    build:
+      context: .
+      dockerfile: arch.Dockerfile
+      target: arch-nodeps-gcc
+    container_name: arch-nodeps-gcc
+    volumes:
+      - ..:/dolphin
+
+  arch-alldeps-clang:
+    build:
+      context: .
+      dockerfile: arch.Dockerfile
+      target: arch-alldeps-clang
+    container_name: arch-alldeps-clang
+    volumes:
+      - ..:/dolphin
+      
+  arch-nodeps-clang:
+    build:
+      context: .
+      dockerfile: arch.Dockerfile
+      target: arch-nodeps-clang
+    container_name: arch-nodeps-clang
     volumes:
       - ..:/dolphin
