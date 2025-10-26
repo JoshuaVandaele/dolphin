@@ -1,5 +1,26 @@
 # Building for Linux
 
+- [Building for Linux](#building-for-linux)
+  - [Prerequisites](#prerequisites)
+    - [Tools](#tools)
+    - [Required Dependencies](#required-dependencies)
+    - [Optional Dependencies](#optional-dependencies)
+    - [System-specific instructions](#system-specific-instructions)
+      - [Debian](#debian)
+      - [Ubuntu](#ubuntu)
+      - [Fedora](#fedora)
+      - [Arch](#arch)
+      - [Alpine](#alpine)
+      - [Chrome/Chromium OS (via Chromebrew)](#chromechromium-os-via-chromebrew)
+  - [Checkout Dolphin](#checkout-dolphin)
+  - [Building](#building)
+    - [Global Build (if unsure, use this option)](#global-build-if-unsure-use-this-option)
+    - [Local Build](#local-build)
+    - [Portable Build](#portable-build)
+    - [Distributable .deb Package](#distributable-deb-package)
+  - [Externally Managed Packages](#externally-managed-packages)
+  - [Troubleshooting](#troubleshooting)
+
 ## Prerequisites
 
 ### Tools
@@ -47,7 +68,7 @@ Libraries will silently fall back to their vendored counterpart if they cannot b
 |  **libevdev**  |    ⬜    |              | Only optional if `-DENABLE_EVDEV=OFF` is set.                         | `libevdev-dev`                                                                          | `libevdev-devel`                                                                                                           | `libevdev`                                                           | `libevdev-dev`                                                                                                            |
 |    **SDL**     |    ✅    |   >=3.2.0    | Disable with `-DENABLE_SDL=OFF`.                                      | `libsdl3-dev`                                                                           | `SDL3-devel`                                                                                                               | `sdl3`                                                               | `sdl3-dev`                                                                                                                |
 |   **cubeb**    |    ✅    |              | Disable with `-DENABLE_CUBEB=OFF`.                                    | `libcubeb-dev`                                                                          | `cubeb-devel`                                                                                                              | `cubeb` (Only in AUR)                                                | Not in the repos                                                                                                          |
-|    **SFML**    |    ✅    |    >=3.0     |                                                                       | `libsfml-dev` Version 3.x currently not available outside of testing                    | `SFML-devel` Version 3.x [currently not available](https://bugzilla.redhat.com/show_bug.cgi?id=2312363)                    | `sfml`                                                               | ~~`sfml-dev`~~ Version 3.x [Currently not available](https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/85247) |
+|    **SFML**    |    ✅    |    >=3.0     |                                                                       | ~~`libsfml-dev`~~ Version 3.x currently not available outside of testing                | ~~`SFML-devel`~~ Version 3.x [currently not available](https://bugzilla.redhat.com/show_bug.cgi?id=2312363)                | `sfml`                                                               | ~~`sfml-dev`~~ Version 3.x [Currently not available](https://gitlab.alpinelinux.org/alpine/aports/-/merge_requests/85247) |
 | **miniupnpc**  |    ✅    |    >=1.6     | Disable with `-DUSE_UPNP=OFF`.                                        | `libminiupnpc-dev`                                                                      | `miniupnpc-devel`                                                                                                          | `miniupnpc`                                                          | `miniupnpc-dev`                                                                                                           |
 |  **mbedtls**   |    ✅    | >=2.0, <=3.0 |                                                                       | ~~`libmbedtls-dev`~~ MbedTLS 2.x is no longer shipped from Debian Trixie and forward.   | ~~`mbedtls-devel`~~ MbedTLS 2.x is no longer shipped from Fedora 42 forward.                                               | `mbedtls2`                                                           | `mbedtls2-dev`                                                                                                            |
 |   **iconv**    |    ✅    |    >=1.14    |                                                                       | Built-in                                                                                | Built-in                                                                                                                   | `libiconv`                                                           | Built-in                                                                                                                  |
@@ -499,7 +520,17 @@ submodule update --init --recursive \
 
 ## Building
 
-If your system has an old compiler in its system repos, a higher version can be specified with build flags. For example, Ubuntu 20.04 users should install `gcc-13` from something like [this PPA](https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test) and then instead of `cmake ..` type `cmake .. -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_CXX_COMPILER=g++-13` during the build process.
+If your system’s default compiler is too old to support C++20, you’ll need to specify a newer version manually when configuring the build.
+
+For example, on Ubuntu 20.04, you can install `gcc-13` from [this PPA](https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test) or `clang-18` from [LLVM's APT repository](https://apt.llvm.org/).
+
+After installation, use the newer compiler explicitly during configuration, like so:
+
+```sh
+cmake .. -DCMAKE_C_COMPILER=gcc-13 -DCMAKE_CXX_COMPILER=g++-13
+# or
+cmake .. -DCMAKE_C_COMPILER=clang-18 -DCMAKE_CXX_COMPILER=clang++-18
+```
 
 ### Global Build (if unsure, use this option)
 
@@ -541,14 +572,14 @@ touch Binaries/portable.txt
 
 ### Distributable .deb Package
 
-following the instructions from [the PR where this feature was implemented](https://github.com/dolphin-emu/dolphin/pull/10170):
+Following the instructions from [the PR where this feature was implemented](https://github.com/dolphin-emu/dolphin/pull/10170):
 
 ```bash
 sudo apt install dpkg-dev file
 
 mkdir build && cd build
 
-cmake .. -DCPACK_PACKAGE_CONTACT="Your Name Here" # You're responsible for what you distribute
+cmake .. -DCPACK_PACKAGE_CONTACT="Your Name Here" # You're responsible for what you distribute.
 
 make -j$(nproc)
 
@@ -560,7 +591,7 @@ cpack -G DEB
 Dolphin maintains official Flatpak repositories for both [releases](https://flatpak.dolphin-emu.org/releases.flatpakrepo) and [development builds](https://flatpak.dolphin-emu.org/dev.flatpakrepo). Additionally, on some distributions of Linux, package maintainers provide unofficial, unmodified builds of Dolphin. These are listed below:
 
 - [Debian LTS (Bullseye)](https://packages.debian.org/buster/dolphin-emu), [Ubuntu 24.04 LTS (Noble Numbat)](https://packages.ubuntu.com/focal/dolphin-emu), and older **use a highly outdated build from 2016. Do not install Dolphin Emulator from APT on these versions!**
-- [Debian Stable (Bookworm)](https://packages.debian.org/search?keywords=dolphin-emu&searchon=names&suite=all&section=all), [Ubuntu 24.10 (Oracular Oriole)](https://packages.ubuntu.com/search?keywords=dolphin-emu&searchon=names), and newer have recent release versions of Dolphin, though they can still become outdated due to software versions being mostly frozen when distribution versions release.
+- [Debian Stable (Trixie)](https://packages.debian.org/search?keywords=dolphin-emu&searchon=names&suite=all&section=all), [Ubuntu 24.10 (Oracular Oriole)](https://packages.ubuntu.com/search?keywords=dolphin-emu&searchon=names), and newer have recent release versions of Dolphin, though they can still become outdated due to software versions being mostly frozen when distribution versions release.
 - [Arch Linux](https://archlinux.org/packages/extra/x86_64/dolphin-emu/), [Developement Builds](https://aur.archlinux.org/packages/dolphin-emu-git)
 - [Fedora](https://packages.fedoraproject.org/pkgs/dolphin-emu/dolphin-emu/) follows the latest release version but isn't always quite caught up with the most recent.
 - [OpenSUSE](https://software.opensuse.org/package/dolphin-emu)
@@ -570,6 +601,4 @@ Dolphin maintains official Flatpak repositories for both [releases](https://flat
 ## Troubleshooting
 
 - The compiler will normally tell you what's going on if you run into an error. Read the error messages closely and look them up verbatim to see if it's something missing on your system and/or a typo in recent Dolphin commits.
-- Qt5 support has been [officially been deprecated](https://dolphin-emu.org/blog/2022/06/09/leaving-a-legend/) by the Dolphin development team. While it's still technically possible to build using Qt5, as of [5.0-17764](https://dolphin-emu.org/download/dev/950e1f94dc73b56309c090d7b04033506b057ae0/) the minimum requirement was raised to 5.15. It's recommended to install the proper Qt6 dependencies instead - by the time you're reading this, it's possible that not even 5.15 works anymore.
-  - That being said, there _is_ a [known bug](https://bugs.dolphin-emu.org/issues/12913) as of Qt **6.3+** where mouse clicks don't work on Linux. No one's really sure why yet. This can be worked around by setting `QT_XCB_NO_XI2=1`. As an example, you can just run Dolphin using the `QT_XCB_NO_XI2=1 dolphin-emu` command in a terminal. Another easy way to accomplish this would be to install `menulibre` from your package manager, open it and use it to modify Dolphin's desktop file, and change the Command to read something like `env QT_XCB_NO_XI2=1 QT_QPA_PLATFORM=xcb dolphin-emu`. Although it would be more proper to set this as an [environment variable](https://wiki.archlinux.org/title/environment_variables).
 - Need more speed? As an alternative to `cmake ..` during the build process, type `cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-march=native -DCMAKE_C_FLAGS=-march=native` instead. The resulting build will be optimized specifically for YOUR processor! The difference is more noticeable the weaker your computer is. Note that this may result in longer compile times, and the binaries you build will almost certainly be unusable on any computer besides your own. AUR users of `*-git` packages can get a similar effect by following <https://wiki.archlinux.org/title/makepkg#Building_optimized_binaries>
