@@ -200,6 +200,8 @@ CMake Flags: `-DUSE_SYSTEM_LIBMGBA=OFF`
 
 #### Fedora
 
+A simpler alternative way to install all the necessary build dependencies is with `dnf builddep dolphin-emu`. This command installs everything required to build Fedora's `dolphin-emu` package, which should be close to up-to-date.
+
 CMake Flags: `-DUSE_SYSTEM_SFML=OFF -DUSE_SYSTEM_MBEDTLS=OFF -DUSE_SYSTEM_LIBMGBA=OFF`
 
 <details>
