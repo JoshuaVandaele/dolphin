@@ -142,3 +142,39 @@ services:
     container_name: arch-nodeps-clang
     volumes:
       - ..:/dolphin
+
+  ubuntu-alldeps-gcc:
+    build:
+      context: .
+      dockerfile: ubuntu.Dockerfile
+      target: ubuntu-alldeps-gcc
+    container_name: ubuntu-alldeps-gcc
+    volumes:
+      - ..:/dolphin
+      
+  ubuntu-nodeps-gcc:
+    build:
+      context: .
+      dockerfile: ubuntu.Dockerfile
+      target: ubuntu-nodeps-gcc
+    container_name: ubuntu-nodeps-gcc
+    volumes:
+      - ..:/dolphin
+
+  ubuntu-alldeps-clang:
+    build:
+      context: .
+      dockerfile: ubuntu.Dockerfile
+      target: ubuntu-alldeps-clang
+    container_name: ubuntu-alldeps-clang
+    volumes:
+      - ..:/dolphin
+      
+  ubuntu-nodeps-clang:
+    build:
+      context: .
+      dockerfile: ubuntu.Dockerfile
+      target: ubuntu-nodeps-clang
+    container_name: ubuntu-nodeps-clang
+    volumes:
+      - ..:/dolphin
