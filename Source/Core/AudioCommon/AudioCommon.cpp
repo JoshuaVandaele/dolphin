@@ -137,10 +137,8 @@ std::vector<std::string> GetSoundBackends()
 
 bool SupportsDPL2Decoder(std::string_view backend)
 {
-#ifndef __APPLE__
   if (backend == BACKEND_OPENAL)
     return true;
-#endif
   if (backend == BACKEND_CUBEB)
     return true;
   if (backend == BACKEND_PULSEAUDIO)

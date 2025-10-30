@@ -1,21 +1,22 @@
 // Copyright 2008 Dolphin Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#ifdef _WIN32
-
 #include "AudioCommon/OpenALStream.h"
 
+#ifdef _WIN32
 #include <windows.h>
+#endif
 #include <climits>
 #include <cstring>
 #include <thread>
 
 #include "Common/Logging/Log.h"
 #include "Common/MsgHandler.h"
+#include "Common/StringUtil.h"
 #include "Common/Thread.h"
 #include "Core/Config/MainSettings.h"
 
-static HMODULE s_openal_dll = nullptr;
+#if defined HAVE_OPENAL && HAVE_OPENAL
 
 #define OPENAL_API_VISIT(X)                                                                        \
   X(alBufferData)                                                                                  \
@@ -49,51 +50,96 @@ static HMODULE s_openal_dll = nullptr;
   typedef decltype(&func) func##_t;                                                                \
   static func##_t p##func = nullptr;
 
+OPENAL_API_VISIT(DYN_FUNC_DECLARE);
+
+// Defines all "pfunc"s to "func".
+#define DYN_FUNC_USE_OPENALSOFT(func) p##func = func;
+// Undefines all "pfunc"s back to nullptr.
+#define DYN_FUNC_RESET(func) p##func = nullptr;
+
+static void InitOpenALSoftLibrary()
+{
+  OPENAL_API_VISIT(DYN_FUNC_USE_OPENALSOFT);
+  INFO_LOG_FMT(AUDIO, "Using vendored OpenAL Soft");
+}
+
+static void DeinitOpenALSoftLibrary()
+{
+  OPENAL_API_VISIT(DYN_FUNC_RESET);
+}
+
+#ifdef _WIN32
+static HMODULE s_openal_dll = nullptr;
+
 // Attempt to load the function from the given module handle.
 #define OPENAL_FUNC_LOAD(func)                                                                     \
   p##func = (func##_t)::GetProcAddress(s_openal_dll, #func);                                       \
   if (!p##func)                                                                                    \
   {                                                                                                \
+    ERROR_LOG_FMT(AUDIO, "Missing symbol in external OpenAL: {}", #func);                          \
     return false;                                                                                  \
   }
 
-OPENAL_API_VISIT(DYN_FUNC_DECLARE);
-
-static bool InitFunctions()
+static bool LoadExternalFunctions(HMODULE dll)
 {
   OPENAL_API_VISIT(OPENAL_FUNC_LOAD);
   return true;
 }
 
-static bool InitLibrary()
+static bool InitExternalLibrary()
 {
   if (s_openal_dll)
     return true;
 
   s_openal_dll = ::LoadLibrary(TEXT("openal32.dll"));
-  if (!s_openal_dll)
-    return false;
-
-  if (!InitFunctions())
+  if (s_openal_dll)
   {
-    FreeLibrary(s_openal_dll);
+    std::wstring dll_path;
+    TCHAR buffer[MAX_PATH];
+    if (::GetModuleFileName(s_openal_dll, buffer, MAX_PATH) != 0)
+      dll_path = buffer;
+    else
+      dll_path = L"openal32.dll";
+
+    if (LoadExternalFunctions(s_openal_dll))
+    {
+      INFO_LOG_FMT(AUDIO, "Using external OpenAL DLL: {}", WStringToUTF8(dll_path));
+      return true;
+    }
+    ::FreeLibrary(s_openal_dll);
     s_openal_dll = nullptr;
-    return false;
+    WARN_LOG_FMT(AUDIO, "External OpenAL DLL {} is missing required symbols",
+                 WStringToUTF8(dll_path));
   }
 
-  return true;
+  return false;
 }
 
-bool OpenALStream::IsValid()
+static void DeinitExternalLibrary()
 {
-  return InitLibrary();
+  if (s_openal_dll)
+  {
+    ::FreeLibrary(s_openal_dll);
+    s_openal_dll = nullptr;
+  }
 }
+
+#endif  // _WIN32
 
 //
 // AyuanX: Spec says OpenAL1.1 is thread safe already
 //
 bool OpenALStream::Init()
 {
+#ifdef _WIN32
+  if (!InitExternalLibrary())
+  {
+    InitOpenALSoftLibrary();
+  }
+#else
+  InitOpenALSoftLibrary();
+#endif
+
   if (!palcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT"))
   {
     PanicAlertFmtT("OpenAL: can't find sound devices");
@@ -143,6 +189,10 @@ OpenALStream::~OpenALStream()
   palcMakeContextCurrent(nullptr);
   palcDestroyContext(context);
   palcCloseDevice(device);
+#ifdef _WIN32
+  DeinitExternalLibrary();
+#endif
+  DeinitOpenALSoftLibrary();
 }
 
 void OpenALStream::SetVolume(int volume)
@@ -377,4 +427,4 @@ void OpenALStream::SoundLoop()
   }
 }
 
-#endif  // _WIN32
+#endif  // HAVE_OPENAL

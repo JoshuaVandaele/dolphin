@@ -126,3 +126,7 @@
 	path = Externals/bzip2/bzip2
 	url = https://gitlab.com/bzip2/bzip2.git
 	shallow = true
+[submodule "Externals/OpenAL/openal-soft"]
+	path = Externals/OpenAL/openal-soft
+	url = https://github.com/kcat/openal-soft.git
+	shallow = true

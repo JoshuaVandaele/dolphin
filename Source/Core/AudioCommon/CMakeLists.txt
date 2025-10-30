@@ -72,12 +72,17 @@ else()
   message(STATUS "PulseAudio explicitly disabled, disabling PulseAudio sound backend")
 endif()
 
-if(WIN32)
+if(ENABLE_OPENAL)
+  message(STATUS "OpenAL found, enabling OpenAL sound backend")
   target_sources(audiocommon PRIVATE
-    # Dolphin loads openal32.dll at runtime
     OpenALStream.cpp
     OpenALStream.h
+  )
+  target_link_libraries(audiocommon PRIVATE OpenAL::OpenAL)
+endif()
 
+if(WIN32)
+  target_sources(audiocommon PRIVATE
     WASAPIStream.cpp
     WASAPIStream.h
   )

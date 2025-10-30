@@ -98,6 +98,7 @@ option(ENABLE_GENERIC "Enables generic build that should run on any little-endia
 option(ENABLE_HEADLESS "Enables running Dolphin as a headless variant" OFF)
 option(ENABLE_ALSA "Enables ALSA sound backend" ON)
 option(ENABLE_PULSEAUDIO "Enables PulseAudio sound backend" ON)
+option(ENABLE_OPENAL "Enables OpenAL sound backend" ON)
 option(ENABLE_CUBEB "Enables Cubeb sound backend" ON)
 option(ENABLE_LLVM "Enables LLVM support, for disassembly" ON)
 option(ENABLE_TESTS "Enables building the unit tests" ON)
@@ -722,6 +723,12 @@ if(ENABLE_CUBEB)
   add_definitions(-DHAVE_CUBEB)
 endif()
 
+
+if(ENABLE_OPENAL)
+  dolphin_find_optional_system_library(OpenAL Externals/OpenAL 1.1)
+  add_definitions(-DHAVE_OPENAL)
+endif()
+
 if(NOT ANDROID)
   dolphin_find_optional_system_library_pkgconfig(
     LibUSB libusb-1.0 LibUSB::LibUSB Externals/libusb
@@ -776,7 +783,6 @@ endif()
 
 if (WIN32)
   include_directories(Externals/WIL/include)
-  include_directories(Externals/OpenAL/include)
 endif()
 
 include_directories(Externals/picojson)

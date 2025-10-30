@@ -8,7 +8,7 @@
 #include "AudioCommon/SoundStream.h"
 #include "Common/Event.h"
 
-#ifdef _WIN32
+#if defined HAVE_OPENAL && HAVE_OPENAL
 #include <al.h>
 #include <alc.h>
 #include <alext.h>
@@ -25,7 +25,7 @@
 #define FRAME_SURROUND_FLOAT SURROUND_CHANNELS* SIZE_FLOAT
 #define FRAME_SURROUND_SHORT SURROUND_CHANNELS* SIZE_SHORT
 #define FRAME_SURROUND_INT32 SURROUND_CHANNELS* SIZE_INT32
-#endif  // _WIN32
+#endif  // HAVE_OPENAL
 
 // From AL_EXT_float32
 #ifndef AL_FORMAT_STEREO_FLOAT32
@@ -48,7 +48,7 @@
 
 class OpenALStream final : public SoundStream
 {
-#ifdef _WIN32
+#if defined HAVE_OPENAL && HAVE_OPENAL
 public:
   OpenALStream() = default;
   ~OpenALStream() override;
@@ -56,7 +56,7 @@ public:
   void SetVolume(int volume) override;
   bool SetRunning(bool running) override;
 
-  static bool IsValid();
+  static bool IsValid() { return true; }
 
 private:
   void SoundLoop();
@@ -69,5 +69,5 @@ private:
   ALuint m_source = 0;
   ALfloat m_volume = 1;
 
-#endif  // _WIN32
+#endif  // HAVE_OPENAL
 };
