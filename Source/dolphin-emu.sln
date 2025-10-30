@@ -49,6 +49,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "curl", "..\Externals\curl\c
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glslang", "..\Externals\glslang\glslang.vcxproj", "{D178061B-84D3-44F9-BEED-EFD18D9033F0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenAL", "..\Externals\OpenAL\OpenAL.vcxproj", "{56616e64-6165-6c65-2020-4a6f73687561}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpp-ipc", "..\Externals\cpp-ipc\cpp-ipc.vcxproj", "{7299DDD3-BBEC-4027-AF30-8DACC5415F96}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cpp-optparse", "..\Externals\cpp-optparse\cpp-optparse.vcxproj", "{C636D9D1-82FE-42B5-9987-63B7D4836341}"
@@ -273,6 +275,14 @@ Global
 		{D178061B-84D3-44F9-BEED-EFD18D9033F0}.Release|ARM64.Build.0 = Release|ARM64
 		{D178061B-84D3-44F9-BEED-EFD18D9033F0}.Release|x64.ActiveCfg = Release|x64
 		{D178061B-84D3-44F9-BEED-EFD18D9033F0}.Release|x64.Build.0 = Release|x64
+		{56616e64-6165-6c65-2020-4a6f73687561}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{56616e64-6165-6c65-2020-4a6f73687561}.Debug|ARM64.Build.0 = Debug|ARM64
+		{56616e64-6165-6c65-2020-4a6f73687561}.Debug|x64.ActiveCfg = Debug|x64
+		{56616e64-6165-6c65-2020-4a6f73687561}.Debug|x64.Build.0 = Debug|x64
+		{56616e64-6165-6c65-2020-4a6f73687561}.Release|ARM64.ActiveCfg = Release|ARM64
+		{56616e64-6165-6c65-2020-4a6f73687561}.Release|ARM64.Build.0 = Release|ARM64
+		{56616e64-6165-6c65-2020-4a6f73687561}.Release|x64.ActiveCfg = Release|x64
+		{56616e64-6165-6c65-2020-4a6f73687561}.Release|x64.Build.0 = Release|x64
 		{7299DDD3-BBEC-4027-AF30-8DACC5415F96}.Debug|ARM64.ActiveCfg = Debug|ARM64
 		{7299DDD3-BBEC-4027-AF30-8DACC5415F96}.Debug|ARM64.Build.0 = Debug|ARM64
 		{7299DDD3-BBEC-4027-AF30-8DACC5415F96}.Debug|x64.ActiveCfg = Debug|x64

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>
+        $(ExternalsDir)OpenAL;
+        $(ExternalsDir)OpenAL\openal-soft;
+        $(ExternalsDir)OpenAL\openal-soft\common;
+        $(ExternalsDir)OpenAL\openal-soft\include;
+        $(ExternalsDir)OpenAL\openal-soft\include\AL;
+        $(ExternalsDir)OpenAL\openal-soft\gsl\include;
+        %(AdditionalIncludeDirectories)
+    </AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(BuildRootDir)$(Platform)\$(Configuration)\OpenAL\bin\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Link Condition="'$(Configuration)'=='Debug'">
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link Condition="'$(Configuration)'=='Release'">
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(ExternalsDir)OpenAL\OpenAL.vcxproj">
+      <Project>{56616e64-6165-6c65-2020-4a6f73687561}</Project>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
