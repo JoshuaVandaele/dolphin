@@ -131,10 +131,10 @@ set(ZSTD_SRCS
 add_library(zstd STATIC ${ZSTD_SRCS} ${ZSTD_PUBLIC_HDRS} ${ZSTD_PRIVATE_HDRS})
 target_compile_definitions(zstd PUBLIC ZSTD_LEGACY_SUPPORT=0)
 
-if(MSVC)
-    target_compile_definitions(zstd PUBLIC ZSTD_DISABLE_ASM)
-else()
+if(_M_X86_64 AND NOT MSVC)
     target_sources(zstd PRIVATE zstd/lib/decompress/huf_decompress_amd64.S)
+else()
+    target_compile_definitions(zstd PUBLIC ZSTD_DISABLE_ASM)
 endif()
 
 dolphin_disable_warnings(zstd)
