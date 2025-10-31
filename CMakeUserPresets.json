@@ -1,0 +1,49 @@
+{
+  "version": 9,
+  "include": ["CMakePresets.json"],
+  "configurePresets": [
+    {
+      "name": "gcc-debug-arm64",
+      "inherits": "unix-debug-arm64",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "aarch64-linux-gnu-gcc",
+        "CMAKE_CXX_COMPILER": "aarch64-linux-gnu-g++",
+        "CMAKE_EXE_LINKER_FLAGS": "-L/opt/sysroots/ArchLinuxARM/lib",
+        "CMAKE_SYSROOT": "/opt/sysroots/ArchLinuxARM"
+      }
+    },
+    {
+      "name": "clang-debug-arm64",
+      "inherits": "unix-debug-arm64",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_C_FLAGS": "-target aarch64-linux-gnu",
+        "CMAKE_CXX_FLAGS": "-target aarch64-linux-gnu",
+        "CMAKE_SYSROOT": "/opt/sysroots/ArchLinuxARM"
+      }
+    },
+    {
+      "name": "clang-debug-x64",
+      "inherits": "unix-debug-x64",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "gcc-build-debug-arm64",
+      "configurePreset": "gcc-debug-arm64"
+    },
+    {
+      "name": "clang-build-debug-arm64",
+      "configurePreset": "clang-debug-arm64"
+    },
+    {
+      "name": "clang-build-debug-x64",
+      "configurePreset": "clang-debug-x64"
+    }
+  ]
+}
