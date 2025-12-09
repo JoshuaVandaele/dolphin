@@ -251,6 +251,10 @@ elseif(CMAKE_GENERATOR MATCHES "Visual Studio")
   add_compile_options("/MP")
 endif()
 
+if (MINGW)
+  include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/Source/MinGW")
+endif()
+
 if(MSVC)
   check_and_add_flag(EXCEPTIONS /EHsc)
   dolphin_compile_definitions(_DEBUG DEBUG_ONLY)

@@ -381,7 +381,7 @@ if(UNIX)
   if(SYSTEMD_FOUND)
     target_link_libraries(traversal_server PRIVATE ${SYSTEMD_LIBRARIES})
   endif()
-elseif(WIN32)
+elseif(WIN32 AND NOT MINGW)
   find_package(PowerShell REQUIRED)
   execute_process(
     COMMAND ${POWERSHELL_EXE} -Command "[System.Diagnostics.FileVersionInfo]::GetVersionInfo('$ENV{VCToolsRedistDir}vc_redist.x64.exe').ProductVersion"
