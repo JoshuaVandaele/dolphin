@@ -192,6 +192,10 @@ endif()
 # See https://cmake.org/cmake/help/v4.2/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY $<1:${CMAKE_BINARY_DIR}/Binaries>)
 
+# Output directory for PDB files. PDBs are only generated on Windows with MSVC.
+# We set a common directory for all PDBs to avoid littering the Binaries/ directory.
+set(CMAKE_PDB_OUTPUT_DIRECTORY $<1:${CMAKE_BINARY_DIR}/pdb>)
+
 # setup CCache
 include(CCache)
 
