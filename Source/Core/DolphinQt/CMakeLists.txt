@@ -492,19 +492,10 @@ if (MSVC)
   target_compile_options(dolphin-emu PRIVATE "/GR")
 endif()
 
-if(WIN32)
-  target_sources(dolphin-emu PRIVATE DolphinQt.manifest DolphinQt.rc)
-
-  set_target_properties(dolphin-emu PROPERTIES
-    DEBUG_POSTFIX    D
-    OUTPUT_NAME      Dolphin
-    WIN32_EXECUTABLE TRUE
-  )
-
+if (NOT APPLE AND NOT ANDROID)
   # Copy Sys dir
   add_custom_command(TARGET dolphin-emu POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sys"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/Data/Sys" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sys"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${CMAKE_SOURCE_DIR}/Data/Sys" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Sys"
   )
 
   # Copy COPYING
@@ -514,9 +505,10 @@ if(WIN32)
 
   # Copy Licenses dir
   add_custom_command(TARGET dolphin-emu POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/LICENSES" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Licenses"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${CMAKE_SOURCE_DIR}/LICENSES" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Licenses"
   )
-
+endif()
+if (WIN32)
   # Copy qt.conf
   add_custom_command(TARGET dolphin-emu POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/qt.conf.win" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/qt.conf"
@@ -529,6 +521,14 @@ if(WIN32)
     )
   endif()
 
+
+  target_sources(dolphin-emu PRIVATE DolphinQt.manifest DolphinQt.rc)
+
+  set_target_properties(dolphin-emu PROPERTIES
+    DEBUG_POSTFIX    D
+    OUTPUT_NAME      Dolphin
+    WIN32_EXECUTABLE TRUE
+  )
   # Delegate to Qt's official deployment binary on Windows to copy over the necessary Qt-specific libraries, etc.
   get_target_property(MOC_EXECUTABLE_LOCATION Qt6::moc IMPORTED_LOCATION)
   get_filename_component(QT_BINARY_DIRECTORY "${MOC_EXECUTABLE_LOCATION}" DIRECTORY)
