@@ -38,7 +38,23 @@ function(dolphin_optional_system_library out_use_system library)
   endif()
 endfunction()
 
+function(dolphin_register_optional_dependency dependency_provider library)
+  set(_DOLPHIN_DEP_COMMAND_${library} "${dependency_provider}(${library} ${ARGN})" CACHE INTERNAL "")
+endfunction()
+
+function(dolphin_add_optional_dependency library)
+  if(NOT DEFINED _DOLPHIN_DEP_COMMAND_${library})
+    message(FATAL_ERROR
+      "No optional dependency provider registered for '${library}'.\n"
+      "Did you forget to call dolphin_register_optional_dependency()?"
+    )
+  endif()
+
+  cmake_language(EVAL CODE "${_DOLPHIN_DEP_COMMAND_${library}}")
+endfunction()
+
 function(dolphin_add_bundled_library library use_system bundled_path)
+  set(dependencies ${ARGN})
   if (${use_system} STREQUAL "AUTO")
     message(STATUS "No system ${library} was found.  Using static ${library} from Externals.")
   else()
@@ -47,6 +63,11 @@ function(dolphin_add_bundled_library library use_system bundled_path)
   if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${bundled_path}/CMakeLists.txt")
     message(FATAL_ERROR "No bundled ${library} was found.  Did you forget to checkout submodules?")
   endif()
+  foreach(dependency IN LISTS dependencies)
+    if(NOT ${dependency}_TYPE)
+      dolphin_add_optional_dependency(${dependency})
+    endif()
+  endforeach()
   add_subdirectory(${bundled_path} EXCLUDE_FROM_ALL)
 endfunction()
 
@@ -61,7 +82,28 @@ function(dolphin_set_library_type library type)
   set(${library}_TYPE "${type}" CACHE INTERNAL "")
 endfunction()
 
+# USAGE:
+# dolphin_find_optional_system_library(
+#   <library>
+#   <bundled_path>
+#   [DOLPHIN_TRY_VERSIONS <versions>...]
+#   [DEPENDS <dependencies>...]
+# )
 function(dolphin_find_optional_system_library library bundled_path)
+  if("DEPENDS" IN_LIST ARGN)
+    list(FIND ARGN "DEPENDS" depends_idx)
+    list(REMOVE_AT ARGN ${depends_idx})
+    set(dependencies)
+    while(TRUE)
+      list(LENGTH ARGN len)
+      if(len EQUAL depends_idx)
+        break()
+      endif()
+      LIST(GET ARGN ${depends_idx} dependency)
+      list(APPEND dependencies "${dependency}")
+      list(REMOVE_AT ARGN ${depends_idx})
+    endwhile()
+  endif()
   dolphin_optional_system_library(use_system ${library})
   string(TOUPPER ${library} upperlib)
   if(use_system)
@@ -116,11 +158,33 @@ function(dolphin_find_optional_system_library library bundled_path)
     message(STATUS "Using system ${library}")
   else()
     dolphin_set_library_type(${library} "Bundled")
-    dolphin_add_bundled_library(${library} ${use_system} ${bundled_path})
+    dolphin_add_bundled_library(${library} ${use_system} ${bundled_path} ${dependencies})
   endif()
 endfunction()
 
+# USAGE:
+# dolphin_find_optional_system_library_pkgconfig(
+#   <library>
+#   <search>
+#   <alias>
+#   <bundled_path>
+#   [DEPENDS <dependencies>...]
+# )
 function(dolphin_find_optional_system_library_pkgconfig library search alias bundled_path)
+  if("DEPENDS" IN_LIST ARGN)
+    list(FIND ARGN "DEPENDS" depends_idx)
+    list(REMOVE_AT ARGN ${depends_idx})
+    set(dependencies)
+    while(TRUE)
+      list(LENGTH ARGN len)
+      if(len EQUAL depends_idx)
+        break()
+      endif()
+      LIST(GET ARGN ${depends_idx} dependency)
+      list(APPEND dependencies "${dependency}")
+      list(REMOVE_AT ARGN ${depends_idx})
+    endwhile()
+  endif()
   dolphin_optional_system_library(use_system ${library})
   string(TOUPPER ${library} upperlib)
   if(use_system)
@@ -135,6 +199,6 @@ function(dolphin_find_optional_system_library_pkgconfig library search alias bun
     dolphin_alias_library(${alias} PkgConfig::${library})
   else()
     dolphin_set_library_type(${library} "Bundled")
-    dolphin_add_bundled_library(${library} ${use_system} ${bundled_path})
+    dolphin_add_bundled_library(${library} ${use_system} ${bundled_path} ${dependencies})
   endif()
 endfunction()

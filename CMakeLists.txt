@@ -1,7 +1,7 @@
 ########################################
 # General setup
 #
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.14)
 
 cmake_policy(SET CMP0079 NEW) # let target_link_libraries() link to a target defined in a different directory
 cmake_policy(SET CMP0080 OLD) # allow using BundleUtilities at configure time
@@ -682,25 +682,37 @@ dolphin_find_optional_system_library_pkgconfig(ENET libenet>=1.3.18 enet::enet E
 
 dolphin_find_optional_system_library_pkgconfig(xxhash libxxhash>=0.8.2 xxhash::xxhash Externals/xxhash)
 
-dolphin_find_optional_system_library(BZip2 Externals/bzip2)
+if(NOT WIN32)
+  if(ANDROID)
+    set(USE_SYSTEM_Iconv OFF)
+  endif()
+  dolphin_register_optional_dependency(dolphin_find_optional_system_library Iconv Externals/libiconv 1.14)
+  dolphin_add_optional_dependency(Iconv)
+  set(Iconv_if_present Iconv)
+endif()
 
-dolphin_find_optional_system_library(LibLZMA Externals/liblzma)
-# Imported target added in CMake 3.14
-dolphin_make_imported_target_if_missing(LibLZMA::LibLZMA LIBLZMA)
+dolphin_register_optional_dependency(dolphin_find_optional_system_library BZip2 Externals/bzip2)
+dolphin_add_optional_dependency(BZip2)
 
-dolphin_find_optional_system_library_pkgconfig(ZSTD libzstd>=1.4.0 zstd::zstd Externals/zstd)
+dolphin_register_optional_dependency(dolphin_find_optional_system_library LibLZMA Externals/liblzma)
+dolphin_add_optional_dependency(LibLZMA)
 
-dolphin_find_optional_system_library_pkgconfig(ZLIB zlib>=1.3.1 ZLIB::ZLIB Externals/zlib-ng)
+dolphin_register_optional_dependency(dolphin_find_optional_system_library_pkgconfig ZSTD libzstd>=1.4.0 zstd::zstd Externals/zstd)
+dolphin_add_optional_dependency(ZSTD)
+
+dolphin_register_optional_dependency(dolphin_find_optional_system_library_pkgconfig ZLIB zlib>=1.3.1 ZLIB::ZLIB Externals/zlib-ng)
+dolphin_add_optional_dependency(ZLIB)
 
 dolphin_find_optional_system_library_pkgconfig(minizip-ng
   "minizip-ng>=4.0.4" MINIZIP::minizip-ng Externals/minizip-ng
+  DEPENDS BZip2 LibLZMA ZSTD ZLIB ${Iconv_if_present}
 )
 
 dolphin_find_optional_system_library(LZO Externals/LZO)
 
 dolphin_find_optional_system_library_pkgconfig(lz4 liblz4>=1.8 LZ4::LZ4 Externals/lz4)
 
-dolphin_find_optional_system_library_pkgconfig(SPNG spng spng::spng Externals/libspng)
+dolphin_find_optional_system_library_pkgconfig(SPNG spng spng::spng Externals/libspng DEPENDS ZLIB)
 
 # Using static FreeSurround from Externals
 # There is no system FreeSurround library.
@@ -752,7 +764,7 @@ if(NOT ENABLE_QT)
   set(USE_MGBA 0)
 endif()
 if(USE_MGBA)
-  dolphin_find_optional_system_library(LIBMGBA Externals/mGBA 0.11)
+  dolphin_find_optional_system_library(LIBMGBA Externals/mGBA 0.11 DEPENDS ZLIB)
 endif()
 
 find_package(SYSTEMD)
