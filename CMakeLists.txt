@@ -730,13 +730,15 @@ if(ENABLE_CUBEB)
   add_definitions(-DHAVE_CUBEB)
 endif()
 
+dolphin_register_optional_dependency(dolphin_find_optional_system_library LibUSB Externals/libusb)
+
 if(NOT ANDROID)
-  dolphin_find_optional_system_library(LibUSB Externals/libusb)
+  dolphin_add_optional_dependency(LibUSB)
   add_definitions(-D__LIBUSB__)
 endif()
 
 if(ENABLE_SDL)
-  dolphin_find_optional_system_library(SDL3 Externals/SDL 3.2.0)
+  dolphin_find_optional_system_library(SDL3 Externals/SDL 3.2.0 DEPENDS LibUSB)
 endif()
 
 dolphin_find_optional_system_library(SFML Externals/SFML 3.0 COMPONENTS Network System)
