@@ -756,6 +756,33 @@ if(NOT ANDROID)
   dolphin_find_optional_system_library(HIDAPI Externals/hidapi)
 endif()
 
+if(ENABLE_LLVM)
+  dolphin_find_optional_system_library(LLVM Externals/llvm)
+  add_definitions(-DHAVE_LLVM)
+endif()
+
+# if(ENABLE_LLVM)
+#   find_package(LLVM CONFIG)
+#   if(LLVM_FOUND)
+#     message(STATUS "LLVM found, enabling LLVM support in disassembler")
+#     target_compile_definitions(common PRIVATE HAVE_LLVM)
+#     # Minimal documentation about LLVM's CMake functions is available here:
+#     # https://releases.llvm.org/16.0.0/docs/CMake.html#embedding-llvm-in-your-project
+#     # https://groups.google.com/g/llvm-dev/c/YeEVe7HTasQ?pli=1
+#     #
+#     # However, you have to read the source code in any case.
+#     # Look for LLVM-Config.cmake in your (Unix) system:
+#     # $ find /usr -name LLVM-Config\\.cmake 2>/dev/null
+#     llvm_expand_pseudo_components(LLVM_EXPAND_COMPONENTS
+#       AllTargetsInfos AllTargetsDisassemblers AllTargetsCodeGens
+#     )
+#     llvm_config(common USE_SHARED
+#       mcdisassembler target ${LLVM_EXPAND_COMPONENTS}
+#     )
+#     target_include_directories(common PRIVATE ${LLVM_INCLUDE_DIRS})
+#   endif()
+# endif()
+
 if(USE_DISCORD_PRESENCE)
   message(STATUS "Using static DiscordRPC from Externals")
   add_subdirectory(Externals/discord-rpc EXCLUDE_FROM_ALL)

@@ -353,17 +353,6 @@ if(USE_UPNP)
 endif()
 
 if(ENABLE_LLVM)
-  find_package(LLVM CONFIG)
-  if(LLVM_FOUND)
-    message(STATUS "LLVM found, enabling LLVM support in disassembler")
-    target_compile_definitions(common PRIVATE HAVE_LLVM)
-    # Minimal documentation about LLVM's CMake functions is available here:
-    # https://releases.llvm.org/16.0.0/docs/CMake.html#embedding-llvm-in-your-project
-    # https://groups.google.com/g/llvm-dev/c/YeEVe7HTasQ?pli=1
-    #
-    # However, you have to read the source code in any case.
-    # Look for LLVM-Config.cmake in your (Unix) system:
-    # $ find /usr -name LLVM-Config\\.cmake 2>/dev/null
     llvm_expand_pseudo_components(LLVM_EXPAND_COMPONENTS
       AllTargetsInfos AllTargetsDisassemblers AllTargetsCodeGens
     )
@@ -371,7 +360,6 @@ if(ENABLE_LLVM)
       mcdisassembler target ${LLVM_EXPAND_COMPONENTS}
     )
     target_include_directories(common PRIVATE ${LLVM_INCLUDE_DIRS})
-  endif()
 endif()
 
 if(UNIX)
