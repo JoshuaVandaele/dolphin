@@ -4,7 +4,6 @@
 FROM ubuntu:latest AS ubuntu-base
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV BUILD_DIR=/build
 ENV DOLPHIN_DIR=/dolphin
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
@@ -14,12 +13,12 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     ninja-build \
     g++ \
     clang \
-    lld
+    lld \
+    software-properties-common \
+    ccache
 RUN rm -rf /var/lib/apt/lists/*
 
-RUN git config --global --add safe.directory /dolphin
-RUN mkdir -p $BUILD_DIR/Binaries
-WORKDIR $BUILD_DIR
+RUN git config --global --add safe.directory $DOLPHIN_DIR
 
 ENV USE_SYSTEM_LIBS=OFF
 ENV ENABLE_HEADLESS=ON
@@ -53,7 +52,15 @@ ENV USE_SYSTEM_LIBS=ON
 ENV ENABLE_HEADLESS=OFF
 ENV DENABLE_HWDB=ON
 ENV ENABLE_EVDEV=ON
-ENV EXTRA_CMAKE_ARGS="-DUSE_SYSTEM_MINIZIP-NG=OFF -DUSE_SYSTEM_SFML=OFF -DUSE_SYSTEM_MBEDTLS=OFF -DUSE_SYSTEM_LIBMGBA=OFF"
+ENV EXTRA_CMAKE_ARGS="-DUSE_SYSTEM_MINIZIP-NG=OFF -DUSE_SYSTEM_SFML=OFF -DUSE_SYSTEM_MBEDTLS=OFF -DUSE_SYSTEM_LIBMGBA=OFF -DUSE_SYSTEM_ENET=OFF -DUSE_SYSTEM_ZLIB=OFF"
+
+# SDL3 is not available for 25.04<
+RUN add-apt-repository ppa:hrzhu/sdl3-backport
+# FMT 10 is not available for 25.04
+RUN add-apt-repository ppa:trldp/libfmt
+# ENET 1.3.18 is not available for 25.04<
+# ZLIB>=1.3.1 is not available for 25.04<
+
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     # kernel headers

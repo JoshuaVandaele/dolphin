@@ -3,14 +3,9 @@
 ###############
 FROM alpine:latest AS alpine-base
 
-ENV BUILD_DIR=/build
 ENV DOLPHIN_DIR=/dolphin
-ENV USE_SYSTEM_LIBS=OFF
-ENV ENABLE_HEADLESS=ON
-ENV DENABLE_HWDB=OFF
-ENV ENABLE_EVDEV=OFF
-ENV EXTRA_CMAKE_ARGS=""
 
+# linux-headers is required to build libusb from Externals
 RUN apk add --no-cache \
     bash \
     git \
@@ -19,13 +14,16 @@ RUN apk add --no-cache \
     g++ \
     clang \
     lld \
-    linux-headers
+    linux-headers \
+    ccache
 
-# linux-headers is required to build libusb from Externals
+RUN git config --global --add safe.directory $DOLPHIN_DIR
 
-RUN git config --global --add safe.directory /dolphin
-RUN mkdir -p $BUILD_DIR/Binaries
-WORKDIR $BUILD_DIR
+ENV USE_SYSTEM_LIBS=OFF
+ENV ENABLE_HEADLESS=ON
+ENV DENABLE_HWDB=OFF
+ENV ENABLE_EVDEV=OFF
+ENV EXTRA_CMAKE_ARGS=""
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -136,6 +134,7 @@ RUN apk add --no-cache \
     bluez-dev \
     # Qt6
     qt6-qtbase-dev \
+    qt6-qtbase-private-dev \
     qt6-qtsvg-dev \
     # Gettext
     gettext

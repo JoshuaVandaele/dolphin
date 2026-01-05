@@ -3,7 +3,6 @@
 ################
 FROM archlinux:latest AS arch-base
 
-ENV BUILD_DIR=/build
 ENV DOLPHIN_DIR=/dolphin
 
 RUN pacman -Syu --noconfirm \
@@ -13,12 +12,11 @@ RUN pacman -Syu --noconfirm \
     ninja \
     base-devel \
     clang \
-    lld
+    lld \
+    ccache
 RUN pacman -Scc --noconfirm
 
-RUN git config --global --add safe.directory /dolphin
-RUN mkdir -p $BUILD_DIR/Binaries
-WORKDIR $BUILD_DIR
+RUN git config --global --add safe.directory $DOLPHIN_DIR
 
 ENV USE_SYSTEM_LIBS=OFF
 ENV ENABLE_HEADLESS=ON
@@ -53,8 +51,8 @@ ENV USE_SYSTEM_LIBS=ON
 ENV ENABLE_HEADLESS=OFF
 ENV DENABLE_HWDB=ON
 ENV ENABLE_EVDEV=ON
-# TODO: GLSLANG 16 doesn't work only because of CMakeLists.txt
-ENV EXTRA_CMAKE_ARGS="-DUSE_SYSTEM_CUBEB=OFF -DUSE_SYSTEM_LIBMGBA=OFF -DUSE_SYSTEM_GLSLANG=OFF"
+
+ENV EXTRA_CMAKE_ARGS="-DUSE_SYSTEM_CUBEB=OFF -DUSE_SYSTEM_LIBMGBA=OFF"
 
 RUN pacman -Syu --noconfirm \
     # Kernel headers
@@ -139,8 +137,6 @@ RUN pacman -Scc --noconfirm
 # Arch alldeps clang      #
 ###########################
 FROM arch-alldeps-gcc AS arch-alldeps-clang
-# TODO: fmt12 is broken with clang
-ENV EXTRA_CMAKE_ARGS="${EXTRA_CMAKE_ARGS} -DUSE_SYSTEM_FMT=OFF"
 ENV CC=clang
 ENV CXX=clang++
 ENV LDFLAGS="-fuse-ld=lld"

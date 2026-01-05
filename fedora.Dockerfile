@@ -3,7 +3,6 @@
 ################
 FROM fedora:latest AS fedora-base
 
-ENV BUILD_DIR=/build
 ENV DOLPHIN_DIR=/dolphin
 
 RUN dnf -y update && dnf -y upgrade && dnf -y install \
@@ -13,16 +12,14 @@ RUN dnf -y update && dnf -y upgrade && dnf -y install \
     ninja-build \
     gcc-c++ \
     clang \
-    lld
+    lld \
+    ccache
 RUN dnf clean all
 
-RUN git config --global --add safe.directory /dolphin
-RUN mkdir -p $BUILD_DIR/Binaries
-WORKDIR $BUILD_DIR
+RUN git config --global --add safe.directory $DOLPHIN_DIR
 
 ENV USE_SYSTEM_LIBS=OFF
 ENV ENABLE_HEADLESS=ON
-ENV OPROFILING=OFF
 ENV DENABLE_HWDB=OFF
 ENV ENABLE_EVDEV=OFF
 ENV EXTRA_CMAKE_ARGS=""
