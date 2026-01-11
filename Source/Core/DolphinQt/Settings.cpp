@@ -667,22 +667,6 @@ bool Settings::GetCheatsEnabled() const
   return Config::Get(Config::MAIN_ENABLE_CHEATS);
 }
 
-void Settings::SetDebugModeEnabled(bool enabled)
-{
-  if (AchievementManager::GetInstance().IsHardcoreModeActive())
-    enabled = false;
-  if (IsDebugModeEnabled() != enabled)
-  {
-    Config::SetBaseOrCurrent(Config::MAIN_ENABLE_DEBUGGING, enabled);
-    emit DebugModeToggled(enabled);
-  }
-}
-
-bool Settings::IsDebugModeEnabled() const
-{
-  return Config::Get(Config::MAIN_ENABLE_DEBUGGING);
-}
-
 void Settings::SetRegistersVisible(bool enabled)
 {
   if (IsRegistersVisible() != enabled)
@@ -815,7 +799,7 @@ bool Settings::IsAssemblerVisible() const
 
 void Settings::RefreshWidgetVisibility()
 {
-  emit DebugModeToggled(IsDebugModeEnabled());
+  emit DebugModeToggled(Config::IsDebuggingEnabled());
   emit LogVisibilityChanged(IsLogVisible());
   emit LogConfigVisibilityChanged(IsLogConfigVisible());
 }
