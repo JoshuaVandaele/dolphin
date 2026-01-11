@@ -31,19 +31,28 @@ struct CachedValue
   u64 config_version;
 };
 
+enum class EditPolicy
+{
+  Unconditional,
+  NotRunning,
+  NotInNetplay,
+  NotInHardcore
+};
+
 template <typename T>
 class Info
 {
 public:
-  constexpr Info(Location location, T default_value)
+  constexpr Info(Location location, T default_value,
+                 EditPolicy edit_policy = EditPolicy::Unconditional)
       : m_location{std::move(location)}, m_default_value{default_value},
-        m_cached_value{std::move(default_value), 0}
+        m_cached_value{std::move(default_value), 0}, m_edit_policy(edit_policy)
   {
   }
 
   Info(const Info<T>& other)
       : m_location{other.m_location}, m_default_value{other.m_default_value},
-        m_cached_value(other.GetCachedValue())
+        m_cached_value(other.GetCachedValue()), m_edit_policy(other.GetEditPolicy())
   {
   }
 
@@ -52,7 +61,8 @@ public:
   template <Common::TypedEnum<T> Enum>
   Info(const Info<Enum>& other)
       : m_location{other.GetLocation()}, m_default_value{static_cast<T>(other.GetDefaultValue())},
-        m_cached_value(other.template GetCachedValueCasted<T>())
+        m_cached_value(other.template GetCachedValueCasted<T>()),
+        m_edit_policy(other.GetEditPolicy())
   {
   }
 
@@ -81,6 +91,8 @@ public:
     return {static_cast<U>(m_cached_value.value), m_cached_value.config_version};
   }
 
+  constexpr EditPolicy GetEditPolicy() const { return m_edit_policy; }
+
   // Only updates if the provided config_version is newer.
   void TryToSetCachedValue(CachedValue<T> new_value) const
   {
@@ -94,6 +106,8 @@ private:
   T m_default_value;
 
   mutable CachedValue<T> m_cached_value;
+
+  const EditPolicy m_edit_policy;
 
   // In testing, this mutex is effectively never contested.
   // The lock durations are brief and each `Info` object is mostly relevant to one thread.
