@@ -1,0 +1,10 @@
+m_dsp_combo
+
+m_dolby_pro_logic
+m_dolby_quality_label
+m_dolby_quality_combo
+m_latency_label
+m_latency_slider
+m_volume_slider
+m_volume_indicator
+

@@ -47,7 +47,6 @@ private:
 
   void LoadConfig();
   void OnSaveConfig();
-  void OnEmulationStateChanged(Core::State state);
   void UpdateDescriptionsUsingHardcoreStatus();
 
   // Widgets

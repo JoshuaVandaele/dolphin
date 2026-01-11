@@ -34,8 +34,6 @@ private:
   void CreateWhitelistedUSBPassthroughDevices();
   void CreateWiiRemoteSettings();
 
-  void OnEmulationStateChanged(bool running);
-
   void ValidateSelectionState();
 
   void OnUSBWhitelistAddButton();

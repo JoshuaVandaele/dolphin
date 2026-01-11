@@ -262,9 +262,6 @@ void AudioPane::OnBackendChanged()
 
 void AudioPane::OnEmulationStateChanged(bool running)
 {
-  m_dsp_combo->setEnabled(!running);
-  m_backend_label->setEnabled(!running);
-  m_backend_combo->setEnabled(!running);
   if (AudioCommon::SupportsDPL2Decoder(Config::Get(Config::MAIN_AUDIO_BACKEND)) &&
       !Config::Get(Config::MAIN_DSP_HLE))
   {
@@ -278,10 +275,6 @@ void AudioPane::OnEmulationStateChanged(bool running)
     m_latency_label->setEnabled(!running);
     m_latency_slider->setEnabled(!running);
   }
-
-#ifdef _WIN32
-  m_wasapi_device_combo->setEnabled(!running);
-#endif
 }
 
 void AudioPane::CheckNeedForLatencyControl()

@@ -39,8 +39,6 @@ private:
   void LoadSettings();
   void SaveSettings();
 
-  void OnEmulationStateChanged();
-
   void UpdateButton(ExpansionInterface::Slot slot);
   void OnConfigPressed(ExpansionInterface::Slot slot);
 

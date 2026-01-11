@@ -55,10 +55,8 @@ GeneralPane::GeneralPane(QWidget* parent) : QWidget(parent)
   ConnectLayout();
 
   connect(&Settings::Instance(), &Settings::EmulationStateChanged, this,
-          &GeneralPane::OnEmulationStateChanged);
+          &GeneralPane::UpdateDescriptionsUsingHardcoreStatus);
   connect(&Settings::Instance(), &Settings::ConfigChanged, this, &GeneralPane::LoadConfig);
-
-  OnEmulationStateChanged(Core::GetState(Core::System::GetInstance()));
 }
 
 void GeneralPane::CreateLayout()
@@ -78,22 +76,6 @@ void GeneralPane::CreateLayout()
 
   m_main_layout->addStretch(1);
   setLayout(m_main_layout);
-}
-
-void GeneralPane::OnEmulationStateChanged(Core::State state)
-{
-  const bool running = state != Core::State::Uninitialized;
-
-  m_checkbox_dualcore->setEnabled(!running);
-  m_checkbox_cheats->setEnabled(!running);
-  m_checkbox_load_games_into_memory->setEnabled(!running);
-  m_checkbox_override_region_settings->setEnabled(!running);
-#ifdef USE_DISCORD_PRESENCE
-  m_checkbox_discord_presence->setEnabled(!running);
-#endif
-  m_combobox_fallback_region->setEnabled(!running);
-
-  UpdateDescriptionsUsingHardcoreStatus();
 }
 
 void GeneralPane::ConnectLayout()
