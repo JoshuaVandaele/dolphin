@@ -15,8 +15,8 @@ ConfigSlider::ConfigSlider(int minimum, int maximum, const Config::Info<int>& se
 
 ConfigSlider::ConfigSlider(int minimum, int maximum, const Config::Info<int>& setting,
                            Config::Layer* layer, int tick)
-    : ConfigControl(Qt::Horizontal, setting.GetLocation(), layer), m_setting(setting)
-
+    : ConfigControl(Qt::Horizontal, setting.GetLocation(), layer, setting.GetEditPolicy()),
+      m_setting(setting)
 {
   setMinimum(minimum);
   setMaximum(maximum);
@@ -28,8 +28,8 @@ ConfigSlider::ConfigSlider(int minimum, int maximum, const Config::Info<int>& se
 
 ConfigSlider::ConfigSlider(std::vector<int> tick_values, const Config::Info<int>& setting,
                            Config::Layer* layer)
-    : ConfigControl(Qt::Horizontal, setting.GetLocation(), layer), m_setting(setting),
-      m_tick_values(std::move(tick_values))
+    : ConfigControl(Qt::Horizontal, setting.GetLocation(), layer, setting.GetEditPolicy()),
+      m_setting(setting), m_tick_values(std::move(tick_values))
 {
   assert(!m_tick_values.empty());
   setMinimum(0);
@@ -88,8 +88,8 @@ ConfigSliderU32::ConfigSliderU32(u32 minimum, u32 maximum, const Config::Info<u3
 
 ConfigSliderU32::ConfigSliderU32(u32 minimum, u32 maximum, const Config::Info<u32>& setting,
                                  Config::Layer* layer, u32 scale)
-    : ConfigControl(Qt::Horizontal, setting.GetLocation(), layer), m_setting(setting),
-      m_scale(scale)
+    : ConfigControl(Qt::Horizontal, setting.GetLocation(), layer, setting.GetEditPolicy()),
+      m_setting(setting), m_scale(scale)
 
 {
   setMinimum(minimum);

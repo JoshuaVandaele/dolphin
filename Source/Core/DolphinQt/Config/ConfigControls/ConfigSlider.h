@@ -44,7 +44,7 @@ class ConfigSliderU32 final : public ConfigControl<ToolTipSlider>
   Q_OBJECT
 public:
   ConfigSliderU32(u32 minimum, u32 maximum, const Config::Info<u32>& setting, u32 scale = 1);
-  ConfigSliderU32(u32 minimum, u32 maximum, const Config::Info<u32>& setting, Config ::Layer* layer,
+  ConfigSliderU32(u32 minimum, u32 maximum, const Config::Info<u32>& setting, Config::Layer* layer,
                   u32 scale = 1);
 
   void Update(u32 value);
