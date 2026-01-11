@@ -20,6 +20,14 @@ enum class LayerType
   Meta,
 };
 
+enum class EditPolicy
+{
+  Unconditional,
+  NotRunning,
+  NotInNetplay,
+  NotInHardcore
+};
+
 enum class System
 {
   Main,
