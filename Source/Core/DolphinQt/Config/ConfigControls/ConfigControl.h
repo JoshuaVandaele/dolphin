@@ -3,11 +3,18 @@
 
 #pragma once
 
+#include <functional>
+#include <utility>
+
 #include <QFont>
 #include <QMouseEvent>
 
 #include "Common/Config/Enums.h"
 #include "Common/Config/Layer.h"
+#include "Core/AchievementManager.h"
+#include "Core/Core.h"
+#include "Core/NetPlayProto.h"
+#include "Core/System.h"
 #include "DolphinQt/Settings.h"
 
 namespace Config
@@ -21,24 +28,55 @@ template <class Derived>
 class ConfigControl : public Derived
 {
 public:
-  ConfigControl(const Config::Location& location, Config::Layer* layer)
-      : m_location(location), m_layer(layer)
+  ConfigControl(const Config::Location& location, Config::Layer* layer,
+                Config::EditPolicy edit_policy)
+      : m_location(location), m_layer(layer), m_edit_policy(edit_policy)
   {
     ConnectConfig();
   }
-  ConfigControl(const QString& label, const Config::Location& location, Config::Layer* layer)
-      : Derived(label), m_location(location), m_layer(layer)
+  ConfigControl(const QString& label, const Config::Location& location, Config::Layer* layer,
+                Config::EditPolicy edit_policy)
+      : Derived(label), m_location(location), m_layer(layer), m_edit_policy(edit_policy)
   {
     ConnectConfig();
   }
   ConfigControl(const Qt::Orientation& orient, const Config::Location& location,
-                Config::Layer* layer)
-      : Derived(orient), m_location(location), m_layer(layer)
+                Config::Layer* layer, Config::EditPolicy edit_policy)
+      : Derived(orient), m_location(location), m_layer(layer), m_edit_policy(edit_policy)
   {
     ConnectConfig();
   }
 
   const Config::Location GetLocation() const { return m_location; }
+
+  void UpdateEnabledState()
+  {
+    bool enabled = true;
+
+    switch (m_edit_policy)
+    {
+    case Config::EditPolicy::Unconditional:
+      break;
+    case Config::EditPolicy::NotRunning:
+      enabled = Core::IsUninitialized(Core::System::GetInstance());
+      break;
+    case Config::EditPolicy::NotInNetplay:
+      enabled = !NetPlay::IsNetPlayRunning();
+      break;
+    case Config::EditPolicy::NotInHardcore:
+      enabled = !AchievementManager::GetInstance().IsHardcoreModeActive();
+      break;
+    }
+
+    Derived::setEnabled(enabled && (!m_edit_condition || m_edit_condition()));
+  }
+
+  // Adds an extra condition on top of the edit policy.
+  void SetEditCondition(std::function<bool()> condition)
+  {
+    m_edit_condition = std::move(condition);
+    UpdateEnabledState();
+  }
 
 protected:
   void ConnectConfig()
@@ -53,6 +91,22 @@ protected:
       OnConfigChanged();
       m_updating = false;
     });
+
+    UpdateEnabledState();
+    switch (m_edit_policy)
+    {
+    case Config::EditPolicy::Unconditional:
+      break;
+    case Config::EditPolicy::NotRunning:
+    case Config::EditPolicy::NotInNetplay:
+      Derived::connect(&Settings::Instance(), &Settings::EmulationStateChanged, this,
+                       [this] { UpdateEnabledState(); });
+      break;
+    case Config::EditPolicy::NotInHardcore:
+      Derived::connect(&Settings::Instance(), &Settings::HardcoreModeChanged, this,
+                       [this] { UpdateEnabledState(); });
+      break;
+    }
   }
 
   template <typename T>
@@ -117,4 +171,6 @@ private:
   bool m_updating = false;
   const Config::Location m_location;
   Config::Layer* m_layer;
+  const Config::EditPolicy m_edit_policy;
+  std::function<bool()> m_edit_condition;
 };
