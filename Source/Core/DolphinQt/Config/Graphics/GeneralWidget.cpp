@@ -16,8 +16,6 @@
 #include "Core/Config/GraphicsSettings.h"
 #include "Core/Config/MainSettings.h"
 #include "Core/ConfigManager.h"
-#include "Core/Core.h"
-#include "Core/System.h"
 
 #include "DolphinQt/Config/ConfigControls/ConfigBool.h"
 #include "DolphinQt/Config/ConfigControls/ConfigChoice.h"
@@ -25,7 +23,6 @@
 #include "DolphinQt/Config/ConfigControls/ConfigRadio.h"
 #include "DolphinQt/Config/GameConfigWidget.h"
 #include "DolphinQt/Config/Graphics/GraphicsPane.h"
-#include "DolphinQt/Config/ToolTipControls/ToolTipComboBox.h"
 #include "DolphinQt/QtUtils/ModalMessageBox.h"
 #include "DolphinQt/Settings.h"
 
@@ -39,10 +36,9 @@ GeneralWidget::GeneralWidget(GraphicsPane* gfx_pane) : m_game_layer{gfx_pane->Ge
   AddDescriptions();
 
   connect(gfx_pane, &GraphicsPane::BackendChanged, this, &GeneralWidget::OnBackendChanged);
-  connect(&Settings::Instance(), &Settings::EmulationStateChanged, this, [this](Core::State state) {
-    OnEmulationStateChanged(state != Core::State::Uninitialized);
-  });
-  OnEmulationStateChanged(!Core::IsUninitialized(Core::System::GetInstance()));
+  connect(&Settings::Instance(), &Settings::EmulationStateChanged, this,
+          &GeneralWidget::OnEmulationStateChanged);
+  OnEmulationStateChanged();
 }
 
 void GeneralWidget::CreateWidgets()
@@ -73,7 +69,8 @@ void GeneralWidget::CreateWidgets()
                                              Config::GFX_CUSTOM_ASPECT_RATIO_HEIGHT, m_game_layer);
   ToggleCustomAspectRatio(m_aspect_combo->currentIndex());
 
-  m_adapter_combo = new ToolTipComboBox;
+  m_adapter_combo = new ConfigChoice({}, Config::GFX_ADAPTER);
+  m_adapter_combo->SetEditCondition([] { return !g_backend_info.Adapters.empty(); });
   m_enable_vsync = new ConfigBool(tr("V-Sync"), Config::GFX_VSYNC, m_game_layer);
   m_enable_fullscreen =
       new ConfigBool(tr("Start in Fullscreen"), Config::MAIN_FULLSCREEN, m_game_layer);
@@ -152,8 +149,7 @@ void GeneralWidget::ConnectWidgets()
 {
   // Video Backend
   connect(m_backend_combo, &QComboBox::currentIndexChanged, this, &GeneralWidget::BackendWarning);
-  connect(m_adapter_combo, &QComboBox::currentIndexChanged, this, [&](int index) {
-    Config::SetBaseOrCurrent(Config::GFX_ADAPTER, index);
+  connect(m_adapter_combo, &QComboBox::currentIndexChanged, this, [this] {
     emit BackendChanged(QString::fromStdString(Config::Get(Config::MAIN_GFX_BACKEND)));
   });
   connect(m_aspect_combo, &QComboBox::currentIndexChanged, this,
@@ -208,15 +204,8 @@ void GeneralWidget::BackendWarning()
   emit BackendChanged(m_backend_combo->currentData().toString());
 }
 
-void GeneralWidget::OnEmulationStateChanged(bool running)
+void GeneralWidget::OnEmulationStateChanged()
 {
-  m_backend_combo->setEnabled(!running);
-  m_render_main_window->setEnabled(!running);
-  m_enable_fullscreen->setEnabled(!running);
-
-  const bool supports_adapters = !g_backend_info.Adapters.empty();
-  m_adapter_combo->setEnabled(!running && supports_adapters);
-
   std::string current_backend = m_backend_combo->currentData().toString().toStdString();
   if (Config::Get(Config::MAIN_GFX_BACKEND) != current_backend)
   {
@@ -350,8 +339,8 @@ void GeneralWidget::OnBackendChanged(const QString& backend_name)
   if (adapter_index < m_adapter_combo->count())
     m_adapter_combo->setCurrentIndex(adapter_index);
 
-  m_adapter_combo->setEnabled(supports_adapters &&
-                              Core::IsUninitialized(Core::System::GetInstance()));
+  // The adapter list is not part of the config, so refresh the edit condition manually.
+  m_adapter_combo->UpdateEnabledState();
 
   static constexpr char TR_ADAPTER_AVAILABLE_DESCRIPTION[] =
       QT_TR_NOOP("Selects a hardware adapter to use.<br><br>"

@@ -91,13 +91,8 @@ InterfacePane::InterfacePane(QWidget* parent) : QWidget(parent)
   CreateLayout();
   LoadUserStyle();
   ConnectLayout();
-
-  connect(&Settings::Instance(), &Settings::EmulationStateChanged, this,
-          &InterfacePane::OnEmulationStateChanged);
   connect(&Settings::Instance(), &Settings::HardcoreModeChanged, this,
           &InterfacePane::OnHardcoreModeChanged);
-
-  OnEmulationStateChanged(Core::GetState(Core::System::GetInstance()));
 
   bool hardcore = false;
 #ifdef USE_RETRO_ACHIEVEMENTS
@@ -305,12 +300,6 @@ void InterfacePane::OnLanguageChanged()
       tr("You must restart Dolphin in order for the change to take effect."));
 }
 
-void InterfacePane::OnEmulationStateChanged(Core::State state)
-{
-  const bool uninitialized = state == Core::State::Uninitialized;
-  m_checkbox_time_tracking->setEnabled(uninitialized);
-}
-
 void InterfacePane::OnHardcoreModeChanged(bool enabled)
 {
   static constexpr char TR_SHOW_DEBUGGING_UI_DESCRIPTION[] = QT_TR_NOOP(
@@ -329,8 +318,6 @@ void InterfacePane::OnHardcoreModeChanged(bool enabled)
   {
     m_checkbox_show_debugging_ui->SetDescription(tr(TR_SHOW_DEBUGGING_UI_DESCRIPTION));
   }
-
-  m_checkbox_show_debugging_ui->setEnabled(!enabled);
 }
 
 void InterfacePane::AddDescriptions()

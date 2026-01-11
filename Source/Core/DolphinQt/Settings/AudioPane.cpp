@@ -51,11 +51,10 @@ AudioPane::AudioPane()
   ConnectWidgets();
   OnBackendChanged();
 
-  connect(&Settings::Instance(), &Settings::EmulationStateChanged, this, [this](Core::State state) {
-    OnEmulationStateChanged(state != Core::State::Uninitialized);
-  });
+  connect(&Settings::Instance(), &Settings::EmulationStateChanged, this,
+          &AudioPane::OnEmulationStateChanged);
 
-  OnEmulationStateChanged(!Core::IsUninitialized(Core::System::GetInstance()));
+  OnEmulationStateChanged();
 }
 
 void AudioPane::CreateWidgets()
@@ -97,6 +96,10 @@ void AudioPane::CreateWidgets()
   // This prevents [-Volume] title ugliness on Windows.
   const int title_width = font_metrics.boundingRect(volume_box->title()).width();
   m_volume_indicator->setFixedWidth(std::max(label_width, title_width));
+
+  m_volume_slider->SetEditCondition(
+      [] { return AudioCommon::SupportsVolumeChanges(Config::Get(Config::MAIN_AUDIO_BACKEND)); });
+  m_volume_slider->AddDependentWidget(m_volume_indicator);
 
   volume_layout->addWidget(m_volume_slider, 0, Qt::AlignHCenter);
   volume_layout->addWidget(m_volume_indicator, 0, Qt::AlignHCenter);
@@ -142,6 +145,16 @@ void AudioPane::CreateWidgets()
 
   m_dolby_quality_combo = new ConfigChoice(quality_options, Config::MAIN_DPL2_QUALITY);
 
+  m_dolby_pro_logic->SetEditCondition([] {
+    return AudioCommon::SupportsDPL2Decoder(Config::Get(Config::MAIN_AUDIO_BACKEND)) &&
+           !Config::Get(Config::MAIN_DSP_HLE);
+  });
+  m_dolby_quality_combo->SetEditCondition([] {
+    return AudioCommon::SupportsDPL2Decoder(Config::Get(Config::MAIN_AUDIO_BACKEND)) &&
+           !Config::Get(Config::MAIN_DSP_HLE) && Config::Get(Config::MAIN_DPL2_DECODER);
+  });
+  m_dolby_quality_combo->AddDependentWidget(m_dolby_quality_label);
+
   backend_layout->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
   backend_layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
   backend_layout->addRow(m_backend_label, m_backend_combo);
@@ -170,6 +183,11 @@ void AudioPane::CreateWidgets()
     m_latency_label = new QLabel(tr("Latency: %1 ms").arg(m_latency_slider->value()));
     m_latency_label->setFixedWidth(
         QFontMetrics(font()).boundingRect(tr("Latency:  000 ms")).width());
+
+    m_latency_slider->SetEditCondition([] {
+      return AudioCommon::SupportsLatencyControl(Config::Get(Config::MAIN_AUDIO_BACKEND));
+    });
+    m_latency_slider->AddDependentWidget(m_latency_label);
 
     backend_layout->addRow(m_latency_label, m_latency_slider);
   }
@@ -304,8 +322,6 @@ void AudioPane::CreateWidgets()
 void AudioPane::ConnectWidgets()
 {
   connect(m_backend_combo, &QComboBox::currentIndexChanged, this, &AudioPane::OnBackendChanged);
-  connect(m_dolby_pro_logic, &ConfigBool::toggled, this, &AudioPane::OnDspChanged);
-  connect(m_dsp_combo, &ConfigComplexChoice::currentIndexChanged, this, &AudioPane::OnDspChanged);
   connect(m_volume_slider, &QSlider::valueChanged, this,
           [] { AudioCommon::UpdateSoundStream(Core::System::GetInstance()); });
 
@@ -340,38 +356,16 @@ void AudioPane::ConnectWidgets()
 #endif
 }
 
-void AudioPane::OnDspChanged()
-{
-  const auto backend = Config::Get(Config::MAIN_AUDIO_BACKEND);
-  const bool enabled =
-      AudioCommon::SupportsDPL2Decoder(backend) && !Config::Get(Config::MAIN_DSP_HLE);
-  m_dolby_pro_logic->setEnabled(enabled);
-  m_dolby_quality_label->setEnabled(enabled && m_dolby_pro_logic->isChecked());
-  m_dolby_quality_combo->setEnabled(enabled && m_dolby_pro_logic->isChecked());
-}
-
 void AudioPane::OnBackendChanged()
 {
   Settings::Instance().AudioBackendChanged();
 
-  OnDspChanged();
-
-  const auto backend = Config::Get(Config::MAIN_AUDIO_BACKEND);
-
-  if (m_latency_control_supported)
-  {
-    m_latency_label->setEnabled(AudioCommon::SupportsLatencyControl(backend));
-    m_latency_slider->setEnabled(AudioCommon::SupportsLatencyControl(backend));
-  }
-
 #ifdef _WIN32
+  const auto backend = Config::Get(Config::MAIN_AUDIO_BACKEND);
   bool is_wasapi = backend == BACKEND_WASAPI;
   m_wasapi_device_label->setHidden(!is_wasapi);
   m_wasapi_device_combo->setHidden(!is_wasapi);
 #endif
-
-  m_volume_slider->setEnabled(AudioCommon::SupportsVolumeChanges(backend));
-  m_volume_indicator->setEnabled(AudioCommon::SupportsVolumeChanges(backend));
 
 #ifdef HAVE_CUBEB
   UpdateWiimoteRoutingEnabled();
@@ -397,29 +391,8 @@ void AudioPane::OnBackendChanged()
 #endif
 }
 
-void AudioPane::OnEmulationStateChanged(bool running)
+void AudioPane::OnEmulationStateChanged()
 {
-  m_dsp_combo->setEnabled(!running);
-  m_backend_label->setEnabled(!running);
-  m_backend_combo->setEnabled(!running);
-  if (AudioCommon::SupportsDPL2Decoder(Config::Get(Config::MAIN_AUDIO_BACKEND)) &&
-      !Config::Get(Config::MAIN_DSP_HLE))
-  {
-    m_dolby_pro_logic->setEnabled(!running);
-    m_dolby_quality_label->setEnabled(!running && m_dolby_pro_logic->isChecked());
-    m_dolby_quality_combo->setEnabled(!running && m_dolby_pro_logic->isChecked());
-  }
-  if (m_latency_control_supported &&
-      AudioCommon::SupportsLatencyControl(Config::Get(Config::MAIN_AUDIO_BACKEND)))
-  {
-    m_latency_label->setEnabled(!running);
-    m_latency_slider->setEnabled(!running);
-  }
-
-#ifdef _WIN32
-  m_wasapi_device_combo->setEnabled(!running);
-#endif
-
 #ifdef HAVE_CUBEB
   UpdateWiimoteRoutingEnabled();
   UpdateGBARoutingEnabled();

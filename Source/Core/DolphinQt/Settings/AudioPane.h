@@ -38,9 +38,8 @@ private:
   void ConnectWidgets();
   void AddDescriptions();
 
-  void OnEmulationStateChanged(bool running);
+  void OnEmulationStateChanged();
   void OnBackendChanged();
-  void OnDspChanged();
 
   void UpdateWiimoteRoutingEnabled();
   void UpdateGBARoutingEnabled();

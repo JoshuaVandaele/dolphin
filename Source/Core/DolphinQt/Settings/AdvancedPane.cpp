@@ -352,10 +352,6 @@ void AdvancedPane::Update()
   const bool enable_custom_rtc_widgets =
       Config::Get(Config::MAIN_CUSTOM_RTC_ENABLE) && is_uninitialized;
 
-  m_cpu_emulation_engine_combobox->setEnabled(is_uninitialized);
-  m_enable_mmu_checkbox->setEnabled(is_uninitialized);
-  m_pause_on_panic_checkbox->setEnabled(is_uninitialized);
-
   {
     QFont bf = font();
     bf.setBold(Config::GetActiveLayerForConfig(Config::MAIN_OVERCLOCK_ENABLE) !=
@@ -378,7 +374,6 @@ void AdvancedPane::Update()
   m_vi_rate_override_slider->setEnabled(enable_vi_rate_override_widgets);
   m_vi_label->setEnabled(enable_vi_rate_override_widgets);
 
-  m_ram_override_checkbox->setEnabled(is_uninitialized);
   SignalBlocking(m_ram_override_checkbox)->setChecked(enable_ram_override_widgets);
 
   m_mem1_override_slider->setEnabled(enable_ram_override_widgets && is_uninitialized);
@@ -387,7 +382,6 @@ void AdvancedPane::Update()
   m_mem2_override_slider->setEnabled(enable_ram_override_widgets && is_uninitialized);
   m_mem2_label->setEnabled(enable_ram_override_widgets && is_uninitialized);
 
-  m_custom_rtc_checkbox->setEnabled(is_uninitialized);
   SignalBlocking(m_custom_rtc_checkbox)->setChecked(Config::Get(Config::MAIN_CUSTOM_RTC_ENABLE));
 
   QDateTime initial_date_time;

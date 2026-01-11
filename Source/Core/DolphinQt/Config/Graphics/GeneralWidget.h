@@ -14,7 +14,6 @@ class ConfigRadioInt;
 class ConfigStringChoice;
 class GraphicsPane;
 class QLabel;
-class ToolTipComboBox;
 
 namespace Config
 {
@@ -39,11 +38,11 @@ private:
   void AddDescriptions();
 
   void OnBackendChanged(const QString& backend_name);
-  void OnEmulationStateChanged(bool running);
+  void OnEmulationStateChanged();
 
   // Video
   ConfigStringChoice* m_backend_combo;
-  ToolTipComboBox* m_adapter_combo;
+  ConfigChoice* m_adapter_combo;
   ConfigChoice* m_aspect_combo;
   QLabel* m_custom_aspect_label;
   ConfigInteger* m_custom_aspect_width;
