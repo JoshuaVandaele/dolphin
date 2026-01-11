@@ -241,8 +241,9 @@ void InterfacePane::ConnectLayout()
           &Settings::GameListRefreshRequested);
   connect(m_checkbox_use_covers, &QCheckBox::toggled, &Settings::Instance(),
           &Settings::MetadataRefreshRequested);
-  connect(m_checkbox_show_debugging_ui, &QCheckBox::toggled, &Settings::Instance(),
-          &Settings::SetDebugModeEnabled);
+  connect(m_checkbox_show_debugging_ui, &QCheckBox::toggled, &Settings::Instance(), [this] {
+    emit Settings::Instance().DebugModeToggled(Config::Get(Config::MAIN_ENABLE_DEBUGGING));
+  });
   connect(m_combobox_theme, &QComboBox::currentIndexChanged, &Settings::Instance(),
           &Settings::ThemeChanged);
   connect(m_combobox_userstyle, &QComboBox::currentIndexChanged, this,
