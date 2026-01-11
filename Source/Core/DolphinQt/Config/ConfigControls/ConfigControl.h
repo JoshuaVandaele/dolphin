@@ -3,11 +3,17 @@
 
 #pragma once
 
+#include <functional>
+#include <utility>
+#include <vector>
+
 #include <QFont>
 #include <QMouseEvent>
+#include <QWidget>
 
 #include "Common/Config/Enums.h"
 #include "Common/Config/Layer.h"
+#include "Core/Config/EditPolicy.h"
 #include "DolphinQt/Settings.h"
 
 namespace Config
@@ -15,30 +21,75 @@ namespace Config
 template <typename T>
 class Info;
 struct Location;
+
+template <typename Func>
+void ConnectEditPolicySignals(QObject* receiver, EditPolicy policy, Func callback)
+{
+  switch (policy)
+  {
+  case EditPolicy::Unconditional:
+    break;
+  case EditPolicy::NotRunning:
+  case EditPolicy::NotInNetplay:
+    QObject::connect(&Settings::Instance(), &Settings::EmulationStateChanged, receiver, callback);
+    break;
+  case EditPolicy::NotInHardcore:
+    QObject::connect(&Settings::Instance(), &Settings::HardcoreModeChanged, receiver, callback);
+    break;
+  }
+}
 }  // namespace Config
 
 template <class Derived>
 class ConfigControl : public Derived
 {
 public:
-  ConfigControl(const Config::Location& location, Config::Layer* layer)
-      : m_location(location), m_layer(layer)
+  ConfigControl(const Config::Location& location, Config::Layer* layer,
+                Config::EditPolicy edit_policy)
+      : m_location(location), m_layer(layer), m_edit_policy(edit_policy)
   {
     ConnectConfig();
   }
-  ConfigControl(const QString& label, const Config::Location& location, Config::Layer* layer)
-      : Derived(label), m_location(location), m_layer(layer)
+  ConfigControl(const QString& label, const Config::Location& location, Config::Layer* layer,
+                Config::EditPolicy edit_policy)
+      : Derived(label), m_location(location), m_layer(layer), m_edit_policy(edit_policy)
   {
     ConnectConfig();
   }
   ConfigControl(const Qt::Orientation& orient, const Config::Location& location,
-                Config::Layer* layer)
-      : Derived(orient), m_location(location), m_layer(layer)
+                Config::Layer* layer, Config::EditPolicy edit_policy)
+      : Derived(orient), m_location(location), m_layer(layer), m_edit_policy(edit_policy)
   {
     ConnectConfig();
   }
 
   const Config::Location GetLocation() const { return m_location; }
+
+  // Re-evaluates whether this control is enabled. Runs automatically on
+  // config/edit policy changes, but needs to be called manually when an edit condition changes.
+  void UpdateEnabledState()
+  {
+    const bool enabled =
+        Config::IsEditPolicySatisfied(m_edit_policy) && (!m_edit_condition || m_edit_condition());
+
+    Derived::setEnabled(enabled);
+    for (QWidget* widget : m_dependent_widgets)
+      widget->setEnabled(enabled);
+  }
+
+  // Adds an extra condition on top of the edit policy.
+  void SetEditCondition(std::function<bool()> condition)
+  {
+    m_edit_condition = std::move(condition);
+    UpdateEnabledState();
+  }
+
+  // Adds a widget, such as a label, that should be enabled and disabled along with this control.
+  void AddDependentWidget(QWidget* widget)
+  {
+    m_dependent_widgets.push_back(widget);
+    widget->setEnabled(Derived::isEnabled());
+  }
 
 protected:
   void ConnectConfig()
@@ -52,7 +103,12 @@ protected:
       m_updating = true;
       OnConfigChanged();
       m_updating = false;
+
+      UpdateEnabledState();
     });
+
+    UpdateEnabledState();
+    Config::ConnectEditPolicySignals(this, m_edit_policy, [this] { UpdateEnabledState(); });
   }
 
   template <typename T>
@@ -117,4 +173,7 @@ private:
   bool m_updating = false;
   const Config::Location m_location;
   Config::Layer* m_layer;
+  const Config::EditPolicy m_edit_policy;
+  std::function<bool()> m_edit_condition;
+  std::vector<QWidget*> m_dependent_widgets;
 };

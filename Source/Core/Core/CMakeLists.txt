@@ -27,6 +27,8 @@ add_library(core
   Config/AchievementSettings.h
   Config/DefaultLocale.cpp
   Config/DefaultLocale.h
+  Config/EditPolicy.cpp
+  Config/EditPolicy.h
   Config/FreeLookSettings.cpp
   Config/FreeLookSettings.h
   Config/GraphicsSettings.cpp

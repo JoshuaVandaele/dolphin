@@ -10,7 +10,7 @@ ConfigText::ConfigText(const Config::Info<std::string>& setting) : ConfigText(se
 }
 
 ConfigText::ConfigText(const Config::Info<std::string>& setting, Config::Layer* layer)
-    : ConfigControl(setting.GetLocation(), layer), m_setting(setting)
+    : ConfigControl(setting.GetLocation(), layer, setting.GetEditPolicy()), m_setting(setting)
 {
   setText(QString::fromStdString(ReadValue(setting)));
 

@@ -50,8 +50,8 @@ class ConfigChoiceMap final : public ConfigControl<ToolTipComboBox>
 public:
   ConfigChoiceMap(const std::vector<std::pair<QString, T>>& options, const Config::Info<T>& setting,
                   Config::Layer* layer = nullptr)
-      : ConfigControl<ToolTipComboBox>(setting.GetLocation(), layer), m_setting(setting),
-        m_options(options)
+      : ConfigControl<ToolTipComboBox>(setting.GetLocation(), layer, setting.GetEditPolicy()),
+        m_setting(setting), m_options(options)
   {
     for (const auto& [option_text, option_data] : options)
       addItem(option_text);
@@ -123,11 +123,14 @@ public:
 private:
   void SaveValue(int choice);
   void UpdateComboIndex();
+  void UpdateEnabledState();
   void mousePressEvent(QMouseEvent* event) override;
 
   Config::Layer* m_layer;
   const InfoVariant m_setting1;
   const InfoVariant m_setting2;
+  const Config::EditPolicy m_edit_policy1;
+  const Config::EditPolicy m_edit_policy2;
   std::vector<std::pair<OptionVariant, OptionVariant>> m_options;
   int m_default_index = -1;
 };

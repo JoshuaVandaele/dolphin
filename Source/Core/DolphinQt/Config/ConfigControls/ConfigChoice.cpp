@@ -5,9 +5,18 @@
 
 #include <QSignalBlocker>
 
+namespace
+{
+template <typename Variant>
+Config::EditPolicy GetEditPolicy(const Variant& setting)
+{
+  return std::visit([](const auto& info) { return info.GetEditPolicy(); }, setting);
+}
+}  // namespace
+
 ConfigChoice::ConfigChoice(const QStringList& options, const Config::Info<int>& setting,
                            Config::Layer* layer)
-    : ConfigControl(setting.GetLocation(), layer), m_setting(setting)
+    : ConfigControl(setting.GetLocation(), layer, setting.GetEditPolicy()), m_setting(setting)
 {
   addItems(options);
   setCurrentIndex(ReadValue(setting));
@@ -27,7 +36,7 @@ void ConfigChoice::OnConfigChanged()
 
 ConfigChoiceU32::ConfigChoiceU32(const QStringList& options, const Config::Info<u32>& setting,
                                  Config::Layer* layer)
-    : ConfigControl(setting.GetLocation(), layer), m_setting(setting)
+    : ConfigControl(setting.GetLocation(), layer, setting.GetEditPolicy()), m_setting(setting)
 {
   addItems(options);
   setCurrentIndex(ReadValue(setting));
@@ -48,7 +57,8 @@ void ConfigChoiceU32::OnConfigChanged()
 ConfigStringChoice::ConfigStringChoice(std::span<const std::string> options,
                                        const Config::Info<std::string>& setting,
                                        Config::Layer* layer)
-    : ConfigControl(setting.GetLocation(), layer), m_setting(setting), m_text_is_data(true)
+    : ConfigControl(setting.GetLocation(), layer, setting.GetEditPolicy()), m_setting(setting),
+      m_text_is_data(true)
 {
   for (const auto& op : options)
     addItem(QString::fromStdString(op));
@@ -60,7 +70,7 @@ ConfigStringChoice::ConfigStringChoice(std::span<const std::string> options,
 ConfigStringChoice::ConfigStringChoice(std::span<const std::pair<QString, QString>> options,
                                        const Config::Info<std::string>& setting,
                                        Config::Layer* layer)
-    : ConfigControl(setting.GetLocation(), layer), m_setting(setting)
+    : ConfigControl(setting.GetLocation(), layer, setting.GetEditPolicy()), m_setting(setting)
 {
   SetOptions(options);
   connect(this, &QComboBox::currentIndexChanged, this, &ConfigStringChoice::Update);
@@ -103,10 +113,22 @@ void ConfigStringChoice::OnConfigChanged()
 
 ConfigComplexChoice::ConfigComplexChoice(const InfoVariant& setting1, const InfoVariant& setting2,
                                          Config::Layer* layer)
-    : m_layer(layer), m_setting1(setting1), m_setting2(setting2)
+    : m_layer(layer), m_setting1(setting1), m_setting2(setting2),
+      m_edit_policy1(GetEditPolicy(setting1)), m_edit_policy2(GetEditPolicy(setting2))
 {
   connect(&Settings::Instance(), &Settings::ConfigChanged, this, &ConfigComplexChoice::Refresh);
   connect(this, &QComboBox::currentIndexChanged, this, &ConfigComplexChoice::SaveValue);
+
+  UpdateEnabledState();
+  Config::ConnectEditPolicySignals(this, m_edit_policy1, [this] { UpdateEnabledState(); });
+  if (m_edit_policy1 != m_edit_policy2)
+    Config::ConnectEditPolicySignals(this, m_edit_policy2, [this] { UpdateEnabledState(); });
+}
+
+void ConfigComplexChoice::UpdateEnabledState()
+{
+  setEnabled(Config::IsEditPolicySatisfied(m_edit_policy1) &&
+             (m_edit_policy1 == m_edit_policy2 || Config::IsEditPolicySatisfied(m_edit_policy2)));
 }
 
 void ConfigComplexChoice::Refresh()
