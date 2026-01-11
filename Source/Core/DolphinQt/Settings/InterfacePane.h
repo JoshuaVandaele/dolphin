@@ -35,8 +35,6 @@ private:
   void OnUserStyleChanged();
   void OnLanguageChanged();
 
-  void OnEmulationStateChanged(Core::State state);
-
   QVBoxLayout* m_main_layout;
   ConfigStringChoice* m_combobox_language;
 

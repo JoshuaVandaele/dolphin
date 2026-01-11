@@ -26,7 +26,6 @@ private:
   void ConnectWidgets();
   void AddDescriptions();
   void OnBackendChanged();
-  void OnEmulationStateChanged(bool running);
 
   // Debugging
   ConfigBool* m_enable_wireframe;

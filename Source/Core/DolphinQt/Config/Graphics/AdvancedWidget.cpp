@@ -30,14 +30,10 @@ AdvancedWidget::AdvancedWidget(GraphicsPane* gfx_pane) : m_game_layer{gfx_pane->
   AddDescriptions();
 
   connect(gfx_pane, &GraphicsPane::BackendChanged, this, &AdvancedWidget::OnBackendChanged);
-  connect(&Settings::Instance(), &Settings::EmulationStateChanged, this, [this](Core::State state) {
-    OnEmulationStateChanged(state != Core::State::Uninitialized);
-  });
   connect(m_manual_texture_sampling, &QCheckBox::toggled,
           [gfx_pane] { emit gfx_pane->UseFastTextureSamplingChanged(); });
 
   OnBackendChanged();
-  OnEmulationStateChanged(!Core::IsUninitialized(Core::System::GetInstance()));
 }
 
 void AdvancedWidget::CreateWidgets()
@@ -227,11 +223,6 @@ void AdvancedWidget::OnBackendChanged()
   m_prefer_vs_for_point_line_expansion->setEnabled(g_backend_info.bSupportsGeometryShaders &&
                                                    g_backend_info.bSupportsVSLinePointExpand);
   AddDescriptions();
-}
-
-void AdvancedWidget::OnEmulationStateChanged(bool running)
-{
-  m_enable_prog_scan->setEnabled(!running);
 }
 
 void AdvancedWidget::AddDescriptions()

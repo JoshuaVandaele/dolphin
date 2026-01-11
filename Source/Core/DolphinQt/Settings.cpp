@@ -670,7 +670,7 @@ bool Settings::GetCheatsEnabled() const
 void Settings::SetDebugModeEnabled(bool enabled)
 {
   if (AchievementManager::GetInstance().IsHardcoreModeActive())
-    enabled = false;
+    return;
   if (IsDebugModeEnabled() != enabled)
   {
     Config::SetBaseOrCurrent(Config::MAIN_ENABLE_DEBUGGING, enabled);
@@ -680,6 +680,8 @@ void Settings::SetDebugModeEnabled(bool enabled)
 
 bool Settings::IsDebugModeEnabled() const
 {
+  if (AchievementManager::GetInstance().IsHardcoreModeActive())
+    return false;
   return Config::Get(Config::MAIN_ENABLE_DEBUGGING);
 }
 
@@ -851,21 +853,6 @@ void Settings::SetAutoUpdateTrack(const QString& mode)
 QString Settings::GetAutoUpdateTrack() const
 {
   return QString::fromStdString(Config::Get(Config::MAIN_AUTOUPDATE_UPDATE_TRACK));
-}
-
-void Settings::SetFallbackRegion(const DiscIO::Region& region)
-{
-  if (region == GetFallbackRegion())
-    return;
-
-  Config::SetBase(Config::MAIN_FALLBACK_REGION, region);
-
-  emit FallbackRegionChanged(region);
-}
-
-DiscIO::Region Settings::GetFallbackRegion() const
-{
-  return Config::Get(Config::MAIN_FALLBACK_REGION);
 }
 
 void Settings::SetAnalyticsEnabled(bool enabled)

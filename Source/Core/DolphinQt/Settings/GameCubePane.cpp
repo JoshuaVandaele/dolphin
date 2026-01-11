@@ -284,29 +284,6 @@ void GameCubePane::ConnectWidgets()
     connect(m_gba_browse_roms[i], &QPushButton::clicked, this, [this, i] { BrowseGBARom(i); });
   }
 #endif
-
-  // Emulation State
-  connect(&Settings::Instance(), &Settings::EmulationStateChanged, this,
-          &GameCubePane::OnEmulationStateChanged);
-  OnEmulationStateChanged();
-}
-
-void GameCubePane::OnEmulationStateChanged()
-{
-#ifdef HAS_LIBMGBA
-  bool gba_enabled = !NetPlay::IsNetPlayRunning();
-  m_gba_threads->setEnabled(gba_enabled);
-  m_gba_bios_edit->setEnabled(gba_enabled);
-  m_gba_browse_bios->setEnabled(gba_enabled);
-  m_gba_save_rom_path->setEnabled(gba_enabled);
-  m_gba_saves_edit->setEnabled(gba_enabled);
-  m_gba_browse_saves->setEnabled(gba_enabled);
-  for (size_t i = 0; i < m_gba_browse_roms.size(); ++i)
-  {
-    m_gba_rom_edits[i]->setEnabled(gba_enabled);
-    m_gba_browse_roms[i]->setEnabled(gba_enabled);
-  }
-#endif
 }
 
 void GameCubePane::UpdateButton(ExpansionInterface::Slot slot)

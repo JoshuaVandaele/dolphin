@@ -76,7 +76,6 @@ WiiPane::WiiPane(QWidget* parent) : QWidget(parent)
   PopulateUSBPassthroughListWidget();
   ConnectLayout();
   ValidateSelectionState();
-  OnEmulationStateChanged(!Core::IsUninitialized(Core::System::GetInstance()));
 }
 
 void WiiPane::CreateLayout()
@@ -98,11 +97,6 @@ void WiiPane::ConnectLayout()
           &WiiPane::OnUSBWhitelistAddButton);
   connect(m_whitelist_usb_remove_button, &QPushButton::clicked, this,
           &WiiPane::OnUSBWhitelistRemoveButton);
-
-  // Emulation State
-  connect(&Settings::Instance(), &Settings::EmulationStateChanged, this, [this](Core::State state) {
-    OnEmulationStateChanged(state != Core::State::Uninitialized);
-  });
 }
 
 void WiiPane::CreateMisc()
@@ -328,22 +322,6 @@ void WiiPane::CreateWiiRemoteSettings()
   wii_remote_settings_group_layout->addWidget(m_wiimote_speaker_volume_label, 2, 0);
   wii_remote_settings_group_layout->addWidget(m_wiimote_speaker_volume, 2, 1);
   wii_remote_settings_group_layout->addWidget(m_wiimote_motor, 3, 0, 1, -1);
-}
-
-void WiiPane::OnEmulationStateChanged(bool running)
-{
-  m_screensaver_checkbox->setEnabled(!running);
-  m_pal60_mode_checkbox->setEnabled(!running);
-  m_system_language_choice->setEnabled(!running);
-  m_aspect_ratio_choice->setEnabled(!running);
-  m_sound_mode_choice->setEnabled(!running);
-  m_sd_pack_button->setEnabled(!running);
-  m_sd_unpack_button->setEnabled(!running);
-  m_wiimote_motor->setEnabled(!running);
-  m_wiimote_speaker_volume->setEnabled(!running);
-  m_wiimote_ir_sensitivity->setEnabled(!running);
-  m_wiimote_ir_sensor_position->setEnabled(!running);
-  m_wiilink_checkbox->setEnabled(!running);
 }
 
 void WiiPane::ValidateSelectionState()
