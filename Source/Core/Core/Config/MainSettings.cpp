@@ -36,8 +36,8 @@ namespace Config
 // Main.Core
 
 const Info<bool> MAIN_SKIP_IPL{{System::Main, "Core", "SkipIPL"}, true};
-const Info<PowerPC::CPUCore> MAIN_CPU_CORE{{System::Main, "Core", "CPUCore"},
-                                           PowerPC::DefaultCPUCore()};
+const Info<PowerPC::CPUCore> MAIN_CPU_CORE{
+    {System::Main, "Core", "CPUCore"}, PowerPC::DefaultCPUCore(), EditPolicy::NotRunning};
 const Info<bool> MAIN_JIT_FOLLOW_BRANCH{{System::Main, "Core", "JITFollowBranch"}, true};
 const Info<bool> MAIN_FASTMEM{{System::Main, "Core", "Fastmem"}, true};
 const Info<bool> MAIN_FASTMEM_ARENA{{System::Main, "Core", "FastmemArena"}, true};
@@ -57,14 +57,17 @@ constexpr bool DEFAULT_CPU_THREAD = true;
 #else
 constexpr bool DEFAULT_CPU_THREAD = false;
 #endif
-const Info<bool> MAIN_CPU_THREAD{{System::Main, "Core", "CPUThread"}, DEFAULT_CPU_THREAD};
-const Info<bool> MAIN_LOAD_GAME_INTO_MEMORY{{System::Main, "Core", "LoadGameIntoMemory"}, false};
+const Info<bool> MAIN_CPU_THREAD{
+    {System::Main, "Core", "CPUThread"}, DEFAULT_CPU_THREAD, EditPolicy::NotRunning};
+const Info<bool> MAIN_LOAD_GAME_INTO_MEMORY{
+    {System::Main, "Core", "LoadGameIntoMemory"}, false, EditPolicy::NotRunning};
 const Info<bool> MAIN_SYNC_ON_SKIP_IDLE{{System::Main, "Core", "SyncOnSkipIdle"}, true};
 const Info<std::string> MAIN_DEFAULT_ISO{{System::Main, "Core", "DefaultISO"}, ""};
-const Info<bool> MAIN_ENABLE_CHEATS{{System::Main, "Core", "EnableCheats"}, false};
+const Info<bool> MAIN_ENABLE_CHEATS{
+    {System::Main, "Core", "EnableCheats"}, false, EditPolicy::NotRunning};
 const Info<int> MAIN_GC_LANGUAGE{{System::Main, "Core", "SelectedLanguage"}, 0};
-const Info<bool> MAIN_OVERRIDE_REGION_SETTINGS{{System::Main, "Core", "OverrideRegionSettings"},
-                                               false};
+const Info<bool> MAIN_OVERRIDE_REGION_SETTINGS{
+    {System::Main, "Core", "OverrideRegionSettings"}, false, EditPolicy::NotRunning};
 const Info<bool> MAIN_DPL2_DECODER{{System::Main, "Core", "DPL2Decoder"}, false};
 const Info<AudioCommon::DPL2Quality> MAIN_DPL2_QUALITY{{System::Main, "Core", "DPL2Quality"},
                                                        AudioCommon::GetDefaultDPL2Quality()};
@@ -208,8 +211,9 @@ const Info<std::string> MAIN_WIIMOTE_AUTO_CONNECT_ADDRESSES{
 const Info<bool> MAIN_WIIMOTE_ENABLE_SPEAKER{{System::Main, "Core", "WiimoteEnableSpeaker"}, false};
 const Info<bool> MAIN_CONNECT_WIIMOTES_FOR_CONTROLLER_INTERFACE{
     {System::Main, "Core", "WiimoteControllerInterface"}, false};
-const Info<bool> MAIN_MMU{{System::Main, "Core", "MMU"}, false};
-const Info<bool> MAIN_PAUSE_ON_PANIC{{System::Main, "Core", "PauseOnPanic"}, false};
+const Info<bool> MAIN_MMU{{System::Main, "Core", "MMU"}, false, EditPolicy::NotRunning};
+const Info<bool> MAIN_PAUSE_ON_PANIC{
+    {System::Main, "Core", "PauseOnPanic"}, false, EditPolicy::NotRunning};
 const Info<int> MAIN_BB_DUMP_PORT{{System::Main, "Core", "BBDumpPort"}, -1};
 const Info<bool> MAIN_SYNC_GPU{{System::Main, "Core", "SyncGPU"}, false};
 const Info<int> MAIN_SYNC_GPU_MAX_DISTANCE{{System::Main, "Core", "SyncGpuMaxDistance"}, 200000};
@@ -237,11 +241,13 @@ const Info<float> MAIN_OVERCLOCK{{System::Main, "Core", "Overclock"}, 1.0f};
 const Info<bool> MAIN_OVERCLOCK_ENABLE{{System::Main, "Core", "OverclockEnable"}, false};
 const Info<float> MAIN_VI_OVERCLOCK{{System::Main, "Core", "VIOverclock"}, 1.0f};
 const Info<bool> MAIN_VI_OVERCLOCK_ENABLE{{System::Main, "Core", "VIOverclockEnable"}, false};
-const Info<bool> MAIN_RAM_OVERRIDE_ENABLE{{System::Main, "Core", "RAMOverrideEnable"}, false};
+const Info<bool> MAIN_RAM_OVERRIDE_ENABLE{
+    {System::Main, "Core", "RAMOverrideEnable"}, false, EditPolicy::NotRunning};
 const Info<u32> MAIN_MEM1_SIZE{{System::Main, "Core", "MEM1Size"}, Memory::MEM1_SIZE_RETAIL};
 const Info<u32> MAIN_MEM2_SIZE{{System::Main, "Core", "MEM2Size"}, Memory::MEM2_SIZE_RETAIL};
 const Info<std::string> MAIN_GFX_BACKEND{{System::Main, "Core", "GFXBackend"},
-                                         VideoBackendBase::GetDefaultBackendConfigName()};
+                                         VideoBackendBase::GetDefaultBackendConfigName(),
+                                         EditPolicy::NotRunning};
 const Info<HSP::HSPDeviceType> MAIN_HSP_DEVICE{{System::Main, "Core", "HSPDevice"},
                                                HSP::HSPDeviceType::None};
 const Info<u32> MAIN_ARAM_EXPANSION_SIZE{{System::Main, "Core", "ARAMExpansionSize"}, 0x400000};
@@ -265,19 +271,21 @@ GPUDeterminismMode GetGPUDeterminismMode()
 }
 
 const Info<std::string> MAIN_PERF_MAP_DIR{{System::Main, "Core", "PerfMapDir"}, ""};
-const Info<bool> MAIN_CUSTOM_RTC_ENABLE{{System::Main, "Core", "EnableCustomRTC"}, false};
+const Info<bool> MAIN_CUSTOM_RTC_ENABLE{
+    {System::Main, "Core", "EnableCustomRTC"}, false, EditPolicy::NotRunning};
 // Measured in seconds since the unix epoch (1.1.1970).  Default is 1.1.2000; there are 7 leap years
 // between those dates.
 const Info<u32> MAIN_CUSTOM_RTC_VALUE{{System::Main, "Core", "CustomRTCValue"},
                                       (30 * 365 + 7) * 24 * 60 * 60};
-const Info<DiscIO::Region> MAIN_FALLBACK_REGION{{System::Main, "Core", "FallbackRegion"},
-                                                GetDefaultRegion()};
+const Info<DiscIO::Region> MAIN_FALLBACK_REGION{
+    {System::Main, "Core", "FallbackRegion"}, GetDefaultRegion(), EditPolicy::NotRunning};
 const Info<bool> MAIN_AUTO_DISC_CHANGE{{System::Main, "Core", "AutoDiscChange"}, false};
 const Info<bool> MAIN_ALLOW_SD_WRITES{{System::Main, "Core", "WiiSDCardAllowWrites"}, true};
 const Info<bool> MAIN_ENABLE_SAVESTATES{{System::Main, "Core", "EnableSaveStates"}, false};
 const Info<bool> MAIN_REAL_WII_REMOTE_REPEAT_REPORTS{
     {System::Main, "Core", "RealWiiRemoteRepeatReports"}, true};
-const Info<bool> MAIN_WII_WIILINK_ENABLE{{System::Main, "Core", "EnableWiiLink"}, false};
+const Info<bool> MAIN_WII_WIILINK_ENABLE{
+    {System::Main, "Core", "EnableWiiLink"}, false, EditPolicy::NotRunning};
 
 // Empty means use the Dolphin default URL
 const Info<std::string> MAIN_WII_NUS_SHOP_URL{{System::Main, "Core", "WiiNusShopUrl"}, ""};
@@ -286,8 +294,10 @@ const Info<std::string> MAIN_WII_NUS_SHOP_URL{{System::Main, "Core", "WiiNusShop
 
 const Info<std::string> MAIN_FULLSCREEN_DISPLAY_RES{
     {System::Main, "Display", "FullscreenDisplayRes"}, "Auto"};
-const Info<bool> MAIN_FULLSCREEN{{System::Main, "Display", "Fullscreen"}, false};
-const Info<bool> MAIN_RENDER_TO_MAIN{{System::Main, "Display", "RenderToMain"}, false};
+const Info<bool> MAIN_FULLSCREEN{
+    {System::Main, "Display", "Fullscreen"}, false, EditPolicy::NotRunning};
+const Info<bool> MAIN_RENDER_TO_MAIN{
+    {System::Main, "Display", "RenderToMain"}, false, EditPolicy::NotRunning};
 const Info<int> MAIN_RENDER_WINDOW_XPOS{{System::Main, "Display", "RenderWindowXPos"}, -1};
 const Info<int> MAIN_RENDER_WINDOW_YPOS{{System::Main, "Display", "RenderWindowYPos"}, -1};
 const Info<int> MAIN_RENDER_WINDOW_WIDTH{{System::Main, "Display", "RenderWindowWidth"}, 640};
@@ -306,13 +316,14 @@ const Info<bool> MAIN_DUMP_AUDIO{{System::Main, "DSP", "DumpAudio"}, false};
 const Info<bool> MAIN_DUMP_AUDIO_SILENT{{System::Main, "DSP", "DumpAudioSilent"}, false};
 const Info<bool> MAIN_DUMP_UCODE{{System::Main, "DSP", "DumpUCode"}, false};
 const Info<std::string> MAIN_AUDIO_BACKEND{{System::Main, "DSP", "Backend"},
-                                           AudioCommon::GetDefaultSoundBackend()};
+                                           AudioCommon::GetDefaultSoundBackend(),
+                                           EditPolicy::NotRunning};
 const Info<int> MAIN_AUDIO_VOLUME{{System::Main, "DSP", "Volume"}, 100};
 const Info<bool> MAIN_AUDIO_MUTED{{System::Main, "DSP", "Muted"}, false};
 const Info<bool> MAIN_AUDIO_MUTE_ON_DISABLED_SPEED_LIMIT{
     {System::Main, "DSP", "MuteOnDisabledSpeedLimit"}, false};
 #ifdef _WIN32
-const Info<std::string> MAIN_WASAPI_DEVICE{{System::Main, "DSP", "WASAPIDevice"}, "Default"};
+const Info<std::string> MAIN_WASAPI_DEVICE{{System::Main, "DSP", "WASAPIDevice"}, "Default", false};
 #endif
 
 bool ShouldUseDPL2Decoder()
@@ -338,7 +349,8 @@ const Info<int> MAIN_GDB_PORT{{System::Main, "General", "GDBPort"}, -1};
 const Info<int> MAIN_ISO_PATH_COUNT{{System::Main, "General", "ISOPaths"}, 0};
 const Info<std::string> MAIN_SKYLANDERS_PATH{{System::Main, "General", "SkylandersCollectionPath"},
                                              ""};
-const Info<bool> MAIN_TIME_TRACKING{{System::Main, "General", "EnablePlayTimeTracking"}, true};
+const Info<bool> MAIN_TIME_TRACKING{
+    {System::Main, "General", "EnablePlayTimeTracking"}, true, EditPolicy::NotRunning};
 
 static Info<std::string> MakeISOPathConfigInfo(size_t idx)
 {
@@ -390,15 +402,18 @@ void SetIsoPaths(const std::vector<std::string>& paths)
 // Main.GBA
 
 #ifdef HAS_LIBMGBA
-const Info<std::string> MAIN_GBA_BIOS_PATH{{System::Main, "GBA", "BIOS"}, ""};
+const Info<std::string> MAIN_GBA_BIOS_PATH{
+    {System::Main, "GBA", "BIOS"}, "", EditPolicy::NotInNetplay};
 const std::array<Info<std::string>, 4> MAIN_GBA_ROM_PATHS{
-    Info<std::string>{{System::Main, "GBA", "Rom1"}, ""},
-    Info<std::string>{{System::Main, "GBA", "Rom2"}, ""},
-    Info<std::string>{{System::Main, "GBA", "Rom3"}, ""},
-    Info<std::string>{{System::Main, "GBA", "Rom4"}, ""}};
-const Info<std::string> MAIN_GBA_SAVES_PATH{{System::Main, "GBA", "SavesPath"}, ""};
-const Info<bool> MAIN_GBA_SAVES_IN_ROM_PATH{{System::Main, "GBA", "SavesInRomPath"}, false};
-const Info<bool> MAIN_GBA_THREADS{{System::Main, "GBA", "Threads"}, true};
+    Info<std::string>{{System::Main, "GBA", "Rom1"}, "", EditPolicy::NotInNetplay},
+    Info<std::string>{{System::Main, "GBA", "Rom2"}, "", EditPolicy::NotInNetplay},
+    Info<std::string>{{System::Main, "GBA", "Rom3"}, "", EditPolicy::NotInNetplay},
+    Info<std::string>{{System::Main, "GBA", "Rom4"}, "", EditPolicy::NotInNetplay}};
+const Info<std::string> MAIN_GBA_SAVES_PATH{
+    {System::Main, "GBA", "SavesPath"}, "", EditPolicy::NotInNetplay};
+const Info<bool> MAIN_GBA_SAVES_IN_ROM_PATH{
+    {System::Main, "GBA", "SavesInRomPath"}, false, EditPolicy::NotInNetplay};
+const Info<bool> MAIN_GBA_THREADS{{System::Main, "GBA", "Threads"}, true, EditPolicy::NotInNetplay};
 #endif
 
 // Main.Network
@@ -437,7 +452,8 @@ const Info<bool> MAIN_USE_BUILT_IN_TITLE_DATABASE{
 const Info<std::string> MAIN_THEME_NAME{{System::Main, "Interface", "ThemeName"},
                                         DEFAULT_THEME_DIR};
 const Info<bool> MAIN_PAUSE_ON_FOCUS_LOST{{System::Main, "Interface", "PauseOnFocusLost"}, false};
-const Info<bool> MAIN_ENABLE_DEBUGGING{{System::Main, "Interface", "DebugModeEnabled"}, false};
+const Info<bool> MAIN_ENABLE_DEBUGGING{
+    {System::Main, "Interface", "DebugModeEnabled"}, false, EditPolicy::NotInHardcore};
 
 // Main.Analytics
 
