@@ -228,6 +228,7 @@ signals:
   void DevicesChanged();
   void WiiSpeakMuteChanged(bool muted);
   void EnableGfxModsChanged(bool enabled);
+  void HardcoreModeChanged(bool enabled);
 
 private:
   Settings();

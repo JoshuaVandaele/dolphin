@@ -8,6 +8,10 @@
 
 #include "Common/Config/Enums.h"
 #include "Common/Config/Layer.h"
+#include "Core/AchievementManager.h"
+#include "Core/Core.h"
+#include "Core/NetPlayProto.h"
+#include "Core/System.h"
 #include "DolphinQt/Settings.h"
 
 namespace Config
@@ -21,19 +25,21 @@ template <class Derived>
 class ConfigControl : public Derived
 {
 public:
-  ConfigControl(const Config::Location& location, Config::Layer* layer)
-      : m_location(location), m_layer(layer)
+  ConfigControl(const Config::Location& location, Config::Layer* layer,
+                Config::EditPolicy edit_policy)
+      : m_location(location), m_layer(layer), m_edit_policy(edit_policy)
   {
     ConnectConfig();
   }
-  ConfigControl(const QString& label, const Config::Location& location, Config::Layer* layer)
-      : Derived(label), m_location(location), m_layer(layer)
+  ConfigControl(const QString& label, const Config::Location& location, Config::Layer* layer,
+                Config::EditPolicy edit_policy)
+      : Derived(label), m_location(location), m_layer(layer), m_edit_policy(edit_policy)
   {
     ConnectConfig();
   }
   ConfigControl(const Qt::Orientation& orient, const Config::Location& location,
-                Config::Layer* layer)
-      : Derived(orient), m_location(location), m_layer(layer)
+                Config::Layer* layer, Config::EditPolicy edit_policy)
+      : Derived(orient), m_location(location), m_layer(layer), m_edit_policy(edit_policy)
   {
     ConnectConfig();
   }
@@ -53,6 +59,28 @@ protected:
       OnConfigChanged();
       m_updating = false;
     });
+
+    switch (m_edit_policy)
+    {
+    case Config::EditPolicy::Unconditional:
+      break;
+    case Config::EditPolicy::NotRunning:
+      Derived::setEnabled(Core::IsUninitialized(Core::System::GetInstance()));
+      Derived::connect(
+          &Settings::Instance(), &Settings::EmulationStateChanged, this,
+          [this](Core::State state) { Derived::setEnabled(state != Core::State::Uninitialized); });
+      break;
+    case Config::EditPolicy::NotInNetplay:
+      Derived::setEnabled(!NetPlay::IsNetPlayRunning());
+      Derived::connect(&Settings::Instance(), &Settings::EmulationStateChanged, this,
+                       [this] { Derived::setEnabled(NetPlay::IsNetPlayRunning()); });
+      break;
+    case Config::EditPolicy::NotInHardcore:
+      Derived::setEnabled(!AchievementManager::GetInstance().IsHardcoreModeActive());
+      Derived::connect(&Settings::Instance(), &Settings::HardcoreModeChanged, this,
+                       [this](bool hardcore) { Derived::setEnabled(!hardcore); });
+      break;
+    }
   }
 
   template <typename T>
@@ -117,4 +145,5 @@ private:
   bool m_updating = false;
   const Config::Location m_location;
   Config::Layer* m_layer;
+  const Config::EditPolicy m_edit_policy;
 };

@@ -7,7 +7,7 @@
 
 ConfigChoice::ConfigChoice(const QStringList& options, const Config::Info<int>& setting,
                            Config::Layer* layer)
-    : ConfigControl(setting.GetLocation(), layer), m_setting(setting)
+    : ConfigControl(setting.GetLocation(), layer, setting.GetEditPolicy()), m_setting(setting)
 {
   addItems(options);
   setCurrentIndex(ReadValue(setting));
@@ -27,7 +27,7 @@ void ConfigChoice::OnConfigChanged()
 
 ConfigChoiceU32::ConfigChoiceU32(const QStringList& options, const Config::Info<u32>& setting,
                                  Config::Layer* layer)
-    : ConfigControl(setting.GetLocation(), layer), m_setting(setting)
+    : ConfigControl(setting.GetLocation(), layer, setting.GetEditPolicy()), m_setting(setting)
 {
   addItems(options);
   setCurrentIndex(ReadValue(setting));
@@ -48,7 +48,8 @@ void ConfigChoiceU32::OnConfigChanged()
 ConfigStringChoice::ConfigStringChoice(const std::vector<std::string>& options,
                                        const Config::Info<std::string>& setting,
                                        Config::Layer* layer)
-    : ConfigControl(setting.GetLocation(), layer), m_setting(setting), m_text_is_data(true)
+    : ConfigControl(setting.GetLocation(), layer, setting.GetEditPolicy()), m_setting(setting),
+      m_text_is_data(true)
 {
   for (const auto& op : options)
     addItem(QString::fromStdString(op));
@@ -60,7 +61,8 @@ ConfigStringChoice::ConfigStringChoice(const std::vector<std::string>& options,
 ConfigStringChoice::ConfigStringChoice(const std::vector<std::pair<QString, QString>>& options,
                                        const Config::Info<std::string>& setting,
                                        Config::Layer* layer)
-    : ConfigControl(setting.GetLocation(), layer), m_setting(setting), m_text_is_data(false)
+    : ConfigControl(setting.GetLocation(), layer, setting.GetEditPolicy()), m_setting(setting),
+      m_text_is_data(false)
 {
   for (const auto& [option_text, option_data] : options)
     addItem(option_text, option_data);

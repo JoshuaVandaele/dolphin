@@ -10,7 +10,7 @@ ConfigInteger::ConfigInteger(int minimum, int maximum, const Config::Info<int>& 
 
 ConfigInteger::ConfigInteger(int minimum, int maximum, const Config::Info<int>& setting,
                              Config::Layer* layer, int step)
-    : ConfigControl(setting.GetLocation(), layer), m_setting(setting)
+    : ConfigControl(setting.GetLocation(), layer, setting.GetEditPolicy()), m_setting(setting)
 {
   setMinimum(minimum);
   setMaximum(maximum);
