@@ -83,13 +83,23 @@ public:
   void OnToggled(bool enabled)
   {
     this->*member = enabled;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+    beginFilterChange();
+    endFilterChange(Direction::Columns);
+#else
     invalidateRowsFilter();
+#endif
   }
   template <QString BranchWatchProxyModel::* member>
   void OnSymbolTextChanged(const QString& text)
   {
     this->*member = text;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+    beginFilterChange();
+    endFilterChange(Direction::Columns);
+#else
     invalidateRowsFilter();
+#endif
   }
   template <std::optional<u32> BranchWatchProxyModel::* member>
   void OnAddressTextChanged(const QString& text)
@@ -99,7 +109,12 @@ public:
       this->*member = value;
     else
       this->*member = std::nullopt;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+    beginFilterChange();
+    endFilterChange(Direction::Columns);
+#else
     invalidateRowsFilter();
+#endif
   }
 
   bool IsBranchTypeAllowed(UGeckoInstruction inst) const;

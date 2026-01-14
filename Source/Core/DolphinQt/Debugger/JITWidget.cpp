@@ -78,7 +78,12 @@ const JitBlock& JitBlockProxyModel::GetJitBlock(const QModelIndex& index)
 void JitBlockProxyModel::OnSymbolTextChanged(const QString& text)
 {
   m_symbol_name = text;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+  beginFilterChange();
+  endFilterChange(Direction::Columns);
+#else
   invalidateRowsFilter();
+#endif
 }
 
 template <std::optional<u32> JitBlockProxyModel::* member>
@@ -89,7 +94,12 @@ void JitBlockProxyModel::OnAddressTextChanged(const QString& text)
     this->*member = value;
   else
     this->*member = std::nullopt;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 10, 0)
+  beginFilterChange();
+  endFilterChange(Direction::Columns);
+#else
   invalidateRowsFilter();
+#endif
 }
 
 bool JitBlockProxyModel::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
