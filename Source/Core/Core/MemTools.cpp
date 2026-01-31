@@ -42,7 +42,7 @@
 
 namespace EMM
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_M_GENERIC)
 
 static PVOID s_veh_handle;
 
