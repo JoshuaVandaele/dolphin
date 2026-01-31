@@ -1,7 +1,7 @@
 if (MSVC)
   if(_M_ARM_64)
     list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/Externals/Qt/Qt6.5.1/ARM64")
-  else()
+  elseif(_M_X86_64)
     list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/Externals/Qt/Qt6.5.1/x64")
   endif()
 endif()
