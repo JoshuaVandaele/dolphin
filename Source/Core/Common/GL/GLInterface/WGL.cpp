@@ -7,6 +7,7 @@
 #include <array>
 #include <string>
 
+#include "Common/DynamicLibrary.h"
 #include "Common/Logging/Log.h"
 #include "Common/MsgHandler.h"
 
@@ -119,7 +120,95 @@ typedef BOOL(WINAPI* PFNWGLSWAPINTERVALEXTPROC)(int interval);
 typedef int(WINAPI* PFNWGLGETSWAPINTERVALEXTPROC)(void);
 #endif /* WGL_EXT_swap_control */
 
+// from wgl.h
+#ifndef WGL_VERSION_1_0
+#define WGL_VERSION_1_0 1
+#define WGL_FONT_LINES 0
+#define WGL_FONT_POLYGONS 1
+#define WGL_SWAP_MAIN_PLANE 0x00000001
+#define WGL_SWAP_OVERLAY1 0x00000002
+#define WGL_SWAP_OVERLAY2 0x00000004
+#define WGL_SWAP_OVERLAY3 0x00000008
+#define WGL_SWAP_OVERLAY4 0x00000010
+#define WGL_SWAP_OVERLAY5 0x00000020
+#define WGL_SWAP_OVERLAY6 0x00000040
+#define WGL_SWAP_OVERLAY7 0x00000080
+#define WGL_SWAP_OVERLAY8 0x00000100
+#define WGL_SWAP_OVERLAY9 0x00000200
+#define WGL_SWAP_OVERLAY10 0x00000400
+#define WGL_SWAP_OVERLAY11 0x00000800
+#define WGL_SWAP_OVERLAY12 0x00001000
+#define WGL_SWAP_OVERLAY13 0x00002000
+#define WGL_SWAP_OVERLAY14 0x00004000
+#define WGL_SWAP_OVERLAY15 0x00008000
+#define WGL_SWAP_UNDERLAY1 0x00010000
+#define WGL_SWAP_UNDERLAY2 0x00020000
+#define WGL_SWAP_UNDERLAY3 0x00040000
+#define WGL_SWAP_UNDERLAY4 0x00080000
+#define WGL_SWAP_UNDERLAY5 0x00100000
+#define WGL_SWAP_UNDERLAY6 0x00200000
+#define WGL_SWAP_UNDERLAY7 0x00400000
+#define WGL_SWAP_UNDERLAY8 0x00800000
+#define WGL_SWAP_UNDERLAY9 0x01000000
+#define WGL_SWAP_UNDERLAY10 0x02000000
+#define WGL_SWAP_UNDERLAY11 0x04000000
+#define WGL_SWAP_UNDERLAY12 0x08000000
+#define WGL_SWAP_UNDERLAY13 0x10000000
+#define WGL_SWAP_UNDERLAY14 0x20000000
+#define WGL_SWAP_UNDERLAY15 0x40000000
+typedef int(WINAPI* PFNCHOOSEPIXELFORMATPROC)(HDC hDc, const PIXELFORMATDESCRIPTOR* pPfd);
+typedef int(WINAPI* PFNDESCRIBEPIXELFORMATPROC)(HDC hdc, int ipfd, UINT cjpfd,
+                                                PIXELFORMATDESCRIPTOR* ppfd);
+typedef UINT(WINAPI* PFNGETENHMETAFILEPIXELFORMATPROC)(HENHMETAFILE hemf, UINT cbBuffer,
+                                                       PIXELFORMATDESCRIPTOR* ppfd);
+typedef int(WINAPI* PFNGETPIXELFORMATPROC)(HDC hdc);
+typedef BOOL(WINAPI* PFNSETPIXELFORMATPROC)(HDC hdc, int ipfd, const PIXELFORMATDESCRIPTOR* ppfd);
+typedef BOOL(WINAPI* PFNSWAPBUFFERSPROC)(HDC hdc);
+typedef BOOL(WINAPI* PFNWGLCOPYCONTEXTPROC)(HGLRC hglrcSrc, HGLRC hglrcDst, UINT mask);
+typedef HGLRC(WINAPI* PFNWGLCREATECONTEXTPROC)(HDC hDc);
+typedef HGLRC(WINAPI* PFNWGLCREATELAYERCONTEXTPROC)(HDC hDc, int level);
+typedef BOOL(WINAPI* PFNWGLDELETECONTEXTPROC)(HGLRC oldContext);
+typedef BOOL(WINAPI* PFNWGLDESCRIBELAYERPLANEPROC)(HDC hDc, int pixelFormat, int layerPlane,
+                                                   UINT nBytes, LAYERPLANEDESCRIPTOR* plpd);
+typedef HGLRC(WINAPI* PFNWGLGETCURRENTCONTEXTPROC)(void);
+typedef HDC(WINAPI* PFNWGLGETCURRENTDCPROC)(void);
+typedef int(WINAPI* PFNWGLGETLAYERPALETTEENTRIESPROC)(HDC hdc, int iLayerPlane, int iStart,
+                                                      int cEntries, COLORREF* pcr);
+typedef PROC(WINAPI* PFNWGLGETPROCADDRESSPROC)(LPCSTR lpszProc);
+typedef BOOL(WINAPI* PFNWGLMAKECURRENTPROC)(HDC hDc, HGLRC newContext);
+typedef BOOL(WINAPI* PFNWGLREALIZELAYERPALETTEPROC)(HDC hdc, int iLayerPlane, BOOL bRealize);
+typedef int(WINAPI* PFNWGLSETLAYERPALETTEENTRIESPROC)(HDC hdc, int iLayerPlane, int iStart,
+                                                      int cEntries, const COLORREF* pcr);
+typedef BOOL(WINAPI* PFNWGLSHARELISTSPROC)(HGLRC hrcSrvShare, HGLRC hrcSrvSource);
+typedef BOOL(WINAPI* PFNWGLSWAPLAYERBUFFERSPROC)(HDC hdc, UINT fuFlags);
+typedef BOOL(WINAPI* PFNWGLUSEFONTBITMAPSPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase);
+typedef BOOL(WINAPI* PFNWGLUSEFONTBITMAPSAPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase);
+typedef BOOL(WINAPI* PFNWGLUSEFONTBITMAPSWPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase);
+typedef BOOL(WINAPI* PFNWGLUSEFONTOUTLINESPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase,
+                                                FLOAT deviation, FLOAT extrusion, int format,
+                                                LPGLYPHMETRICSFLOAT lpgmf);
+typedef BOOL(WINAPI* PFNWGLUSEFONTOUTLINESAPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase,
+                                                 FLOAT deviation, FLOAT extrusion, int format,
+                                                 LPGLYPHMETRICSFLOAT lpgmf);
+typedef BOOL(WINAPI* PFNWGLUSEFONTOUTLINESWPROC)(HDC hDC, DWORD first, DWORD count, DWORD listBase,
+                                                 FLOAT deviation, FLOAT extrusion, int format,
+                                                 LPGLYPHMETRICSFLOAT lpgmf);
+#endif
+
+static Common::DynamicLibrary s_opengl32;
+
 // Persistent pointers
+static PFNWGLCREATECONTEXTPROC s_wglCreateContext = nullptr;
+static PFNWGLDELETECONTEXTPROC s_wglDeleteContext = nullptr;
+static PFNWGLMAKECURRENTPROC s_wglMakeCurrent = nullptr;
+static PFNWGLGETCURRENTCONTEXTPROC s_wglGetCurrentContext = nullptr;
+static PFNWGLGETPROCADDRESSPROC s_wglGetProcAddress = nullptr;
+#define wglCreateContext s_wglCreateContext
+#define wglDeleteContext s_wglDeleteContext
+#define wglMakeCurrent s_wglMakeCurrent
+#define wglGetCurrentContext s_wglGetCurrentContext
+#define wglGetProcAddress s_wglGetProcAddress
+// Extensions
 static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = nullptr;
 static PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = nullptr;
 static PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = nullptr;
@@ -127,6 +216,29 @@ static PFNWGLCREATEPBUFFERARBPROC wglCreatePbufferARB = nullptr;
 static PFNWGLGETPBUFFERDCARBPROC wglGetPbufferDCARB = nullptr;
 static PFNWGLRELEASEPBUFFERDCARBPROC wglReleasePbufferDCARB = nullptr;
 static PFNWGLDESTROYPBUFFERARBPROC wglDestroyPbufferARB = nullptr;
+
+static bool LoadWGL()
+{
+  if (s_opengl32.IsOpen())
+    return true;
+
+  if (!s_opengl32.Open("opengl32.dll"))
+    return false;
+
+  wglCreateContext =
+      reinterpret_cast<PFNWGLCREATECONTEXTPROC>(s_opengl32.GetSymbolAddress("wglCreateContext"));
+  wglDeleteContext =
+      reinterpret_cast<PFNWGLDELETECONTEXTPROC>(s_opengl32.GetSymbolAddress("wglDeleteContext"));
+  wglMakeCurrent =
+      reinterpret_cast<PFNWGLMAKECURRENTPROC>(s_opengl32.GetSymbolAddress("wglMakeCurrent"));
+  wglGetCurrentContext = reinterpret_cast<PFNWGLGETCURRENTCONTEXTPROC>(
+      s_opengl32.GetSymbolAddress("wglGetCurrentContext"));
+  wglGetProcAddress =
+      reinterpret_cast<PFNWGLGETPROCADDRESSPROC>(s_opengl32.GetSymbolAddress("wglGetProcAddress"));
+
+  return wglCreateContext && wglDeleteContext && wglMakeCurrent && wglGetCurrentContext &&
+         wglGetProcAddress;
+}
 
 static void LoadWGLExtensions()
 {
@@ -232,6 +344,12 @@ bool GLContextWGL::Initialize(const WindowSystemInfo& wsi, bool stereo, bool cor
 {
   if (!wsi.render_surface)
     return false;
+
+  if (!LoadWGL())
+  {
+    PanicAlertFmt("Failed to load WGL");
+    return false;
+  }
 
   RECT window_rect = {};
   m_window_handle = static_cast<HWND>(wsi.render_surface);
