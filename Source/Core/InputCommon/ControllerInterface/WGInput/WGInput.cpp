@@ -420,27 +420,25 @@ private:
       // Using RawGameController for buttons because it gives us a nice array instead of a bitmask.
       m_buttons.resize(m_raw_controller.ButtonCount());
 
-      u32 i = 0;
-      for (const auto& button : m_buttons)
+      for (size_t i = 0; i < m_buttons.size(); ++i)
       {
+        auto& button = m_buttons[i];
         WGI::GameControllerButtonLabel lbl{WGI::GameControllerButtonLabel::None};
         try
         {
-          lbl = m_raw_controller.GetButtonLabel(i);
+          lbl = m_raw_controller.GetButtonLabel(static_cast<int>(i));
         }
         catch (winrt::hresult_error)
         {
           lbl = WGI::GameControllerButtonLabel::None;
         }
 
-        const int32_t button_name_idx = static_cast<int32_t>(lbl);
+        const size_t button_name_idx = static_cast<size_t>(lbl);
         if (lbl != WGI::GameControllerButtonLabel::None &&
             button_name_idx < wgi_button_names.size())
           AddInput(new NamedButton(&button, wgi_button_names[button_name_idx]));
         else
           AddInput(new IndexedButton(&button, i));
-
-        ++i;
       }
     }
     catch (winrt::hresult_error)
