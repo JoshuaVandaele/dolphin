@@ -37,6 +37,14 @@ typedef SSIZE_T ssize_t;
 
 namespace GDBStub
 {
+
+#ifdef _WIN32
+using ws_socket_t = SOCKET;
+#else
+using ws_socket_t = int;
+#define INVALID_SOCKET -1
+#endif
+
 static std::optional<Common::SocketContext> s_socket_context;
 
 #define GDB_BFR_MAX 10000
@@ -66,8 +74,8 @@ const s64 GDB_UPDATE_CYCLES = 100000;
 static bool s_has_control = false;
 static bool s_just_connected = false;
 
-static int s_tmpsock = -1;
-static int s_sock = -1;
+static ws_socket_t s_tmpsock = INVALID_SOCKET;
+static ws_socket_t s_sock = INVALID_SOCKET;
 
 static u8 s_cmd_bfr[GDB_BFR_MAX];
 static u32 s_cmd_len;
@@ -1081,7 +1089,7 @@ static void InitGeneric(int domain, const sockaddr* server_addr, socklen_t serve
   s_socket_context.emplace();
 
   s_tmpsock = socket(domain, SOCK_STREAM, 0);
-  if (s_tmpsock == -1)
+  if (s_tmpsock == INVALID_SOCKET)
     ERROR_LOG_FMT(GDB_STUB, "Failed to create gdb socket");
 
   int on = 1;
@@ -1097,7 +1105,7 @@ static void InitGeneric(int domain, const sockaddr* server_addr, socklen_t serve
   INFO_LOG_FMT(GDB_STUB, "Waiting for gdb to connect...");
 
   s_sock = accept(s_tmpsock, client_addr, client_addrlen);
-  if (s_sock < 0)
+  if (s_sock == INVALID_SOCKET)
     ERROR_LOG_FMT(GDB_STUB, "Failed to accept gdb client");
   INFO_LOG_FMT(GDB_STUB, "Client connected.");
   s_just_connected = true;
@@ -1107,7 +1115,7 @@ static void InitGeneric(int domain, const sockaddr* server_addr, socklen_t serve
 #else
   close(s_tmpsock);
 #endif
-  s_tmpsock = -1;
+  s_tmpsock = INVALID_SOCKET;
 
   auto& system = Core::System::GetInstance();
   auto& core_timing = system.GetCoreTiming();
@@ -1118,15 +1126,15 @@ static void InitGeneric(int domain, const sockaddr* server_addr, socklen_t serve
 
 void Deinit()
 {
-  if (s_tmpsock != -1)
+  if (s_tmpsock != INVALID_SOCKET)
   {
     shutdown(s_tmpsock, SHUT_RDWR);
-    s_tmpsock = -1;
+    s_tmpsock = INVALID_SOCKET;
   }
-  if (s_sock != -1)
+  if (s_sock != INVALID_SOCKET)
   {
     shutdown(s_sock, SHUT_RDWR);
-    s_sock = -1;
+    s_sock = INVALID_SOCKET;
   }
 
   s_socket_context.reset();
@@ -1135,7 +1143,7 @@ void Deinit()
 
 bool IsActive()
 {
-  return s_tmpsock != -1 || s_sock != -1;
+  return s_tmpsock != INVALID_SOCKET || s_sock != INVALID_SOCKET;
 }
 
 bool HasControl()
