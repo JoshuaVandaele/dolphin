@@ -835,7 +835,7 @@ BbaTcpSocket::ConnectingState BbaTcpSocket::Connected(StackRef* ref)
   {
   case ConnectingState::Connecting:
   {
-    const int fd = getNativeHandle();
+    const ws_socket_t fd = getNativeHandle();
     const s32 nfds = fd + 1;
     fd_set read_fds;
     fd_set write_fds;

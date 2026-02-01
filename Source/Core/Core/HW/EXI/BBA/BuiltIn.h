@@ -41,6 +41,12 @@ struct StackRef;
 // and multiple interfaces/IP addresses can reach the socket's peer.
 class BbaTcpSocket : public sf::TcpSocket
 {
+#ifdef _WIN32
+  using ws_socket_t = SOCKET;
+#else
+  using ws_socket_t = int;
+#endif
+
 public:
   BbaTcpSocket();
 
