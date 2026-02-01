@@ -60,8 +60,9 @@ static void LdrObserverRun(const LdrObserver& observer, PCUNICODE_STRING module_
   }
 }
 
-static VOID DllNotificationCallback(ULONG NotificationReason,
-                                    PCLDR_DLL_NOTIFICATION_DATA NotificationData, PVOID Context)
+static VOID NTAPI DllNotificationCallback(ULONG NotificationReason,
+                                          PCLDR_DLL_NOTIFICATION_DATA NotificationData,
+                                          PVOID Context)
 {
   if (NotificationReason != LDR_DLL_NOTIFICATION_REASON_LOADED)
     return;
