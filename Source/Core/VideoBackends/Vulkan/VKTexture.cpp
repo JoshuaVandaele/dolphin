@@ -37,7 +37,7 @@ VKTexture::VKTexture(const TextureConfig& tex_config, VmaAllocation alloc, VkIma
     VkDebugUtilsObjectNameInfoEXT name_info = {};
     name_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
     name_info.objectType = VK_OBJECT_TYPE_IMAGE;
-    name_info.objectHandle = reinterpret_cast<uint64_t>(image);
+    name_info.objectHandle = reinterpret_cast<uint64_t&>(image);
     name_info.pObjectName = m_name.c_str();
     vkSetDebugUtilsObjectNameEXT(g_vulkan_context->GetDevice(), &name_info);
   }
