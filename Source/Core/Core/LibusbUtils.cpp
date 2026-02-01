@@ -124,11 +124,11 @@ std::pair<int, ConfigDescriptor> MakeConfigDescriptor(libusb_device* device, u8 
   libusb_config_descriptor* descriptor = nullptr;
   const int ret = libusb_get_config_descriptor(device, config_num, &descriptor);
   if (ret == LIBUSB_SUCCESS)
-    return {ret, ConfigDescriptor{descriptor, libusb_free_config_descriptor}};
+    return {ret, ConfigDescriptor{descriptor, *libusb_free_config_descriptor}};
 #else
-  const int ret = -1;
+  constexpr int ret = -1;
 #endif
-  return {ret, ConfigDescriptor{nullptr, [](auto) {}}};
+  return {ret, ConfigDescriptor{nullptr, [](auto*) {}}};
 }
 
 const char* ErrorWrap::GetName() const

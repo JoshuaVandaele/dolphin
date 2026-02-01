@@ -20,7 +20,7 @@ struct libusb_device_handle;
 namespace LibusbUtils
 {
 template <typename T>
-using UniquePtr = std::unique_ptr<T, void (*)(T*)>;
+using UniquePtr = std::unique_ptr<T, std::function<void(T*)>>;
 
 // Return false to stop iterating the device list.
 using GetDeviceListCallback = std::function<bool(libusb_device* device)>;
