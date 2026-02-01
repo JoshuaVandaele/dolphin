@@ -156,7 +156,7 @@ u32 CEXIModem::ImmRead(u32 size)
     u32 ret = 0;
     for (u8 z = 0; z < size; z++)
     {
-      if (reg_num + z >= m_regs.size())
+      if (static_cast<size_t>(reg_num + z) >= m_regs.size())
       {
         break;
       }
