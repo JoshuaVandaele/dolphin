@@ -14,6 +14,13 @@
 namespace ExpansionInterface
 {
 
+#ifdef _WIN32
+using ws_socket_t = SOCKET;
+#else
+using ws_socket_t = int;
+#define INVALID_SOCKET -1
+#endif
+
 class TAPServerConnection
 {
 public:
@@ -37,7 +44,7 @@ private:
   const std::size_t m_max_frame_size;
   Common::SocketContext m_socket_context;
 
-  int m_fd = -1;
+  ws_socket_t m_fd = INVALID_SOCKET;
   std::thread m_read_thread;
   Common::Flag m_read_enabled;
   Common::Flag m_read_shutdown;

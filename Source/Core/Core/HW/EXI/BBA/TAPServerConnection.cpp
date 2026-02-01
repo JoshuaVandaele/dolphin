@@ -137,7 +137,7 @@ bool TAPServerConnection::Activate()
     return true;
 
   m_fd = ConnectToDestination(m_destination);
-  if (m_fd < 0)
+  if (m_fd == INVALID_SOCKET)
     return false;
 
   return RecvInit();
@@ -151,14 +151,14 @@ void TAPServerConnection::Deactivate()
     m_read_thread.join();
   m_read_shutdown.Clear();
 
-  if (m_fd >= 0)
+  if (IsActivated())
     closesocket(m_fd);
   m_fd = -1;
 }
 
 bool TAPServerConnection::IsActivated()
 {
-  return (m_fd >= 0);
+  return (m_fd != INVALID_SOCKET);
 }
 
 bool TAPServerConnection::RecvInit()
