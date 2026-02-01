@@ -197,9 +197,15 @@ bool MemoryManager::InitFastmemArena()
   // 4 GiB view for enabled address translation
   // 2 GiB guard
 
+#if INTPTR_MAX >= INT64_MAX
   constexpr size_t ppc_view_size = 0x1'0000'0000;
   constexpr size_t guard_size = 0x8000'0000;
   constexpr size_t memory_size = ppc_view_size * 2 + guard_size * 3;
+#else
+  constexpr size_t ppc_view_size = 0x4000'0000;
+  constexpr size_t guard_size = 0x2000'0000;
+  constexpr size_t memory_size = ppc_view_size * 2 + guard_size * 3;
+#endif
 
   m_fastmem_arena = m_arena.ReserveMemoryRegion(memory_size);
   if (!m_fastmem_arena)
