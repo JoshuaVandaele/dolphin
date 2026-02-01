@@ -15,6 +15,13 @@
 #include "Core/IOS/USB/Common.h"
 #include "Core/LibusbUtils.h"
 
+// from libusb.h
+#if defined(_WIN32) || defined(__CYGWIN__)
+#define LIBUSB_CALL WINAPI
+#else
+#define LIBUSB_CALL
+#endif
+
 struct libusb_device;
 struct libusb_device_descriptor;
 struct libusb_device_handle;
@@ -68,8 +75,8 @@ private:
     std::map<libusb_transfer*, std::unique_ptr<TransferCommand>> m_transfers;
   };
   std::map<u8, TransferEndpoint> m_transfer_endpoints;
-  static void CtrlTransferCallback(libusb_transfer* transfer);
-  static void TransferCallback(libusb_transfer* transfer);
+  static void LIBUSB_CALL CtrlTransferCallback(libusb_transfer* transfer);
+  static void LIBUSB_CALL TransferCallback(libusb_transfer* transfer);
 
   void DisguisePlayStationDevice();
   int SubmitPlayStationRockBand3InstrumentControlTransfer();
