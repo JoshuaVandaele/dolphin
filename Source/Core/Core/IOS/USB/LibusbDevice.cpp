@@ -429,7 +429,7 @@ int LibusbDevice::SubmitTransfer(std::unique_ptr<IsoMessage> cmd)
   return libusb_submit_transfer(transfer);
 }
 
-void LibusbDevice::CtrlTransferCallback(libusb_transfer* transfer)
+void LIBUSB_CALL LibusbDevice::CtrlTransferCallback(libusb_transfer* transfer)
 {
   auto* device = static_cast<LibusbDevice*>(transfer->user_data);
   device->m_transfer_endpoints[0].HandleTransfer(transfer, [&](const auto& cmd) {
@@ -439,7 +439,7 @@ void LibusbDevice::CtrlTransferCallback(libusb_transfer* transfer)
   });
 }
 
-void LibusbDevice::TransferCallback(libusb_transfer* transfer)
+void LIBUSB_CALL LibusbDevice::TransferCallback(libusb_transfer* transfer)
 {
   auto* device = static_cast<LibusbDevice*>(transfer->user_data);
   device->m_transfer_endpoints[transfer->endpoint].HandleTransfer(transfer, [&](const auto& cmd) {
