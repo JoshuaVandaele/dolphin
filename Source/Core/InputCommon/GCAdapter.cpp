@@ -333,8 +333,8 @@ static void WriteThreadFunc()
 
 #if GCADAPTER_USE_LIBUSB_IMPLEMENTATION
 #if LIBUSB_API_HAS_HOTPLUG
-static int HotplugCallback(libusb_context* ctx, libusb_device* dev, libusb_hotplug_event event,
-                           void* user_data)
+static int LIBUSB_CALL HotplugCallback(libusb_context* ctx, libusb_device* dev,
+                                       libusb_hotplug_event event, void* user_data)
 {
   if (event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED)
   {
