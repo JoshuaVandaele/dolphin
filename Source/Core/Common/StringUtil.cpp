@@ -609,7 +609,7 @@ std::vector<std::string> CommandLineToUtf8Argv(const wchar_t* command_line)
     return {};
 
   std::vector<std::string> argv(nargs);
-  for (size_t i = 0; i < nargs; ++i)
+  for (int i = 0; i < nargs; ++i)
   {
     argv[i] = WStringToUTF8(tokenized[i]);
   }
