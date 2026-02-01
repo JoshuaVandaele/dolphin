@@ -128,15 +128,13 @@ s32 WiiSockMan::GetNetErrorCode(s32 ret, std::string_view caller, bool is_rw)
 
 WiiSocket::~WiiSocket()
 {
-  if (fd >= 0)
-  {
+  if (IsValid())
     (void)CloseFd();
-  }
 }
 
-void WiiSocket::SetFd(s32 s)
+void WiiSocket::SetFd(ws_socket_t s)
 {
-  if (fd >= 0)
+  if (IsValid())
     (void)CloseFd();
 
   nonBlock = false;
@@ -212,7 +210,7 @@ s32 WiiSocket::Shutdown(u32 how)
 s32 WiiSocket::CloseFd()
 {
   s32 ReturnValue = 0;
-  if (fd >= 0)
+  if (IsValid())
   {
     s32 ret = closesocket(fd);
     ReturnValue = m_socket_manager.GetNetErrorCode(ret, "CloseFd", false);
@@ -221,7 +219,7 @@ s32 WiiSocket::CloseFd()
   {
     ReturnValue = m_socket_manager.GetNetErrorCode(EITHER(WSAENOTSOCK, EBADF), "CloseFd", false);
   }
-  fd = -1;
+  fd = INVALID_SOCKET;
 
   for (auto it = pending_sockops.begin(); it != pending_sockops.end();)
   {
@@ -320,14 +318,14 @@ void WiiSocket::Update(bool read, bool write, bool except)
           sockaddr_in local_name = WiiSockMan::ToNativeAddrIn(addr);
 
           socklen_t addrlen = sizeof(sockaddr_in);
-          ret = static_cast<s32>(accept(fd, (sockaddr*)&local_name, &addrlen));
+          ret = accept(fd, (sockaddr*)&local_name, &addrlen);
 
           WiiSockAddrIn new_addr = WiiSockMan::ToWiiAddrIn(local_name, addrlen);
           memory.CopyToEmu(ioctl.buffer_out, &new_addr, sizeof(WiiSockAddrIn));
         }
         else
         {
-          ret = static_cast<s32>(accept(fd, nullptr, nullptr));
+          ret = accept(fd, nullptr, nullptr);
         }
 
         ReturnValue = m_socket_manager.AddSocket(ret, true);
@@ -864,11 +862,11 @@ void WiiSocket::DoSock(Request request, SSL_IOCTL type)
   pending_sockops.push_back(so);
 }
 
-s32 WiiSockMan::AddSocket(s32 fd, bool is_rw)
+s32 WiiSockMan::AddSocket(ws_socket_t fd, bool is_rw)
 {
   const char* caller = is_rw ? "SO_ACCEPT" : "NewSocket";
 
-  if (fd < 0)
+  if (fd == INVALID_SOCKET)
     return GetNetErrorCode(fd, caller, is_rw);
 
   s32 wii_fd;
@@ -930,7 +928,7 @@ bool WiiSockMan::IsSocketBlocking(s32 wii_fd) const
   return it != WiiSockets.end() && !it->second.nonBlock;
 }
 
-s32 WiiSockMan::NewSocket(s32 af, s32 type, s32 protocol)
+ws_socket_t WiiSockMan::NewSocket(s32 af, s32 type, s32 protocol)
 {
   if (af == 2)
   {
@@ -957,7 +955,7 @@ s32 WiiSockMan::NewSocket(s32 af, s32 type, s32 protocol)
   if (type != 1 && type != 2)  // SOCK_STREAM && SOCK_DGRAM
     return -SO_EPROTOTYPE;
 
-  s32 fd = static_cast<s32>(socket(af, type, protocol));
+  ws_socket_t fd = socket(af, type, protocol);
   return AddSocket(fd, false);
 }
 
@@ -1014,7 +1012,9 @@ void WiiSockMan::Update()
       FD_SET(sock.fd, &read_fds);
       FD_SET(sock.fd, &write_fds);
       FD_SET(sock.fd, &except_fds);
+#ifndef _WIN32
       nfds = std::max(nfds, sock.fd + 1);
+#endif
       ++socket_iter;
     }
     else

@@ -56,6 +56,13 @@ namespace IOS::HLE
 {
 constexpr int WII_SOCKET_FD_MAX = 24;
 
+#ifdef _WIN32
+using ws_socket_t = SOCKET;
+#else
+using ws_socket_t = int;
+#define INVALID_SOCKET -1
+#endif
+
 enum
 {
   SO_MSG_OOB = 0x01,
@@ -203,7 +210,7 @@ private:
   };
 
   friend class WiiSockMan;
-  void SetFd(s32 s);
+  void SetFd(ws_socket_t s);
   void SetWiiFd(s32 s);
   s32 Shutdown(u32 how);
   s32 CloseFd();
@@ -218,12 +225,12 @@ private:
   void Update(bool read, bool write, bool except);
   void UpdateConnectingState(s32 connect_rv);
   ConnectingState GetConnectingState() const;
-  bool IsValid() const { return fd >= 0; }
+  bool IsValid() const { return fd != INVALID_SOCKET; }
   bool IsTCP() const;
 
   WiiSockMan& m_socket_manager;
 
-  s32 fd = -1;
+  ws_socket_t fd = INVALID_SOCKET;
   s32 wii_fd = -1;
   bool nonBlock = false;
   ConnectingState connecting_state = ConnectingState::None;
@@ -267,8 +274,8 @@ public:
   void DoState(PointerWrap& p);
   void AddPollCommand(const PollCommand& cmd);
   // NON-BLOCKING FUNCTIONS
-  s32 NewSocket(s32 af, s32 type, s32 protocol);
-  s32 AddSocket(s32 fd, bool is_rw);
+  ws_socket_t NewSocket(s32 af, s32 type, s32 protocol);
+  s32 AddSocket(ws_socket_t fd, bool is_rw);
   bool IsSocketBlocking(s32 wii_fd) const;
   s32 GetHostSocket(s32 wii_fd) const;
   s32 ShutdownSocket(s32 wii_fd, u32 how);
