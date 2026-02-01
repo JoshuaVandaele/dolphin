@@ -1682,7 +1682,8 @@ void ZeldaAudioRenderer::DownloadPCMSamplesFromARAM(s16* dst, VPB* vpb, u16 requ
       vpb->SetCurrentARAMAddr(vpb->GetBaseAddress() + vpb->GetCurrentPosition() * sizeof(T));
     }
 
-    u16 samples_to_download = std::min(vpb->GetRemainingLength(), (u32)requested_samples_count);
+    u16 samples_to_download = static_cast<u16>(
+        std::min(vpb->GetRemainingLength(), static_cast<u32>(requested_samples_count)));
     T* src_ptr = reinterpret_cast<T*>(GetARAMPointerForRange(
         m_system, m_aram_base_addr, vpb->GetCurrentARAMAddr(), samples_to_download * sizeof(T)));
 
