@@ -37,7 +37,7 @@ private:
   const std::size_t m_max_frame_size;
   Common::SocketContext m_socket_context;
 
-  int m_fd = -1;
+  HostSocket m_sock = INVALID_SOCKET;
   std::thread m_read_thread;
   Common::Flag m_read_enabled;
   Common::Flag m_read_shutdown;

@@ -9,6 +9,7 @@
 #include <sstream>
 #include <unistd.h>
 
+#include "Common/CommonTypes.h"
 #include "Common/FileUtil.h"
 #include "Core/PowerPC/MMU.h"
 
@@ -28,7 +29,7 @@ MemoryWatcher::~MemoryWatcher()
     return;
 
   m_running = false;
-  close(m_fd);
+  close(m_sock);
 }
 
 bool MemoryWatcher::LoadAddresses(const std::string& path)
@@ -62,8 +63,8 @@ bool MemoryWatcher::OpenSocket(const std::string& path)
   m_addr.sun_family = AF_UNIX;
   strncpy(m_addr.sun_path, path.c_str(), sizeof(m_addr.sun_path) - 1);
 
-  m_fd = socket(AF_UNIX, SOCK_DGRAM, 0);
-  return m_fd >= 0;
+  m_sock = socket(AF_UNIX, SOCK_DGRAM, 0);
+  return m_sock != INVALID_SOCKET;
 }
 
 u32 MemoryWatcher::ChasePointer(const Core::CPUThreadGuard& guard, const std::string& line)
@@ -106,6 +107,6 @@ void MemoryWatcher::Step(const Core::CPUThreadGuard& guard)
     return;
 
   std::string message = ComposeMessages(guard);
-  sendto(m_fd, message.c_str(), message.size() + 1, 0, reinterpret_cast<sockaddr*>(&m_addr),
+  sendto(m_sock, message.c_str(), message.size() + 1, 0, reinterpret_cast<sockaddr*>(&m_addr),
          sizeof(m_addr));
 }

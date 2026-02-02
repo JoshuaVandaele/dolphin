@@ -21,6 +21,7 @@
 #include <sys/socket.h>
 #endif
 
+#include "Common/CommonTypes.h"
 #include "Common/FileUtil.h"
 #include "Core/Config/MainSettings.h"
 #include "Core/Core.h"
@@ -32,15 +33,15 @@
 
 namespace
 {
-QTableWidgetItem* GetSocketDomain(s32 host_fd)
+QTableWidgetItem* GetSocketDomain(HostSocket host_sock)
 {
-  if (host_fd < 0)
+  if (host_sock == INVALID_SOCKET)
     return new QTableWidgetItem();
 
   sockaddr sa;
   socklen_t sa_len = sizeof(sa);
-  const int ret = getsockname(host_fd, &sa, &sa_len);
-  if (ret != 0)
+  const int ret = getsockname(host_sock, &sa, &sa_len);
+  if (ret == SOCKET_ERROR)
     return new QTableWidgetItem(QTableWidget::tr("Unknown"));
 
   switch (sa.sa_family)
@@ -54,16 +55,16 @@ QTableWidgetItem* GetSocketDomain(s32 host_fd)
   }
 }
 
-QTableWidgetItem* GetSocketType(s32 host_fd)
+QTableWidgetItem* GetSocketType(HostSocket host_sock)
 {
-  if (host_fd < 0)
+  if (host_sock == INVALID_SOCKET)
     return new QTableWidgetItem();
 
   int so_type;
   socklen_t opt_len = sizeof(so_type);
   const int ret =
-      getsockopt(host_fd, SOL_SOCKET, SO_TYPE, reinterpret_cast<char*>(&so_type), &opt_len);
-  if (ret != 0)
+      getsockopt(host_sock, SOL_SOCKET, SO_TYPE, reinterpret_cast<char*>(&so_type), &opt_len);
+  if (ret == SOCKET_ERROR)
     return new QTableWidgetItem(QTableWidget::tr("Unknown"));
 
   switch (so_type)
@@ -77,28 +78,29 @@ QTableWidgetItem* GetSocketType(s32 host_fd)
   }
 }
 
-QTableWidgetItem* GetSocketState(s32 host_fd)
+QTableWidgetItem* GetSocketState(HostSocket host_sock)
 {
-  if (host_fd < 0)
+  if (host_sock == INVALID_SOCKET)
     return new QTableWidgetItem();
 
   sockaddr_in peer_addr;
   socklen_t peer_addr_len = sizeof(sockaddr_in);
-  if (getpeername(host_fd, reinterpret_cast<sockaddr*>(&peer_addr), &peer_addr_len) == 0)
+  if (getpeername(host_sock, reinterpret_cast<sockaddr*>(&peer_addr), &peer_addr_len) !=
+      SOCKET_ERROR)
     return new QTableWidgetItem(QTableWidget::tr("Connected"));
 
   int so_accept = 0;
   socklen_t opt_len = sizeof(so_accept);
-  const int ret =
-      getsockopt(host_fd, SOL_SOCKET, SO_ACCEPTCONN, reinterpret_cast<char*>(&so_accept), &opt_len);
-  if (ret == 0 && so_accept > 0)
+  const int ret = getsockopt(host_sock, SOL_SOCKET, SO_ACCEPTCONN,
+                             reinterpret_cast<char*>(&so_accept), &opt_len);
+  if (ret != SOCKET_ERROR && so_accept > 0)
     return new QTableWidgetItem(QTableWidget::tr("Listening"));
   return new QTableWidgetItem(QTableWidget::tr("Unbound"));
 }
 
 static QTableWidgetItem* GetSocketBlocking(const IOS::HLE::WiiSockMan& socket_manager, s32 wii_fd)
 {
-  if (socket_manager.GetHostSocket(wii_fd) < 0)
+  if (socket_manager.GetHostSocket(wii_fd) == INVALID_SOCKET)
     return new QTableWidgetItem();
   const bool is_blocking = socket_manager.IsSocketBlocking(wii_fd);
   return new QTableWidgetItem(is_blocking ? QTableWidget::tr("Yes") : QTableWidget::tr("No"));
@@ -114,14 +116,15 @@ static QString GetAddressAndPort(const sockaddr_in& addr)
   return QStringLiteral("%1:%2").arg(QString::fromLatin1(addr_str)).arg(ntohs(addr.sin_port));
 }
 
-QTableWidgetItem* GetSocketName(s32 host_fd)
+QTableWidgetItem* GetSocketName(HostSocket host_sock)
 {
-  if (host_fd < 0)
+  if (host_sock == INVALID_SOCKET)
     return new QTableWidgetItem();
 
   sockaddr_in sock_addr;
   socklen_t sock_addr_len = sizeof(sockaddr_in);
-  if (getsockname(host_fd, reinterpret_cast<sockaddr*>(&sock_addr), &sock_addr_len) != 0)
+  if (getsockname(host_sock, reinterpret_cast<sockaddr*>(&sock_addr), &sock_addr_len) ==
+      SOCKET_ERROR)
     return new QTableWidgetItem(QTableWidget::tr("Unknown"));
 
   const QString sock_name = GetAddressAndPort(sock_addr);
@@ -130,7 +133,8 @@ QTableWidgetItem* GetSocketName(s32 host_fd)
 
   sockaddr_in peer_addr;
   socklen_t peer_addr_len = sizeof(sockaddr_in);
-  if (getpeername(host_fd, reinterpret_cast<sockaddr*>(&peer_addr), &peer_addr_len) != 0)
+  if (getpeername(host_sock, reinterpret_cast<sockaddr*>(&peer_addr), &peer_addr_len) ==
+      SOCKET_ERROR)
     return new QTableWidgetItem(sock_name);
 
   const QString peer_name = GetAddressAndPort(peer_addr);
@@ -285,13 +289,13 @@ void NetworkWidget::Update()
   for (s32 wii_fd = 0; wii_fd < IOS::HLE::WII_SOCKET_FD_MAX; wii_fd++)
   {
     m_socket_table->insertRow(wii_fd);
-    const s32 host_fd = socket_manager->GetHostSocket(wii_fd);
+    const HostSocket host_sock = socket_manager->GetHostSocket(wii_fd);
     m_socket_table->setItem(wii_fd, 0, new QTableWidgetItem(QString::number(wii_fd)));
-    m_socket_table->setItem(wii_fd, 1, GetSocketDomain(host_fd));
-    m_socket_table->setItem(wii_fd, 2, GetSocketType(host_fd));
-    m_socket_table->setItem(wii_fd, 3, GetSocketState(host_fd));
+    m_socket_table->setItem(wii_fd, 1, GetSocketDomain(host_sock));
+    m_socket_table->setItem(wii_fd, 2, GetSocketType(host_sock));
+    m_socket_table->setItem(wii_fd, 3, GetSocketState(host_sock));
     m_socket_table->setItem(wii_fd, 4, GetSocketBlocking(*socket_manager, wii_fd));
-    m_socket_table->setItem(wii_fd, 5, GetSocketName(host_fd));
+    m_socket_table->setItem(wii_fd, 5, GetSocketName(host_sock));
   }
   m_socket_table->resizeColumnsToContents();
 

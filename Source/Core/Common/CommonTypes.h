@@ -34,3 +34,12 @@ using DT = Clock::duration;
 using DT_us = std::chrono::duration<double, std::micro>;
 using DT_ms = std::chrono::duration<double, std::milli>;
 using DT_s = std::chrono::duration<double, std::ratio<1>>;
+
+#ifdef _WIN32
+// SOCKET definition from WinSock2.h
+using HostSocket = UINT_PTR;
+#else
+using HostSocket = int;
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#endif
