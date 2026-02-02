@@ -15,6 +15,7 @@
 #include <unistd.h>
 #endif
 
+#include "Common/CommonTypes.h"
 #include "Common/Logging/Log.h"
 #include "Common/Network.h"
 #include "Common/StringUtil.h"
@@ -44,12 +45,12 @@ TAPServerConnection::TAPServerConnection(const std::string& destination,
 {
 }
 
-static int ConnectToDestination(const std::string& destination)
+static HostSocket ConnectToDestination(const std::string& destination)
 {
   if (destination.empty())
   {
     ERROR_LOG_FMT(SP1, "Cannot connect: destination is empty\n");
-    return -1;
+    return INVALID_SOCKET;
   }
 
   int ss_size;
@@ -62,7 +63,7 @@ static int ConnectToDestination(const std::string& destination)
     if (colon_offset == std::string::npos)
     {
       ERROR_LOG_FMT(SP1, "Destination IP address does not include port\n");
-      return -1;
+      return INVALID_SOCKET;
     }
 
     sockaddr_in* sin = reinterpret_cast<sockaddr_in*>(&ss);
@@ -71,7 +72,7 @@ static int ConnectToDestination(const std::string& destination)
     if (!dest_ip)
     {
       ERROR_LOG_FMT(SP1, "Destination IP address is not valid\n");
-      return -1;
+      return INVALID_SOCKET;
     }
     sin->sin_addr.s_addr = htonl(dest_ip->toInteger());
     sin->sin_family = AF_INET;
@@ -80,7 +81,7 @@ static int ConnectToDestination(const std::string& destination)
     if (dest_port < 1 || dest_port > 65535)
     {
       ERROR_LOG_FMT(SP1, "Destination port is not valid\n");
-      return -1;
+      return INVALID_SOCKET;
     }
     sin->sin_port = htons(dest_port);
     ss_size = sizeof(*sin);
@@ -93,7 +94,7 @@ static int ConnectToDestination(const std::string& destination)
     if (destination.size() + 1 > sizeof(sun->sun_path))
     {
       ERROR_LOG_FMT(SP1, "Socket path is too long; unable to create tapserver connection\n");
-      return -1;
+      return INVALID_SOCKET;
     }
     sun->sun_family = AF_UNIX;
     std::strcpy(sun->sun_path, destination.c_str());
@@ -103,32 +104,34 @@ static int ConnectToDestination(const std::string& destination)
   else
   {
     ERROR_LOG_FMT(SP1, "UNIX sockets are not supported on Windows\n");
-    return -1;
+    return INVALID_SOCKET;
 #endif
   }
 
-  const int fd = socket(ss.ss_family, SOCK_STREAM, (ss.ss_family == AF_INET) ? IPPROTO_TCP : 0);
-  if (fd == -1)
+  const HostSocket sock =
+      socket(ss.ss_family, SOCK_STREAM, (ss.ss_family == AF_INET) ? IPPROTO_TCP : 0);
+  if (sock == INVALID_SOCKET)
   {
     ERROR_LOG_FMT(SP1, "Couldn't create socket; unable to create tapserver connection\n");
-    return -1;
+    return INVALID_SOCKET;
   }
 
 #ifdef __APPLE__
   int opt_no_sigpipe = 1;
-  if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &opt_no_sigpipe, sizeof(opt_no_sigpipe)) < 0)
+  if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &opt_no_sigpipe, sizeof(opt_no_sigpipe)) ==
+      SOCKET_ERROR)
     INFO_LOG_FMT(SP1, "Failed to set SO_NOSIGPIPE on socket\n");
 #endif
 
-  if (connect(fd, reinterpret_cast<sockaddr*>(&ss), ss_size) == -1)
+  if (connect(sock, reinterpret_cast<sockaddr*>(&ss), ss_size) == INVALID_SOCKET)
   {
     INFO_LOG_FMT(SP1, "Couldn't connect socket ({}), unable to create tapserver connection\n",
                  Common::StrNetworkError());
-    closesocket(fd);
-    return -1;
+    closesocket(sock);
+    return INVALID_SOCKET;
   }
 
-  return fd;
+  return sock;
 }
 
 bool TAPServerConnection::Activate()
@@ -136,8 +139,8 @@ bool TAPServerConnection::Activate()
   if (IsActivated())
     return true;
 
-  m_fd = ConnectToDestination(m_destination);
-  if (m_fd < 0)
+  m_sock = ConnectToDestination(m_destination);
+  if (!IsActivated())
     return false;
 
   return RecvInit();
@@ -151,14 +154,14 @@ void TAPServerConnection::Deactivate()
     m_read_thread.join();
   m_read_shutdown.Clear();
 
-  if (m_fd >= 0)
-    closesocket(m_fd);
-  m_fd = -1;
+  if (IsActivated())
+    closesocket(m_sock);
+  m_sock = INVALID_SOCKET;
 }
 
 bool TAPServerConnection::IsActivated()
 {
-  return (m_fd >= 0);
+  return (m_sock != INVALID_SOCKET);
 }
 
 bool TAPServerConnection::RecvInit()
@@ -195,13 +198,13 @@ bool TAPServerConnection::SendAndRemoveAllHDLCFrames(std::string* send_buf)
     const std::size_t size = end_offset - start_offset;
 
     const u8 size_bytes[2] = {static_cast<u8>(size), static_cast<u8>(size >> 8)};
-    if (send(m_fd, reinterpret_cast<const char*>(size_bytes), 2, SEND_FLAGS) != 2)
+    if (send(m_sock, reinterpret_cast<const char*>(size_bytes), 2, SEND_FLAGS) != 2)
     {
       ERROR_LOG_FMT(SP1, "SendAndRemoveAllHDLCFrames(): could not write size field");
       return false;
     }
     const int written_bytes =
-        send(m_fd, send_buf->data() + start_offset, static_cast<int>(size), SEND_FLAGS);
+        send(m_sock, send_buf->data() + start_offset, static_cast<int>(size), SEND_FLAGS);
     if (u32(written_bytes) != size)
     {
       ERROR_LOG_FMT(SP1,
@@ -222,13 +225,13 @@ bool TAPServerConnection::SendFrame(const u8* frame, u32 size)
   // of type const void*. This is the reason for the reinterpret_cast here and
   // in the other send/recv calls in this file.
   const u8 size_bytes[2] = {static_cast<u8>(size), static_cast<u8>(size >> 8)};
-  if (send(m_fd, reinterpret_cast<const char*>(size_bytes), 2, SEND_FLAGS) != 2)
+  if (send(m_sock, reinterpret_cast<const char*>(size_bytes), 2, SEND_FLAGS) != 2)
   {
     ERROR_LOG_FMT(SP1, "SendFrame(): could not write size field");
     return false;
   }
   const int written_bytes =
-      send(m_fd, reinterpret_cast<const char*>(frame), static_cast<ws_ssize_t>(size), SEND_FLAGS);
+      send(m_sock, reinterpret_cast<const char*>(frame), static_cast<ws_ssize_t>(size), SEND_FLAGS);
   if (u32(written_bytes) != size)
   {
     ERROR_LOG_FMT(SP1, "SendFrame(): expected to write {} bytes, instead wrote {}", size,
@@ -257,13 +260,13 @@ void TAPServerConnection::ReadThreadHandler()
   {
     fd_set rfds;
     FD_ZERO(&rfds);
-    FD_SET(m_fd, &rfds);
+    FD_SET(m_sock, &rfds);
 
     timeval timeout;
     timeout.tv_sec = 0;
     timeout.tv_usec = 50000;
-    int select_res = select(m_fd + 1, &rfds, nullptr, nullptr, &timeout);
-    if (select_res < 0)
+    int select_res = select(m_sock + 1, &rfds, nullptr, nullptr, &timeout);
+    if (select_res == INVALID_SOCKET)
     {
       ERROR_LOG_FMT(SP1, "Can\'t poll tapserver fd: {}", Common::StrNetworkError());
       continue;
@@ -278,7 +281,7 @@ void TAPServerConnection::ReadThreadHandler()
     case ReadState::SIZE:
     {
       u8 size_bytes[2];
-      const ws_ssize_t bytes_read = recv(m_fd, reinterpret_cast<char*>(size_bytes), 2, 0);
+      const ws_ssize_t bytes_read = recv(m_sock, reinterpret_cast<char*>(size_bytes), 2, 0);
       if (bytes_read == 1)
       {
         read_state = ReadState::SIZE_HIGH;
@@ -313,7 +316,7 @@ void TAPServerConnection::ReadThreadHandler()
       // This handles the annoying case where only one byte of the size field
       // was available earlier.
       u8 size_high = 0;
-      const ws_ssize_t bytes_read = recv(m_fd, reinterpret_cast<char*>(&size_high), 1, 0);
+      const ws_ssize_t bytes_read = recv(m_sock, reinterpret_cast<char*>(&size_high), 1, 0);
       if (bytes_read != 1)
       {
         ERROR_LOG_FMT(SP1, "Failed to read split size field from destination: {}",
@@ -337,9 +340,9 @@ void TAPServerConnection::ReadThreadHandler()
     case ReadState::SKIP:
     {
       const std::size_t bytes_to_read = frame_data.size() - frame_bytes_received;
-      const ws_ssize_t bytes_read = recv(m_fd, frame_data.data() + frame_bytes_received,
+      const ws_ssize_t bytes_read = recv(m_sock, frame_data.data() + frame_bytes_received,
                                          static_cast<ws_ssize_t>(bytes_to_read), 0);
-      if (bytes_read <= 0)
+      if (bytes_read == SOCKET_ERROR || bytes_read == 0)
       {
         ERROR_LOG_FMT(SP1, "Failed to read data from destination: {}", Common::StrNetworkError());
         break;

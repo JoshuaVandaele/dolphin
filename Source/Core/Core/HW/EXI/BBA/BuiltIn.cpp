@@ -16,6 +16,7 @@
 #endif
 
 #include "Common/BitUtils.h"
+#include "Common/CommonTypes.h"
 #include "Common/Logging/Log.h"
 #include "Common/MsgHandler.h"
 #include "Common/Network.h"
@@ -801,7 +802,12 @@ sf::Socket::Status BbaTcpSocket::Connect(const sf::IpAddress& dest, u16 port, u3
   addr.sin_addr.s_addr = net_ip;
   addr.sin_family = AF_INET;
   addr.sin_port = 0;
-  (void)::bind(getNativeHandle(), reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
+  if (::bind(getNativeHandle(), reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) ==
+      SOCKET_ERROR)
+  {
+    ERROR_LOG_FMT(SP1, "bind failed: {}", Common::StrNetworkError());
+    return sf::Socket::Status::Error;
+  }
   m_connecting_state = ConnectingState::Connecting;
   return this->connect(dest, port);
 }
@@ -809,7 +815,7 @@ sf::Socket::Status BbaTcpSocket::Connect(const sf::IpAddress& dest, u16 port, u3
 sf::Socket::Status BbaTcpSocket::GetPeerName(sockaddr_in* addr) const
 {
   socklen_t size = sizeof(*addr);
-  if (getpeername(getNativeHandle(), reinterpret_cast<sockaddr*>(addr), &size) == -1)
+  if (getpeername(getNativeHandle(), reinterpret_cast<sockaddr*>(addr), &size) == SOCKET_ERROR)
   {
     ERROR_LOG_FMT(SP1, "getpeername failed: {}", Common::StrNetworkError());
     return sf::Socket::Status::Error;
@@ -820,7 +826,7 @@ sf::Socket::Status BbaTcpSocket::GetPeerName(sockaddr_in* addr) const
 sf::Socket::Status BbaTcpSocket::GetSockName(sockaddr_in* addr) const
 {
   socklen_t size = sizeof(*addr);
-  if (getsockname(getNativeHandle(), reinterpret_cast<sockaddr*>(addr), &size) == -1)
+  if (getsockname(getNativeHandle(), reinterpret_cast<sockaddr*>(addr), &size) == SOCKET_ERROR)
   {
     ERROR_LOG_FMT(SP1, "getsockname failed: {}", Common::StrNetworkError());
     return sf::Socket::Status::Error;
@@ -835,8 +841,8 @@ BbaTcpSocket::ConnectingState BbaTcpSocket::Connected(StackRef* ref)
   {
   case ConnectingState::Connecting:
   {
-    const int fd = getNativeHandle();
-    const s32 nfds = fd + 1;
+    const HostSocket sock = getNativeHandle();
+    const s32 nfds = sock + 1;
     fd_set read_fds;
     fd_set write_fds;
     fd_set except_fds;
@@ -844,22 +850,23 @@ BbaTcpSocket::ConnectingState BbaTcpSocket::Connected(StackRef* ref)
     FD_ZERO(&read_fds);
     FD_ZERO(&write_fds);
     FD_ZERO(&except_fds);
-    FD_SET(fd, &write_fds);
-    FD_SET(fd, &except_fds);
+    FD_SET(sock, &write_fds);
+    FD_SET(sock, &except_fds);
 
-    if (select(nfds, &read_fds, &write_fds, &except_fds, &t) < 0)
+    if (select(nfds, &read_fds, &write_fds, &except_fds, &t) == SOCKET_ERROR)
     {
       ERROR_LOG_FMT(SP1, "Failed to get BBA socket connection state: {}",
                     Common::StrNetworkError());
       break;
     }
 
-    if (FD_ISSET(fd, &write_fds) == 0 && FD_ISSET(fd, &except_fds) == 0)
+    if (FD_ISSET(sock, &write_fds) == 0 && FD_ISSET(sock, &except_fds) == 0)
       break;
 
     s32 error = 0;
     socklen_t len = sizeof(error);
-    if (getsockopt(fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&error), &len) != 0)
+    if (getsockopt(sock, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&error), &len) ==
+        SOCKET_ERROR)
     {
       ERROR_LOG_FMT(SP1, "Failed to get BBA socket error state: {}", Common::StrNetworkError());
       m_connecting_state = ConnectingState::Error;
@@ -877,7 +884,7 @@ BbaTcpSocket::ConnectingState BbaTcpSocket::Connected(StackRef* ref)
     // Get peername to ensure the socket is connected
     sockaddr_in peer;
     socklen_t peer_len = sizeof(peer);
-    if (getpeername(fd, reinterpret_cast<sockaddr*>(&peer), &peer_len) != 0)
+    if (getpeername(sock, reinterpret_cast<sockaddr*>(&peer), &peer_len) == SOCKET_ERROR)
     {
       ERROR_LOG_FMT(SP1, "BBA connect failed to get peername: {}", Common::StrNetworkError());
       m_connecting_state = ConnectingState::Error;
@@ -921,19 +928,19 @@ sf::Socket::Status BbaUdpSocket::Bind(u16 port, u32 net_ip)
   create();
   const int on = 1;
   if (setsockopt(getNativeHandle(), SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char*>(&on),
-                 sizeof(on)) != 0)
+                 sizeof(on)) == SOCKET_ERROR)
   {
     ERROR_LOG_FMT(SP1, "setsockopt failed to reuse SSDP address: {}", Common::StrNetworkError());
   }
 #ifdef SO_REUSEPORT
   if (setsockopt(getNativeHandle(), SOL_SOCKET, SO_REUSEPORT, reinterpret_cast<const char*>(&on),
-                 sizeof(on)) != 0)
+                 sizeof(on)) == SOCKET_ERROR)
   {
     ERROR_LOG_FMT(SP1, "setsockopt failed to reuse SSDP port: {}", Common::StrNetworkError());
   }
 #endif
-  if (const char loop = 1;
-      setsockopt(getNativeHandle(), IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop)) != 0)
+  if (const char loop = 1; setsockopt(getNativeHandle(), IPPROTO_IP, IP_MULTICAST_LOOP, &loop,
+                                      sizeof(loop)) == SOCKET_ERROR)
   {
     ERROR_LOG_FMT(SP1, "setsockopt failed to set SSDP loopback: {}", Common::StrNetworkError());
   }
@@ -944,11 +951,13 @@ sf::Socket::Status BbaUdpSocket::Bind(u16 port, u32 net_ip)
   addr.sin_family = AF_INET;
   addr.sin_port = htons(Common::SSDP_PORT);
   Common::ScopeGuard error_guard([this] { close(); });
-  if (::bind(getNativeHandle(), reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) != 0)
+  if (::bind(getNativeHandle(), reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) ==
+      SOCKET_ERROR)
   {
     WARN_LOG_FMT(SP1, "bind with SSDP port and INADDR_ANY failed: {}", Common::StrNetworkError());
     addr.sin_addr.s_addr = net_ip;
-    if (::bind(getNativeHandle(), reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) != 0)
+    if (::bind(getNativeHandle(), reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) ==
+        SOCKET_ERROR)
     {
       ERROR_LOG_FMT(SP1, "bind with SSDP port failed: {}", Common::StrNetworkError());
       return sf::Socket::Status::Error;
@@ -962,7 +971,8 @@ sf::Socket::Status BbaUdpSocket::Bind(u16 port, u32 net_ip)
 
   // Bind to the right interface
   if (setsockopt(getNativeHandle(), IPPROTO_IP, IP_MULTICAST_IF,
-                 reinterpret_cast<const char*>(&addr.sin_addr), sizeof(addr.sin_addr)) != 0)
+                 reinterpret_cast<const char*>(&addr.sin_addr),
+                 sizeof(addr.sin_addr)) == SOCKET_ERROR)
   {
     ERROR_LOG_FMT(SP1, "setsockopt failed to bind to the network interface: {}",
                   Common::StrNetworkError());
@@ -975,7 +985,7 @@ sf::Socket::Status BbaUdpSocket::Bind(u16 port, u32 net_ip)
   mreq.imr_multiaddr.s_addr = std::bit_cast<u32>(Common::IP_ADDR_SSDP);
   mreq.imr_interface.s_addr = net_ip;
   if (setsockopt(getNativeHandle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                 reinterpret_cast<const char*>(&mreq), sizeof(mreq)) != 0)
+                 reinterpret_cast<const char*>(&mreq), sizeof(mreq)) == SOCKET_ERROR)
   {
     ERROR_LOG_FMT(SP1, "setsockopt failed to subscribe to SSDP multicast group: {}",
                   Common::StrNetworkError());

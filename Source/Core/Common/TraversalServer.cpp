@@ -15,6 +15,7 @@
 #include <vector>
 
 #include <fmt/base.h>
+#include "Common/CommonTypes.h"
 
 #ifdef HAVE_LIBSYSTEMD
 #include <systemd/sd-daemon.h>
@@ -120,8 +121,8 @@ using ConnectedClients =
     std::unordered_map<Common::TraversalHostId, EvictEntry<Common::TraversalInetAddress>>;
 using OutgoingPackets = std::unordered_map<Common::TraversalRequestId, OutgoingPacketInfo>;
 
-static int sock;
-static int sockAlt;
+static HostSocket sock;
+static HostSocket sockAlt;
 static OutgoingPackets outgoingPackets;
 static ConnectedClients connectedClients;
 
@@ -392,26 +393,26 @@ int main()
 {
   int rv;
   sock = socket(PF_INET6, SOCK_DGRAM, 0);
-  if (sock == -1)
+  if (sock == INVALID_SOCKET)
   {
     perror("socket");
     return 1;
   }
   sockAlt = socket(PF_INET6, SOCK_DGRAM, 0);
-  if (sockAlt == -1)
+  if (sockAlt == INVALID_SOCKET)
   {
     perror("socket alt");
     return 1;
   }
   int no = 0;
   rv = setsockopt(sock, IPPROTO_IPV6, IPV6_V6ONLY, &no, sizeof(no));
-  if (rv < 0)
+  if (rv == SOCKET_ERROR)
   {
     perror("setsockopt IPV6_V6ONLY");
     return 1;
   }
   rv = setsockopt(sockAlt, IPPROTO_IPV6, IPV6_V6ONLY, &no, sizeof(no));
-  if (rv < 0)
+  if (rv == SOCKET_ERROR)
   {
     perror("setsockopt IPV6_V6ONLY alt");
     return 1;
@@ -428,14 +429,14 @@ int main()
   addr.sin6_scope_id = 0;
 
   rv = bind(sock, (sockaddr*)&addr, sizeof(addr));
-  if (rv < 0)
+  if (rv == SOCKET_ERROR)
   {
     perror("bind");
     return 1;
   }
   addr.sin6_port = htons(PORT_ALT);
   rv = bind(sockAlt, (sockaddr*)&addr, sizeof(addr));
-  if (rv < 0)
+  if (rv == SOCKET_ERROR)
   {
     perror("bind alt");
     return 1;
@@ -445,13 +446,13 @@ int main()
   tv.tv_sec = 0;
   tv.tv_usec = 300000;
   rv = setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-  if (rv < 0)
+  if (rv == SOCKET_ERROR)
   {
     perror("setsockopt SO_RCVTIMEO");
     return 1;
   }
   rv = setsockopt(sockAlt, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-  if (rv < 0)
+  if (rv == SOCKET_ERROR)
   {
     perror("setsockopt SO_RCVTIMEO alt");
     return 1;
@@ -470,7 +471,7 @@ int main()
     FD_SET(sock, &readSet);
     FD_SET(sockAlt, &readSet);
     rv = select(std::max(sock, sockAlt) + 1, &readSet, nullptr, nullptr, &tv);
-    if (rv < 0)
+    if (rv == SOCKET_ERROR)
     {
       if (errno != EINTR && errno != EAGAIN)
       {
@@ -479,7 +480,7 @@ int main()
       }
     }
 
-    int recvsock;
+    HostSocket recvsock;
     if (FD_ISSET(sock, &readSet))
     {
       recvsock = sock;
@@ -502,7 +503,7 @@ int main()
     currentTime = std::chrono::duration_cast<std::chrono::microseconds>(
                       std::chrono::system_clock::now().time_since_epoch())
                       .count();
-    if (rv < 0)
+    if (rv == SOCKET_ERROR)
     {
       if (errno != EINTR && errno != EAGAIN)
       {

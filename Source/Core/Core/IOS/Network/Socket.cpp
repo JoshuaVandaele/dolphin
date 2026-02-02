@@ -16,6 +16,7 @@
 #include <sys/select.h>
 #endif
 
+#include "Common/CommonTypes.h"
 #include "Common/FileUtil.h"
 #include "Common/IOFile.h"
 #include "Common/Network.h"
@@ -111,7 +112,7 @@ s32 WiiSockMan::GetNetErrorCode(s32 ret, std::string_view caller, bool is_rw)
   s32 error_code = errno;
 #endif
 
-  if (ret >= 0)
+  if (ret != SOCKET_ERROR)
   {
     SetLastNetError(ret);
     return ret;
@@ -128,19 +129,17 @@ s32 WiiSockMan::GetNetErrorCode(s32 ret, std::string_view caller, bool is_rw)
 
 WiiSocket::~WiiSocket()
 {
-  if (fd >= 0)
-  {
+  if (IsValid())
     (void)CloseFd();
-  }
 }
 
-void WiiSocket::SetFd(s32 s)
+void WiiSocket::SetHostSocket(HostSocket s)
 {
-  if (fd >= 0)
+  if (IsValid())
     (void)CloseFd();
 
   nonBlock = false;
-  fd = s;
+  m_sock = s;
 
 // Set socket to NON-BLOCK
 #ifdef _WIN32
@@ -148,9 +147,9 @@ void WiiSocket::SetFd(s32 s)
   ioctlsocket(fd, FIONBIO, &iMode);
 #else
   int flags;
-  if (-1 == (flags = fcntl(fd, F_GETFL, 0)))
+  if (-1 == (flags = fcntl(m_sock, F_GETFL, 0)))
     flags = 0;
-  fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+  fcntl(m_sock, F_SETFL, flags | O_NONBLOCK);
 #endif
 }
 
@@ -167,7 +166,8 @@ s32 WiiSocket::Shutdown(u32 how)
   // The Wii does nothing and returns 0 for IP_PROTO_UDP
   int so_type;
   socklen_t opt_len = sizeof(so_type);
-  if (getsockopt(fd, SOL_SOCKET, SO_TYPE, reinterpret_cast<char*>(&so_type), &opt_len) != 0 ||
+  if (getsockopt(m_sock, SOL_SOCKET, SO_TYPE, reinterpret_cast<char*>(&so_type), &opt_len) ==
+          SOCKET_ERROR ||
       (so_type != SOCK_STREAM && so_type != SOCK_DGRAM))
     return -SO_EBADF;
   if (so_type == SOCK_DGRAM)
@@ -175,7 +175,7 @@ s32 WiiSocket::Shutdown(u32 how)
 
   // Adjust pending operations
   // Values based on https://dolp.in/pr8758 hwtest
-  const s32 ret = m_socket_manager.GetNetErrorCode(shutdown(fd, how), "SO_SHUTDOWN", false);
+  const s32 ret = m_socket_manager.GetNetErrorCode(shutdown(m_sock, how), "SO_SHUTDOWN", false);
   const bool shut_read = how == 0 || how == 2;
   const bool shut_write = how == 1 || how == 2;
   for (auto& op : pending_sockops)
@@ -212,16 +212,16 @@ s32 WiiSocket::Shutdown(u32 how)
 s32 WiiSocket::CloseFd()
 {
   s32 ReturnValue = 0;
-  if (fd >= 0)
+  if (IsValid())
   {
-    s32 ret = closesocket(fd);
+    s32 ret = closesocket(m_sock);
     ReturnValue = m_socket_manager.GetNetErrorCode(ret, "CloseFd", false);
   }
   else
   {
     ReturnValue = m_socket_manager.GetNetErrorCode(EITHER(WSAENOTSOCK, EBADF), "CloseFd", false);
   }
-  fd = -1;
+  m_sock = INVALID_SOCKET;
 
   for (auto it = pending_sockops.begin(); it != pending_sockops.end();)
   {
@@ -289,7 +289,7 @@ void WiiSocket::Update(bool read, bool write, bool except)
         memory.CopyFromEmu(&addr, ioctl.buffer_in + 8, sizeof(WiiSockAddrIn));
         sockaddr_in local_name = WiiSockMan::ToNativeAddrIn(addr);
 
-        int ret = bind(fd, (sockaddr*)&local_name, sizeof(local_name));
+        int ret = bind(m_sock, (sockaddr*)&local_name, sizeof(local_name));
         ReturnValue = m_socket_manager.GetNetErrorCode(ret, "SO_BIND", false);
 
         INFO_LOG_FMT(IOS_NET, "IOCTL_SO_BIND ({:08X}, {}:{}) = {}", wii_fd,
@@ -302,7 +302,7 @@ void WiiSocket::Update(bool read, bool write, bool except)
         memory.CopyFromEmu(&addr, ioctl.buffer_in + 8, sizeof(WiiSockAddrIn));
         sockaddr_in local_name = WiiSockMan::ToNativeAddrIn(addr);
 
-        const int ret = connect(fd, (sockaddr*)&local_name, sizeof(local_name));
+        const int ret = connect(m_sock, (sockaddr*)&local_name, sizeof(local_name));
         ReturnValue = m_socket_manager.GetNetErrorCode(ret, "SO_CONNECT", false);
         UpdateConnectingState(ReturnValue);
 
@@ -312,7 +312,7 @@ void WiiSocket::Update(bool read, bool write, bool except)
       }
       case IOCTL_SO_ACCEPT:
       {
-        s32 ret;
+        HostSocket ret;
         if (ioctl.buffer_out_size > 0)
         {
           WiiSockAddrIn addr;
@@ -320,14 +320,14 @@ void WiiSocket::Update(bool read, bool write, bool except)
           sockaddr_in local_name = WiiSockMan::ToNativeAddrIn(addr);
 
           socklen_t addrlen = sizeof(sockaddr_in);
-          ret = static_cast<s32>(accept(fd, (sockaddr*)&local_name, &addrlen));
+          ret = accept(m_sock, (sockaddr*)&local_name, &addrlen);
 
           WiiSockAddrIn new_addr = WiiSockMan::ToWiiAddrIn(local_name, addrlen);
           memory.CopyToEmu(ioctl.buffer_out, &new_addr, sizeof(WiiSockAddrIn));
         }
         else
         {
-          ret = static_cast<s32>(accept(fd, nullptr, nullptr));
+          ret = accept(m_sock, nullptr, nullptr);
         }
 
         ReturnValue = m_socket_manager.AddSocket(ret, true);
@@ -618,10 +618,11 @@ void WiiSocket::Update(bool read, bool write, bool except)
 
           auto* to = has_destaddr ? reinterpret_cast<sockaddr*>(&local_name) : nullptr;
           socklen_t tolen = has_destaddr ? sizeof(sockaddr) : 0;
-          const int ret = sendto(fd, data, BufferInSize, flags, to, tolen);
+          const int ret = sendto(m_sock, data, BufferInSize, flags, to, tolen);
           ReturnValue = m_socket_manager.GetNetErrorCode(ret, "SO_SENDTO", true);
-          if (ret > 0)
-            system.GetPowerPC().GetDebugInterface().NetworkLogger()->LogWrite(data, ret, fd, to);
+          if (ret != SOCKET_ERROR)
+            system.GetPowerPC().GetDebugInterface().NetworkLogger()->LogWrite(data, ret, m_sock,
+                                                                              to);
 
           INFO_LOG_FMT(IOS_NET,
                        "{} = {} Socket: {:08x}, BufferIn: ({:08x}, {}), BufferIn2: ({:08x}, {}), "
@@ -677,11 +678,12 @@ void WiiSocket::Update(bool read, bool write, bool except)
           socklen_t addrlen = sizeof(sockaddr_in);
           auto* from = BufferOutSize2 ? reinterpret_cast<sockaddr*>(&local_name) : nullptr;
           socklen_t* fromlen = BufferOutSize2 ? &addrlen : nullptr;
-          const int ret = recvfrom(fd, data, data_len, flags, from, fromlen);
+          const int ret = recvfrom(m_sock, data, data_len, flags, from, fromlen);
           ReturnValue = m_socket_manager.GetNetErrorCode(
               ret, BufferOutSize2 ? "SO_RECVFROM" : "SO_RECV", true);
-          if (ret > 0)
-            system.GetPowerPC().GetDebugInterface().NetworkLogger()->LogRead(data, ret, fd, from);
+          if (ret != SOCKET_ERROR && ret != 0)
+            system.GetPowerPC().GetDebugInterface().NetworkLogger()->LogRead(data, ret, m_sock,
+                                                                             from);
 
           INFO_LOG_FMT(IOS_NET,
                        "{}({}, {}) Socket: {:08X}, Flags: {:08X}, "
@@ -752,7 +754,7 @@ WiiSocket::ConnectingState WiiSocket::GetConnectingState() const
   Common::ScopeGuard guard([&state] { Common::RestoreNetworkErrorState(state); });
 
 #ifdef _WIN32
-  constexpr int (*get_errno)() = &WSAGetLastError;
+  constexpr int(__stdcall * get_errno)() = &WSAGetLastError;
 #else
   constexpr int (*get_errno)() = []() { return errno; };
 #endif
@@ -765,7 +767,7 @@ WiiSocket::ConnectingState WiiSocket::GetConnectingState() const
     break;
   case ConnectingState::Connecting:
   {
-    const s32 nfds = fd + 1;
+    const s32 nfds = m_sock + 1;
     fd_set read_fds;
     fd_set write_fds;
     fd_set except_fds;
@@ -773,10 +775,10 @@ WiiSocket::ConnectingState WiiSocket::GetConnectingState() const
     FD_ZERO(&read_fds);
     FD_ZERO(&write_fds);
     FD_ZERO(&except_fds);
-    FD_SET(fd, &write_fds);
-    FD_SET(fd, &except_fds);
+    FD_SET(m_sock, &write_fds);
+    FD_SET(m_sock, &except_fds);
 
-    if (select(nfds, &read_fds, &write_fds, &except_fds, &t) < 0)
+    if (select(nfds, &read_fds, &write_fds, &except_fds, &t) == SOCKET_ERROR)
     {
       const s32 error = get_errno();
       ERROR_LOG_FMT(IOS_SSL, "Failed to get socket (fd={}) connection state (err={}): {}", wii_fd,
@@ -784,12 +786,13 @@ WiiSocket::ConnectingState WiiSocket::GetConnectingState() const
       return ConnectingState::Error;
     }
 
-    if (FD_ISSET(fd, &write_fds) == 0 && FD_ISSET(fd, &except_fds) == 0)
+    if (FD_ISSET(m_sock, &write_fds) == 0 && FD_ISSET(m_sock, &except_fds) == 0)
       break;
 
     s32 error = 0;
     socklen_t len = sizeof(error);
-    if (getsockopt(fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&error), &len) != 0)
+    if (getsockopt(m_sock, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&error), &len) ==
+        SOCKET_ERROR)
     {
       error = get_errno();
       ERROR_LOG_FMT(IOS_SSL, "Failed to get socket (fd={}) error state (err={}): {}", wii_fd, error,
@@ -807,7 +810,7 @@ WiiSocket::ConnectingState WiiSocket::GetConnectingState() const
     // Get peername to ensure the socket is connected
     sockaddr_in peer;
     socklen_t peer_len = sizeof(peer);
-    if (getpeername(fd, reinterpret_cast<sockaddr*>(&peer), &peer_len) != 0)
+    if (getpeername(m_sock, reinterpret_cast<sockaddr*>(&peer), &peer_len) == SOCKET_ERROR)
     {
       error = get_errno();
       ERROR_LOG_FMT(IOS_SSL, "Non-blocking connect (fd={}) failed to get peername (err={}): {}",
@@ -830,8 +833,8 @@ bool WiiSocket::IsTCP() const
 
   int socket_type;
   socklen_t option_length = sizeof(socket_type);
-  return getsockopt(fd, SOL_SOCKET, SO_TYPE, reinterpret_cast<char*>(&socket_type),
-                    &option_length) == 0 &&
+  return getsockopt(m_sock, SOL_SOCKET, SO_TYPE, reinterpret_cast<char*>(&socket_type),
+                    &option_length) != SOCKET_ERROR &&
          socket_type == SOCK_STREAM;
 }
 
@@ -864,12 +867,12 @@ void WiiSocket::DoSock(Request request, SSL_IOCTL type)
   pending_sockops.push_back(so);
 }
 
-s32 WiiSockMan::AddSocket(s32 fd, bool is_rw)
+s32 WiiSockMan::AddSocket(HostSocket sock, bool is_rw)
 {
   const char* caller = is_rw ? "SO_ACCEPT" : "NewSocket";
 
-  if (fd < 0)
-    return GetNetErrorCode(fd, caller, is_rw);
+  if (sock == INVALID_SOCKET)
+    return GetNetErrorCode(sock, caller, is_rw);
 
   s32 wii_fd;
   for (wii_fd = 0; wii_fd < WII_SOCKET_FD_MAX; ++wii_fd)
@@ -882,20 +885,21 @@ s32 WiiSockMan::AddSocket(s32 fd, bool is_rw)
   if (wii_fd == WII_SOCKET_FD_MAX)
   {
     // Close host socket
-    closesocket(fd);
+    closesocket(sock);
     wii_fd = -SO_EMFILE;
     ERROR_LOG_FMT(IOS_NET, "{} failed: Too many open sockets, ret={}", caller, wii_fd);
   }
   else
   {
-    WiiSocket& sock = WiiSockets.emplace(wii_fd, *this).first->second;
-    sock.SetFd(fd);
-    sock.SetWiiFd(wii_fd);
-    m_ios.GetSystem().GetPowerPC().GetDebugInterface().NetworkLogger()->OnNewSocket(fd);
+    WiiSocket& wii_sock = WiiSockets.emplace(wii_fd, *this).first->second;
+    wii_sock.SetHostSocket(sock);
+    wii_sock.SetWiiFd(wii_fd);
+    m_ios.GetSystem().GetPowerPC().GetDebugInterface().NetworkLogger()->OnNewSocket(sock);
 
 #ifdef __APPLE__
     int opt_no_sigpipe = 1;
-    if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &opt_no_sigpipe, sizeof(opt_no_sigpipe)) < 0)
+    if (setsockopt(sock, SOL_SOCKET, SO_NOSIGPIPE, &opt_no_sigpipe, sizeof(opt_no_sigpipe)) ==
+        SOCKET_ERROR)
       ERROR_LOG_FMT(IOS_NET, "Failed to set SO_NOSIGPIPE on socket");
 #endif
 
@@ -907,13 +911,14 @@ s32 WiiSockMan::AddSocket(s32 fd, bool is_rw)
 
       int socket_type;
       socklen_t option_length = sizeof(socket_type);
-      const bool is_udp = getsockopt(fd, SOL_SOCKET, SO_TYPE, reinterpret_cast<char*>(&socket_type),
-                                     &option_length) == 0 &&
-                          socket_type == SOCK_DGRAM;
+      const bool is_udp =
+          getsockopt(sock, SOL_SOCKET, SO_TYPE, reinterpret_cast<char*>(&socket_type),
+                     &option_length) != SOCKET_ERROR &&
+          socket_type == SOCK_DGRAM;
       const int opt_broadcast = 1;
       if (is_udp &&
-          setsockopt(fd, SOL_SOCKET, SO_BROADCAST, reinterpret_cast<const char*>(&opt_broadcast),
-                     sizeof(opt_broadcast)) != 0)
+          setsockopt(sock, SOL_SOCKET, SO_BROADCAST, reinterpret_cast<const char*>(&opt_broadcast),
+                     sizeof(opt_broadcast)) == SOCKET_ERROR)
       {
         ERROR_LOG_FMT(IOS_NET, "Failed to set SO_BROADCAST on socket");
       }
@@ -930,7 +935,7 @@ bool WiiSockMan::IsSocketBlocking(s32 wii_fd) const
   return it != WiiSockets.end() && !it->second.nonBlock;
 }
 
-s32 WiiSockMan::NewSocket(s32 af, s32 type, s32 protocol)
+HostSocket WiiSockMan::NewSocket(s32 af, s32 type, s32 protocol)
 {
   if (af == 2)
   {
@@ -957,16 +962,16 @@ s32 WiiSockMan::NewSocket(s32 af, s32 type, s32 protocol)
   if (type != 1 && type != 2)  // SOCK_STREAM && SOCK_DGRAM
     return -SO_EPROTOTYPE;
 
-  s32 fd = static_cast<s32>(socket(af, type, protocol));
-  return AddSocket(fd, false);
+  HostSocket sock = socket(af, type, protocol);
+  return AddSocket(sock, false);
 }
 
-s32 WiiSockMan::GetHostSocket(s32 wii_fd) const
+HostSocket WiiSockMan::GetHostSocket(s32 wii_fd) const
 {
   auto socket_entry = WiiSockets.find(wii_fd);
   if (socket_entry != WiiSockets.end())
-    return socket_entry->second.fd;
-  return -EBADF;
+    return socket_entry->second.m_sock;
+  return INVALID_SOCKET;
 }
 
 s32 WiiSockMan::ShutdownSocket(s32 wii_fd, u32 how)
@@ -1011,10 +1016,12 @@ void WiiSockMan::Update()
     const WiiSocket& sock = socket_iter->second;
     if (sock.IsValid())
     {
-      FD_SET(sock.fd, &read_fds);
-      FD_SET(sock.fd, &write_fds);
-      FD_SET(sock.fd, &except_fds);
-      nfds = std::max(nfds, sock.fd + 1);
+      FD_SET(sock.m_sock, &read_fds);
+      FD_SET(sock.m_sock, &write_fds);
+      FD_SET(sock.m_sock, &except_fds);
+#ifndef _WIN32
+      nfds = std::max(nfds, sock.m_sock + 1);
+#endif
       ++socket_iter;
     }
     else
@@ -1026,13 +1033,13 @@ void WiiSockMan::Update()
 
   const s32 ret = select(nfds, &read_fds, &write_fds, &except_fds, &t);
 
-  if (ret >= 0)
+  if (ret != SOCKET_ERROR)
   {
     for (auto& pair : WiiSockets)
     {
       WiiSocket& sock = pair.second;
-      sock.Update(FD_ISSET(sock.fd, &read_fds) != 0, FD_ISSET(sock.fd, &write_fds) != 0,
-                  FD_ISSET(sock.fd, &except_fds) != 0);
+      sock.Update(FD_ISSET(sock.m_sock, &read_fds) != 0, FD_ISSET(sock.m_sock, &write_fds) != 0,
+                  FD_ISSET(sock.m_sock, &except_fds) != 0);
     }
   }
   else

@@ -23,6 +23,7 @@ typedef SSIZE_T ssize_t;
 #endif
 
 #include "Common/Assert.h"
+#include "Common/CommonTypes.h"
 #include "Common/Logging/Log.h"
 #include "Common/SocketContext.h"
 #include "Core/Core.h"
@@ -66,8 +67,8 @@ const s64 GDB_UPDATE_CYCLES = 100000;
 static bool s_has_control = false;
 static bool s_just_connected = false;
 
-static int s_tmpsock = -1;
-static int s_sock = -1;
+static HostSocket s_tmpsock = INVALID_SOCKET;
+static HostSocket s_sock = INVALID_SOCKET;
 
 static u8 s_cmd_bfr[GDB_BFR_MAX];
 static u32 s_cmd_len;
@@ -133,7 +134,7 @@ static u8 ReadByte()
   u8 c = '+';
 
   const ssize_t res = recv(s_sock, (char*)&c, 1, MSG_WAITALL);
-  if (res != 1)
+  if (res == SOCKET_ERROR)
   {
     ERROR_LOG_FMT(GDB_STUB, "recv failed : {}", res);
     Deinit();
@@ -264,7 +265,7 @@ static bool IsDataAvailable()
   t.tv_sec = 0;
   t.tv_usec = 20;
 
-  if (select(s_sock + 1, fds, nullptr, nullptr, &t) < 0)
+  if (select(s_sock + 1, fds, nullptr, nullptr, &t) == SOCKET_ERROR)
   {
     ERROR_LOG_FMT(GDB_STUB, "select failed");
     return false;
@@ -1081,23 +1082,23 @@ static void InitGeneric(int domain, const sockaddr* server_addr, socklen_t serve
   s_socket_context.emplace();
 
   s_tmpsock = socket(domain, SOCK_STREAM, 0);
-  if (s_tmpsock == -1)
+  if (s_tmpsock == INVALID_SOCKET)
     ERROR_LOG_FMT(GDB_STUB, "Failed to create gdb socket");
 
   int on = 1;
-  if (setsockopt(s_tmpsock, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof on) < 0)
+  if (setsockopt(s_tmpsock, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, sizeof on) == SOCKET_ERROR)
     ERROR_LOG_FMT(GDB_STUB, "Failed to setsockopt");
 
-  if (bind(s_tmpsock, server_addr, server_addrlen) < 0)
+  if (bind(s_tmpsock, server_addr, server_addrlen) == SOCKET_ERROR)
     ERROR_LOG_FMT(GDB_STUB, "Failed to bind gdb socket");
 
-  if (listen(s_tmpsock, 1) < 0)
+  if (listen(s_tmpsock, 1) == SOCKET_ERROR)
     ERROR_LOG_FMT(GDB_STUB, "Failed to listen to gdb socket");
 
   INFO_LOG_FMT(GDB_STUB, "Waiting for gdb to connect...");
 
   s_sock = accept(s_tmpsock, client_addr, client_addrlen);
-  if (s_sock < 0)
+  if (s_sock == INVALID_SOCKET)
     ERROR_LOG_FMT(GDB_STUB, "Failed to accept gdb client");
   INFO_LOG_FMT(GDB_STUB, "Client connected.");
   s_just_connected = true;
@@ -1107,7 +1108,7 @@ static void InitGeneric(int domain, const sockaddr* server_addr, socklen_t serve
 #else
   close(s_tmpsock);
 #endif
-  s_tmpsock = -1;
+  s_tmpsock = INVALID_SOCKET;
 
   auto& system = Core::System::GetInstance();
   auto& core_timing = system.GetCoreTiming();
@@ -1118,15 +1119,15 @@ static void InitGeneric(int domain, const sockaddr* server_addr, socklen_t serve
 
 void Deinit()
 {
-  if (s_tmpsock != -1)
+  if (s_tmpsock != INVALID_SOCKET)
   {
     shutdown(s_tmpsock, SHUT_RDWR);
-    s_tmpsock = -1;
+    s_tmpsock = INVALID_SOCKET;
   }
-  if (s_sock != -1)
+  if (s_sock != INVALID_SOCKET)
   {
     shutdown(s_sock, SHUT_RDWR);
-    s_sock = -1;
+    s_sock = INVALID_SOCKET;
   }
 
   s_socket_context.reset();
@@ -1135,7 +1136,7 @@ void Deinit()
 
 bool IsActive()
 {
-  return s_tmpsock != -1 || s_sock != -1;
+  return s_tmpsock != INVALID_SOCKET || s_sock != INVALID_SOCKET;
 }
 
 bool HasControl()

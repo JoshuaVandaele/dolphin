@@ -7,6 +7,7 @@
 
 #include <atomic>
 
+#include "Common/CommonTypes.h"
 #include "Common/Network.h"
 #include "Core/HW/WiimoteReal/WiimoteReal.h"
 
@@ -30,9 +31,9 @@ protected:
 
 private:
   const Common::BluetoothAddress m_bdaddr;
-  const int m_wakeup_fd{-1};  // Used to kick the read thread.
-  int m_cmd_sock{-1};         // Command socket
-  int m_int_sock{-1};         // Interrupt socket
+  const int m_wakeup_fd{-1};              // Used to kick the read thread.
+  HostSocket m_cmd_sock{INVALID_SOCKET};  // Command socket
+  HostSocket m_int_sock{INVALID_SOCKET};  // Interrupt socket
 };
 
 class WiimoteScannerLinux final : public WiimoteScannerBackend
@@ -54,7 +55,7 @@ private:
   void Close();
 
   int m_device_id{-1};
-  int m_device_sock{-1};
+  HostSocket m_device_sock{INVALID_SOCKET};
 
   // FYI: Atomic because UI calls IsReady.
   std::atomic<bool> m_is_device_open{};

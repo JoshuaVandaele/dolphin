@@ -41,7 +41,7 @@ private:
 
   bool m_running = false;
 
-  int m_fd;
+  HostSocket m_sock;
   sockaddr_un m_addr{};
 
   // Address as stored in the file -> list of offsets to follow

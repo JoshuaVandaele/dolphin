@@ -215,15 +215,15 @@ static std::vector<InterfaceRouting> GetSystemInterfaceRouting()
   constexpr int BUFF_SIZE = 8192;
   constexpr timeval socket_timeout{.tv_sec = 2, .tv_usec = 0};
   unsigned int msg_seq = 0;
-  const int sock = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE);
-  if (sock < 0)
+  const HostSocket sock = socket(PF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE);
+  if (sock == INVALID_SOCKET)
   {
     ERROR_LOG_FMT(IOS_NET, "Failed to open netlink socket, error {}", Common::StrNetworkError());
     return {};
   }
 
   if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, static_cast<const void*>(&socket_timeout),
-                 sizeof(socket_timeout)) < 0)
+                 sizeof(socket_timeout)) == SOCKET_ERROR)
   {
     ERROR_LOG_FMT(IOS_NET, "Failed to set netlink socket recv timeout: {}",
                   Common::StrNetworkError());
@@ -245,7 +245,7 @@ static std::vector<InterfaceRouting> GetSystemInterfaceRouting()
   nl_msg->nlmsg_pid = pid;                           // PID of process sending the request.
 
   // ship it
-  if (send(sock, nl_msg, nl_msg->nlmsg_len, 0) < 0)
+  if (send(sock, nl_msg, nl_msg->nlmsg_len, 0) == SOCKET_ERROR)
   {
     ERROR_LOG_FMT(IOS_NET, "Failed to send netlink request ({})", Common::StrNetworkError());
     return {};
@@ -259,7 +259,7 @@ static std::vector<InterfaceRouting> GetSystemInterfaceRouting()
   {
     auto buf_ptr = msg_buffer.data() + msg_len;
     const int read_len = recv(sock, buf_ptr, BUFF_SIZE - msg_len, 0);
-    if (read_len < 0)
+    if (read_len == SOCKET_ERROR)
     {
       ERROR_LOG_FMT(IOS_NET, "Failed to receive netlink response ({})", Common::StrNetworkError());
       return {};
@@ -394,7 +394,7 @@ static std::optional<DefaultInterface> GetSystemDefaultInterface()
   // Assume that the address that is used to access the Internet corresponds
   // to the default interface.
   auto get_default_address = []() -> std::optional<in_addr> {
-    const int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    const HostSocket sock = socket(AF_INET, SOCK_DGRAM, 0);
     Common::ScopeGuard sock_guard{[sock] { close(sock); }};
 
     sockaddr_in addr{};
@@ -404,9 +404,9 @@ static std::optional<DefaultInterface> GetSystemDefaultInterface()
     // to a valid IP and port.
     addr.sin_addr.s_addr = inet_addr("8.8.8.8");
     addr.sin_port = htons(53);
-    if (connect(sock, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) == -1)
+    if (connect(sock, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) == SOCKET_ERROR)
       return {};
-    if (getsockname(sock, reinterpret_cast<sockaddr*>(&addr), &length) == -1)
+    if (getsockname(sock, reinterpret_cast<sockaddr*>(&addr), &length) == SOCKET_ERROR)
       return {};
     return addr.sin_addr;
   };

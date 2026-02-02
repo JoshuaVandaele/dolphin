@@ -298,14 +298,15 @@ bool WiimoteLinux::ConnectInternal()
     constexpr int total_tries = 3;
     for (int i = 0; i != total_tries; ++i)
     {
-      const int descriptor = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-      if (descriptor == -1)
+      const HostSocket descriptor = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+      if (descriptor == INVALID_SOCKET)
       {
         WARN_LOG_FMT(WIIMOTE, "Failed to create L2CAP socket: {}", Common::LastStrerrorString());
         return -1;
       }
 
-      if (connect(descriptor, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) == 0)
+      if (connect(descriptor, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) !=
+          SOCKET_ERROR)
         return descriptor;
 
       // If connecting fails sleep and try again.
@@ -320,13 +321,13 @@ bool WiimoteLinux::ConnectInternal()
   };
 
   m_cmd_sock = open_channel(L2CAP_PSM_HID_CNTL);
-  if (m_cmd_sock == -1)
+  if (m_cmd_sock == INVALID_SOCKET)
     return false;
 
   m_int_sock = open_channel(L2CAP_PSM_HID_INTR);
-  if (m_int_sock == -1)
+  if (m_int_sock == INVALID_SOCKET)
   {
-    close(std::exchange(m_cmd_sock, -1));
+    close(std::exchange(m_cmd_sock, INVALID_SOCKET));
     return false;
   }
 
@@ -335,13 +336,13 @@ bool WiimoteLinux::ConnectInternal()
 
 void WiimoteLinux::DisconnectInternal()
 {
-  close(std::exchange(m_cmd_sock, -1));
-  close(std::exchange(m_int_sock, -1));
+  close(std::exchange(m_cmd_sock, INVALID_SOCKET));
+  close(std::exchange(m_int_sock, INVALID_SOCKET));
 }
 
 bool WiimoteLinux::IsConnected() const
 {
-  return m_cmd_sock != -1;  // && int_sock != -1;
+  return m_cmd_sock != INVALID_SOCKET;  // && int_sock != INVALID_SOCKET;
 }
 
 void WiimoteLinux::IOWakeup()

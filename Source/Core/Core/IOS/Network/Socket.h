@@ -203,7 +203,7 @@ private:
   };
 
   friend class WiiSockMan;
-  void SetFd(s32 s);
+  void SetHostSocket(HostSocket s);
   void SetWiiFd(s32 s);
   s32 Shutdown(u32 how);
   s32 CloseFd();
@@ -218,12 +218,12 @@ private:
   void Update(bool read, bool write, bool except);
   void UpdateConnectingState(s32 connect_rv);
   ConnectingState GetConnectingState() const;
-  bool IsValid() const { return fd >= 0; }
+  bool IsValid() const { return m_sock != INVALID_SOCKET; }
   bool IsTCP() const;
 
   WiiSockMan& m_socket_manager;
 
-  s32 fd = -1;
+  HostSocket m_sock = INVALID_SOCKET;
   s32 wii_fd = -1;
   bool nonBlock = false;
   ConnectingState connecting_state = ConnectingState::None;
@@ -267,10 +267,10 @@ public:
   void DoState(PointerWrap& p);
   void AddPollCommand(const PollCommand& cmd);
   // NON-BLOCKING FUNCTIONS
-  s32 NewSocket(s32 af, s32 type, s32 protocol);
-  s32 AddSocket(s32 fd, bool is_rw);
+  HostSocket NewSocket(s32 af, s32 type, s32 protocol);
+  s32 AddSocket(HostSocket sock, bool is_rw);
   bool IsSocketBlocking(s32 wii_fd) const;
-  s32 GetHostSocket(s32 wii_fd) const;
+  HostSocket GetHostSocket(s32 wii_fd) const;
   s32 ShutdownSocket(s32 wii_fd, u32 how);
   s32 DeleteSocket(s32 wii_fd);
   s32 GetLastNetError() const { return errno_last; }
