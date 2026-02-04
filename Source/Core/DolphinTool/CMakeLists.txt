@@ -30,6 +30,10 @@ PRIVATE
   fmt::fmt
 )
 
+if(WIN32)
+  target_link_libraries(dolphin-tool PRIVATE LibArchive::LibArchive)
+endif()
+
 if(MSVC)
   # Add precompiled header
   target_link_libraries(dolphin-tool PRIVATE use_pch)

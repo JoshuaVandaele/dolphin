@@ -134,3 +134,6 @@
 	path = Externals/wil
 	url = https://github.com/microsoft/wil.git
 	shallow = true
+[submodule "Externals/libarchive/libarchive"]
+	path = Externals/libarchive/libarchive
+	url = https://github.com/libarchive/libarchive.git

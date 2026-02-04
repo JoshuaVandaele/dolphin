@@ -149,7 +149,7 @@ bool AutoUpdateChecker::SystemSupportsAutoUpdates()
 #endif
 }
 
-static std::string GetPlatformID()
+std::string AutoUpdateChecker::GetPlatformID()
 {
 #if defined(_WIN32)
 #if defined(_M_ARM_64)
@@ -168,7 +168,7 @@ static std::string GetPlatformID()
 #endif
 }
 
-static std::string GetUpdateServerUrl()
+std::string AutoUpdateChecker::GetUpdateServerUrl()
 {
   auto server_url = std::getenv("DOLPHIN_UPDATE_SERVER_URL");
   if (server_url)

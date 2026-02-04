@@ -24,6 +24,8 @@ public:
                       CheckType check_type);
 
   static bool SystemSupportsAutoUpdates();
+  static std::string GetUpdateServerUrl();
+  static std::string GetPlatformID();
 
   struct NewVersionInformation
   {

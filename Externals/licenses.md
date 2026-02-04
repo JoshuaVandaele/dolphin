@@ -28,6 +28,9 @@ Dolphin includes or links code of the following third-party software projects:
    [BSD 3-Clause](https://github.com/google/googletest/blob/master/LICENSE)
 - [libao](https://www.xiph.org/ao/):
    [GPLv2+](https://trac.xiph.org/browser/trunk/ao/README)
+- [libarchive](https://www.libarchive.org/):
+   [BSD 2-Clause](https://github.com/libarchive/libarchive/blob/master/COPYING)
+   (with some files under BSD 3-Clause, Public Domain, and Apache 2.0 / CC0 / OpenSSL)
 - [libav](https://libav.org/):
    [GPLv2+](https://libav.org/legal.html)
 - [libcdio](https://www.gnu.org/software/libcdio/):
