@@ -9,6 +9,7 @@
 
 #include <fmt/ostream.h>
 
+#include "DolphinTool/BisectCommand.h"
 #include "DolphinTool/ConvertCommand.h"
 #include "DolphinTool/ExtractCommand.h"
 #include "DolphinTool/HeaderCommand.h"
@@ -22,7 +23,7 @@ static void PrintUsage()
 {
   fmt::print(std::cerr, "usage: dolphin-tool COMMAND -h\n"
                         "\n"
-                        "commands supported: [convert, verify, header, extract]\n");
+                        "commands supported: [convert, verify, header, extract, bisect]\n");
 }
 
 #ifdef _WIN32
@@ -43,12 +44,14 @@ int main(int argc, char* argv[])
 
   if (command_str == "convert")
     return DolphinTool::ConvertCommand(args);
-  else if (command_str == "verify")
+  if (command_str == "verify")
     return DolphinTool::VerifyCommand(args);
-  else if (command_str == "header")
+  if (command_str == "header")
     return DolphinTool::HeaderCommand(args);
-  else if (command_str == "extract")
+  if (command_str == "extract")
     return DolphinTool::Extract(args);
+  if (command_str == "bisect")
+    return DolphinTool::BisectCommand(args);
   PrintUsage();
   return EXIT_FAILURE;
 }
