@@ -85,6 +85,23 @@ struct Touch
   s16 y;
 };
 
+struct ControllersData
+{
+  RegisterFlags register_flags;
+  u8 pad_id_to_register;
+  std::array<u8, 6> mac_address_to_register;
+};
+
+struct ConnectedControllersInfo
+{
+  u8 pad_id;
+  DsState pad_state;
+  DsModel model;
+  DsConnection connection_type;
+  std::array<u8, 6> pad_mac_address;
+  DsBattery battery_status;
+};
+
 namespace MessageType
 {
 struct VersionRequest
@@ -121,12 +138,7 @@ struct PortInfo
   static constexpr auto TYPE = 0x100001U;
   MessageHeader header;
   u32 message_type;
-  u8 pad_id;
-  DsState pad_state;
-  DsModel model;
-  DsConnection connection_type;
-  std::array<u8, 6> pad_mac_address;
-  DsBattery battery_status;
+  ConnectedControllersInfo info;
   u8 padding;
 };
 
@@ -136,9 +148,7 @@ struct PadDataRequest
   static constexpr auto TYPE = 0x100002U;
   MessageHeader header;
   u32 message_type;
-  RegisterFlags register_flags;
-  u8 pad_id_to_register;
-  std::array<u8, 6> mac_address_to_register;
+  ControllersData data;
 };
 
 struct PadDataResponse
@@ -147,12 +157,7 @@ struct PadDataResponse
   static constexpr auto TYPE = 0x100002U;
   MessageHeader header;
   u32 message_type;
-  u8 pad_id;
-  DsState pad_state;
-  DsModel model;
-  DsConnection connection_type;
-  std::array<u8, 6> pad_mac_address;
-  DsBattery battery_status;
+  ConnectedControllersInfo info;
   u8 active;
   u32 hid_packet_counter;
   u8 button_states1;
@@ -186,6 +191,36 @@ struct PadDataResponse
   float gyro_roll_deg_s;
 };
 
+struct RumbleInfoRequest
+{
+  static constexpr auto FROM = CLIENT;
+  static constexpr auto TYPE = 0x110001U;
+  MessageHeader header;
+  u32 message_type;
+  ControllersData data;
+};
+
+struct RumbleInfoResponse
+{
+  static constexpr auto FROM = SERVER;
+  static constexpr auto TYPE = 0x110001U;
+  MessageHeader header;
+  u32 message_type;
+  ConnectedControllersInfo info;
+  u8 motor_count;
+};
+
+struct RumbleSet
+{
+  static constexpr auto FROM = CLIENT;
+  static constexpr auto TYPE = 0x110002U;
+  MessageHeader header;
+  u32 message_type;
+  ControllersData data;
+  u8 motor_id;
+  u8 motor_intensity;
+};
+
 struct FromServer
 {
   union
@@ -198,6 +233,7 @@ struct FromServer
     MessageType::VersionResponse version_response;
     MessageType::PortInfo port_info;
     MessageType::PadDataResponse pad_data_response;
+    MessageType::RumbleInfoResponse rumble_info_response;
   };
 };
 
@@ -213,6 +249,8 @@ struct FromClient
     MessageType::VersionRequest version_request;
     MessageType::ListPorts list_ports;
     MessageType::PadDataRequest pad_data_request;
+    MessageType::RumbleInfoRequest rumble_info_request;
+    MessageType::RumbleSet rumble_set;
   };
 };
 }  // namespace MessageType

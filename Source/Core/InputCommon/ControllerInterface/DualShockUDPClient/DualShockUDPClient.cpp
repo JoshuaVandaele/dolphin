@@ -124,6 +124,25 @@ private:
     const BatteryState& m_battery;
   };
 
+  class RumbleOutput final : public Output
+  {
+  public:
+    RumbleOutput(Device& device, u8 motor_id) : m_device{device}, m_motor_id{motor_id} {}
+
+    std::string GetName() const override { return fmt::format("Motor {}", m_motor_id); }
+
+    void SetState(ControlState state) override
+    {
+      const u8 new_state = static_cast<u8>(std::lround(std::clamp(state, 0.0, 1.0) * 255.0));
+
+      m_device.UpdateRumble(m_motor_id, new_state);
+    }
+
+  private:
+    Device& m_device;
+    const u8 m_motor_id;
+  };
+
 public:
   Core::DeviceRemoval UpdateInput() override;
 
@@ -137,6 +156,9 @@ public:
 
 private:
   void ResetPadData();
+  void UpdateRumble(u8 motor_id, u8 motor_intensity);
+
+  u8 GetMotorCount();
 
   const std::string m_name;
   const int m_index;
@@ -228,8 +250,10 @@ static bool IsSameController(const Proto::MessageType::PortInfo& a,
                              const Proto::MessageType::PortInfo& b)
 {
   // compare everything but battery_status
-  return std::tie(a.pad_id, a.pad_state, a.model, a.connection_type, a.pad_mac_address) ==
-         std::tie(b.pad_id, b.pad_state, b.model, b.connection_type, b.pad_mac_address);
+  return std::tie(a.info.pad_id, a.info.pad_state, a.info.model, a.info.connection_type,
+                  a.info.pad_mac_address) == std::tie(b.info.pad_id, b.info.pad_state, b.info.model,
+                                                      b.info.connection_type,
+                                                      b.info.pad_mac_address);
 }
 
 void InputBackend::HotplugThreadFunc()
@@ -318,10 +342,10 @@ void InputBackend::HotplugThreadFunc()
             timed_out_servers[i] = false;
 
             const bool port_changed =
-                !IsSameController(*port_info, server.m_port_info[port_info->pad_id]);
+                !IsSameController(*port_info, server.m_port_info[port_info->info.pad_id]);
             if (port_changed)
             {
-              server.m_port_info[port_info->pad_id] = *port_info;
+              server.m_port_info[port_info->info.pad_id] = *port_info;
               // Just remove and re-add all the devices for simplicity
               GetControllerInterface().PlatformPopulateDevices([this] { PopulateDevices(); });
             }
@@ -342,10 +366,10 @@ void InputBackend::HotplugThreadFunc()
         bool any_connected = false;
         for (size_t port_index = 0; port_index < server.m_port_info.size(); port_index++)
         {
-          any_connected = any_connected ||
-                          server.m_port_info[port_index].pad_state == Proto::DsState::Connected;
+          any_connected = any_connected || server.m_port_info[port_index].info.pad_state ==
+                                               Proto::DsState::Connected;
           server.m_port_info[port_index] = {};
-          server.m_port_info[port_index].pad_id = static_cast<u8>(port_index);
+          server.m_port_info[port_index].info.pad_id = static_cast<u8>(port_index);
         }
         // We can't only remove devices added by this server as we wouldn't know which they are
         if (any_connected)
@@ -396,7 +420,7 @@ void InputBackend::Restart()
     for (size_t port_index = 0; port_index < server.m_port_info.size(); port_index++)
     {
       server.m_port_info[port_index] = {};
-      server.m_port_info[port_index].pad_id = static_cast<u8>(port_index);
+      server.m_port_info[port_index].info.pad_id = static_cast<u8>(port_index);
     }
   }
 
@@ -498,7 +522,7 @@ void InputBackend::PopulateDevices()
     for (size_t port_index = 0; port_index < server.m_port_info.size(); port_index++)
     {
       const Proto::MessageType::PortInfo& port_info = server.m_port_info[port_index];
-      if (port_info.pad_state != Proto::DsState::Connected)
+      if (port_info.info.pad_state != Proto::DsState::Connected)
         continue;
 
       GetControllerInterface().AddDevice(
@@ -576,7 +600,12 @@ Device::Device(std::string name, int index, std::string server_address, u16 serv
   AddInput(new GyroInput("Gyro Yaw Left", m_pad_data.gyro_yaw_deg_s, -gyro_scale));
   AddInput(new GyroInput("Gyro Yaw Right", m_pad_data.gyro_yaw_deg_s, gyro_scale));
 
-  AddInput(new BatteryInput(m_pad_data.battery_status));
+  AddInput(new BatteryInput(m_pad_data.info.battery_status));
+
+  for (u8 i = 0; i < GetMotorCount(); i++)
+  {
+    AddOutput(new RumbleOutput(*this, i));
+  }
 
   m_touch_x_min = 0;
   m_touch_y_min = 0;
@@ -602,6 +631,25 @@ void Device::ResetPadData()
   m_pad_data.touch1.y = m_touch_y;
 }
 
+void Device::UpdateRumble(u8 motor_id, u8 motor_intensity)
+{
+  Proto::Message<Proto::MessageType::RumbleSet> msg(m_client_uid);
+  auto& rumble = msg.m_message;
+
+  rumble.data.register_flags = Proto::RegisterFlags::PadID;
+  rumble.data.pad_id_to_register = m_index;
+  rumble.motor_id = motor_id;
+  rumble.motor_intensity = motor_intensity;
+
+  msg.Finish();
+
+  if (m_socket.send(&rumble, sizeof(rumble), sf::IpAddress::resolve(m_server_address).value(),
+                    m_server_port) != sf::Socket::Status::Done)
+  {
+    ERROR_LOG_FMT(CONTROLLERINTERFACE, "DualShockUDPClient UpdateRumble send failed");
+  }
+}
+
 std::string Device::GetName() const
 {
   return m_name;
@@ -622,8 +670,8 @@ Core::DeviceRemoval Device::UpdateInput()
 
     Proto::Message<Proto::MessageType::PadDataRequest> msg(m_client_uid);
     auto& data_req = msg.m_message;
-    data_req.register_flags = Proto::RegisterFlags::PadID;
-    data_req.pad_id_to_register = m_index;
+    data_req.data.register_flags = Proto::RegisterFlags::PadID;
+    data_req.data.pad_id_to_register = m_index;
     msg.Finish();
     if (m_socket.send(&data_req, sizeof(data_req), sf::IpAddress::resolve(m_server_address).value(),
                       m_server_port) != sf::Socket::Status::Done)
@@ -660,6 +708,62 @@ Core::DeviceRemoval Device::UpdateInput()
   }
 
   return Core::DeviceRemoval::Keep;
+}
+
+u8 Device::GetMotorCount()
+{
+  {
+    Proto::Message<Proto::MessageType::RumbleInfoRequest> msg(m_client_uid);
+    auto& data_req = msg.m_message;
+    data_req.data.register_flags = Proto::RegisterFlags::PadID;
+    data_req.data.pad_id_to_register = m_index;
+    msg.Finish();
+    if (m_socket.send(&data_req, sizeof(data_req), sf::IpAddress::resolve(m_server_address).value(),
+                      m_server_port) != sf::Socket::Status::Done)
+    {
+      ERROR_LOG_FMT(CONTROLLERINTERFACE, "DualShockUDPClient GetMotorCount send failed");
+      return 0;
+    }
+  }
+
+  Proto::Message<Proto::MessageType::FromServer> msg;
+  std::size_t received_bytes;
+  std::optional<sf::IpAddress> sender;
+  u16 port;
+  sf::Socket::Status status;
+
+  auto start = SteadyClock::now();
+  do
+  {
+    status = m_socket.receive(&msg, sizeof msg, received_bytes, sender, port);
+    if (status == sf::Socket::Status::Disconnected)
+    {
+      ERROR_LOG_FMT(CONTROLLERINTERFACE, "DualShockUDPClient Peer disconnected");
+      break;
+    }
+    else if (status == sf::Socket::Status::Error)
+    {
+      ERROR_LOG_FMT(CONTROLLERINTERFACE, "DualShockUDPClient Socket error");
+      break;
+    }
+    else if (status == sf::Socket::Status::NotReady)
+    {
+      if (SteadyClock::now() - start >= THREAD_MAX_WAIT_INTERVAL)
+      {
+        ERROR_LOG_FMT(CONTROLLERINTERFACE,
+                      "DualShockUDPClient GetMotorCount timeout. Does the server support rumble?");
+        break;
+      }
+      continue;
+    }
+  } while (status != sf::Socket::Status::Done);
+
+  u8 motor_count = 0;
+  if (auto rumble_data = msg.CheckAndCastTo<Proto::MessageType::RumbleInfoResponse>())
+  {
+    motor_count = rumble_data->motor_count;
+  }
+  return motor_count;
 }
 
 std::optional<int> Device::GetPreferredId() const
