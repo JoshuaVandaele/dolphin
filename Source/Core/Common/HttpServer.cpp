@@ -9,7 +9,6 @@
 #else
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <unistd.h>
 #endif
 
 #include <fmt/chrono.h>
@@ -57,8 +56,7 @@ void HttpServer::Start()
   if (m_server_thread.joinable())
     return;
 
-  m_stop_flag.store(false);
-  m_server_thread = std::thread([this]() { Serve(); });
+  m_server_thread = std::jthread([this](std::stop_token st) { Serve(st); });
 
   int success = m_server_ready_future.get();
   if (success != 0)
@@ -73,48 +71,22 @@ void HttpServer::Stop()
   if (!m_server_thread.joinable())
     return;
 
-  m_stop_flag.store(true);
-  const s32 server_sock = m_server_sock.exchange(-1);
-  if (server_sock >= 0)
-  {
-#ifndef _WIN32
-    shutdown(server_sock, SHUT_RDWR);
-#endif
-    closesocket(server_sock);
-  }
+  m_server_thread.request_stop();
   m_server_thread.join();
 
-  std::vector<std::thread> worker_threads;
-  std::vector<s32> worker_socks;
   {
     std::lock_guard lock(m_workers_mutex);
-    worker_threads = std::move(m_workers);
-    worker_socks = std::move(m_worker_socks);
-  }
-  for (auto sock : worker_socks)
-  {
-#ifndef _WIN32
-    shutdown(sock, SHUT_RDWR);
-#endif
-    closesocket(sock);
-  }
-  for (auto& worker : worker_threads)
-  {
-    if (worker.joinable())
-      worker.join();
-  }
-  {
-    std::lock_guard lock(m_workers_mutex);
+    for (auto& worker : m_workers)
+      worker.request_stop();
     m_workers.clear();
-    m_worker_socks.clear();
   }
 }
 
-void HttpServer::Serve()
+void HttpServer::Serve(std::stop_token stop_token)
 {
   Common::SetCurrentThreadName("Http Server Thread");
   Common::SocketContext socket_context;
-  const s32 server_sock = socket(AF_INET, SOCK_STREAM, 0);
+  s32 server_sock = socket(AF_INET, SOCK_STREAM, 0);
   if (server_sock < 0)
   {
     ERROR_LOG_FMT(COMMON, "HttpServer: Could not create a socket for the server - {}",
@@ -122,12 +94,13 @@ void HttpServer::Serve()
     m_server_ready_promise.set_value(1);
     return;
   }
-  m_server_sock.store(server_sock);
-  Common::ScopeGuard guard([this] {
-    const s32 sock = m_server_sock.exchange(-1);
-    if (sock >= 0)
-      closesocket(sock);
+  std::stop_callback scb(stop_token, [server_sock] {
+#ifndef _WIN32
+    shutdown(server_sock, SHUT_RDWR);
+#endif
+    closesocket(server_sock);
   });
+  Common::ScopeGuard guard([server_sock] { closesocket(server_sock); });
 
   sockaddr_in server_addr{};
   server_addr.sin_family = AF_INET;
@@ -168,7 +141,7 @@ void HttpServer::Serve()
 
   INFO_LOG_FMT(COMMON, "HttpServer: Running on {}", m_address.ToString());
 
-  while (!m_stop_flag.load())
+  while (!stop_token.stop_requested())
   {
     sockaddr_in client_addr{};
     socklen_t client_addr_len = sizeof(client_addr);
@@ -176,7 +149,7 @@ void HttpServer::Serve()
         accept(server_sock, reinterpret_cast<sockaddr*>(&client_addr), &client_addr_len);
     if (client_sock < 0)
     {
-      if (!m_stop_flag.load())
+      if (!stop_token.stop_requested())
       {
         ERROR_LOG_FMT(COMMON, "HttpServer: Failed to accept connection from a client - {}",
                       Common::StrNetworkError());
@@ -185,24 +158,22 @@ void HttpServer::Serve()
     }
     {
       std::lock_guard lock(m_workers_mutex);
-      m_worker_socks.push_back(client_sock);
-      m_workers.emplace_back([this, client_sock]() { HandleClient(client_sock); });
+      m_workers.emplace_back(
+          [this, client_sock](std::stop_token st) { HandleClient(client_sock, st); });
     }
   }
 }
 
-void HttpServer::HandleClient(s32 client_sock)
+void HttpServer::HandleClient(s32 client_sock, std::stop_token stop_token)
 {
   Common::SetCurrentThreadName("Http Server Worker Thread");
-  Common::ScopeGuard guard([this, client_sock]() {
-    std::lock_guard lk(m_workers_mutex);
-    auto it = std::find(m_worker_socks.begin(), m_worker_socks.end(), client_sock);
-    if (it != m_worker_socks.end())
-    {
-      m_worker_socks.erase(it);
-      closesocket(client_sock);
-    }
+  std::stop_callback scb(stop_token, [client_sock] {
+#ifndef _WIN32
+    shutdown(client_sock, SHUT_RDWR);
+#endif
+    closesocket(client_sock);
   });
+  Common::ScopeGuard guard([client_sock] { closesocket(client_sock); });
 
   std::string request;
   char buffer[1024];

@@ -35,16 +35,13 @@ private:
   const int m_max_clients;
   std::map<std::string, HttpRequestCallback> m_routes;
   std::mutex m_routes_mutex;
-  std::atomic<bool> m_stop_flag{false};
-  std::thread m_server_thread;
-  std::atomic<s32> m_server_sock{-1};
+  std::jthread m_server_thread;
   std::promise<int> m_server_ready_promise;
   std::shared_future<int> m_server_ready_future;
-  std::vector<std::thread> m_workers;
-  std::vector<s32> m_worker_socks;
+  std::vector<std::jthread> m_workers;
   std::mutex m_workers_mutex;
 
-  void Serve();
-  void HandleClient(s32 client_sock);
+  void Serve(std::stop_token stop_token);
+  void HandleClient(s32 client_sock, std::stop_token stop_token);
 };
 }  // namespace Common
