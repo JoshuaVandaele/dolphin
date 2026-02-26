@@ -42,8 +42,6 @@ Dolphin includes or links code of the following third-party software projects:
    [LGPLv2.1+](https://github.com/libusb/libusb/blob/master/COPYING)
 - [LLVM](http://llvm.org/):
    [University of Illinois/NCSA Open Source license](http://llvm.org/docs/DeveloperPolicy.html#license)
-- [json](https://json.nlohmann.me/):
-   [MIT](https://json.nlohmann.me/home/license/)
 - [LZO](http://www.oberhumer.com/opensource/lzo/):
    [GPLv2+](http://www.oberhumer.com/opensource/gpl.html)
 - [mGBA](http://mgba.io)
@@ -72,6 +70,8 @@ Dolphin includes or links code of the following third-party software projects:
    [zlib license](http://hg.libsdl.org/SDL/file/tip/COPYING.txt)
 - [SFML](http://www.sfml-dev.org/):
    [zlib license](http://www.sfml-dev.org/license.php)
+- [simdjson](https://simdjson.org/):
+   [Apache 2.0](https://simdjson.org/about#license)
 - [TAP-Windows](https://openvpn.net/):
    header only
 - [Windows Implementation Libraries](https://github.com/microsoft/wil):

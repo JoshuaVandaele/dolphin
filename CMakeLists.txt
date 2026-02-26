@@ -757,7 +757,7 @@ if (WIN32)
   include_directories(Externals/OpenAL/include)
 endif()
 
-dolphin_find_optional_system_library(nlohmann_json Externals/nlohmann_json)
+dolphin_find_optional_system_library(simdjson Externals/simdjson)
 
 add_subdirectory(Externals/expr)
 

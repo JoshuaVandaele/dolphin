@@ -187,7 +187,7 @@ PUBLIC
 PRIVATE
   CURL::libcurl
   FatFs
-  nlohmann_json::nlohmann_json
+  simdjson::simdjson
   spng::spng
   watcher
   ${VTUNE_LIBRARIES}

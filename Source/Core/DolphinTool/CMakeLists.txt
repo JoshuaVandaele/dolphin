@@ -26,7 +26,7 @@ PRIVATE
   uicommon
   cpp-optparse
   fmt::fmt
-  nlohmann_json::nlohmann_json
+  simdjson::simdjson
 )
 
 if(MSVC)

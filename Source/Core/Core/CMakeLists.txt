@@ -658,7 +658,7 @@ PUBLIC
   enet::enet
   expr
   inputcommon
-  nlohmann_json::nlohmann_json
+  simdjson::simdjson
   MbedTLS::mbedtls
   pugixml
   RangeSet::RangeSet

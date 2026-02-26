@@ -2,11 +2,11 @@
 <Project>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ExternalsDir)nlohmann_json\json\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ExternalsDir)simdjson\simdjson\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="$(ExternalsDir)nlohmann_json\nlohmann_json.vcxproj">
+    <ProjectReference Include="$(ExternalsDir)simdjson\simdjson.vcxproj">
       <Project>{2c0d058e-de35-4471-ad99-e68a2caf9e18}</Project>
     </ProjectReference>
   </ItemGroup>

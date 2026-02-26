@@ -41,7 +41,7 @@
   <Import Project="$(ExternalsDir)glslang\exports.props" />
   <Import Project="$(ExternalsDir)liblzma\exports.props" />
   <Import Project="$(ExternalsDir)mbedtls\exports.props" />
-  <Import Project="$(ExternalsDir)nlohmann_json\exports.props" />
+  <Import Project="$(ExternalsDir)simdjson\exports.props" />
   <Import Project="$(ExternalsDir)rcheevos\exports.props" />
   <Import Project="$(ExternalsDir)zstd\exports.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -242,7 +242,7 @@ PUBLIC
   glslang::glslang
 PRIVATE
   fmt::fmt
-  nlohmann_json::nlohmann_json
+  simdjson::simdjson
   spng::spng
   xxhash::xxhash
   imgui
