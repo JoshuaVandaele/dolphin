@@ -8,8 +8,6 @@
 #include <variant>
 #include <vector>
 
-#include <nlohmann/json_fwd.hpp>
-
 #include "Common/CommonTypes.h"
 #include "VideoCommon/Assets/CustomAsset.h"
 #include "VideoCommon/Assets/TextureSamplerValue.h"
@@ -32,9 +30,6 @@ struct MaterialProperty
 
 struct MaterialData
 {
-  static bool FromJson(const CustomAssetLibrary::AssetID& asset_id, const nlohmann::json& json,
-                       MaterialData* data);
-  static void ToJson(nlohmann::json* obj, const MaterialData& data);
   CustomAssetLibrary::AssetID shader_asset;
   CustomAssetLibrary::AssetID next_material_asset;
   std::vector<MaterialProperty> properties;

@@ -3,66 +3,39 @@
 
 #include "VideoCommon/GraphicsModSystem/Config/GraphicsModAsset.h"
 
-#include <nlohmann/json.hpp>
+#include <simdjson.h>
 
-#include "Common/Logging/Log.h"
-#include "Common/StringUtil.h"
-
-void GraphicsModAssetConfig::SerializeToConfig(nlohmann::json& json_obj) const
+namespace simdjson
 {
-  json_obj["name"] = m_asset_id;
 
-  nlohmann::json serialized_data;
-  for (const auto& [name, path] : m_map)
-  {
-    serialized_data[name] = PathToString(path);
-  }
-  json_obj["data"] = std::move(serialized_data);
+template <typename builder_type>
+void tag_invoke(serialize_tag, builder_type& builder, const GraphicsModAssetConfig& cfg)
+{
+  builder.start_object();
+  builder.append_key_value("name", cfg.m_asset_id);
+  builder.append_comma();
+
+  builder.append_key_value("data", cfg.m_map);
+  builder.end_object();
 }
 
-bool GraphicsModAssetConfig::DeserializeFromConfig(const nlohmann::json& obj)
+template <typename simdjson_value>
+auto tag_invoke(deserialize_tag, simdjson_value& val, GraphicsModAssetConfig& cfg)
 {
-  auto name_it = obj.find("name");
-  if (name_it == obj.end())
-  {
-    ERROR_LOG_FMT(VIDEO, "Failed to load mod configuration file, specified asset has no name");
-    return false;
-  }
-  else if (!name_it->is_string())
-  {
-    ERROR_LOG_FMT(VIDEO, "Failed to load mod configuration file, specified asset has a name "
-                         "that is not a string");
-    return false;
-  }
-  m_asset_id = name_it->get<std::string>();
+  simdjson::ondemand::object obj;
+  simdjson::error_code err;
 
-  auto data_it = obj.find("data");
-  if (data_it == obj.end())
-  {
-    ERROR_LOG_FMT(VIDEO, "Failed to load mod configuration file, specified asset '{}' has no data",
-                  m_asset_id);
-    return false;
-  }
-  else if (!data_it->is_object())
-  {
-    ERROR_LOG_FMT(VIDEO,
-                  "Failed to load mod configuration file, specified asset '{}' has data "
-                  "that is not an object",
-                  m_asset_id);
-    return false;
-  }
-  for (const auto& [key, value] : data_it->items())
-  {
-    if (!value.is_string())
-    {
-      ERROR_LOG_FMT(VIDEO,
-                    "Failed to load mod configuration file, specified asset '{}' has data "
-                    "with a value for key '{}' that is not a string",
-                    m_asset_id, key);
-      return false;
-    }
-    m_map[key] = value.get<std::string>();
-  }
+  if (err = val.get_object().get(obj); err)
+    return err;
 
-  return true;
+  if (err = obj["name"].get(cfg.m_asset_id); err)
+    return err;
+
+  cfg.m_map.clear();
+  if (err = obj["data"].get(cfg.m_map); err)
+    return err;
+
+  return simdjson::SUCCESS;
 }
+
+}  // namespace simdjson

@@ -7,12 +7,9 @@
 #include <string_view>
 #include <vector>
 
-#include <nlohmann/json.hpp>
+#include <simdjson.h>
 
-#include "Common/JsonUtil.h"
 #include "Common/Logging/Log.h"
-#include "Common/StringUtil.h"
-#include "Common/VariantUtil.h"
 #include "VideoCommon/Assets/CustomAssetLibrary.h"
 
 namespace VideoCommon
@@ -219,225 +216,6 @@ std::size_t MaterialProperty::GetMemorySize(const MaterialProperty& property)
   return result;
 }
 
-bool MaterialData::FromJson(const CustomAssetLibrary::AssetID& asset_id, const nlohmann::json& json,
-                            MaterialData* data)
-{
-  const auto parse_properties = [&](const char* name,
-                                    std::vector<MaterialProperty>* material_properties) -> bool {
-    if (!json.contains(name))
-    {
-      ERROR_LOG_FMT(VIDEO, "Asset '{}' failed to parse json, '{}' not found", asset_id, name);
-      return false;
-    }
-    auto& properties_array = json[name];
-    if (!properties_array.is_array())
-    {
-      ERROR_LOG_FMT(VIDEO, "Asset '{}' failed to parse json, '{}' is not the right json type",
-                    asset_id, name);
-      return false;
-    }
-
-    if (!ParseMaterialProperties(asset_id, properties_array, material_properties))
-      return false;
-    return true;
-  };
-
-  if (!parse_properties("properties", &data->properties))
-    return false;
-
-  if (const auto shader_asset = ReadStringFromJson(json, "shader_asset"))
-  {
-    data->shader_asset = *shader_asset;
-  }
-  else
-  {
-    ERROR_LOG_FMT(VIDEO, "Asset '{}' failed to parse json, 'shader_asset' not found or wrong type",
-                  asset_id);
-    return false;
-  }
-
-  if (const auto next_material_asset = ReadStringFromJson(json, "next_material_asset"))
-  {
-    data->next_material_asset = *next_material_asset;
-  }
-  else
-  {
-    ERROR_LOG_FMT(VIDEO,
-                  "Asset '{}' failed to parse json, 'next_material_asset' not found or wrong type",
-                  asset_id);
-    return false;
-  }
-
-  if (const auto cull_mode = ReadNumericFromJson<CullMode>(json, "cull_mode"))
-  {
-    data->cull_mode = *cull_mode;
-  }
-
-  if (const auto json_obj = ReadObjectFromJson(json, "depth_state"))
-  {
-    DepthState state;
-    state.test_enable = ReadNumericFromJson<u32>(*json_obj, "test_enable").value_or(0);
-    state.update_enable = ReadNumericFromJson<u32>(*json_obj, "update_enable").value_or(0);
-    state.func = ReadNumericFromJson<CompareMode>(*json_obj, "func").value_or(CompareMode::Never);
-    data->depth_state = state;
-  }
-
-  if (const auto json_obj = ReadObjectFromJson(json, "blending_state"))
-  {
-    BlendingState state;
-    state.blend_enable = ReadNumericFromJson<u32>(*json_obj, "blend_enable").value_or(0);
-    state.logic_op_enable = ReadNumericFromJson<u32>(*json_obj, "logic_op_enable").value_or(0);
-    state.color_update = ReadNumericFromJson<u32>(*json_obj, "color_update").value_or(0);
-    state.alpha_update = ReadNumericFromJson<u32>(*json_obj, "alpha_update").value_or(0);
-    state.subtract = ReadNumericFromJson<u32>(*json_obj, "subtract").value_or(0);
-    state.subtract_alpha = ReadNumericFromJson<u32>(*json_obj, "subtract_alpha").value_or(0);
-    state.use_dual_src = ReadNumericFromJson<u32>(*json_obj, "use_dual_src").value_or(0);
-    state.dst_factor =
-        ReadNumericFromJson<DstBlendFactor>(*json_obj, "dst_factor").value_or(DstBlendFactor::Zero);
-    state.src_factor =
-        ReadNumericFromJson<SrcBlendFactor>(*json_obj, "src_factor").value_or(SrcBlendFactor::Zero);
-    state.dst_factor_alpha = ReadNumericFromJson<DstBlendFactor>(*json_obj, "dst_factor_alpha")
-                                 .value_or(DstBlendFactor::Zero);
-    state.src_factor_alpha = ReadNumericFromJson<SrcBlendFactor>(*json_obj, "src_factor_alpha")
-                                 .value_or(SrcBlendFactor::Zero);
-    state.logic_mode =
-        ReadNumericFromJson<LogicOp>(*json_obj, "logic_mode").value_or(LogicOp::Clear);
-    data->blending_state = state;
-  }
-
-  auto tex_it = json.find("textures");
-  if (tex_it == json.end())
-  {
-    ERROR_LOG_FMT(VIDEO, "Asset '{}' failed to parse json, 'textures' not found", asset_id);
-    return false;
-  }
-  else if (!tex_it->is_array())
-  {
-    ERROR_LOG_FMT(VIDEO, "Asset '{}' failed to parse json, 'textures' is not the right json type",
-                  asset_id);
-    return false;
-  }
-  auto& textures_array = *tex_it;
-
-  if (!std::ranges::all_of(textures_array, &nlohmann::json::is_object))
-  {
-    ERROR_LOG_FMT(VIDEO, "Asset '{}' failed to parse json, 'textures' must contain objects",
-                  asset_id);
-    return false;
-  }
-
-  for (const auto& texture_json : textures_array)
-  {
-    TextureSamplerValue sampler_value;
-    if (!TextureSamplerValue::FromJson(texture_json, &sampler_value))
-      return false;
-    data->textures.push_back(std::move(sampler_value));
-  }
-
-  return true;
-}
-
-void MaterialData::ToJson(nlohmann::json* obj, const MaterialData& data)
-{
-  if (!obj) [[unlikely]]
-    return;
-
-  auto& json_obj = *obj;
-
-  const auto add_property = [](nlohmann::json* json_properties, const MaterialProperty& property) {
-    nlohmann::json json_property;
-
-    std::visit(overloaded{[&](s32 value) {
-                            json_property["type"] = "int";
-                            json_property["value"] = value;
-                          },
-                          [&](const std::array<s32, 2>& value) {
-                            json_property["type"] = "int2";
-                            json_property["value"] = value;
-                          },
-                          [&](const std::array<s32, 3>& value) {
-                            json_property["type"] = "int3";
-                            json_property["value"] = value;
-                          },
-                          [&](const std::array<s32, 4>& value) {
-                            json_property["type"] = "int4";
-                            json_property["value"] = value;
-                          },
-                          [&](float value) {
-                            json_property["type"] = "float";
-                            json_property["value"] = value;
-                          },
-                          [&](const std::array<float, 2>& value) {
-                            json_property["type"] = "float2";
-                            json_property["value"] = value;
-                          },
-                          [&](const std::array<float, 3>& value) {
-                            json_property["type"] = "float3";
-                            json_property["value"] = value;
-                          },
-                          [&](const std::array<float, 4>& value) {
-                            json_property["type"] = "float4";
-                            json_property["value"] = value;
-                          },
-                          [&](bool value) {
-                            json_property["type"] = "bool";
-                            json_property["value"] = value;
-                          }},
-               property.m_value);
-
-    json_properties->push_back(std::move(json_property));
-  };
-
-  nlohmann::json json_properties;
-  for (const auto& property : data.properties)
-  {
-    add_property(&json_properties, property);
-  }
-  json_obj["properties"] = std::move(json_properties);
-
-  json_obj["shader_asset"] = data.shader_asset;
-  json_obj["next_material_asset"] = data.next_material_asset;
-
-  if (data.cull_mode)
-    json_obj["cull_mode"] = *data.cull_mode;
-
-  if (data.depth_state)
-  {
-    nlohmann::json depth_state_json;
-    depth_state_json["test_enable"] = data.depth_state->test_enable.Value();
-    depth_state_json["update_enable"] = data.depth_state->update_enable.Value();
-    depth_state_json["func"] = data.depth_state->func.Value();
-    json_obj["depth_state"] = depth_state_json;
-  }
-
-  if (data.blending_state)
-  {
-    nlohmann::json blending_state_json;
-    blending_state_json["blend_enable"] = data.blending_state->blend_enable.Value();
-    blending_state_json["logic_op_enable"] = data.blending_state->logic_op_enable.Value();
-    blending_state_json["color_update"] = data.blending_state->color_update.Value();
-    blending_state_json["alpha_update"] = data.blending_state->alpha_update.Value();
-    blending_state_json["subtract"] = data.blending_state->subtract.Value();
-    blending_state_json["subtract_alpha"] = data.blending_state->subtract_alpha.Value();
-    blending_state_json["use_dual_src"] = data.blending_state->use_dual_src.Value();
-    blending_state_json["dst_factor"] = data.blending_state->dst_factor.Value();
-    blending_state_json["src_factor"] = data.blending_state->src_factor.Value();
-    blending_state_json["dst_factor_alpha"] = data.blending_state->dst_factor_alpha.Value();
-    blending_state_json["src_factor_alpha"] = data.blending_state->src_factor_alpha.Value();
-    blending_state_json["logic_mode"] = data.blending_state->logic_mode.Value();
-    json_obj["blending_state"] = blending_state_json;
-  }
-
-  nlohmann::json json_textures;
-  for (const auto& texture : data.textures)
-  {
-    nlohmann::json json_texture;
-    TextureSamplerValue::ToJson(&json_texture, texture);
-    json_textures.push_back(std::move(json_texture));
-  }
-  json_obj["textures"] = json_textures;
-}
-
 CustomAssetLibrary::LoadInfo MaterialAsset::LoadImpl(const CustomAssetLibrary::AssetID& asset_id)
 {
   auto potential_data = std::make_shared<MaterialData>();
@@ -452,3 +230,156 @@ CustomAssetLibrary::LoadInfo MaterialAsset::LoadImpl(const CustomAssetLibrary::A
   return loaded_info;
 }
 }  // namespace VideoCommon
+
+namespace simdjson
+{
+
+template <typename builder_type>
+void tag_invoke(serialize_tag, builder_type& builder, const MaterialProperty& property)
+{
+  builder.start_object();
+
+  auto write = [&](std::string_view type, const auto& value) {
+    builder.append_key_value("type", type);
+    builder.append_comma();
+    builder.append_key_value("value", value);
+  };
+
+  std::visit(overloaded{[&](s32 v) { write("int", v); },
+                        [&](const std::array<s32, 2>& v) { write("int2", v); },
+                        [&](const std::array<s32, 3>& v) { write("int3", v); },
+                        [&](const std::array<s32, 4>& v) { write("int4", v); },
+                        [&](float v) { write("float", v); },
+                        [&](const std::array<float, 2>& v) { write("float2", v); },
+                        [&](const std::array<float, 3>& v) { write("float3", v); },
+                        [&](const std::array<float, 4>& v) { write("float4", v); },
+                        [&](bool v) { write("bool", v); }},
+             property.m_value);
+
+  builder.end_object();
+}
+
+template <typename simdjson_value>
+auto tag_invoke(deserialize_tag, simdjson_value& val, MaterialProperty& property)
+{
+  simdjson::ondemand::object obj;
+  simdjson::error_code err;
+
+  if (err = val.get_object().get(obj); err)
+    return err;
+
+  std::string_view type;
+  if (err = obj["type"].get_string().get(type); err)
+    return err;
+
+  auto get_value = [&](auto type_tag) -> simdjson::error_code {
+    using T = decltype(type_tag);
+    T temp{};
+    if (auto err = obj["value"].get(temp); err)
+      return err;
+    property.m_value = temp;
+    return simdjson::SUCCESS;
+  };
+
+  if (type == "int")
+    return get_value(int32_t{});
+  if (type == "int2")
+    return get_value(std::array<int32_t, 2>{});
+  if (type == "int3")
+    return get_value(std::array<int32_t, 3>{});
+  if (type == "int4")
+    return get_value(std::array<int32_t, 4>{});
+  if (type == "float")
+    return get_value(float{});
+  if (type == "float2")
+    return get_value(std::array<float, 2>{});
+  if (type == "float3")
+    return get_value(std::array<float, 3>{});
+  if (type == "float4")
+    return get_value(std::array<float, 4>{});
+  if (type == "bool")
+    return get_value(bool{});
+
+  return simdjson::INCORRECT_TYPE;
+}
+
+template <typename builder_type>
+void tag_invoke(serialize_tag, builder_type& builder, const MaterialData& data)
+{
+  builder.start_object();
+
+  builder.append_key_value("shader_asset", data.shader_asset);
+  builder.append_comma();
+
+  builder.append_key_value("next_material_asset", data.next_material_asset);
+  builder.append_comma();
+
+  builder.append_key_value("properties", data.properties);
+  builder.append_comma();
+
+  builder.append_key_value("textures", m.textures);
+
+  if (data.cull_mode)
+  {
+    builder.append_comma();
+    builder.append_key_value("cull_mode", *m.cull_mode);
+  }
+
+  if (data.depth_state)
+  {
+    builder.append_comma();
+    builder.append_key_value("depth_state", *m.depth_state);
+  }
+
+  if (data.blending_state)
+  {
+    builder.append_comma();
+    builder.append_key_value("blending_state", *m.blending_state);
+  }
+
+  builder.end_object();
+}
+
+template <typename simdjson_value>
+auto tag_invoke(deserialize_tag, simdjson_value& val, MaterialData& data)
+{
+  simdjson::ondemand::object obj;
+  simdjson::error_code err;
+
+  if (err = val.get_object().get(obj); err)
+    return err;
+
+  if (err = obj["shader_asset"].get(data.shader_asset); err)
+    return err;
+
+  if (err = obj["next_material_asset"].get(data.next_material_asset); err)
+    return err;
+
+  if (err = obj["properties"].get(data.properties); err)
+    return err;
+
+  if (err = obj["textures"].get(data.textures); err)
+    return err;
+
+  err = obj["cull_mode"].get(data.cull_mode);
+  if (err == simdjson::NO_SUCH_FIELD)
+    data.cull_mode = std::nullopt;
+  else if (err)
+    return err;
+
+  err = obj["depth_state"].get(data.depth_state);
+  if (err == simdjson::NO_SUCH_FIELD)
+    data.depth_state = std::nullopt;
+  else if (err)
+    return err;
+
+  err = obj["blending_state"].get(data.blending_state);
+  if (err == simdjson::NO_SUCH_FIELD)
+    data.blending_state = std::nullopt;
+  else if (err)
+    return err;
+
+  return simdjson::SUCCESS;
+}
+
+}  // namespace simdjson

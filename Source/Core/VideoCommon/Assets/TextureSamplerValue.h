@@ -5,8 +5,6 @@
 
 #include <string>
 
-#include <nlohmann/json_fwd.hpp>
-
 #include "VideoCommon/Assets/CustomAssetLibrary.h"
 
 namespace VideoCommon

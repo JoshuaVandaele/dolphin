@@ -4,9 +4,7 @@
 #pragma once
 
 #include <fmt/format.h>
-#include <nlohmann/json_fwd.hpp>
 
-#include "Common/EnumFormatter.h"
 #include "VideoCommon/Assets/CustomAsset.h"
 #include "VideoCommon/Assets/CustomTextureData.h"
 #include "VideoCommon/RenderState.h"
@@ -15,9 +13,6 @@ namespace VideoCommon
 {
 struct TextureAndSamplerData
 {
-  static bool FromJson(const CustomAssetLibrary::AssetID& asset_id, const nlohmann::json& json,
-                       TextureAndSamplerData* data);
-  static void ToJson(nlohmann::json* obj, const TextureAndSamplerData& data);
   AbstractTextureType type;
   CustomTextureData texture_data;
   SamplerState sampler;
