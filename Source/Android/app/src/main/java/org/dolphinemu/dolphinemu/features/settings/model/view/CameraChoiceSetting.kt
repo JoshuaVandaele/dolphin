@@ -6,7 +6,6 @@ import android.content.Context
 import org.dolphinemu.dolphinemu.NativeLibrary
 import org.dolphinemu.dolphinemu.R
 import org.dolphinemu.dolphinemu.features.settings.model.AbstractStringSetting
-import org.dolphinemu.dolphinemu.features.settings.model.Settings
 
 open class CameraChoiceSetting(
     private val context: Context,

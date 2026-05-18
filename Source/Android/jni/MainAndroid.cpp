@@ -812,4 +812,13 @@ JNIEXPORT void JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_recreateTrif
 {
   Triforce::Camera::GetInstance().Recreate();
 }
+
+JNIEXPORT jstring JNICALL
+Java_org_dolphinemu_dolphinemu_NativeLibrary_getTriforceCameraIP(JNIEnv* env, jclass)
+{
+  const auto address = Triforce::Camera::GetInstance().GetAddress();
+  if (!address)
+    return nullptr;
+  return ToJString(env, address->ToString());
+}
 }
