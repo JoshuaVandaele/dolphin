@@ -142,6 +142,8 @@ static jclass s_input_detector_class;
 static jfieldID s_input_detector_pointer;
 
 static jclass s_permission_handler_class;
+static jmethodID s_permission_handler_has_camera_permission;
+static jmethodID s_permission_handler_request_camera_permission;
 static jmethodID s_permission_handler_has_record_audio_permission;
 static jmethodID s_permission_handler_request_record_audio_permission;
 
@@ -691,6 +693,16 @@ jclass GetPermissionHandlerClass()
   return s_permission_handler_class;
 }
 
+jmethodID GetPermissionHandlerHasCameraPermission()
+{
+  return s_permission_handler_has_camera_permission;
+}
+
+jmethodID GetPermissionHandlerRequestCameraPermission()
+{
+  return s_permission_handler_request_camera_permission;
+}
+
 jmethodID GetPermissionHandlerHasRecordAudioPermission()
 {
   return s_permission_handler_has_record_audio_permission;
@@ -998,6 +1010,10 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved)
       env->FindClass("org/dolphinemu/dolphinemu/utils/PermissionsHandler");
   s_permission_handler_class =
       reinterpret_cast<jclass>(env->NewGlobalRef(permission_handler_class));
+  s_permission_handler_has_camera_permission = env->GetStaticMethodID(
+      permission_handler_class, "hasCameraPermission", "(Landroid/content/Context;)Z");
+  s_permission_handler_request_camera_permission = env->GetStaticMethodID(
+      permission_handler_class, "requestCameraPermission", "(Landroid/app/Activity;)V");
   s_permission_handler_has_record_audio_permission = env->GetStaticMethodID(
       permission_handler_class, "hasRecordAudioPermission", "(Landroid/content/Context;)Z");
   s_permission_handler_request_record_audio_permission = env->GetStaticMethodID(

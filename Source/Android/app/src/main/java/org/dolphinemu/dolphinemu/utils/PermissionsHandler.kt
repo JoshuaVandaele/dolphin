@@ -18,6 +18,7 @@ import org.dolphinemu.dolphinemu.R
 object PermissionsHandler {
     const val REQUEST_CODE_WRITE_PERMISSION = 500
     const val REQUEST_CODE_RECORD_AUDIO = 501
+    const val REQUEST_CODE_CAMERA = 502
 
     private var writePermissionDenied = false
 
@@ -82,6 +83,37 @@ object PermissionsHandler {
 
         targetActivity.requestPermissions(
             arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_CODE_RECORD_AUDIO
+        )
+    }
+
+    @JvmStatic
+    @Keep
+    fun hasCameraPermission(context: Context?): Boolean {
+        val nonNullContext = context ?: DolphinApplication.getAppContext()
+        val hasCameraPermission =
+            ContextCompat.checkSelfPermission(nonNullContext, Manifest.permission.CAMERA)
+        return hasCameraPermission == PackageManager.PERMISSION_GRANTED
+    }
+
+    @JvmStatic
+    @Keep
+    fun requestCameraPermission(activity: Activity?) {
+        val targetActivity = activity ?: DolphinApplication.getAppActivity()!!
+        if (activity == null) {
+            // Calling from C++ code
+            // Since the permission is asked upon Dolphin trying to open the camera for the first time,
+            // opening the camera has already failed and the user may need to re-initiate that camera opening operation. Warn the user about it.
+            NativeLibrary.displayAlertMsg(
+                targetActivity.getString(R.string.camera_permission_warning),
+                targetActivity.getString(R.string.camera_permission_warning_description),
+                false,
+                true,
+                false
+            )
+        }
+
+        targetActivity.requestPermissions(
+            arrayOf(Manifest.permission.CAMERA), REQUEST_CODE_CAMERA
         )
     }
 }

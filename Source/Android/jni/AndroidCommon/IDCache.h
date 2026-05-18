@@ -141,6 +141,8 @@ jclass GetInputDetectorClass();
 jfieldID GetInputDetectorPointer();
 
 jclass GetPermissionHandlerClass();
+jmethodID GetPermissionHandlerHasCameraPermission();
+jmethodID GetPermissionHandlerRequestCameraPermission();
 jmethodID GetPermissionHandlerHasRecordAudioPermission();
 jmethodID GetPermissionHandlerRequestRecordAudioPermission();
 
