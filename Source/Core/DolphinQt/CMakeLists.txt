@@ -345,8 +345,6 @@ add_executable(dolphin-emu
   QtUtils/PartiallyClosableTabWidget.h
   QtUtils/QtUtils.cpp
   QtUtils/QtUtils.h
-  QtUtils/SetWindowDecorations.cpp
-  QtUtils/SetWindowDecorations.h
   QtUtils/SignalBlocking.h
   QtUtils/UTF8CodePointCountValidator.cpp
   QtUtils/UTF8CodePointCountValidator.h
@@ -421,12 +419,6 @@ add_executable(dolphin-emu
   WiiUpdate.cpp
   WiiUpdate.h
 )
-
-if (WIN32)
-  target_sources(dolphin-emu PRIVATE
-    Styles/Dark/dark.qrc
-  )
-endif()
 
 if (NOT WIN32)
   target_sources(dolphin-emu PRIVATE

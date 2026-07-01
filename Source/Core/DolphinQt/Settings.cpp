@@ -324,36 +324,6 @@ void Settings::ApplyStyle()
     palette.setColor(QPalette::All, QPalette::LinkVisited, QColor(110, 70, 150));
     palette.setColor(QPalette::Disabled, QPalette::LinkVisited, QColor(110, 70, 150).darker());
   }
-#ifdef _WIN32
-  // Unlike other OSes we don't automatically get a default dark theme on Windows.
-  // We manually load a dark palette for our included "(Dark)" style,
-  //  and for *any* external style when the system is in "Dark" mode.
-  // Unfortunately it doesn't seem trivial to load a palette based on the stylesheet itself.
-  else if (style_type == StyleType::Dark || (style_type != StyleType::Light && IsSystemDark()))
-  {
-    if (stylesheet_contents.isEmpty())
-    {
-      QFile file(QStringLiteral(":/dolphin_dark_win/dark.qss"));
-      if (file.open(QFile::ReadOnly))
-        stylesheet_contents = QString::fromUtf8(file.readAll().data());
-    }
-
-    palette = qApp->style()->standardPalette();
-    palette.setColor(QPalette::Window, QColor(32, 32, 32));
-    palette.setColor(QPalette::WindowText, QColor(220, 220, 220));
-    palette.setColor(QPalette::Base, QColor(32, 32, 32));
-    palette.setColor(QPalette::AlternateBase, QColor(48, 48, 48));
-    palette.setColor(QPalette::PlaceholderText, QColor(126, 126, 126));
-    palette.setColor(QPalette::Text, QColor(220, 220, 220));
-    palette.setColor(QPalette::Button, QColor(48, 48, 48));
-    palette.setColor(QPalette::ButtonText, QColor(220, 220, 220));
-    palette.setColor(QPalette::BrightText, QColor(255, 255, 255));
-    palette.setColor(QPalette::Highlight, QColor(0, 120, 215));
-    palette.setColor(QPalette::HighlightedText, QColor(255, 255, 255));
-    palette.setColor(QPalette::Link, QColor(100, 160, 220));
-    palette.setColor(QPalette::LinkVisited, QColor(100, 160, 220));
-  }
-#endif
   else
   {
     if (s_default_palette)

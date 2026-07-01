@@ -36,9 +36,6 @@
 #include "DolphinQt/QtUtils/AnalyticsPrompt.h"
 #include "DolphinQt/QtUtils/ModalMessageBox.h"
 #include "DolphinQt/QtUtils/RunOnObject.h"
-#ifdef _WIN32
-#include "DolphinQt/QtUtils/SetWindowDecorations.h"
-#endif
 #include "DolphinQt/Resources.h"
 #include "DolphinQt/Settings.h"
 #include "DolphinQt/Translation.h"
@@ -171,8 +168,6 @@ int main(int argc, char* argv[])
   const std::vector<std::string> args = parser->args();
 
 #ifdef _WIN32
-  QtUtils::InstallWindowDecorationFilter(&app);
-
   FreeConsole();
 #endif
 
