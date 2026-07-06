@@ -1,3 +1,11 @@
+if (MSVC)
+  if(_M_ARM_64)
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/Externals/Qt/Qt6.8.3/ARM64")
+  else()
+    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/Externals/Qt/Qt6.8.3/x64")
+  endif()
+endif()
+
 set(CMAKE_AUTOMOC ON)
 
 set(QT_QML_GENERATE_QMLLS_INI ON)
