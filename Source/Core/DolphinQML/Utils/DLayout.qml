@@ -8,7 +8,11 @@ import QtQuick
 QtObject {
     property Window window: null
 
-    readonly property bool compact: window.width < 400
-    readonly property bool regular: !compact && window.width < 1200
-    readonly property bool big: !compact && !regular
+    readonly property real shortestSide: Math.min(window.width, window.height)
+
+    property bool tvMode: false // TODO: Some button/switch/config for this
+
+    readonly property bool compact: shortestSide < 500 && !tvMode
+    readonly property bool regular: !compact && !tvMode
+    readonly property bool big: tvMode
 }
