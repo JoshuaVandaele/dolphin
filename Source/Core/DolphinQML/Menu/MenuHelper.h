@@ -15,6 +15,8 @@ class MenuHelper : public QObject
 public:
   MenuHelper(QObject* parent = nullptr) : QObject(parent) {}
 
+  Q_INVOKABLE void Open(const QUrl& file);
+
   Q_INVOKABLE void ChangeDisc(const QUrl& file);
   Q_INVOKABLE void EjectDisc();
 

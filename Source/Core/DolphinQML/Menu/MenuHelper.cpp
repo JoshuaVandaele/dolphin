@@ -10,6 +10,14 @@
 #include "Core/HW/DVD/DVDInterface.h"
 #include "Core/System.h"
 
+void MenuHelper::Open(const QUrl& file)
+{
+  if (!file.isLocalFile())
+    return;
+  QString path = file.toLocalFile();
+  // TODO
+}
+
 void MenuHelper::ChangeDisc(const QUrl& file)
 {
   if (!file.isLocalFile())

@@ -53,6 +53,8 @@ set(SOURCES
     Translation.h
     Utils/DHotkeyDisabler.cpp
     Utils/DHotkeyDisabler.h
+    Utils/QMLUtils.cpp
+    Utils/QMLUtils.h
 )
 file(GLOB_RECURSE THEME_RESOURCES
     CONFIGURE_DEPENDS

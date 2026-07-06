@@ -9,6 +9,8 @@ ApplicationWindow {
     visible: true
     title: AppInfo.ScmRevStr
 
+    Component.onCompleted: QMLUtils.SetWindowIcon(mainWindow, DResource.icon("dolphin_logo"))
+
     menuBar: MenuBar {
         visible: DLayout.regular
         FileMenu {}

@@ -13,7 +13,7 @@ Menu {
         Connections {
             target: openDialog
             function onAccepted() {
-                // MenuHelper.Open(openDialog.selectedFile);
+                MenuHelper.Open(openDialog.selectedFile);
             }
         }
     }
