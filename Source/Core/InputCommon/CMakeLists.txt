@@ -80,6 +80,7 @@ add_library(inputcommon
 target_link_libraries(inputcommon
 PUBLIC
   common
+  core
 
 PRIVATE
   fmt::fmt

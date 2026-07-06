@@ -36,7 +36,9 @@
 #include "Core/PowerPC/MMU.h"
 #include "Core/System.h"
 #include "DiscIO/Blob.h"
+#ifdef USE_DISCORD_PRESENCE
 #include "UICommon/DiscordPresence.h"
+#endif
 #include "VideoCommon/Assets/CustomTextureData.h"
 #include "VideoCommon/OnScreenDisplay.h"
 #include "VideoCommon/VideoEvents.h"
@@ -352,8 +354,10 @@ void AchievementManager::DoFrame()
     m_last_rp_time = current_time;
     rc_client_get_rich_presence_message(m_client, m_rich_presence.data(), RP_SIZE);
     update_event.Trigger(UpdatedItems{.rich_presence = true});
+#ifdef USE_DISCORD_PRESENCE
     if (Config::Get(Config::RA_DISCORD_PRESENCE_ENABLED))
       Discord::UpdateDiscordPresence();
+#endif
   }
 }
 
@@ -768,8 +772,10 @@ void AchievementManager::CloseGame()
     m_leaderboard_map.clear();
     m_rich_presence.fill('\0');
     m_system.store(nullptr, std::memory_order_release);
+#ifdef USE_DISCORD_PRESENCE
     if (Config::Get(Config::RA_DISCORD_PRESENCE_ENABLED))
       Discord::UpdateDiscordPresence();
+#endif
     if (rc_client_get_game_info(m_client))
       rc_client_unload_game(m_client);
     INFO_LOG_FMT(ACHIEVEMENTS, "Game closed.");

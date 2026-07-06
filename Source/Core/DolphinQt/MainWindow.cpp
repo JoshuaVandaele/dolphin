@@ -829,12 +829,14 @@ void MainWindow::ChangeDisc()
   if (paths.empty())
     return;
 
-  m_system.GetDVDInterface().ChangeDisc(Core::CPUThreadGuard{m_system}, paths);
+  auto& system = Core::System::GetInstance();
+  system.GetDVDInterface().ChangeDisc(Core::CPUThreadGuard{m_system}, paths);
 }
 
 void MainWindow::EjectDisc()
 {
-  m_system.GetDVDInterface().EjectDisc(Core::CPUThreadGuard{m_system}, DVD::EjectCause::User);
+  auto& system = Core::System::GetInstance();
+  system.GetDVDInterface().EjectDisc(Core::CPUThreadGuard{m_system}, DVD::EjectCause::User);
 }
 
 void MainWindow::OpenUserFolder()

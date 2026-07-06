@@ -248,6 +248,7 @@ PRIVATE
   implot
   glslang::SPIRV
   tinygltf
+  uicommon
 )
 
 if(_M_X86_64)

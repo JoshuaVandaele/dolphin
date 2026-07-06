@@ -16,7 +16,7 @@ if(ENABLE_CLI_TOOL)
 endif()
 
 if(ENABLE_QT)
-  add_subdirectory(DolphinQt)
+  add_subdirectory(DolphinQML)
 endif()
 
 if (APPLE OR WIN32)
