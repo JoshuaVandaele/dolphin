@@ -5,11 +5,11 @@
 
 #include "Common/EnumMap.h"
 
-#include <fmt/format.h>
+#include <format>
 #include <type_traits>
 
 /*
- * Helper for using enums with fmt.
+ * Helper for using enums with std::format.
  *
  * Usage example:
  *
@@ -21,7 +21,7 @@
  * };
  *
  * template <>
- * struct fmt::formatter<Foo> : EnumFormatter<Foo::C>
+ * struct std::formatter<Foo> : EnumFormatter<Foo::C>
  * {
  *   constexpr formatter() : EnumFormatter({"A", "B", "C"}) {}
  * };
@@ -34,7 +34,7 @@
  * };
  *
  * template <>
- * struct fmt::formatter<Bar> : EnumFormatter<Bar::F>
+ * struct std::formatter<Bar> : EnumFormatter<Bar::F>
  * {
  *   // using std::array here fails due to nullptr not being const char*, at least in MSVC
  *   // (but only when a field is used; directly in the constructor is OK)
@@ -48,7 +48,7 @@ class EnumFormatter
   using T = decltype(last_member);
 
 public:
-  constexpr auto parse(fmt::format_parse_context& ctx)
+  constexpr auto parse(std::format_parse_context& ctx)
   {
     auto it = ctx.begin(), end = ctx.end();
     // 'u' for user display, 's' for shader generation, 'n' for name only
@@ -69,19 +69,19 @@ public:
     default:
     case 'u':
       if (has_name)
-        return fmt::format_to(ctx.out(), "{} ({})", m_names[e], value_s);
+        return std::format_to(ctx.out(), "{} ({})", m_names[e], value_s);
       else
-        return fmt::format_to(ctx.out(), "Invalid ({})", value_s);
+        return std::format_to(ctx.out(), "Invalid ({})", value_s);
     case 's':
       if (has_name)
-        return fmt::format_to(ctx.out(), "{:#x}u /* {} */", value_u, m_names[e]);
+        return std::format_to(ctx.out(), "{:#x}u /* {} */", value_u, m_names[e]);
       else
-        return fmt::format_to(ctx.out(), "{:#x}u /* Invalid */", value_u);
+        return std::format_to(ctx.out(), "{:#x}u /* Invalid */", value_u);
     case 'n':
       if (has_name)
-        return fmt::format_to(ctx.out(), "{}", m_names[e]);
+        return std::format_to(ctx.out(), "{}", m_names[e]);
       else
-        return fmt::format_to(ctx.out(), "Invalid ({})", value_s);
+        return std::format_to(ctx.out(), "Invalid ({})", value_s);
     }
   }
 
@@ -91,6 +91,6 @@ protected:
 
   constexpr explicit EnumFormatter(const array_type names) : m_names(std::move(names)) {}
 
-  const array_type m_names;
+  array_type m_names;
   char format_type = 'u';
 };

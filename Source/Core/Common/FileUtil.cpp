@@ -15,6 +15,8 @@
 #include <system_error>
 #include <vector>
 
+#include <fmt/std.h>
+
 #include "Common/CommonFuncs.h"
 #include "Common/CommonPaths.h"
 #include "Common/CommonTypes.h"
@@ -74,7 +76,7 @@ static Common::DynamicLibrary s_security_framework;
 using DolSecTranslocateIsTranslocatedURL = Boolean (*)(CFURLRef path, bool* isTranslocated,
                                                        CFErrorRef* __nullable error);
 using DolSecTranslocateCreateOriginalPathForURL = CFURLRef
-__nullable (*)(CFURLRef translocatedPath, CFErrorRef* __nullable error);
+    __nullable (*)(CFURLRef translocatedPath, CFErrorRef* __nullable error);
 
 static DolSecTranslocateIsTranslocatedURL s_is_translocated_url;
 static DolSecTranslocateCreateOriginalPathForURL s_create_orig_path;

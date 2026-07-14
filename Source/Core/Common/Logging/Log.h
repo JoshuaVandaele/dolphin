@@ -3,9 +3,7 @@
 
 #pragma once
 
-#include <cstddef>
-#include <fmt/format.h>
-#include "Common/FormatUtil.h"
+#include <format>
 
 namespace Common::Log
 {
@@ -94,37 +92,24 @@ constexpr auto MAX_EFFECTIVE_LOGLEVEL = Common::Log::LogLevel::LINFO;
 static const char LOG_LEVEL_TO_CHAR[7] = "-NEWID";
 
 void GenericLogFmtImpl(LogLevel level, LogType type, const char* file, int line,
-                       fmt::string_view format, const fmt::format_args& args);
+                       std::string_view format, std::format_args args);
 
-template <std::size_t NumFields, typename S, typename... Args>
-void GenericLogFmt(LogLevel level, LogType type, const char* file, int line, const S& format,
-                   const Args&... args)
+template <typename... Args>
+void GenericLogFmt(LogLevel level, LogType type, const char* file, int line,
+                   std::format_string<Args...> format, Args&&... args)
 {
-  static_assert(NumFields == sizeof...(args),
-                "Unexpected number of replacement fields in format string; did you pass too few or "
-                "too many arguments?");
-#if FMT_VERSION >= 110000 && FMT_VERSION < 120200
-  // fmt 11 made fmt::string_view no longer directly constructible from compile-time strings.
-  // In fmt 12.2+, compile-time strings are plain string literals, so this is no longer needed.
-  auto&& format_str = fmt::format_string<Args...>(format);
-#else
-  auto&& format_str = format;
-#endif
-  GenericLogFmtImpl(level, type, file, line, format_str, fmt::make_format_args(args...));
+  GenericLogFmtImpl(level, type, file, line, format.get(), std::make_format_args(args...));
 }
 }  // namespace Common::Log
 
-// fmtlib capable API
+// std::format-capable API
 
 #define GENERIC_LOG_FMT(t, v, format, ...)                                                         \
   do                                                                                               \
   {                                                                                                \
     if (v <= Common::Log::MAX_EFFECTIVE_LOGLEVEL)                                                  \
     {                                                                                              \
-      /* Use a macro-like name to avoid shadowing warnings */                                      \
-      constexpr auto GENERIC_LOG_FMT_N = Common::CountFmtReplacementFields(format);                \
-      Common::Log::GenericLogFmt<GENERIC_LOG_FMT_N>(                                               \
-          v, t, __FILE__, __LINE__, FMT_STRING(format) __VA_OPT__(, ) __VA_ARGS__);                \
+      Common::Log::GenericLogFmt(v, t, __FILE__, __LINE__, format __VA_OPT__(, ) __VA_ARGS__);     \
     }                                                                                              \
   } while (0)
 

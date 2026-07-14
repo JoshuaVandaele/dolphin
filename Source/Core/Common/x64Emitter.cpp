@@ -5,6 +5,8 @@
 
 #include <cstring>
 
+#include <fmt/std.h>
+
 #include "Common/CPUDetect.h"
 #include "Common/CommonTypes.h"
 #include "Common/Logging/Log.h"

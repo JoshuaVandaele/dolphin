@@ -7,6 +7,8 @@
 #include <span>
 #include <unordered_set>
 
+#include <fmt/format.h>
+
 #include "Common/Logging/Log.h"
 #include "Common/ScopeGuard.h"
 

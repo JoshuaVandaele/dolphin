@@ -78,7 +78,7 @@ enum class CPArray : u8
   XF_D = 15,  // Usually used for light objects
 };
 template <>
-struct fmt::formatter<CPArray> : EnumFormatter<CPArray::XF_D>
+struct std::formatter<CPArray> : EnumFormatter<CPArray::XF_D>
 {
   static constexpr array_type names = {"Position",    "Normal",      "Color 0",     "Color 1",
                                        "Tex Coord 0", "Tex Coord 1", "Tex Coord 2", "Tex Coord 3",
@@ -105,7 +105,7 @@ enum class VertexComponentFormat
   Index16 = 3,
 };
 template <>
-struct fmt::formatter<VertexComponentFormat> : EnumFormatter<VertexComponentFormat::Index16>
+struct std::formatter<VertexComponentFormat> : EnumFormatter<VertexComponentFormat::Index16>
 {
   constexpr formatter() : EnumFormatter({"Not present", "Direct", "8-bit index", "16-bit index"}) {}
 };
@@ -133,7 +133,7 @@ enum class ComponentFormat
 // NOTE: don't include the invalid formats here, so that EnumFormatter marks them as invalid
 // (EnumFormatter also handles bounds-checking).
 template <>
-struct fmt::formatter<ComponentFormat> : EnumFormatter<ComponentFormat::Float>
+struct std::formatter<ComponentFormat> : EnumFormatter<ComponentFormat::Float>
 {
   static constexpr array_type names = {"Unsigned Byte", "Byte", "Unsigned Short", "Short", "Float"};
   constexpr formatter() : EnumFormatter(names) {}
@@ -166,7 +166,7 @@ enum class CoordComponentCount
   XYZ = 1,
 };
 template <>
-struct fmt::formatter<CoordComponentCount> : EnumFormatter<CoordComponentCount::XYZ>
+struct std::formatter<CoordComponentCount> : EnumFormatter<CoordComponentCount::XYZ>
 {
   constexpr formatter() : EnumFormatter({"2 (x, y)", "3 (x, y, z)"}) {}
 };
@@ -177,7 +177,7 @@ enum class NormalComponentCount
   NTB = 1,
 };
 template <>
-struct fmt::formatter<NormalComponentCount> : EnumFormatter<NormalComponentCount::NTB>
+struct std::formatter<NormalComponentCount> : EnumFormatter<NormalComponentCount::NTB>
 {
   constexpr formatter() : EnumFormatter({"1 (normal)", "3 (normal, tangent, binormal)"}) {}
 };
@@ -188,7 +188,7 @@ enum class ColorComponentCount
   RGBA = 1,
 };
 template <>
-struct fmt::formatter<ColorComponentCount> : EnumFormatter<ColorComponentCount::RGBA>
+struct std::formatter<ColorComponentCount> : EnumFormatter<ColorComponentCount::RGBA>
 {
   constexpr formatter() : EnumFormatter({"3 (r, g, b)", "4 (r, g, b, a)"}) {}
 };
@@ -203,7 +203,7 @@ enum class ColorFormat
   RGBA8888 = 5,  // 32b
 };
 template <>
-struct fmt::formatter<ColorFormat> : EnumFormatter<ColorFormat::RGBA8888>
+struct std::formatter<ColorFormat> : EnumFormatter<ColorFormat::RGBA8888>
 {
   static constexpr array_type names = {
       "RGB 16 bits 565",   "RGB 24 bits 888",   "RGB 32 bits 888x",
@@ -218,7 +218,7 @@ enum class TexComponentCount
   ST = 1,
 };
 template <>
-struct fmt::formatter<TexComponentCount> : EnumFormatter<TexComponentCount::ST>
+struct std::formatter<TexComponentCount> : EnumFormatter<TexComponentCount::ST>
 {
   constexpr formatter() : EnumFormatter({"1 (s)", "2 (s, t)"}) {}
 };
@@ -267,7 +267,7 @@ struct TVtxDesc
   High high;
 };
 template <>
-struct fmt::formatter<TVtxDesc::Low>
+struct std::formatter<TVtxDesc::Low>
 {
   constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
   template <typename FormatContext>
@@ -275,7 +275,7 @@ struct fmt::formatter<TVtxDesc::Low>
   {
     static constexpr std::array<const char*, 2> present = {"Not present", "Present"};
 
-    return fmt::format_to(
+    return std::format_to(
         ctx.out(),
         "Position and normal matrix index: {}\n"
         "Texture Coord 0 matrix index: {}\n"
@@ -297,13 +297,13 @@ struct fmt::formatter<TVtxDesc::Low>
   }
 };
 template <>
-struct fmt::formatter<TVtxDesc::High>
+struct std::formatter<TVtxDesc::High>
 {
   constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
   template <typename FormatContext>
   auto format(const TVtxDesc::High& desc, FormatContext& ctx) const
   {
-    return fmt::format_to(ctx.out(),
+    return std::format_to(ctx.out(),
                           "Texture Coord 0: {}\n"
                           "Texture Coord 1: {}\n"
                           "Texture Coord 2: {}\n"
@@ -317,13 +317,13 @@ struct fmt::formatter<TVtxDesc::High>
   }
 };
 template <>
-struct fmt::formatter<TVtxDesc>
+struct std::formatter<TVtxDesc>
 {
   constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
   template <typename FormatContext>
   auto format(const TVtxDesc& desc, FormatContext& ctx) const
   {
-    return fmt::format_to(ctx.out(), "{}\n{}", desc.low, desc.high);
+    return std::format_to(ctx.out(), "{}\n{}", desc.low, desc.high);
   }
 };
 
@@ -352,7 +352,7 @@ union UVAT_group0
   BitField<31, 1, bool, u32> NormalIndex3;
 };
 template <>
-struct fmt::formatter<UVAT_group0>
+struct std::formatter<UVAT_group0>
 {
   constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
   template <typename FormatContext>
@@ -364,7 +364,7 @@ struct fmt::formatter<UVAT_group0>
         "single index shared by normal, tangent, and binormal",
         "three indices, one each for normal, tangent, and binormal"};
 
-    return fmt::format_to(ctx.out(),
+    return std::format_to(ctx.out(),
                           "Position elements: {}\n"
                           "Position format: {}\n"
                           "Position shift: {} ({})\n"
@@ -409,13 +409,13 @@ union UVAT_group1
   BitField<31, 1, bool, u32> VCacheEnhance;
 };
 template <>
-struct fmt::formatter<UVAT_group1>
+struct std::formatter<UVAT_group1>
 {
   constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
   template <typename FormatContext>
   auto format(const UVAT_group1& g1, FormatContext& ctx) const
   {
-    return fmt::format_to(
+    return std::format_to(
         ctx.out(),
         "Texture coord 1 elements: {}\n"
         "Texture coord 1 format: {}\n"
@@ -455,13 +455,13 @@ union UVAT_group2
   BitField<27, 5, u8, u32> Tex7Frac;
 };
 template <>
-struct fmt::formatter<UVAT_group2>
+struct std::formatter<UVAT_group2>
 {
   constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
   template <typename FormatContext>
   auto format(const UVAT_group2& g2, FormatContext& ctx) const
   {
-    return fmt::format_to(ctx.out(),
+    return std::format_to(ctx.out(),
                           "Texture coord 4 shift: {} ({})\n"
                           "Texture coord 5 elements: {}\n"
                           "Texture coord 5 format: {}\n"
@@ -685,13 +685,13 @@ struct VAT
   }
 };
 template <>
-struct fmt::formatter<VAT>
+struct std::formatter<VAT>
 {
   constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
   template <typename FormatContext>
   auto format(const VAT& vat, FormatContext& ctx) const
   {
-    return fmt::format_to(ctx.out(), "{}\n{}\n{}", vat.g0, vat.g1, vat.g2);
+    return std::format_to(ctx.out(), "{}\n{}\n{}", vat.g0, vat.g1, vat.g2);
   }
 };
 
@@ -706,13 +706,13 @@ union TMatrixIndexA
   u32 Hex;
 };
 template <>
-struct fmt::formatter<TMatrixIndexA>
+struct std::formatter<TMatrixIndexA>
 {
   constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
   template <typename FormatContext>
   auto format(const TMatrixIndexA& m, FormatContext& ctx) const
   {
-    return fmt::format_to(ctx.out(), "PosNormal: {}\nTex0: {}\nTex1: {}\nTex2: {}\nTex3: {}",
+    return std::format_to(ctx.out(), "PosNormal: {}\nTex0: {}\nTex1: {}\nTex2: {}\nTex3: {}",
                           m.PosNormalMtxIdx, m.Tex0MtxIdx, m.Tex1MtxIdx, m.Tex2MtxIdx,
                           m.Tex3MtxIdx);
   }
@@ -727,13 +727,13 @@ union TMatrixIndexB
   u32 Hex;
 };
 template <>
-struct fmt::formatter<TMatrixIndexB>
+struct std::formatter<TMatrixIndexB>
 {
   constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
   template <typename FormatContext>
   auto format(const TMatrixIndexB& m, FormatContext& ctx) const
   {
-    return fmt::format_to(ctx.out(), "Tex4: {}\nTex5: {}\nTex6: {}\nTex7: {}", m.Tex4MtxIdx,
+    return std::format_to(ctx.out(), "Tex4: {}\nTex5: {}\nTex6: {}\nTex7: {}", m.Tex4MtxIdx,
                           m.Tex5MtxIdx, m.Tex6MtxIdx, m.Tex7MtxIdx);
   }
 };

@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <filesystem>
+#include <strings.h>
 #include <system_error>
 
 #include "Common/CommonPaths.h"

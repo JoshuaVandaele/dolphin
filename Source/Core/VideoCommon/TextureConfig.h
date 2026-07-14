@@ -95,7 +95,7 @@ struct std::hash<TextureConfig>
 };
 
 template <>
-struct fmt::formatter<AbstractTextureType> : EnumFormatter<AbstractTextureType::Texture_CubeMap>
+struct std::formatter<AbstractTextureType> : EnumFormatter<AbstractTextureType::Texture_CubeMap>
 {
   constexpr formatter() : EnumFormatter({"2D Array", "2D", "Cubemap"}) {}
 };
