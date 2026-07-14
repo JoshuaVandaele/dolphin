@@ -15,7 +15,7 @@ Please read the [FAQ](https://dolphin-emu.org/docs/faq/) before using Dolphin.
 * OS
     * Windows (10 1903 or higher).
     * Linux.
-    * macOS (11.0 Big Sur or higher).
+    * macOS (13.3 Ventura or higher).
     * Unix-like systems other than Linux are not officially supported but might work.
 * Processor
     * A CPU with SSE2 support.
@@ -55,7 +55,7 @@ The "Debug" solution configuration is significantly slower, more verbose and les
 ## Building for Linux and macOS
 
 Dolphin requires [CMake](https://cmake.org/) for systems other than Windows. 
-You need a recent version of GCC or Clang with decent c++20 support. CMake will
+You need a recent version of GCC or Clang with decent c++23 support. CMake will
 inform you if your compiler is too old.
 Many libraries are bundled with Dolphin and used if they're not installed on 
 your system. CMake will inform you if a bundled library is used or if you need

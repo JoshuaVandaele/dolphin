@@ -11,7 +11,7 @@ endif()
 
 # Minimum OS X version.
 # This is inserted into the Info.plist as well.
-set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0.0" CACHE STRING "")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "13.3.0" CACHE STRING "")
 
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/FlagsOverride.cmake")
 
@@ -39,8 +39,8 @@ if (COMPILER STREQUAL "GNU")
 endif()
 
 # Enforce minimum compiler versions that support the c++23 features we use
-set (GCC_min_version 12)
-set (Clang_min_version 15)
+set (GCC_min_version 14)
+set (Clang_min_version 17)
 set (AppleClang_min_version 14.0.3)
 set (min_xcode_version "14.3") # corresponding xcode version for AppleClang_min_version
 set (MSVC_min_version 19.32)
