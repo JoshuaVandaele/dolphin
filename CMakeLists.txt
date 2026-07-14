@@ -54,6 +54,9 @@ set(GCC_min_version 12)
 set(Clang_min_version 15)
 set(AppleClang_min_version 14.0.3)
 set(MSVC_min_version 19.32)
+# Standard libraries
+set(libstdc++_min_version 12) # This should match GCC_min_version's major version.
+set(libc++_min_version 150000) # This should match Clang_min_version in the format "xxyyzz" instead of "xx.yy.zz" 
 
 dolphin_check_toolset_version("Xcode" XCODE_VERSION ${Xcode_min_version})
 dolphin_check_toolset_version("MSVC Toolset" MSVC_TOOLSET_VERSION ${MSVC_toolset_min_version})
@@ -65,6 +68,9 @@ if(NOT DEFINED ${COMPILER}_min_version)
 elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${${COMPILER}_min_version})
   message(FATAL_ERROR "Requires ${COMPILER} ${${COMPILER}_min_version} or higher")
 endif()
+
+dolphin_check_std_version(libstdc++ _GLIBCXX_RELEASE ${libstdc++_min_version})
+dolphin_check_std_version(libc++ _LIBCPP_VERSION ${libc++_min_version})
 
 # Name of the Dolphin distributor. If you redistribute Dolphin builds (forks,
 # unofficial builds) please consider identifying your distribution with a
