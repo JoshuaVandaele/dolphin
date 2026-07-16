@@ -7,6 +7,7 @@ set(BUILD_STATIC_LIBS ON)
 set(BUILD_TESTING OFF)
 set(CURL_ENABLE_EXPORT_TARGET OFF)
 set(ENABLE_CURL_MANUAL OFF)
+set(CURL_LTO ${CMAKE_INTERPROCEDURAL_OPTIMIZATION})
 
 set(HTTP_ONLY ON)
 
@@ -15,13 +16,12 @@ set(CURL_USE_LIBSSH2 OFF)
 set(CURL_ZLIB OFF CACHE BOOL "" FORCE)
 set(CURL_ZSTD OFF CACHE BOOL "" FORCE)
 set(CURL_BROTLI OFF CACHE BOOL "" FORCE)
-set(ZLIB_FOUND FALSE) # TODO: Remove once we update to cURL >=8.17.1 https://github.com/curl/curl/pull/20147
-set(ZSTD_FOUND FALSE) # TODO: Same as above
-set(BROTLI_FOUND FALSE) # TODO: Same as above
 set(USE_LIBIDN2 OFF)
 set(USE_NGHTTP2 OFF)
 
-if(UNIX)
+if(WIN32)
+  set(CURL_USE_SCHANNEL ON)
+elseif(UNIX)
   # We use mbedtls on Unix(-like) systems and Android.
   set(CURL_USE_OPENSSL OFF)
 
@@ -38,10 +38,6 @@ if(UNIX)
     set(USE_MBEDTLS ON)
     set(_curl_ca_bundle_supported TRUE)
   endif()
-endif()
-
-if(WIN32)
-  set(CURL_USE_SCHANNEL ON)
 endif()
 
 if(ANDROID)
