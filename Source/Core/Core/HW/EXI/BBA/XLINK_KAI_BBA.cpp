@@ -1,15 +1,14 @@
 // Copyright 2008 Dolphin Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include "Common/Logging/Log.h"
-#include "Common/StringUtil.h"
 #include "Core/HW/EXI/EXI_DeviceEthernet.h"
 
-#include "SFML/Network/IpAddress.hpp"
-#include "VideoCommon/OnScreenDisplay.h"
+#include <SFML/Network/IpAddress.hpp>
 
-#include <cstring>
-#include <optional>
+#include "Common/Logging/Log.h"
+#include "Common/SFMLHelper.h"
+#include "Common/StringUtil.h"
+#include "VideoCommon/OnScreenDisplay.h"
 
 // BBA implementation with UDP interface to XLink Kai PC/MAC/RaspberryPi client
 // For more information please see: https://www.teamxlink.co.uk/wiki/Emulator_Integration_Protocol
@@ -29,7 +28,7 @@ bool CEXIETHERNET::XLinkNetworkInterface::Activate()
     return false;
   }
 
-  m_sf_recipient_ip = sf::IpAddress::resolve(m_dest_ip.c_str()).value_or(sf::IpAddress::Any);
+  m_sf_recipient_ip = Common::ResolveIPv4(m_dest_ip.c_str()).value_or(sf::IpAddress::Any);
 
   // Send connect command with unique local name
   // connect;locally_unique_name;emulator_name;optional_padding

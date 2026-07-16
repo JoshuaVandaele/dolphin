@@ -8,13 +8,13 @@
 #include <mutex>
 #include <thread>
 #include <vector>
-#include "SFML/Network/IpAddress.hpp"
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
 #include <SFML/Network.hpp>
+#include <SFML/Network/IpAddress.hpp>
 #ifdef HAVE_CPPIPC
 #include <libipc/ipc.h>
 #endif

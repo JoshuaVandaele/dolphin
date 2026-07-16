@@ -678,7 +678,7 @@ PUBLIC
   inputcommon
   MbedTLS::mbedtls2
   pugixml
-  sfml-network
+  SFML::Network
   videonull
   videoogl
   videosoftware

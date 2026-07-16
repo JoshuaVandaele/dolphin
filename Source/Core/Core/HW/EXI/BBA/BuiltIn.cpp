@@ -5,8 +5,6 @@
 
 #include <bit>
 #include <optional>
-#include "SFML/Network/IpAddress.hpp"
-#include "SFML/Network/Socket.hpp"
 
 #ifdef _WIN32
 #include <ws2ipdef.h>
@@ -15,10 +13,15 @@
 #include <sys/socket.h>
 #endif
 
+#include <SFML/Network/Dns.hpp>
+#include <SFML/Network/Socket.hpp>
+#include <SFML/System/Time.hpp>
+
 #include "Common/BitUtils.h"
 #include "Common/Logging/Log.h"
 #include "Common/MsgHandler.h"
 #include "Common/Network.h"
+#include "Common/SFMLHelper.h"
 #include "Common/ScopeGuard.h"
 #include "Core/HW/EXI/EXI_DeviceEthernet.h"
 
@@ -79,10 +82,9 @@ bool CEXIETHERNET::BuiltInBBAInterface::Activate()
   for (auto& buf : m_queue_data)
     buf.reserve(2048);
 
-  // Workaround to get the host IP (might not be accurate)
   // TODO: Fix the JNI crash and use GetSystemDefaultInterface()
   //  - https://pastebin.com/BFpmnxby (see https://dolp.in/pr10920)
-  const u32 ip = sf::IpAddress::resolve(m_local_ip)
+  const u32 ip = sf::Dns::getPublicAddress(sf::seconds(5), sf::IpAddress::Type::IpV4)
                      .value_or(sf::IpAddress::getLocalAddress().value_or(sf::IpAddress::Any))
                      .toInteger();
   m_current_ip = htonl(ip);
@@ -533,10 +535,15 @@ void CEXIETHERNET::BuiltInBBAInterface::HandleUDPFrame(const Common::UDPPacket& 
     }
   }
   if (ntohs(udp_header.destination_port) == 53)
+  {
     // DNS server IP
-    target = sf::IpAddress::resolve(m_dns_ip.c_str()).value_or(sf::IpAddress::Any);
+    const auto resolved = Common::ResolveIPv4(m_dns_ip.c_str());
+    target = resolved ? *resolved : sf::IpAddress::Any;
+  }
   else
+  {
     target = sf::IpAddress(ntohl(std::bit_cast<u32>(ip_header.destination_addr)));
+  }
 
   (void)ref->udp_socket.send(data.data(), data.size(), target, ntohs(udp_header.destination_port));
 }

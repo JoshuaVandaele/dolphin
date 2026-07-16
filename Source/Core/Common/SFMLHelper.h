@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <SFML/Network/IpAddress.hpp>
 #include <SFML/Network/Packet.hpp>
 
 #include <utility>
@@ -37,4 +38,7 @@ sf::Packet& operator>>(sf::Packet& packet, Enum& e)
 namespace Common
 {
 u64 PacketReadU64(sf::Packet& packet);
+std::optional<sf::IpAddress> ResolveIPv4(const std::string& hostname,
+                                         const std::vector<sf::IpAddress>& servers = {},
+                                         std::optional<sf::Time> timeout = sf::seconds(5));
 }  // namespace Common

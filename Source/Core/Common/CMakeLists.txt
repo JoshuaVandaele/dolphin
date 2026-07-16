@@ -184,7 +184,7 @@ PUBLIC
   fmt::fmt
   MbedTLS::mbedtls2
   MINIZIP::minizip-ng
-  sfml-network
+  SFML::Network
 
 PRIVATE
   CURL::libcurl
