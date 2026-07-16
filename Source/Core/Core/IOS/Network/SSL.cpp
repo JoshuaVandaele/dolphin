@@ -7,8 +7,8 @@
 #include <cstring>
 #include <vector>
 
-#include <mbedtls/md.h>
-#include <mbedtls/sha256.h>
+#include <mbedtls2/md.h>
+#include <mbedtls2/sha256.h>
 
 #include "Common/FileUtil.h"
 #include "Common/IOFile.h"
@@ -25,11 +25,14 @@ namespace IOS::HLE
 {
 WII_SSL NetSSLDevice::_SSL[NET_SSL_MAXINSTANCES];
 
-static constexpr mbedtls_x509_crt_profile mbedtls_x509_crt_profile_wii = {
+static constexpr mbedtls2_x509_crt_profile mbedtls2_x509_crt_profile_wii = {
     /* Hashes from SHA-1 and above */
-    MBEDTLS_X509_ID_FLAG(MBEDTLS_MD_SHA1) | MBEDTLS_X509_ID_FLAG(MBEDTLS_MD_RIPEMD160) |
-        MBEDTLS_X509_ID_FLAG(MBEDTLS_MD_SHA224) | MBEDTLS_X509_ID_FLAG(MBEDTLS_MD_SHA256) |
-        MBEDTLS_X509_ID_FLAG(MBEDTLS_MD_SHA384) | MBEDTLS_X509_ID_FLAG(MBEDTLS_MD_SHA512),
+    MBEDTLS2_X509_ID_FLAG(MBEDTLS2_MD_SHA1) |
+        MBEDTLS2_X509_ID_FLAG(MBEDTLS2_MD_RIPEMD160) |
+        MBEDTLS2_X509_ID_FLAG(MBEDTLS2_MD_SHA224) |
+        MBEDTLS2_X509_ID_FLAG(MBEDTLS2_MD_SHA256) |
+        MBEDTLS2_X509_ID_FLAG(MBEDTLS2_MD_SHA384) |
+        MBEDTLS2_X509_ID_FLAG(MBEDTLS2_MD_SHA512),
     0xFFFFFFF, /* Any PK alg          */
     0xFFFFFFF, /* Any curve           */
     0,         /* No RSA min key size */
@@ -40,14 +43,14 @@ namespace
 // Dirty workaround to disable SNI which isn't supported by the Wii.
 //
 // This SSL extension can ONLY be disabled by undefining
-// MBEDTLS_SSL_SERVER_NAME_INDICATION and recompiling the library. When
+// MBEDTLS2_SSL_SERVER_NAME_INDICATION and recompiling the library. When
 // enabled and if the hostname is set, it uses the SNI extension which is sent
 // with the Client Hello message.
 //
 // This workaround doesn't require recompiling the library. It does so by
-// deferring mbedtls_ssl_set_hostname after the Client Hello message. The send
+// deferring mbedtls2_ssl_set_hostname after the Client Hello message. The send
 // callback is used as it's the (only?) hook called at the beginning of
-// each step of the handshake by the mbedtls_ssl_flush_output function.
+// each step of the handshake by the mbedtls2_ssl_flush_output function.
 //
 // The hostname still needs to be set as it is checked against the Common Name
 // field during the certificate verification process.
@@ -56,9 +59,9 @@ int SSLSendWithoutSNI(void* ctx, const unsigned char* buf, size_t len)
   auto* ssl = static_cast<WII_SSL*>(ctx);
   auto* fd = &ssl->hostfd;
 
-  if (ssl->ctx.state == MBEDTLS_SSL_SERVER_HELLO)
-    mbedtls_ssl_set_hostname(&ssl->ctx, ssl->hostname.c_str());
-  const int ret = mbedtls_net_send(fd, buf, len);
+  if (ssl->ctx.state == MBEDTLS2_SSL_SERVER_HELLO)
+    mbedtls2_ssl_set_hostname(&ssl->ctx, ssl->hostname.c_str());
+  const int ret = mbedtls2_net_send(fd, buf, len);
 
   // Log raw SSL packets if we don't dump unencrypted SSL writes
   if (!Config::Get(Config::MAIN_NETWORK_SSL_DUMP_WRITE) && ret > 0)
@@ -74,7 +77,7 @@ int SSLRecv(void* ctx, unsigned char* buf, size_t len)
 {
   auto* ssl = static_cast<WII_SSL*>(ctx);
   auto* fd = &ssl->hostfd;
-  const int ret = mbedtls_net_recv(fd, buf, len);
+  const int ret = mbedtls2_net_recv(fd, buf, len);
 
   // Log raw SSL packets if we don't dump unencrypted SSL reads
   if (!Config::Get(Config::MAIN_NETWORK_SSL_DUMP_READ) && ret > 0)
@@ -103,16 +106,16 @@ NetSSLDevice::~NetSSLDevice()
   {
     if (ssl.active)
     {
-      mbedtls_ssl_close_notify(&ssl.ctx);
+      mbedtls2_ssl_close_notify(&ssl.ctx);
 
-      mbedtls_x509_crt_free(&ssl.cacert);
-      mbedtls_x509_crt_free(&ssl.clicert);
+      mbedtls2_x509_crt_free(&ssl.cacert);
+      mbedtls2_x509_crt_free(&ssl.clicert);
 
-      mbedtls_ssl_session_free(&ssl.session);
-      mbedtls_ssl_free(&ssl.ctx);
-      mbedtls_ssl_config_free(&ssl.config);
-      mbedtls_ctr_drbg_free(&ssl.ctr_drbg);
-      mbedtls_entropy_free(&ssl.entropy);
+      mbedtls2_ssl_session_free(&ssl.session);
+      mbedtls2_ssl_free(&ssl.ctx);
+      mbedtls2_ssl_config_free(&ssl.config);
+      mbedtls2_ctr_drbg_free(&ssl.ctr_drbg);
+      mbedtls2_entropy_free(&ssl.entropy);
 
       ssl.hostname.clear();
 
@@ -171,7 +174,7 @@ static std::vector<u8> ReadCertFile(const std::string& path, const std::array<u8
   }
 
   std::array<u8, 32> hash;
-  mbedtls_sha256_ret(bytes.data(), bytes.size(), hash.data(), 0);
+  mbedtls2_sha256_ret(bytes.data(), bytes.size(), hash.data(), 0);
   if (hash != correct_hash)
   {
     ERROR_LOG_FMT(IOS_SSL, "Wrong hash for {}", path);
@@ -247,36 +250,39 @@ std::optional<IPCReply> NetSSLDevice::IOCtlV(const IOCtlVRequest& request)
     {
       int sslID = freeSSL - 1;
       WII_SSL* ssl = &_SSL[sslID];
-      mbedtls_ssl_init(&ssl->ctx);
-      mbedtls_entropy_init(&ssl->entropy);
+      mbedtls2_ssl_init(&ssl->ctx);
+      mbedtls2_entropy_init(&ssl->entropy);
       static constexpr const char* pers = "dolphin-emu";
-      mbedtls_ctr_drbg_init(&ssl->ctr_drbg);
-      int ret = mbedtls_ctr_drbg_seed(&ssl->ctr_drbg, mbedtls_entropy_func, &ssl->entropy,
-                                      (const unsigned char*)pers, strlen(pers));
+      mbedtls2_ctr_drbg_init(&ssl->ctr_drbg);
+      int ret =
+          mbedtls2_ctr_drbg_seed(&ssl->ctr_drbg, mbedtls2_entropy_func, &ssl->entropy,
+                                        (const unsigned char*)pers, strlen(pers));
       if (ret)
       {
-        mbedtls_ssl_free(&ssl->ctx);
-        mbedtls_ctr_drbg_free(&ssl->ctr_drbg);
-        mbedtls_entropy_free(&ssl->entropy);
+        mbedtls2_ssl_free(&ssl->ctx);
+        mbedtls2_ctr_drbg_free(&ssl->ctr_drbg);
+        mbedtls2_entropy_free(&ssl->entropy);
         goto _SSL_NEW_ERROR;
       }
 
-      mbedtls_ssl_config_init(&ssl->config);
-      mbedtls_ssl_config_defaults(&ssl->config, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM,
-                                  MBEDTLS_SSL_PRESET_DEFAULT);
-      mbedtls_ssl_conf_rng(&ssl->config, mbedtls_ctr_drbg_random, &ssl->ctr_drbg);
+      mbedtls2_ssl_config_init(&ssl->config);
+      mbedtls2_ssl_config_defaults(&ssl->config, MBEDTLS2_SSL_IS_CLIENT,
+                                          MBEDTLS2_SSL_TRANSPORT_STREAM,
+                                          MBEDTLS2_SSL_PRESET_DEFAULT);
+      mbedtls2_ssl_conf_rng(&ssl->config, mbedtls2_ctr_drbg_random, &ssl->ctr_drbg);
 
       // For some reason we can't use TLSv1.2, v1.1 and below are fine!
-      mbedtls_ssl_conf_max_version(&ssl->config, MBEDTLS_SSL_MAJOR_VERSION_3,
-                                   MBEDTLS_SSL_MINOR_VERSION_2);
-      mbedtls_ssl_conf_cert_profile(&ssl->config, &mbedtls_x509_crt_profile_wii);
-      mbedtls_ssl_set_session(&ssl->ctx, &ssl->session);
+      mbedtls2_ssl_conf_max_version(&ssl->config, MBEDTLS2_SSL_MAJOR_VERSION_3,
+                                           MBEDTLS2_SSL_MINOR_VERSION_2);
+      mbedtls2_ssl_conf_cert_profile(&ssl->config, &mbedtls2_x509_crt_profile_wii);
+      mbedtls2_ssl_set_session(&ssl->ctx, &ssl->session);
 
       if (Config::Get(Config::MAIN_NETWORK_SSL_VERIFY_CERTIFICATES) && verifyOption)
-        mbedtls_ssl_conf_authmode(&ssl->config, MBEDTLS_SSL_VERIFY_REQUIRED);
+        mbedtls2_ssl_conf_authmode(&ssl->config, MBEDTLS2_SSL_VERIFY_REQUIRED);
       else
-        mbedtls_ssl_conf_authmode(&ssl->config, MBEDTLS_SSL_VERIFY_NONE);
-      mbedtls_ssl_conf_renegotiation(&ssl->config, MBEDTLS_SSL_RENEGOTIATION_ENABLED);
+        mbedtls2_ssl_conf_authmode(&ssl->config, MBEDTLS2_SSL_VERIFY_NONE);
+      mbedtls2_ssl_conf_renegotiation(&ssl->config,
+                                             MBEDTLS2_SSL_RENEGOTIATION_ENABLED);
 
       ssl->hostname = hostname;
       ssl->active = true;
@@ -305,16 +311,16 @@ std::optional<IPCReply> NetSSLDevice::IOCtlV(const IOCtlVRequest& request)
     {
       WII_SSL* ssl = &_SSL[sslID];
 
-      mbedtls_ssl_close_notify(&ssl->ctx);
+      mbedtls2_ssl_close_notify(&ssl->ctx);
 
-      mbedtls_x509_crt_free(&ssl->cacert);
-      mbedtls_x509_crt_free(&ssl->clicert);
+      mbedtls2_x509_crt_free(&ssl->cacert);
+      mbedtls2_x509_crt_free(&ssl->clicert);
 
-      mbedtls_ssl_session_free(&ssl->session);
-      mbedtls_ssl_free(&ssl->ctx);
-      mbedtls_ssl_config_free(&ssl->config);
-      mbedtls_ctr_drbg_free(&ssl->ctr_drbg);
-      mbedtls_entropy_free(&ssl->entropy);
+      mbedtls2_ssl_session_free(&ssl->session);
+      mbedtls2_ssl_free(&ssl->ctx);
+      mbedtls2_ssl_config_free(&ssl->config);
+      mbedtls2_ctr_drbg_free(&ssl->ctr_drbg);
+      mbedtls2_entropy_free(&ssl->entropy);
 
       ssl->hostname.clear();
 
@@ -349,7 +355,7 @@ std::optional<IPCReply> NetSSLDevice::IOCtlV(const IOCtlVRequest& request)
     if (IsSSLIDValid(sslID))
     {
       WII_SSL* ssl = &_SSL[sslID];
-      int ret = mbedtls_x509_crt_parse_der(
+      int ret = mbedtls2_x509_crt_parse_der(
           &ssl->cacert, memory.GetPointerForRange(BufferOut2, BufferOutSize2), BufferOutSize2);
 
       if (Config::Get(Config::MAIN_NETWORK_SSL_DUMP_ROOT_CA))
@@ -365,7 +371,7 @@ std::optional<IPCReply> NetSSLDevice::IOCtlV(const IOCtlVRequest& request)
       }
       else
       {
-        mbedtls_ssl_conf_ca_chain(&ssl->config, &ssl->cacert, nullptr);
+        mbedtls2_ssl_conf_ca_chain(&ssl->config, &ssl->cacert, nullptr);
         WriteReturnValue(memory, SSL_OK, BufferIn);
       }
 
@@ -401,17 +407,19 @@ std::optional<IPCReply> NetSSLDevice::IOCtlV(const IOCtlVRequest& request)
       if (client_cert.empty() || client_key.empty())
         m_cert_error_shown = true;
 
-      int ret = mbedtls_x509_crt_parse(&ssl->clicert, client_cert.data(), client_cert.size());
-      int pk_ret = mbedtls_pk_parse_key(&ssl->pk, client_key.data(), client_key.size(), nullptr, 0);
+      int ret =
+          mbedtls2_x509_crt_parse(&ssl->clicert, client_cert.data(), client_cert.size());
+      int pk_ret =
+          mbedtls2_pk_parse_key(&ssl->pk, client_key.data(), client_key.size(), nullptr, 0);
       if (ret || pk_ret)
       {
-        mbedtls_x509_crt_free(&ssl->clicert);
-        mbedtls_pk_free(&ssl->pk);
+        mbedtls2_x509_crt_free(&ssl->clicert);
+        mbedtls2_pk_free(&ssl->pk);
         WriteReturnValue(memory, SSL_ERR_FAILED, BufferIn);
       }
       else
       {
-        mbedtls_ssl_conf_own_cert(&ssl->config, &ssl->clicert, &ssl->pk);
+        mbedtls2_ssl_conf_own_cert(&ssl->config, &ssl->clicert, &ssl->pk);
         WriteReturnValue(memory, SSL_OK, BufferIn);
       }
 
@@ -438,10 +446,10 @@ std::optional<IPCReply> NetSSLDevice::IOCtlV(const IOCtlVRequest& request)
     if (IsSSLIDValid(sslID))
     {
       WII_SSL* ssl = &_SSL[sslID];
-      mbedtls_x509_crt_free(&ssl->clicert);
-      mbedtls_pk_free(&ssl->pk);
+      mbedtls2_x509_crt_free(&ssl->clicert);
+      mbedtls2_pk_free(&ssl->pk);
 
-      mbedtls_ssl_conf_own_cert(&ssl->config, nullptr, nullptr);
+      mbedtls2_ssl_conf_own_cert(&ssl->config, nullptr, nullptr);
       WriteReturnValue(memory, SSL_OK, BufferIn);
     }
     else
@@ -463,15 +471,15 @@ std::optional<IPCReply> NetSSLDevice::IOCtlV(const IOCtlVRequest& request)
       if (root_ca.empty())
         m_cert_error_shown = true;
 
-      int ret = mbedtls_x509_crt_parse(&ssl->cacert, root_ca.data(), root_ca.size());
+      int ret = mbedtls2_x509_crt_parse(&ssl->cacert, root_ca.data(), root_ca.size());
       if (ret)
       {
-        mbedtls_x509_crt_free(&ssl->clicert);
+        mbedtls2_x509_crt_free(&ssl->clicert);
         WriteReturnValue(memory, SSL_ERR_FAILED, BufferIn);
       }
       else
       {
-        mbedtls_ssl_conf_ca_chain(&ssl->config, &ssl->cacert, nullptr);
+        mbedtls2_ssl_conf_ca_chain(&ssl->config, &ssl->cacert, nullptr);
         WriteReturnValue(memory, SSL_OK, BufferIn);
       }
       INFO_LOG_FMT(IOS_SSL, "IOCTLV_NET_SSL_SETBUILTINROOTCA = {}", ret);
@@ -495,11 +503,11 @@ std::optional<IPCReply> NetSSLDevice::IOCtlV(const IOCtlVRequest& request)
     if (IsSSLIDValid(sslID))
     {
       WII_SSL* ssl = &_SSL[sslID];
-      mbedtls_ssl_setup(&ssl->ctx, &ssl->config);
+      mbedtls2_ssl_setup(&ssl->ctx, &ssl->config);
       ssl->sockfd = memory.Read_U32(BufferOut2);
       ssl->hostfd = GetEmulationKernel().GetSocketManager()->GetHostSocket(ssl->sockfd);
       INFO_LOG_FMT(IOS_SSL, "IOCTLV_NET_SSL_CONNECT socket = {}", ssl->sockfd);
-      mbedtls_ssl_set_bio(&ssl->ctx, ssl, SSLSendWithoutSNI, SSLRecv, nullptr);
+      mbedtls2_ssl_set_bio(&ssl->ctx, ssl, SSLSendWithoutSNI, SSLRecv, nullptr);
       WriteReturnValue(memory, SSL_OK, BufferIn);
     }
     else

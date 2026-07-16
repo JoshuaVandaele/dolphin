@@ -9,7 +9,7 @@
 #include <optional>
 #include <vector>
 
-#include <mbedtls/sha1.h>
+#include <mbedtls2/sha1.h>
 
 #include "Common/CommonTypes.h"
 #include "Core/HW/MMIO.h"
@@ -28,13 +28,13 @@ std::optional<IPCReply> ShaDevice::Open(const OpenRequest& request)
   return Device::Open(request);
 }
 
-static void ConvertContext(const ShaDevice::ShaContext& src, mbedtls_sha1_context* dest)
+static void ConvertContext(const ShaDevice::ShaContext& src, mbedtls2_sha1_context* dest)
 {
   std::ranges::copy(src.length, std::begin(dest->total));
   std::ranges::copy(src.states, std::begin(dest->state));
 }
 
-static void ConvertContext(const mbedtls_sha1_context& src, ShaDevice::ShaContext* dest)
+static void ConvertContext(const mbedtls2_sha1_context& src, ShaDevice::ShaContext* dest)
 {
   std::ranges::copy(src.total, std::begin(dest->length));
   std::ranges::copy(src.state, std::begin(dest->states));
@@ -46,7 +46,7 @@ HLE::ReturnCode ShaDevice::ProcessShaCommand(ShaIoctlv command, const IOCtlVRequ
   auto& memory = system.GetMemory();
   auto ret = 0;
   std::array<u8, 20> output_hash{};
-  mbedtls_sha1_context context;
+  mbedtls2_sha1_context context;
   ShaDevice::ShaContext engine_context;
   memory.CopyFromEmu(&engine_context, request.io_vectors[0].address, sizeof(ShaDevice::ShaContext));
   ConvertContext(engine_context, &context);
@@ -54,16 +54,16 @@ HLE::ReturnCode ShaDevice::ProcessShaCommand(ShaIoctlv command, const IOCtlVRequ
   // reset the context
   if (command == ShaIoctlv::InitState)
   {
-    ret = mbedtls_sha1_starts_ret(&context);
+    ret = mbedtls2_sha1_starts_ret(&context);
   }
   else
   {
     std::vector<u8> input_data(request.in_vectors[0].size);
     memory.CopyFromEmu(input_data.data(), request.in_vectors[0].address, input_data.size());
-    ret = mbedtls_sha1_update_ret(&context, input_data.data(), input_data.size());
+    ret = mbedtls2_sha1_update_ret(&context, input_data.data(), input_data.size());
     if (!ret && command == ShaIoctlv::FinalizeState)
     {
-      ret = mbedtls_sha1_finish_ret(&context, output_hash.data());
+      ret = mbedtls2_sha1_finish_ret(&context, output_hash.data());
     }
   }
 
@@ -72,7 +72,7 @@ HLE::ReturnCode ShaDevice::ProcessShaCommand(ShaIoctlv command, const IOCtlVRequ
   if (!ret && command == ShaIoctlv::FinalizeState)
     memory.CopyToEmu(request.io_vectors[1].address, output_hash.data(), output_hash.size());
 
-  mbedtls_sha1_free(&context);
+  mbedtls2_sha1_free(&context);
   return ret ? HLE::ReturnCode::IPC_EACCES : HLE::ReturnCode::IPC_SUCCESS;
 }
 

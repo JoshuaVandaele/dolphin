@@ -10,8 +10,8 @@
 
 #include <OptionParser.h>
 #include <ed25519.h>
-#include <mbedtls/base64.h>
-#include <mbedtls/sha256.h>
+#include <mbedtls2/base64.h>
+#include <mbedtls2/sha256.h>
 #include <zlib.h>
 
 #ifdef _WIN32
@@ -149,8 +149,8 @@ static std::optional<std::string> GzipInflate(const std::string& data)
 Manifest::Hash ComputeHash(const std::string& contents)
 {
   std::array<u8, 32> full;
-  mbedtls_sha256_ret(reinterpret_cast<const u8*>(contents.data()), contents.size(), full.data(),
-                     false);
+  mbedtls2_sha256_ret(reinterpret_cast<const u8*>(contents.data()), contents.size(),
+                             full.data(), false);
 
   Manifest::Hash out;
   std::copy_n(full.begin(), 16, out.begin());
@@ -162,9 +162,9 @@ static bool VerifySignature(const std::string& data, const std::string& b64_sign
   u8 signature[64];  // ed25519 sig size.
   size_t sig_size;
 
-  if (mbedtls_base64_decode(signature, sizeof(signature), &sig_size,
-                            reinterpret_cast<const u8*>(b64_signature.data()),
-                            b64_signature.size()) ||
+  if (mbedtls2_base64_decode(signature, sizeof(signature), &sig_size,
+                                    reinterpret_cast<const u8*>(b64_signature.data()),
+                                    b64_signature.size()) ||
       sig_size != sizeof(signature))
   {
     LogToFile("Invalid base64: %s\n", b64_signature.c_str());

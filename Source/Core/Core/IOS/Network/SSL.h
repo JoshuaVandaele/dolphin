@@ -6,13 +6,13 @@
 // These imports need to be in this order for mbed to be included correctly.
 // clang-format off
 
-#include <mbedtls/ctr_drbg.h>
-#include <mbedtls/entropy.h>
-#include <mbedtls/net_sockets.h>
-#include <mbedtls/pk.h>
-#include <mbedtls/platform.h>
-#include <mbedtls/ssl.h>
-#include <mbedtls/x509_crt.h>
+#include <mbedtls2/ctr_drbg.h>
+#include <mbedtls2/entropy.h>
+#include <mbedtls2/net_sockets.h>
+#include <mbedtls2/pk.h>
+#include <mbedtls2/platform.h>
+#include <mbedtls2/ssl.h>
+#include <mbedtls2/x509_crt.h>
 #include <string>
 
 // clang-format on
@@ -65,14 +65,14 @@ enum SSL_IOCTL
 
 struct WII_SSL
 {
-  mbedtls_ssl_context ctx{};
-  mbedtls_ssl_config config{};
-  mbedtls_ssl_session session{};
-  mbedtls_entropy_context entropy{};
-  mbedtls_ctr_drbg_context ctr_drbg{};
-  mbedtls_x509_crt cacert{};
-  mbedtls_x509_crt clicert{};
-  mbedtls_pk_context pk{};
+  mbedtls2_ssl_context ctx{};
+  mbedtls2_ssl_config config{};
+  mbedtls2_ssl_session session{};
+  mbedtls2_entropy_context entropy{};
+  mbedtls2_ctr_drbg_context ctr_drbg{};
+  mbedtls2_x509_crt cacert{};
+  mbedtls2_x509_crt clicert{};
+  mbedtls2_pk_context pk{};
   int sockfd = -1;
   int hostfd = -1;
   std::string hostname;

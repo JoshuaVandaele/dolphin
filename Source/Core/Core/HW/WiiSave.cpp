@@ -12,7 +12,7 @@
 #include <array>
 #include <cstdio>
 #include <cstring>
-#include <mbedtls/md5.h>
+#include <mbedtls2/md5.h>
 #include <memory>
 #include <optional>
 #include <string>
@@ -125,7 +125,7 @@ public:
     header.banner[7] &= ~1;
 
     Md5 md5_calc;
-    mbedtls_md5_ret(reinterpret_cast<const u8*>(&header), sizeof(Header), md5_calc.data());
+    mbedtls2_md5_ret(reinterpret_cast<const u8*>(&header), sizeof(Header), md5_calc.data());
     header.md5 = md5_calc;
     return header;
   }
@@ -302,7 +302,7 @@ public:
     Md5 md5_file = header.md5;
     header.md5 = s_md5_blanker;
     Md5 md5_calc;
-    mbedtls_md5_ret(reinterpret_cast<const u8*>(&header), sizeof(Header), md5_calc.data());
+    mbedtls2_md5_ret(reinterpret_cast<const u8*>(&header), sizeof(Header), md5_calc.data());
     if (md5_file != md5_calc)
     {
       ERROR_LOG_FMT(CONSOLE, "MD5 mismatch\n {:016x}{:016x} != {:016x}{:016x}",

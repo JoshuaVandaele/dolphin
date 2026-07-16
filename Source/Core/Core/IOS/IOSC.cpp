@@ -12,8 +12,8 @@
 #include <vector>
 
 #include <fmt/format.h>
-#include <mbedtls/md.h>
-#include <mbedtls/rsa.h>
+#include <mbedtls2/md.h>
+#include <mbedtls2/rsa.h>
 
 #include "Common/Assert.h"
 #include "Common/ChunkFile.h"
@@ -394,22 +394,23 @@ ReturnCode IOSC::VerifyPublicKeySign(const std::array<u8, 20>& sha1, Handle sign
     ASSERT(entry->data.size() == expected_key_size);
     ASSERT(signature.size() == expected_key_size);
 
-    mbedtls_rsa_context rsa;
-    mbedtls_rsa_init(&rsa, MBEDTLS_RSA_PKCS_V15, 0);
-    Common::ScopeGuard context_guard{[&rsa] { mbedtls_rsa_free(&rsa); }};
+    mbedtls2_rsa_context rsa;
+    mbedtls2_rsa_init(&rsa, MBEDTLS2_RSA_PKCS_V15, 0);
+    Common::ScopeGuard context_guard{[&rsa] { mbedtls2_rsa_free(&rsa); }};
 
-    mbedtls_mpi_read_binary(&rsa.N, entry->data.data(), entry->data.size());
-    mbedtls_mpi_read_binary(&rsa.E, reinterpret_cast<const u8*>(&entry->misc_data), 4);
+    mbedtls2_mpi_read_binary(&rsa.N, entry->data.data(), entry->data.size());
+    mbedtls2_mpi_read_binary(&rsa.E, reinterpret_cast<const u8*>(&entry->misc_data), 4);
     rsa.len = entry->data.size();
 
-    int ret = mbedtls_rsa_pkcs1_verify(&rsa, nullptr, nullptr, MBEDTLS_RSA_PUBLIC, MBEDTLS_MD_SHA1,
-                                       0, sha1.data(), signature.data());
+    int ret =
+        mbedtls2_rsa_pkcs1_verify(&rsa, nullptr, nullptr, MBEDTLS2_RSA_PUBLIC,
+                                         MBEDTLS2_MD_SHA1, 0, sha1.data(), signature.data());
     if (ret != 0 && m_console_type == ConsoleType::RVT)
     {
       // Some dev signatures do not have proper PKCS#1 padding. Just powmod and check it ends with
       // digest.
       std::vector<u8> result(signature.size());
-      if (mbedtls_rsa_public(&rsa, signature.data(), result.data()) == 0 &&
+      if (mbedtls2_rsa_public(&rsa, signature.data(), result.data()) == 0 &&
           memcmp(&result[result.size() - sha1.size()], sha1.data(), sha1.size()) == 0)
       {
         ret = 0;

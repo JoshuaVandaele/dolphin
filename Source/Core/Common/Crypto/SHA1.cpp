@@ -8,7 +8,7 @@
 #include <memory>
 
 #include <fmt/ranges.h>
-#include <mbedtls/sha1.h>
+#include <mbedtls2/sha1.h>
 
 #include "Common/Assert.h"
 #include "Common/CPUDetect.h"
@@ -39,24 +39,24 @@ class ContextMbed final : public Context
 public:
   ContextMbed()
   {
-    mbedtls_sha1_init(&ctx);
-    ASSERT(!mbedtls_sha1_starts_ret(&ctx));
+    mbedtls2_sha1_init(&ctx);
+    ASSERT(!mbedtls2_sha1_starts_ret(&ctx));
   }
-  ~ContextMbed() override { mbedtls_sha1_free(&ctx); }
+  ~ContextMbed() override { mbedtls2_sha1_free(&ctx); }
   void Update(const u8* msg, size_t len) override
   {
-    ASSERT(!mbedtls_sha1_update_ret(&ctx, msg, len));
+    ASSERT(!mbedtls2_sha1_update_ret(&ctx, msg, len));
   }
   Digest Finish() override
   {
     Digest digest;
-    ASSERT(!mbedtls_sha1_finish_ret(&ctx, digest.data()));
+    ASSERT(!mbedtls2_sha1_finish_ret(&ctx, digest.data()));
     return digest;
   }
   bool HwAccelerated() const override { return false; }
 
 private:
-  mbedtls_sha1_context ctx{};
+  mbedtls2_sha1_context ctx{};
 };
 
 class BlockContext : public Context

@@ -698,7 +698,9 @@ if(USE_UPNP)
   add_definitions(-DUSE_UPNP)
 endif()
 
-dolphin_find_optional_system_library(MBEDTLS Externals/mbedtls 2.28)
+# We use a modified version of Mbed TLS 2.28 to provide SSLv3 support
+message(STATUS "Using static MbedTLS2 from Externals")
+add_subdirectory(Externals/mbedtls2) 
 
 dolphin_find_optional_system_library(CURL Externals/curl)
 

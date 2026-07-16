@@ -7,7 +7,7 @@
 #include <cstring>
 #include <memory>
 
-#include <mbedtls/aes.h>
+#include <mbedtls2/aes.h>
 
 #include "Common/Assert.h"
 #include "Common/CPUDetect.h"
@@ -39,11 +39,11 @@ class ContextGeneric final : public Context
 public:
   ContextGeneric(const u8* key)
   {
-    mbedtls_aes_init(&ctx);
+    mbedtls2_aes_init(&ctx);
     if constexpr (AesMode == Mode::Encrypt)
-      ASSERT(!mbedtls_aes_setkey_enc(&ctx, key, 128));
+      ASSERT(!mbedtls2_aes_setkey_enc(&ctx, key, 128));
     else
-      ASSERT(!mbedtls_aes_setkey_dec(&ctx, key, 128));
+      ASSERT(!mbedtls2_aes_setkey_dec(&ctx, key, 128));
   }
 
   bool Crypt(const u8* iv, u8* iv_out, const u8* buf_in, u8* buf_out, size_t len) const override
@@ -52,9 +52,10 @@ public:
     if (iv)
       std::memcpy(&iv_tmp[0], iv, BLOCK_SIZE);
 
-    constexpr int mode = (AesMode == Mode::Encrypt) ? MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
-    if (mbedtls_aes_crypt_cbc(const_cast<mbedtls_aes_context*>(&ctx), mode, len, &iv_tmp[0], buf_in,
-                              buf_out))
+    constexpr int mode =
+        (AesMode == Mode::Encrypt) ? MBEDTLS2_AES_ENCRYPT : MBEDTLS2_AES_DECRYPT;
+    if (mbedtls2_aes_crypt_cbc(const_cast<mbedtls2_aes_context*>(&ctx), mode, len,
+                                      &iv_tmp[0], buf_in, buf_out))
       return false;
 
     if (iv_out)
@@ -63,7 +64,7 @@ public:
   }
 
 private:
-  mbedtls_aes_context ctx{};
+  mbedtls2_aes_context ctx{};
 };
 
 #if defined(_M_X86_64)
@@ -422,15 +423,15 @@ std::unique_ptr<Context> CreateContextDecrypt(const u8* key)
 // OFB encryption and decryption are the exact same. We don't encrypt though.
 void CryptOFB(const u8* key, const u8* iv, u8* iv_out, const u8* buf_in, u8* buf_out, size_t size)
 {
-  mbedtls_aes_context aes_ctx;
+  mbedtls2_aes_context aes_ctx;
   size_t iv_offset = 0;
 
   std::array<u8, 16> iv_tmp{};
   if (iv)
     std::memcpy(&iv_tmp[0], iv, 16);
 
-  ASSERT(!mbedtls_aes_setkey_enc(&aes_ctx, key, 128));
-  mbedtls_aes_crypt_ofb(&aes_ctx, size, &iv_offset, &iv_tmp[0], buf_in, buf_out);
+  ASSERT(!mbedtls2_aes_setkey_enc(&aes_ctx, key, 128));
+  mbedtls2_aes_crypt_ofb(&aes_ctx, size, &iv_offset, &iv_tmp[0], buf_in, buf_out);
 
   if (iv_out)
     std::memcpy(iv_out, &iv_tmp[0], 16);

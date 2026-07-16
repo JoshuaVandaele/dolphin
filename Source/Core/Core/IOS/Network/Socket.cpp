@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <numeric>
 
-#include <mbedtls/error.h>
+#include <mbedtls2/error.h>
 #ifndef _WIN32
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -424,12 +424,12 @@ void WiiSocket::Update(bool read, bool write, bool except)
               break;
             }
 
-            mbedtls_ssl_context* ctx = &NetSSLDevice::_SSL[sslID].ctx;
-            const int ret = mbedtls_ssl_handshake(ctx);
+            mbedtls2_ssl_context* ctx = &NetSSLDevice::_SSL[sslID].ctx;
+            const int ret = mbedtls2_ssl_handshake(ctx);
             if (ret != 0)
             {
               char error_buffer[256] = "";
-              mbedtls_strerror(ret, error_buffer, sizeof(error_buffer));
+              mbedtls2_strerror(ret, error_buffer, sizeof(error_buffer));
               ERROR_LOG_FMT(IOS_SSL, "IOCTLV_NET_SSL_DOHANDSHAKE: {}", error_buffer);
             }
             switch (ret)
@@ -437,31 +437,33 @@ void WiiSocket::Update(bool read, bool write, bool except)
             case 0:
               WriteReturnValue(memory, SSL_OK, BufferIn);
               break;
-            case MBEDTLS_ERR_SSL_WANT_READ:
+            case MBEDTLS2_ERR_SSL_WANT_READ:
               WriteReturnValue(memory, SSL_ERR_RAGAIN, BufferIn);
               if (!nonBlock)
                 ReturnValue = SSL_ERR_RAGAIN;
               break;
-            case MBEDTLS_ERR_SSL_WANT_WRITE:
+            case MBEDTLS2_ERR_SSL_WANT_WRITE:
               WriteReturnValue(memory, SSL_ERR_WAGAIN, BufferIn);
               if (!nonBlock)
                 ReturnValue = SSL_ERR_WAGAIN;
               break;
-            case MBEDTLS_ERR_X509_CERT_VERIFY_FAILED:
+            case MBEDTLS2_ERR_X509_CERT_VERIFY_FAILED:
             {
               char error_buffer[256] = "";
-              int res = mbedtls_ssl_get_verify_result(ctx);
-              mbedtls_x509_crt_verify_info(error_buffer, sizeof(error_buffer), "", res);
-              ERROR_LOG_FMT(IOS_SSL, "MBEDTLS_ERR_X509_CERT_VERIFY_FAILED (verify_result = {}): {}",
+              int res = mbedtls2_ssl_get_verify_result(ctx);
+              mbedtls2_x509_crt_verify_info(error_buffer, sizeof(error_buffer), "", res);
+              ERROR_LOG_FMT(IOS_SSL,
+                            "MBEDTLS2_ERR_X509_CERT_VERIFY_FAILED (verify_result = {}): {}",
                             res, error_buffer);
 
-              if (res & MBEDTLS_X509_BADCERT_CN_MISMATCH)
+              if (res & MBEDTLS2_X509_BADCERT_CN_MISMATCH)
                 res = SSL_ERR_VCOMMONNAME;
-              else if (res & MBEDTLS_X509_BADCERT_NOT_TRUSTED)
+              else if (res & MBEDTLS2_X509_BADCERT_NOT_TRUSTED)
                 res = SSL_ERR_VROOTCA;
-              else if (res & MBEDTLS_X509_BADCERT_REVOKED)
+              else if (res & MBEDTLS2_X509_BADCERT_REVOKED)
                 res = SSL_ERR_VCHAIN;
-              else if (res & MBEDTLS_X509_BADCERT_EXPIRED || res & MBEDTLS_X509_BADCERT_FUTURE)
+              else if (res & MBEDTLS2_X509_BADCERT_EXPIRED ||
+                       res & MBEDTLS2_X509_BADCERT_FUTURE)
                 res = SSL_ERR_VDATE;
               else
                 res = SSL_ERR_FAILED;
@@ -476,12 +478,12 @@ void WiiSocket::Update(bool read, bool write, bool except)
               break;
             }
 
-            // mbedtls_ssl_get_peer_cert(ctx) seems not to work if handshake failed
+            // mbedtls2_ssl_get_peer_cert(ctx) seems not to work if handshake failed
             // Below is an alternative to dump the peer certificate
             if (Config::Get(Config::MAIN_NETWORK_SSL_DUMP_PEER_CERT) &&
                 ctx->session_negotiate != nullptr)
             {
-              const mbedtls_x509_crt* cert = ctx->session_negotiate->peer_cert;
+              const mbedtls2_x509_crt* cert = ctx->session_negotiate->peer_cert;
               if (cert != nullptr)
               {
                 std::string filename = File::GetUserPath(D_DUMPSSL_IDX) +
@@ -502,7 +504,7 @@ void WiiSocket::Update(bool read, bool write, bool except)
           case IOCTLV_NET_SSL_WRITE:
           {
             WII_SSL* ssl = &NetSSLDevice::_SSL[sslID];
-            const int ret = mbedtls_ssl_write(
+            const int ret = mbedtls2_ssl_write(
                 &ssl->ctx, memory.GetPointerForRange(BufferOut2, BufferOutSize2), BufferOutSize2);
 
             if (ret >= 0)
@@ -516,12 +518,12 @@ void WiiSocket::Update(bool read, bool write, bool except)
             {
               switch (ret)
               {
-              case MBEDTLS_ERR_SSL_WANT_READ:
+              case MBEDTLS2_ERR_SSL_WANT_READ:
                 WriteReturnValue(memory, SSL_ERR_RAGAIN, BufferIn);
                 if (!nonBlock)
                   ReturnValue = SSL_ERR_RAGAIN;
                 break;
-              case MBEDTLS_ERR_SSL_WANT_WRITE:
+              case MBEDTLS2_ERR_SSL_WANT_WRITE:
                 WriteReturnValue(memory, SSL_ERR_WAGAIN, BufferIn);
                 if (!nonBlock)
                   ReturnValue = SSL_ERR_WAGAIN;
@@ -536,7 +538,7 @@ void WiiSocket::Update(bool read, bool write, bool except)
           case IOCTLV_NET_SSL_READ:
           {
             WII_SSL* ssl = &NetSSLDevice::_SSL[sslID];
-            const int ret = mbedtls_ssl_read(
+            const int ret = mbedtls2_ssl_read(
                 &ssl->ctx, memory.GetPointerForRange(BufferIn2, BufferInSize2), BufferInSize2);
 
             if (ret >= 0)
@@ -550,12 +552,12 @@ void WiiSocket::Update(bool read, bool write, bool except)
             {
               switch (ret)
               {
-              case MBEDTLS_ERR_SSL_WANT_READ:
+              case MBEDTLS2_ERR_SSL_WANT_READ:
                 WriteReturnValue(memory, SSL_ERR_RAGAIN, BufferIn);
                 if (!nonBlock)
                   ReturnValue = SSL_ERR_RAGAIN;
                 break;
-              case MBEDTLS_ERR_SSL_WANT_WRITE:
+              case MBEDTLS2_ERR_SSL_WANT_WRITE:
                 WriteReturnValue(memory, SSL_ERR_WAGAIN, BufferIn);
                 if (!nonBlock)
                   ReturnValue = SSL_ERR_WAGAIN;

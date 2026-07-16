@@ -8,8 +8,8 @@
 #include <span>
 #include <string>
 
-#include <mbedtls/aes.h>
-#include <mbedtls/md5.h>
+#include <mbedtls2/aes.h>
+#include <mbedtls2/md5.h>
 
 #include "Common/BitUtils.h"
 #include "Common/CommonTypes.h"
@@ -107,14 +107,14 @@ void SkylanderFigure::Encrypt(std::span<const u8, FIGURE_SIZE> input)
 
     std::array<u8, BLOCK_SIZE> hash_out = {};
 
-    mbedtls_md5_ret(hash_in.data(), 0x56, hash_out.data());
+    mbedtls2_md5_ret(hash_in.data(), 0x56, hash_out.data());
 
-    mbedtls_aes_context aes_context = {};
+    mbedtls2_aes_context aes_context = {};
 
-    mbedtls_aes_setkey_enc(&aes_context, hash_out.data(), 128);
+    mbedtls2_aes_setkey_enc(&aes_context, hash_out.data(), 128);
 
-    mbedtls_aes_crypt_ecb(&aes_context, MBEDTLS_AES_ENCRYPT, current_block.data(),
-                          encrypted.data() + (i * BLOCK_SIZE));
+    mbedtls2_aes_crypt_ecb(&aes_context, MBEDTLS2_AES_ENCRYPT, current_block.data(),
+                                  encrypted.data() + (i * BLOCK_SIZE));
   }
 
   memcpy(m_data.data(), encrypted.data(), FIGURE_SIZE);
@@ -394,14 +394,14 @@ void SkylanderFigure::DecryptFigure(std::array<u8, FIGURE_SIZE>* dest) const
 
     std::array<u8, BLOCK_SIZE> hash_out = {};
 
-    mbedtls_md5_ret(hash_in.data(), 0x56, hash_out.data());
+    mbedtls2_md5_ret(hash_in.data(), 0x56, hash_out.data());
 
-    mbedtls_aes_context aes_context = {};
+    mbedtls2_aes_context aes_context = {};
 
-    mbedtls_aes_setkey_dec(&aes_context, hash_out.data(), 128);
+    mbedtls2_aes_setkey_dec(&aes_context, hash_out.data(), 128);
 
-    mbedtls_aes_crypt_ecb(&aes_context, MBEDTLS_AES_DECRYPT, current_block.data(),
-                          decrypted.data() + (i * BLOCK_SIZE));
+    mbedtls2_aes_crypt_ecb(&aes_context, MBEDTLS2_AES_DECRYPT, current_block.data(),
+                                  decrypted.data() + (i * BLOCK_SIZE));
   }
 
   memcpy(dest->data(), decrypted.data(), FIGURE_SIZE);
