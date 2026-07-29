@@ -1,25 +1,15 @@
-if (MSVC)
-  if(_M_ARM_64)
-    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/Externals/Qt/Qt6.8.3/ARM64")
-  else()
-    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/Externals/Qt/Qt6.8.3/x64")
-  endif()
-endif()
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Svg)
 
-if (Qt6_VERSION VERSION_GREATER_EQUAL 6.10.0)
+if (Qt6_VERSION VERSION_GREATER_EQUAL 6.10.0 OR NOT DEFINED Qt6_VERSION)
   # GuiPrivate is needed to #include qplatformnativeinterface.h in MainWindow.cpp with Qt 6.10+.
   set(NEED_QT_GUI_PRIVATE_COMPONENT ON)
   find_package(Qt6 REQUIRED COMPONENTS GuiPrivate)
 endif()
 
 message(STATUS "Found Qt version ${Qt6_VERSION}")
-
-set_property(TARGET Qt6::Core PROPERTY INTERFACE_COMPILE_FEATURES "")
 
 add_executable(dolphin-emu
   AboutDialog.cpp
