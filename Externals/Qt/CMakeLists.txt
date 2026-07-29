@@ -45,6 +45,7 @@ set(FEATURE_wayland OFF CACHE BOOL "" FORCE)
 
 set(FEATURE_xcb ON CACHE BOOL "" FORCE)
 
+# TODO: Should we instead manually clone qttools and qtbase and build them ourselves? I think that would make a lot of things easier
 FetchContent_Declare(
     qt6
     GIT_REPOSITORY "git://code.qt.io/qt/qt5.git"
