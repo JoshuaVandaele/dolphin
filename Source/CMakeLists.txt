@@ -15,11 +15,9 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
   add_definitions(-D_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
 endif()
 
-if (NOT MSVC)
-  set(CMAKE_CXX_STANDARD 23)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  set(CMAKE_CXX_EXTENSIONS OFF)
-endif()
+add_library(dolphin_cxx INTERFACE)
+target_compile_features(dolphin_cxx INTERFACE "cxx_std_${DOLPHIN_CXX_STANDARD}")
+link_libraries(dolphin_cxx)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

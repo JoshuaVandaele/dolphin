@@ -38,11 +38,12 @@ include(RemoveCompileFlag)
 # When using the Visual Studio generator, only show our targets and not the ones from Externals.
 set_property(DIRECTORY ${PROJECT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT dolphin-emu)
 
-if (MSVC)
-  set(CMAKE_C_STANDARD 99)
-  set(CMAKE_CXX_STANDARD 23)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-endif()
+set(DOLPHIN_CXX_STANDARD 23 CACHE STRING "Minimum required C++ standard to use for Dolphin")
+# CMAKE_CXX_STANDARD should be set to the latest available standard available (see https://cmake.org/cmake/help/latest/prop_tgt/CXX_STANDARD.html)
+# This allows catching compatibility issues as they come rather than all at once every 3 years.
+# CMake will "decay" to the highest available previous standard if the requested one isn't available.
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_EXTENSIONS_DEFAULT OFF)
 
 set(COMPILER ${CMAKE_CXX_COMPILER_ID})
 if (COMPILER STREQUAL "GNU")

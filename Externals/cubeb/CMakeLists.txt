@@ -16,13 +16,6 @@ if(NOT CMAKE_BUILD_TYPE)
       "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
-if (NOT MSVC)
-  set(CMAKE_C_STANDARD 99)
-  set(CMAKE_CXX_STANDARD 17)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-endif()
-
 if(USE_SANITIZERS)
   if(NOT COMMAND add_sanitizers)
     list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cubeb/cmake/sanitizers-cmake/cmake")
