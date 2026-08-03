@@ -41,8 +41,21 @@ function(dolphin_optional_system_library out_use_system library)
   endif()
 endfunction()
 
-function(dolphin_add_bundled_library library use_system bundled_path)
-  if (${use_system} STREQUAL "AUTO")
+function(dolphin_find_directory_targets dir result)
+  get_directory_property(targets DIRECTORY ${dir} BUILDSYSTEM_TARGETS)
+
+  get_property(subdirs DIRECTORY ${dir} PROPERTY SUBDIRECTORIES)
+  foreach(subdir IN LISTS subdirs)
+    dolphin_find_directory_targets(${subdir} sub_targets)
+    list(APPEND targets ${sub_targets})
+  endforeach()
+
+  set(${result} "${targets}" PARENT_SCOPE)
+endfunction()
+
+function(dolphin_add_bundled_library library bundled_path)
+  set(use_system "${ARGV2}")
+  if (use_system STREQUAL "AUTO")
     message(STATUS "No system ${library} was found.  Using static ${library} from Externals.")
   else()
     message(STATUS "Using static ${library} from Externals")
@@ -50,7 +63,20 @@ function(dolphin_add_bundled_library library use_system bundled_path)
   if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${bundled_path}/CMakeLists.txt")
     message(FATAL_ERROR "No bundled ${library} was found.  Did you forget to checkout submodules?")
   endif()
-  add_subdirectory(${bundled_path} EXCLUDE_FROM_ALL)
+  add_subdirectory(${bundled_path} EXCLUDE_FROM_ALL SYSTEM)
+  dolphin_find_directory_targets(${bundled_path} bundled_targets)
+  foreach(target IN LISTS bundled_targets)
+    get_target_property(type ${target} TYPE)
+    get_target_property(imported ${target} IMPORTED)
+    if(NOT imported AND NOT type STREQUAL "INTERFACE_LIBRARY" AND NOT type STREQUAL "UTILITY")
+      dolphin_disable_warnings(${target})
+    endif()
+
+    # Add this bundled library's headers to the front of the include paths.
+    # Otherwise if an include directory is exposed by a system package, it may be found first
+    # and used instead of the bundled headers.
+    include_directories(BEFORE SYSTEM "$<TARGET_PROPERTY:${target},INTERFACE_INCLUDE_DIRECTORIES>")
+  endforeach()
 endfunction()
 
 function(dolphin_set_library_type library type)
@@ -119,7 +145,7 @@ function(dolphin_find_optional_system_library library bundled_path)
     message(STATUS "Using system ${library}")
   else()
     dolphin_set_library_type(${library} "Bundled")
-    dolphin_add_bundled_library(${library} ${use_system} ${bundled_path})
+    dolphin_add_bundled_library(${library} ${bundled_path} ${use_system})
   endif()
 endfunction()
 
@@ -138,7 +164,7 @@ function(dolphin_find_optional_system_library_pkgconfig library search alias bun
     dolphin_alias_library(${alias} PkgConfig::${library})
   else()
     dolphin_set_library_type(${library} "Bundled")
-    dolphin_add_bundled_library(${library} ${use_system} ${bundled_path})
+    dolphin_add_bundled_library(${library} ${bundled_path} ${use_system})
   endif()
 endfunction()
 
