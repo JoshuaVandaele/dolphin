@@ -63,19 +63,15 @@ function(dolphin_add_bundled_library library bundled_path)
   if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${bundled_path}/CMakeLists.txt")
     message(FATAL_ERROR "No bundled ${library} was found.  Did you forget to checkout submodules?")
   endif()
-  add_subdirectory(${bundled_path} EXCLUDE_FROM_ALL SYSTEM)
+  add_subdirectory(${bundled_path} EXCLUDE_FROM_ALL)
   dolphin_find_directory_targets(${bundled_path} bundled_targets)
   foreach(target IN LISTS bundled_targets)
     get_target_property(type ${target} TYPE)
     get_target_property(imported ${target} IMPORTED)
-    if(NOT imported AND NOT type STREQUAL "INTERFACE_LIBRARY" AND NOT type STREQUAL "UTILITY")
-      dolphin_disable_warnings(${target})
+    if(imported OR type STREQUAL "INTERFACE_LIBRARY" OR type STREQUAL "UTILITY")
+      continue()
     endif()
-
-    # Add this bundled library's headers to the front of the include paths.
-    # Otherwise if an include directory is exposed by a system package, it may be found first
-    # and used instead of the bundled headers.
-    include_directories(BEFORE SYSTEM "$<TARGET_PROPERTY:${target},INTERFACE_INCLUDE_DIRECTORIES>")
+    dolphin_disable_warnings(${target})
   endforeach()
 endfunction()
 
