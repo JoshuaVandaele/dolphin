@@ -8,6 +8,7 @@
 
 class ConfigBool;
 class ConfigChoice;
+template <std::integral T>
 class ConfigInteger;
 class GraphicsPane;
 
@@ -51,8 +52,8 @@ private:
   // Frame dumping
   ConfigBool* m_dump_use_lossless;
   ConfigChoice* m_frame_dumps_resolution_type;
-  ConfigInteger* m_dump_bitrate;
-  ConfigInteger* m_png_compression_level;
+  ConfigInteger<int>* m_dump_bitrate;
+  ConfigInteger<int>* m_png_compression_level;
 
   // Misc
   ConfigBool* m_enable_prog_scan;
@@ -65,10 +66,10 @@ private:
   ConfigBool* m_crop_to_aspect_ratio;
   ConfigBool* m_crop_custom;
   QGroupBox* m_crop_custom_box;
-  ConfigInteger* m_crop_custom_left;
-  ConfigInteger* m_crop_custom_top;
-  ConfigInteger* m_crop_custom_right;
-  ConfigInteger* m_crop_custom_bottom;
+  ConfigInteger<int>* m_crop_custom_left;
+  ConfigInteger<int>* m_crop_custom_top;
+  ConfigInteger<int>* m_crop_custom_right;
+  ConfigInteger<int>* m_crop_custom_bottom;
 
   // Experimental
   ConfigBool* m_defer_efb_access_invalidation;

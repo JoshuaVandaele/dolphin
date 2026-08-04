@@ -357,7 +357,7 @@ void GameConfigWidget::SetItalics()
     italics(config);
   for (auto* config : findChildren<ConfigFloatSlider*>())
     italics(config);
-  for (auto* config : findChildren<ConfigInteger*>())
+  for (auto* config : findChildren<ConfigIntegerBase*>())
     italics(config);
   for (auto* config : findChildren<ConfigRadioInt*>())
     italics(config);

@@ -9,6 +9,7 @@
 
 class ConfigBool;
 class ConfigChoice;
+template <std::integral T>
 class ConfigInteger;
 class ConfigRadioInt;
 class ConfigStringChoice;
@@ -46,8 +47,8 @@ private:
   ToolTipComboBox* m_adapter_combo;
   ConfigChoice* m_aspect_combo;
   QLabel* m_custom_aspect_label;
-  ConfigInteger* m_custom_aspect_width;
-  ConfigInteger* m_custom_aspect_height;
+  ConfigInteger<int>* m_custom_aspect_width;
+  ConfigInteger<int>* m_custom_aspect_height;
   ConfigBool* m_enable_vsync;
   ConfigBool* m_enable_fullscreen;
 

@@ -18,7 +18,6 @@ class Layer;
 }  // namespace Config
 
 class ConfigBool;
-class ConfigInteger;
 class ConfigFloatSlider;
 class ConfigStringChoice;
 class QPushButton;

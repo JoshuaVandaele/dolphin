@@ -67,10 +67,10 @@ void GeneralWidget::CreateWidgets()
                                     Config::GFX_ASPECT_RATIO, m_game_layer);
   m_custom_aspect_label = new QLabel(tr("Custom Aspect Ratio:"));
   constexpr int MAX_CUSTOM_ASPECT_RATIO_RESOLUTION = 10000;
-  m_custom_aspect_width = new ConfigInteger(1, MAX_CUSTOM_ASPECT_RATIO_RESOLUTION,
-                                            Config::GFX_CUSTOM_ASPECT_RATIO_WIDTH, m_game_layer);
-  m_custom_aspect_height = new ConfigInteger(1, MAX_CUSTOM_ASPECT_RATIO_RESOLUTION,
-                                             Config::GFX_CUSTOM_ASPECT_RATIO_HEIGHT, m_game_layer);
+  m_custom_aspect_width = new ConfigInteger<int>(
+      1, MAX_CUSTOM_ASPECT_RATIO_RESOLUTION, Config::GFX_CUSTOM_ASPECT_RATIO_WIDTH, m_game_layer);
+  m_custom_aspect_height = new ConfigInteger<int>(
+      1, MAX_CUSTOM_ASPECT_RATIO_RESOLUTION, Config::GFX_CUSTOM_ASPECT_RATIO_HEIGHT, m_game_layer);
   ToggleCustomAspectRatio(m_aspect_combo->currentIndex());
 
   m_adapter_combo = new ToolTipComboBox;

@@ -7,6 +7,7 @@
 
 class QLabel;
 class ConfigBool;
+template <std::integral T>
 class ConfigInteger;
 
 class OnScreenDisplayPane final : public QWidget
@@ -21,7 +22,7 @@ private:
 
   // General
   ConfigBool* m_enable_osd;
-  ConfigInteger* m_font_size;
+  ConfigInteger<int>* m_font_size;
 
   // Performance
   ConfigBool* m_show_fps;
@@ -31,7 +32,7 @@ private:
   ConfigBool* m_show_graph;
   ConfigBool* m_show_speed;
   ConfigBool* m_speed_colors;
-  ConfigInteger* m_perf_sample_window;
+  ConfigInteger<int>* m_perf_sample_window;
 
   // Movie window
   ConfigBool* m_movie_window;

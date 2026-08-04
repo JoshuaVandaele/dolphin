@@ -133,7 +133,7 @@ void AdvancedWidget::CreateWidgets()
                         tr("Raw Internal Resolution")},
                        Config::GFX_FRAME_DUMPS_RESOLUTION_TYPE, m_game_layer);
   m_png_compression_level =
-      new ConfigInteger(0, 9, Config::GFX_PNG_COMPRESSION_LEVEL, m_game_layer);
+      new ConfigInteger<int>(0, 9, Config::GFX_PNG_COMPRESSION_LEVEL, m_game_layer);
   dump_layout->addWidget(new QLabel(tr("Resolution Type:")), 0, 0);
   dump_layout->addWidget(m_frame_dumps_resolution_type, 0, 1);
 
@@ -141,7 +141,7 @@ void AdvancedWidget::CreateWidgets()
   m_dump_use_lossless =
       new ConfigBool(tr("Use Lossless Codec (Ut Video)"), Config::GFX_USE_LOSSLESS, m_game_layer);
 
-  m_dump_bitrate = new ConfigInteger(0, 1000000, Config::GFX_BITRATE_KBPS, m_game_layer, 1000);
+  m_dump_bitrate = new ConfigInteger<int>(0, 1000000, Config::GFX_BITRATE_KBPS, m_game_layer, 1000);
   m_dump_bitrate->setEnabled(!m_dump_use_lossless->isChecked());
 
   dump_layout->addWidget(m_dump_use_lossless, 1, 0);
@@ -167,14 +167,17 @@ void AdvancedWidget::CreateWidgets()
   m_crop_custom_box->setLayout(misc_crop_custom_layout);
   m_crop_custom_box->setDisabled(!m_crop_custom->isChecked());
 
-  m_crop_custom_left = new ConfigInteger(0, 640, Config::GFX_CROP_CUSTOM_LEFT, m_game_layer, 1);
-  auto crop_custom_left_label = new ConfigIntegerLabel(tr("Left"), m_crop_custom_left);
-  m_crop_custom_top = new ConfigInteger(0, 528, Config::GFX_CROP_CUSTOM_TOP, m_game_layer, 1);
-  auto crop_custom_top_label = new ConfigIntegerLabel(tr("Top"), m_crop_custom_top);
-  m_crop_custom_right = new ConfigInteger(0, 640, Config::GFX_CROP_CUSTOM_RIGHT, m_game_layer, 1);
-  auto crop_custom_right_label = new ConfigIntegerLabel(tr("Right"), m_crop_custom_right);
-  m_crop_custom_bottom = new ConfigInteger(0, 528, Config::GFX_CROP_CUSTOM_BOTTOM, m_game_layer, 1);
-  auto crop_custom_bottom_label = new ConfigIntegerLabel(tr("Bottom"), m_crop_custom_bottom);
+  m_crop_custom_left =
+      new ConfigInteger<int>(0, 640, Config::GFX_CROP_CUSTOM_LEFT, m_game_layer, 1);
+  auto crop_custom_left_label = new ConfigIntegerLabel<int>(tr("Left"), m_crop_custom_left);
+  m_crop_custom_top = new ConfigInteger<int>(0, 528, Config::GFX_CROP_CUSTOM_TOP, m_game_layer, 1);
+  auto crop_custom_top_label = new ConfigIntegerLabel<int>(tr("Top"), m_crop_custom_top);
+  m_crop_custom_right =
+      new ConfigInteger<int>(0, 640, Config::GFX_CROP_CUSTOM_RIGHT, m_game_layer, 1);
+  auto crop_custom_right_label = new ConfigIntegerLabel<int>(tr("Right"), m_crop_custom_right);
+  m_crop_custom_bottom =
+      new ConfigInteger<int>(0, 528, Config::GFX_CROP_CUSTOM_BOTTOM, m_game_layer, 1);
+  auto crop_custom_bottom_label = new ConfigIntegerLabel<int>(tr("Bottom"), m_crop_custom_bottom);
 
   misc_crop_custom_layout->addWidget(crop_custom_left_label, 0, 0);
   misc_crop_custom_layout->addWidget(m_crop_custom_left, 0, 1);
