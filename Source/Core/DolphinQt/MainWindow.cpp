@@ -103,7 +103,6 @@
 #include "DolphinQt/InfinityBase/InfinityBaseWindow.h"
 #include "DolphinQt/MenuBar.h"
 #include "DolphinQt/NKitWarningDialog.h"
-#include "DolphinQt/NetPlay/NetPlayBrowser.h"
 #include "DolphinQt/NetPlay/NetPlayDialog.h"
 #include "DolphinQt/NetPlay/NetPlaySetupDialog.h"
 #include "DolphinQt/QtUtils/DolphinFileDialog.h"
@@ -565,7 +564,6 @@ void MainWindow::ConnectMenuBar()
   connect(m_menu_bar, &MenuBar::PerformOnlineUpdate, this, &MainWindow::PerformOnlineUpdate);
   connect(m_menu_bar, &MenuBar::BootWiiSystemMenu, this, &MainWindow::BootWiiSystemMenu);
   connect(m_menu_bar, &MenuBar::StartNetPlay, this, &MainWindow::ShowNetPlaySetupDialog);
-  connect(m_menu_bar, &MenuBar::BrowseNetPlay, this, &MainWindow::ShowNetPlayBrowser);
   connect(m_menu_bar, &MenuBar::ShowFIFOPlayer, this, &MainWindow::ShowFIFOPlayer);
   connect(m_menu_bar, &MenuBar::ShowSkylanderPortal, this, &MainWindow::ShowSkylanderPortal);
   connect(m_menu_bar, &MenuBar::ShowInfinityBase, this, &MainWindow::ShowInfinityBase);
@@ -1436,14 +1434,6 @@ void MainWindow::ShowNetPlaySetupDialog()
   m_netplay_setup_dialog->activateWindow();
 }
 
-void MainWindow::ShowNetPlayBrowser()
-{
-  auto* browser = new NetPlayBrowser(this);
-  browser->setAttribute(Qt::WA_DeleteOnClose, true);
-  connect(browser, &NetPlayBrowser::Join, this, &MainWindow::NetPlayJoin);
-  browser->exec();
-}
-
 void MainWindow::ShowFIFOPlayer()
 {
   if (!m_fifo_window)
@@ -1611,7 +1601,7 @@ void MainWindow::BootWiiSystemMenu()
 void MainWindow::NetPlayInit()
 {
   const auto& game_list_model = m_game_list->GetGameListModel();
-  m_netplay_setup_dialog = new NetPlaySetupDialog(game_list_model, this);
+  m_netplay_setup_dialog = new NetPlaySetupDialog(this);
   m_netplay_dialog = new NetPlayDialog(
       game_list_model,
       [this](const std::string& path, std::unique_ptr<BootSessionData> boot_session_data) {
@@ -1623,8 +1613,6 @@ void MainWindow::NetPlayInit()
 
   connect(m_netplay_dialog, &NetPlayDialog::Stop, this, &MainWindow::ForceStop);
   connect(m_netplay_dialog, &NetPlayDialog::rejected, this, &MainWindow::NetPlayQuit);
-  connect(m_netplay_setup_dialog, &NetPlaySetupDialog::Join, this, &MainWindow::NetPlayJoin);
-  connect(m_netplay_setup_dialog, &NetPlaySetupDialog::Host, this, &MainWindow::NetPlayHost);
 #ifdef USE_DISCORD_PRESENCE
   connect(m_netplay_discord, &DiscordHandler::Join, this, &MainWindow::NetPlayJoin);
 
@@ -1639,121 +1627,14 @@ void MainWindow::NetPlayInit()
 
 bool MainWindow::NetPlayJoin()
 {
-  if (!Core::IsUninitialized(m_system))
-  {
-    ModalMessageBox::critical(nullptr, tr("Error"),
-                              tr("Can't start a NetPlay Session while a game is still running!"));
-    return false;
-  }
-
-  if (m_netplay_dialog->isVisible())
-  {
-    ModalMessageBox::critical(nullptr, tr("Error"),
-                              tr("A NetPlay Session is already in progress!"));
-    return false;
-  }
-
-  auto server = Settings::Instance().GetNetPlayServer();
-
-  // Settings
-  const std::string traversal_choice = Config::Get(Config::NETPLAY_TRAVERSAL_CHOICE);
-  const bool is_traversal = traversal_choice == "traversal";
-
-  std::string host_ip;
-  u16 host_port;
-  if (server)
-  {
-    host_ip = "127.0.0.1";
-    host_port = server->GetPort();
-  }
-  else
-  {
-    host_ip = is_traversal ? Config::Get(Config::NETPLAY_HOST_CODE) :
-                             Config::Get(Config::NETPLAY_ADDRESS);
-    host_port = Config::Get(Config::NETPLAY_CONNECT_PORT);
-  }
-
-  const std::string traversal_host = Config::Get(Config::NETPLAY_TRAVERSAL_SERVER);
-  const u16 traversal_port = Config::Get(Config::NETPLAY_TRAVERSAL_PORT);
-  const std::string nickname = Config::Get(Config::NETPLAY_NICKNAME);
-  const std::string network_mode = Config::Get(Config::NETPLAY_NETWORK_MODE);
-  const bool host_input_authority = network_mode == "hostinputauthority" || network_mode == "golf";
-
-  if (server)
-  {
-    server->SetHostInputAuthority(host_input_authority);
-    server->AdjustPadBufferSize(Config::Get(Config::NETPLAY_BUFFER_SIZE));
-  }
-
-  // Create Client
-  const bool is_hosting_netplay = server != nullptr;
-  Settings::Instance().ResetNetPlayClient(new NetPlay::NetPlayClient(
-      host_ip, host_port, m_netplay_dialog, nickname,
-      NetPlay::NetTraversalConfig{is_hosting_netplay ? false : is_traversal, traversal_host,
-                                  traversal_port}));
-
-  if (!Settings::Instance().GetNetPlayClient()->IsConnected())
-  {
-    NetPlayQuit();
-    return false;
-  }
-
-  m_netplay_setup_dialog->close();
-  m_netplay_dialog->show(nickname, is_traversal);
-
+  // TODO: This should join a NetPlay session and show NetPlayDialog
   return true;
 }
 
 bool MainWindow::NetPlayHost(const UICommon::GameFile& game)
 {
-  if (!Core::IsUninitialized(m_system))
-  {
-    ModalMessageBox::critical(nullptr, tr("Error"),
-                              tr("Can't start a NetPlay Session while a game is still running!"));
-    return false;
-  }
-
-  if (m_netplay_dialog->isVisible())
-  {
-    ModalMessageBox::critical(nullptr, tr("Error"),
-                              tr("A NetPlay Session is already in progress!"));
-    return false;
-  }
-
-  // Settings
-  u16 host_port = Config::Get(Config::NETPLAY_HOST_PORT);
-  const std::string traversal_choice = Config::Get(Config::NETPLAY_TRAVERSAL_CHOICE);
-  const bool is_traversal = traversal_choice == "traversal";
-  const bool use_upnp = Config::Get(Config::NETPLAY_USE_UPNP);
-
-  const std::string traversal_host = Config::Get(Config::NETPLAY_TRAVERSAL_SERVER);
-  const u16 traversal_port = Config::Get(Config::NETPLAY_TRAVERSAL_PORT);
-  const u16 traversal_port_alt = Config::Get(Config::NETPLAY_TRAVERSAL_PORT_ALT);
-
-  if (is_traversal)
-    host_port = Config::Get(Config::NETPLAY_LISTEN_PORT);
-
-  // Create Server
-  Settings::Instance().ResetNetPlayServer(
-      new NetPlay::NetPlayServer(host_port, use_upnp, m_netplay_dialog,
-                                 NetPlay::NetTraversalConfig{is_traversal, traversal_host,
-                                                             traversal_port, traversal_port_alt}));
-
-  if (!Settings::Instance().GetNetPlayServer()->is_connected)
-  {
-    ModalMessageBox::critical(
-        nullptr, tr("Failed to open server"),
-        tr("Failed to listen on port %1. Is another instance of the NetPlay server running?")
-            .arg(host_port));
-    NetPlayQuit();
-    return false;
-  }
-
-  Settings::Instance().GetNetPlayServer()->ChangeGame(game.GetSyncIdentifier(),
-                                                      m_game_list->GetNetPlayName(game));
-
-  // Join our local server
-  return NetPlayJoin();
+  // TODO: This should host a NetPlay session and call NetPlayJoin to join our local session
+  return true;
 }
 
 void MainWindow::NetPlayQuit()
