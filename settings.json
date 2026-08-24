@@ -1,5 +1,9 @@
 {
   "[cpp]": {
     "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
+  },
+  "cdt.debug.sourceHighlighting": false,
+  "cmake.debugConfig": {
+        "args": ["-d", "-C", "Dolphin.Core.Fastmem=0", "-u", "${workspaceRoot}/build/userpath"]
   }
 }

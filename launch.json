@@ -3,28 +3,36 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Release",
+      "name": "Run with debugger",
       "type": "gdb",
       "request": "launch",
-      "program": "dolphin-emu",
-      "arguments": "-C Dolphin.Core.Fastmem=0",
-      "environment": {
-        "DOLPHIN_EMU_USERPATH": "${workspaceRoot}/build/Binaries/userpath"
-      },
-      "cwd": "${workspaceRoot}/build/Binaries",
-      "preLaunchTask": "Build Dolphin (Release)"
-    },
-    {
-      "name": "Debug",
-      "type": "gdb",
-      "request": "launch",
-      "program": "dolphin-emu",
+      "program": "./dolphin-emu",
       "arguments": "-d -C Dolphin.Core.Fastmem=0",
       "environment": {
-        "DOLPHIN_EMU_USERPATH": "${workspaceRoot}/build/Binaries/userpath"
+        "DOLPHIN_EMU_USERPATH": "${workspaceRoot}/build/userpath",
       },
-      "cwd": "${workspaceRoot}/build/Binaries",
-      "preLaunchTask": "Build Dolphin (Debug)"
+      "cwd": "${workspaceRoot}/build/debug/x64/Binaries"
+    },
+    {
+      "name": "Run tool with debugger",
+      "type": "gdb",
+      "request": "launch",
+      "program": "./dolphin-tool",
+      "arguments": "",
+      "environment": {
+        "DOLPHIN_EMU_USERPATH": "${workspaceRoot}/build/userpath",
+      },
+      "cwd": "${workspaceRoot}/build/debug/x64/Binaries"
+    },
+    {
+      "name": "Run tests with debugger",
+      "type": "gdb",
+      "request": "launch",
+      "program": "./tests",
+      "environment": {
+        "DOLPHIN_EMU_USERPATH": "${workspaceRoot}/build/userpath",
+      },
+      "cwd": "${workspaceRoot}/build/debug/x64/Binaries/Tests/"
     }
   ]
 }
