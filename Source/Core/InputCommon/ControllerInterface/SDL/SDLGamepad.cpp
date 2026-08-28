@@ -272,12 +272,65 @@ SDL_JoystickID Gamepad::GetSDLInstanceID() const
   return SDL_GetJoystickID(m_joystick);
 }
 
+static const char* GetFaceButtonLabelName(SDL_GamepadButtonLabel label)
+{
+  switch (label)
+  {
+  case SDL_GAMEPAD_BUTTON_LABEL_A:
+    return "A";
+  case SDL_GAMEPAD_BUTTON_LABEL_B:
+    return "B";
+  case SDL_GAMEPAD_BUTTON_LABEL_X:
+    return "X";
+  case SDL_GAMEPAD_BUTTON_LABEL_Y:
+    return "Y";
+  case SDL_GAMEPAD_BUTTON_LABEL_CROSS:
+    return "Cross";
+  case SDL_GAMEPAD_BUTTON_LABEL_CIRCLE:
+    return "Circle";
+  case SDL_GAMEPAD_BUTTON_LABEL_SQUARE:
+    return "Square";
+  case SDL_GAMEPAD_BUTTON_LABEL_TRIANGLE:
+    return "Triangle";
+  default:
+    return nullptr;
+  }
+}
+
+static const char* GetButtonNameOverride(SDL_GamepadType type, SDL_GamepadButton button)
+{
+  for (const ButtonNameOverride& entry : s_button_name_overrides)
+  {
+    if (entry.type == type && entry.button == button)
+      return entry.name;
+  }
+
+  return nullptr;
+}
+
+static const char* GetAxisNameOverride(SDL_GamepadType type, SDL_GamepadAxis axis)
+{
+  for (const AxisNameOverride& entry : s_axis_name_overrides)
+  {
+    if (entry.type == type && entry.axis == axis)
+      return entry.name;
+  }
+
+  return nullptr;
+}
+
 std::string Gamepad::Button::GetName() const
 {
   const auto button = m_binding.output.button;
 
   if (std::size_t(button) >= std::size(s_sdl_button_names))
     return GetLegacyButtonName(button);
+
+  if (const char* const label = GetFaceButtonLabelName(SDL_GetGamepadButtonLabel(m_gc, button)))
+    return label;
+
+  if (const char* const override_name = GetButtonNameOverride(SDL_GetGamepadType(m_gc), button))
+    return override_name;
 
   return s_sdl_button_names[button];
 }
@@ -286,6 +339,9 @@ std::string Gamepad::Axis::GetName() const
 {
   if (std::size_t(m_axis) >= std::size(s_sdl_axis_names))
     return GetLegacyAxisName(m_axis, m_range);
+
+  if (const char* const override_name = GetAxisNameOverride(SDL_GetGamepadType(m_gc), m_axis))
+    return override_name;
 
   if (IsTriggerAxis(m_axis))
     return s_sdl_axis_names[m_axis];
@@ -324,6 +380,12 @@ bool Gamepad::Button::IsMatchingName(std::string_view name) const
   if (m_binding.output.button == SDL_GAMEPAD_BUTTON_WEST && name == "Button X")
     return true;
   if (m_binding.output.button == SDL_GAMEPAD_BUTTON_NORTH && name == "Button Y")
+    return true;
+
+  // Keep matching the plain SDL3 name (pre-override), for profiles saved
+  // before per-controller button naming was added.
+  if (std::size_t(m_binding.output.button) < std::size(s_sdl_button_names) &&
+      name == s_sdl_button_names[m_binding.output.button])
     return true;
 
   // Match the old "Button 0"-like names.
