@@ -2,5 +2,4 @@
 //
 #include "resource.h"
 IDI_ICON1               ICON                    "..\\..\\..\\Data\\Dolphin.ico"
-"dolphin"               ICON                    "..\\..\\..\\Data\\Dolphin.ico"
 
